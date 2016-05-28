@@ -1,5 +1,7 @@
 package com.philliphsu.clock;
 
+import android.support.annotation.NonNull;
+
 import com.google.auto.value.AutoValue;
 
 import java.util.Calendar;
@@ -38,13 +40,10 @@ public abstract class Alarm {
     /** Initializes a Builder to the same property values as this instance */
     public abstract Builder toBuilder();
 
-    public static void main(String[] args) {
-        Alarm a = Alarm.builder().build();
-    }
-
     public static Builder builder() {
         // Unfortunately, default values must be provided for generated Builders.
         // Fields that were not set when build() is called will throw an exception.
+        // TODO: How can QualityMatters get away with not setting defaults?????
         return new AutoValue_Alarm.Builder()
                 .id(-1)
                 .hour(0)
@@ -55,17 +54,17 @@ public abstract class Alarm {
                 .vibrates(false);
     }
 
-    public final void snooze(int minutes) {
+    public void snooze(int minutes) {
         if (minutes <= 0 || minutes > MAX_MINUTES_CAN_SNOOZE)
             throw new IllegalArgumentException("Cannot snooze for "+minutes+" minutes");
         snoozingUntilMillis = System.currentTimeMillis() + minutes * 60000;
     }
 
-    public final long snoozingUntil() {
+    public long snoozingUntil() {
         return snoozingUntilMillis;
     }
 
-    public final boolean isSnoozed() {
+    public boolean isSnoozed() {
         if (snoozingUntilMillis <= System.currentTimeMillis()) {
             snoozingUntilMillis = 0;
             return false;
@@ -73,31 +72,31 @@ public abstract class Alarm {
         return true;
     }
 
-    public final void setEnabled(boolean enabled) {
+    public void setEnabled(boolean enabled) {
         this.enabled = enabled;
     }
 
-    public final boolean isEnabled() {
+    public boolean isEnabled() {
         return enabled;
     }
 
-    public final void setRecurring(int day, boolean recurring) {
+    public void setRecurring(int day, boolean recurring) {
         checkDay(day);
         recurringDays()[day] =  recurring;
     }
 
-    public final boolean isRecurring(int day) {
+    public boolean isRecurring(int day) {
         checkDay(day);
         return recurringDays()[day];
     }
 
-    public final boolean hasRecurrence() {
+    public boolean hasRecurrence() {
         for (boolean b : recurringDays())
             if (b) return true;
         return false;
     }
 
-    public final long ringsAt() {
+    public long ringsAt() {
         // Always with respect to the current date and time
         Calendar calendar = new GregorianCalendar();
         calendar.set(Calendar.HOUR_OF_DAY, hour());
@@ -127,12 +126,12 @@ public abstract class Alarm {
         return calendar.getTimeInMillis();
     }
 
-    public final long ringsIn() {
+    public long ringsIn() {
         return ringsAt() - System.currentTimeMillis();
     }
 
     /** @return true if this Alarm will ring in the next {@code hours} hours */
-    public final boolean ringsWithinHours(int hours) {
+    public boolean ringsWithinHours(int hours) {
         return ringsIn() <= hours * 3600000;
     }
 
@@ -148,30 +147,39 @@ public abstract class Alarm {
            // and provide an "accumulating" method
         abstract boolean[] recurringDays();
         public final Builder setRecurring(int day, boolean recurs) {
+            checkDay(day)
             recurringDays()[day] = recurs;
             return this;
         }
         */
         public abstract Builder recurringDays(boolean[] recurringDays);
-        public abstract Builder label(String label);
-        public abstract Builder ringtone(String ringtone);
+        public abstract Builder label(@NonNull String label);
+        public abstract Builder ringtone(@NonNull String ringtone);
         public abstract Builder vibrates(boolean vibrates);
         // To enforce preconditions, split the build method into two. autoBuild() is hidden from
         // callers and is generated. You implement the public build(), which calls the generated
         // autoBuild() and performs your desired validations.
         /*not public*/abstract Alarm autoBuild();
 
-        public final Alarm build() {
+        public Alarm build() {
             Alarm alarm = autoBuild();
-            if (alarm.hour() < 0 || alarm.hour() > 23 || alarm.minutes() < 0 || alarm.minutes() > 59) {
-                throw new IllegalStateException("Hour and minutes invalid");
-            }
+            checkTime(alarm.hour(), alarm.minutes());
             return alarm;
         }
     }
 
-    private void checkDay(int day) {
+    private static void checkTime(int hour, int minutes) {
+        if (hour < 0 || hour > 23 || minutes < 0 || minutes > 59) {
+            throw new IllegalStateException("Hour and minutes invalid");
+        }
+    }
+
+    private static void checkDay(int day) {
         if (day < SUNDAY || day > SATURDAY)
             throw new IllegalArgumentException("Invalid day " + day);
+    }
+
+    public static void main(String[] args) {
+
     }
 }
