@@ -1,7 +1,5 @@
 package com.philliphsu.clock;
 
-import android.support.annotation.NonNull;
-
 import com.google.auto.value.AutoValue;
 
 import java.util.Calendar;
@@ -153,8 +151,8 @@ public abstract class Alarm {
         }
         */
         public abstract Builder recurringDays(boolean[] recurringDays);
-        public abstract Builder label(@NonNull String label);
-        public abstract Builder ringtone(@NonNull String ringtone);
+        public abstract Builder label(String label);
+        public abstract Builder ringtone(String ringtone);
         public abstract Builder vibrates(boolean vibrates);
         // To enforce preconditions, split the build method into two. autoBuild() is hidden from
         // callers and is generated. You implement the public build(), which calls the generated
@@ -177,9 +175,5 @@ public abstract class Alarm {
     private static void checkDay(int day) {
         if (day < SUNDAY || day > SATURDAY)
             throw new IllegalArgumentException("Invalid day " + day);
-    }
-
-    public static void main(String[] args) {
-
     }
 }
