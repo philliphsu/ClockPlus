@@ -20,9 +20,8 @@
         </activity>
         <activity
             android:name=".ringtone.RingtoneActivity"
-            android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/title_activity_ringtone"
-            android:theme="@style/FullscreenTheme">
+            android:theme="@style/AppTheme.NoActionBar">
         </activity>
 
         <service
