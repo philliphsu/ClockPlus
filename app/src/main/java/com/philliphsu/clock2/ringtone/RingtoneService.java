@@ -111,9 +111,9 @@ public class RingtoneService extends Service {
     private void scheduleAutoSilence() {
         // TODO: Read prefs
         //SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
-        int minutes = 2; /*Integer.parseInt(pref.getString(
+        /*int minutes = Integer.parseInt(pref.getString(
                 getString(R.string.key_silence_after),
                 "15"));*/
-        mSilenceHandler.postDelayed(mSilenceRunnable, minutes * 60000);
+        mSilenceHandler.postDelayed(mSilenceRunnable, 10000);
     }
 }

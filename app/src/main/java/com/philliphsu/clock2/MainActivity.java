@@ -63,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 scheduleAlarm();
-                Snackbar.make(view, "Alarm set for 1 minute from now", Snackbar.LENGTH_LONG)
+                Snackbar.make(view, "Alarm set for 1 minute from now", Snackbar.LENGTH_INDEFINITE)
                         .setAction("Dismiss", new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
@@ -180,17 +180,32 @@ public class MainActivity extends AppCompatActivity {
         // by this one. For most of our uses, the relevant criteria for equality will be the
         // action, the data, and the class (component). Although not documented, the request code
         // of a PendingIntent is also considered to determine equality of two intents.
+
+        // WAKEUP alarm types wake the CPU up, but NOT the screen. If that is what you want, you need
+        // to handle that yourself by using a wakelock, etc..
+        // We use a WAKEUP alarm to send the upcoming alarm notification so it goes off even if the
+        // device is asleep. Otherwise, it will not go off until the device is turned back on.
+        // todo: use alarm's ring time - (number of hours to be notified in advance, converted to millis)
+        am.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), notifyUpcomingAlarmIntent());
         // todo: get alarm's ring time
-        am.setExact(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + 60000, alarmIntent());
+        am.setExact(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + 10000, alarmIntent());
     }
 
     private PendingIntent alarmIntent() {
         // TODO: Use appropriate subclass instead
         Intent intent = new Intent(this, RingtoneActivity.class)
                 .setData(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM));
+        // TODO: Pass in the id of the alarm to the intent. Alternatively, if the upcoming alarm note
+        // only needs to show the alarm's ring time, just pass in the alarm's ringsAt().
         // TODO: Use unique request codes per alarm.
         // If a PendingIntent with this request code already exists, then we are likely modifying
         // an alarm, so we should cancel the existing intent.
         return PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+    }
+
+    private PendingIntent notifyUpcomingAlarmIntent() {
+        Intent intent = new Intent(this, UpcomingAlarmReceiver.class);
+        // TODO: Use unique request codes per alarm.
+        return PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
     }
 }

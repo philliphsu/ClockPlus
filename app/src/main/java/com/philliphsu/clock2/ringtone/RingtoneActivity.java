@@ -11,6 +11,7 @@ import android.view.MotionEvent;
 import android.view.View;
 
 import com.philliphsu.clock2.R;
+import com.philliphsu.clock2.UpcomingAlarmReceiver;
 
 import static com.philliphsu.clock2.util.Preconditions.checkNotNull;
 
@@ -19,7 +20,7 @@ import static com.philliphsu.clock2.util.Preconditions.checkNotNull;
  * status bar and navigation/system bar) with user interaction.
  *
  * TODO: Make this abstract and make appropriate subclasses for Alarms and Timers.
- * TODO: Use this together with RingtoneService.
+ * TODO: Implement dismiss and extend logic here.
  */
 public class RingtoneActivity extends AppCompatActivity {
     /**
@@ -97,9 +98,14 @@ public class RingtoneActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_ringtone);
+        // Play the ringtone
         Uri ringtone = checkNotNull(getIntent().getData());
         Intent intent = new Intent(this, RingtoneService.class).setData(ringtone);
         startService(intent);
+        // Cancel the upcoming alarm notification
+        Intent intent2 = new Intent(this, UpcomingAlarmReceiver.class)
+                .setAction(UpcomingAlarmReceiver.ACTION_CANCEL_NOTIFICATION);
+        sendBroadcast(intent2);
 
         mVisible = true;
         mControlsView = findViewById(R.id.fullscreen_content_controls);

@@ -9,7 +9,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name="com.philliphsu.clock2.MainActivity"
+            android:name=".MainActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
@@ -19,17 +19,23 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.philliphsu.clock2.ringtone.RingtoneActivity"
+            android:name=".ringtone.RingtoneActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/title_activity_ringtone"
             android:theme="@style/FullscreenTheme">
         </activity>
 
         <service
-            android:name="com.philliphsu.clock2.ringtone.RingtoneService"
+            android:name=".ringtone.RingtoneService"
             android:enabled="true"
             android:exported="false">
         </service>
+
+        <receiver
+            android:name=".UpcomingAlarmReceiver"
+            android:enabled="true"
+            android:exported="false">
+        </receiver>
     </application>
 
 </manifest>
