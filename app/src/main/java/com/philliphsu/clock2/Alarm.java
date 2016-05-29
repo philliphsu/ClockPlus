@@ -1,4 +1,4 @@
-package com.philliphsu.clock;
+package com.philliphsu.clock2;
 
 import com.google.auto.value.AutoValue;
 

@@ -1,23 +1,27 @@
-package com.philliphsu.clock;
+package com.philliphsu.clock2;
 
-import android.support.design.widget.TabLayout;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Intent;
+import android.media.RingtoneManager;
+import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-
 import android.widget.TextView;
+
+import com.philliphsu.clock2.ringtone.RingtoneActivity;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -58,8 +62,17 @@ public class MainActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                scheduleAlarm();
+                Snackbar.make(view, "Alarm set for 1 minute from now", Snackbar.LENGTH_LONG)
+                        .setAction("Dismiss", new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
+                                PendingIntent pi = alarmIntent();
+                                am.cancel(pi);
+                                pi.cancel();
+                            }
+                        }).show();
             }
         });
 
@@ -158,5 +171,26 @@ public class MainActivity extends AppCompatActivity {
             }
             return null;
         }
+    }
+
+    private void scheduleAlarm() {
+        AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
+        // If there is already an alarm for this Intent scheduled (with the equality of two
+        // intents being defined by filterEquals(Intent)), then it will be removed and replaced
+        // by this one. For most of our uses, the relevant criteria for equality will be the
+        // action, the data, and the class (component). Although not documented, the request code
+        // of a PendingIntent is also considered to determine equality of two intents.
+        // todo: get alarm's ring time
+        am.setExact(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + 60000, alarmIntent());
+    }
+
+    private PendingIntent alarmIntent() {
+        // TODO: Use appropriate subclass instead
+        Intent intent = new Intent(this, RingtoneActivity.class)
+                .setData(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM));
+        // TODO: Use unique request codes per alarm.
+        // If a PendingIntent with this request code already exists, then we are likely modifying
+        // an alarm, so we should cancel the existing intent.
+        return PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
     }
 }
