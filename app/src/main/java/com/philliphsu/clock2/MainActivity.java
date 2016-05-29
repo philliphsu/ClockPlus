@@ -68,9 +68,12 @@ public class MainActivity extends AppCompatActivity {
                             @Override
                             public void onClick(View v) {
                                 AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
-                                PendingIntent pi = alarmIntent();
+                                PendingIntent pi = alarmIntent(true);
                                 am.cancel(pi);
                                 pi.cancel();
+                                Intent intent = new Intent(MainActivity.this, UpcomingAlarmReceiver.class)
+                                        .setAction(UpcomingAlarmReceiver.ACTION_CANCEL_NOTIFICATION);
+                                sendBroadcast(intent);
                             }
                         }).show();
             }
@@ -188,10 +191,12 @@ public class MainActivity extends AppCompatActivity {
         // todo: use alarm's ring time - (number of hours to be notified in advance, converted to millis)
         am.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), notifyUpcomingAlarmIntent());
         // todo: get alarm's ring time
-        am.setExact(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + 10000, alarmIntent());
+        am.setExact(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + 10000, alarmIntent(false));
     }
 
-    private PendingIntent alarmIntent() {
+    private static int alarmCount;
+
+    private PendingIntent alarmIntent(boolean retrievePrevious) {
         // TODO: Use appropriate subclass instead
         Intent intent = new Intent(this, RingtoneActivity.class)
                 .setData(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM));
@@ -200,12 +205,16 @@ public class MainActivity extends AppCompatActivity {
         // TODO: Use unique request codes per alarm.
         // If a PendingIntent with this request code already exists, then we are likely modifying
         // an alarm, so we should cancel the existing intent.
-        return PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+        int requestCode = retrievePrevious ? alarmCount - 1 : alarmCount++;
+        int flag = retrievePrevious
+                ? PendingIntent.FLAG_NO_CREATE
+                : PendingIntent.FLAG_CANCEL_CURRENT;
+        return PendingIntent.getActivity(this, requestCode, intent, flag);
     }
 
     private PendingIntent notifyUpcomingAlarmIntent() {
         Intent intent = new Intent(this, UpcomingAlarmReceiver.class);
         // TODO: Use unique request codes per alarm.
-        return PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+        return PendingIntent.getBroadcast(this, alarmCount, intent, PendingIntent.FLAG_CANCEL_CURRENT);
     }
 }

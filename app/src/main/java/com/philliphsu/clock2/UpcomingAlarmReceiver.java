@@ -13,27 +13,31 @@ public class UpcomingAlarmReceiver extends BroadcastReceiver {
     public static final String ACTION_SHOW_SNOOZING
             = "com.philliphsu.clock2.action.CANCEL_NOTIFICATION";
 
+    private static int count = -1;
+
     @Override
     public void onReceive(Context context, Intent intent) {
         NotificationManager nm = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         if (ACTION_CANCEL_NOTIFICATION.equals(intent.getAction())) {
-            nm.cancel("tag", 0);
+            nm.cancel(count);
         } else if (ACTION_SHOW_SNOOZING.equals(intent.getAction())) {
             Notification note = new NotificationCompat.Builder(context)
                     .setSmallIcon(R.mipmap.ic_launcher)
                     .setContentTitle("Snoozing")
                     .setContentText("New ring time here")
+                    .setOngoing(true)
                     .build();
             // todo actions
-            nm.notify("tag", 0, note);
+            nm.notify(count, note);
         } else {
             Notification note = new NotificationCompat.Builder(context)
                     .setSmallIcon(R.mipmap.ic_launcher)
                     .setContentTitle("Upcoming alarm")
                     .setContentText("Ring time here")
+                    .setOngoing(true)
                     .build();
             // todo actions
-            nm.notify("tag", 0, note);
+            nm.notify(++count, note);
         }
     }
 }

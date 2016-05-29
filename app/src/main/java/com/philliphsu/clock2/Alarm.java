@@ -23,7 +23,7 @@ public abstract class Alarm {
     public static final int NUM_DAYS = 7;
 
     // =========== MUTABLE ===========
-    private long snoozingUntilMillis;
+    private long snoozingUntilMillis; // TODO: Not necessary? Can just schedule another alarm w/ AlarmManager.
     private boolean enabled;
     // ===============================
     public abstract long id(); // TODO: Counter in the repository. Set this field as the repo creates instances.
