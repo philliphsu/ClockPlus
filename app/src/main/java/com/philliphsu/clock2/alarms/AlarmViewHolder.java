@@ -1,27 +1,25 @@
 package com.philliphsu.clock2.alarms;
 
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
-import android.support.annotation.CallSuper;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SwitchCompat;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.format.DateFormat;
 import android.text.style.RelativeSizeSpan;
-import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
 import com.philliphsu.clock2.Alarm;
+import com.philliphsu.clock2.BaseViewHolder;
 import com.philliphsu.clock2.DaysOfWeek;
+import com.philliphsu.clock2.OnListItemInteractionListener;
 import com.philliphsu.clock2.R;
 
 import java.util.Date;
 
 import butterknife.Bind;
-import butterknife.ButterKnife;
 
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
@@ -30,12 +28,8 @@ import static com.philliphsu.clock2.DaysOfWeek.NUM_DAYS;
 /**
  * Created by Phillip Hsu on 5/31/2016.
  */
-public class AlarmViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+public class AlarmViewHolder extends BaseViewHolder<Alarm> {
     private static final RelativeSizeSpan AMPM_SIZE_SPAN = new RelativeSizeSpan(0.5f);
-
-    private final Context mContext;
-    private final AlarmsFragment.OnListFragmentInteractionListener mListener;
-    private Alarm mItem;
 
     @Bind(R.id.time) TextView mTime;
     @Bind(R.id.on_off_switch) SwitchCompat mSwitch;
@@ -44,27 +38,15 @@ public class AlarmViewHolder extends RecyclerView.ViewHolder implements View.OnC
     @Bind(R.id.recurring_days) TextView mDays;
     @Bind(R.id.dismiss) Button mDismissButton;
 
-    /*public AlarmViewHolder(ViewGroup parent, BaseViewHolder.OnClickListener<Alarm> listener) {
-
-    }*/
-
-    public AlarmViewHolder(View view, AlarmsFragment.OnListFragmentInteractionListener listener) {
-        super(view);
-        ButterKnife.bind(this, view);
-        mContext = view.getContext();
-        mListener = listener;
-        view.setOnClickListener(this);
+    public AlarmViewHolder(ViewGroup parent, OnListItemInteractionListener<Alarm> listener) {
+        super(parent, R.layout.item_alarm, listener);
     }
 
-    /**
-     * Call to super must be the first line in the overridden implementation,
-     * so that the base class can keep a reference to the item parameter.
-     */
-    @CallSuper
+    @Override
     public void onBind(Alarm alarm) {
-        mItem = alarm;
-        String time = DateFormat.getTimeFormat(mContext).format(new Date(alarm.ringsAt()));
-        if (DateFormat.is24HourFormat(mContext)) {
+        super.onBind(alarm);
+        String time = DateFormat.getTimeFormat(getContext()).format(new Date(alarm.ringsAt()));
+        if (DateFormat.is24HourFormat(getContext())) {
             mTime.setText(time);
         } else {
             // No way around having to construct this on binding
@@ -78,7 +60,7 @@ public class AlarmViewHolder extends RecyclerView.ViewHolder implements View.OnC
             //TODO:mCountdown.showAsText(alarm.ringsIn());
             mCountdown.setVisibility(VISIBLE);
             //todo:mCountdown.getTickHandler().startTicking(true)
-            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getContext());
             // how many hours before alarm is considered upcoming
             // TODO: shared prefs
             /*int hoursBeforeUpcoming = Integer.parseInt(prefs.getString(
@@ -110,14 +92,14 @@ public class AlarmViewHolder extends RecyclerView.ViewHolder implements View.OnC
         if (numRecurringDays > 0) {
             String text;
             if (numRecurringDays == NUM_DAYS) {
-                text = mContext.getString(R.string.every_day);
+                text = getContext().getString(R.string.every_day);
             } else {
                 StringBuilder sb = new StringBuilder();
                 for (int i = 0; // ordinal number, i.e. the position in the week, not an actual day!
                      i < NUM_DAYS; i++) {
                     if (alarm.isRecurring(i)) { // Is the i-th day in the week recurring?
                         // This is the actual day at the i-th position in the week.
-                        int weekDay = DaysOfWeek.getInstance(mContext).weekDay(i);
+                        int weekDay = DaysOfWeek.getInstance(getContext()).weekDay(i);
                         sb.append(DaysOfWeek.getLabel(weekDay)).append(", ");
                     }
                 }
@@ -129,13 +111,6 @@ public class AlarmViewHolder extends RecyclerView.ViewHolder implements View.OnC
             mDays.setVisibility(VISIBLE);
         } else {
             mDays.setVisibility(GONE);
-        }
-    }
-
-    @Override
-    public void onClick(View v) {
-        if (mListener != null) {
-            mListener.onListFragmentInteraction(mItem);
         }
     }
 }

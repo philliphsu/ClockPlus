@@ -24,7 +24,7 @@ import android.widget.TextView;
 import com.philliphsu.clock2.alarms.AlarmsFragment;
 import com.philliphsu.clock2.ringtone.RingtoneActivity;
 
-public class MainActivity extends AppCompatActivity implements AlarmsFragment.OnListFragmentInteractionListener {
+public class MainActivity extends AppCompatActivity implements AlarmsFragment.OnAlarmInteractionListener {
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -179,7 +179,7 @@ public class MainActivity extends AppCompatActivity implements AlarmsFragment.On
     }
 
     @Override
-    public void onListFragmentInteraction(Alarm item) {
+    public void onListItemInteraction(Alarm item) {
         // TODO react to click
     }
 
