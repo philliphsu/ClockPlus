@@ -2,30 +2,38 @@ package com.philliphsu.clock2;
 
 import com.google.auto.value.AutoValue;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+
+import static com.philliphsu.clock2.DaysOfWeek.SATURDAY;
+import static com.philliphsu.clock2.DaysOfWeek.SUNDAY;
 
 /**
  * Created by Phillip Hsu on 5/26/2016.
  */
 @AutoValue
 public abstract class Alarm {
-    private static final int MAX_MINUTES_CAN_SNOOZE = 30;
-    // Define our own day constants because those in the
-    // Calendar class are not zero-based.
-    public static final int SUNDAY = 0;
-    public static final int MONDAY = 1;
-    public static final int TUESDAY = 2;
-    public static final int WEDNESDAY = 3;
-    public static final int THURSDAY = 4;
-    public static final int FRIDAY = 5;
-    public static final int SATURDAY = 6;
-    public static final int NUM_DAYS = 7;
+    private static final int MAX_MINUTES_CAN_SNOOZE = 30; // TODO: Delete this along with all snooze stuff.
 
-    // =========== MUTABLE ===========
-    private long snoozingUntilMillis; // TODO: Not necessary? Can just schedule another alarm w/ AlarmManager.
+    // JSON property names
+    private static final String KEY_ENABLED = "enabled";
+    private static final String KEY_ID = "id";
+    private static final String KEY_HOUR = "hour";
+    private static final String KEY_MINUTES = "minutes";
+    private static final String KEY_RECURRING_DAYS = "recurring_days";
+    private static final String KEY_LABEL = "label";
+    private static final String KEY_RINGTONE = "ringtone";
+    private static final String KEY_VIBRATES = "vibrates";
+
+    // ========= MUTABLE ==============
+    private long snoozingUntilMillis;
     private boolean enabled;
-    // ===============================
+    // ================================
+
     public abstract long id(); // TODO: Counter in the repository. Set this field as the repo creates instances.
     public abstract int hour();
     public abstract int minutes();
@@ -38,6 +46,24 @@ public abstract class Alarm {
     /** Initializes a Builder to the same property values as this instance */
     public abstract Builder toBuilder();
 
+    public static Alarm create(JSONObject jsonObject) {
+        try {
+            Alarm alarm = new AutoValue_Alarm.Builder()
+                    .id(jsonObject.getLong(KEY_ID))
+                    .hour(jsonObject.getInt(KEY_HOUR))
+                    .minutes(jsonObject.getInt(KEY_MINUTES))
+                    .recurringDays((boolean[]) jsonObject.get(KEY_RECURRING_DAYS))
+                    .label(jsonObject.getString(KEY_LABEL))
+                    .ringtone(jsonObject.getString(KEY_RINGTONE))
+                    .vibrates(jsonObject.getBoolean(KEY_VIBRATES))
+                    .build();
+            alarm.setEnabled(jsonObject.getBoolean(KEY_ENABLED));
+            return alarm;
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public static Builder builder() {
         // Unfortunately, default values must be provided for generated Builders.
         // Fields that were not set when build() is called will throw an exception.
@@ -46,11 +72,14 @@ public abstract class Alarm {
                 .id(-1)
                 .hour(0)
                 .minutes(0)
-                .recurringDays(new boolean[NUM_DAYS])
+                .recurringDays(new boolean[DaysOfWeek.NUM_DAYS])
                 .label("")
                 .ringtone("")
                 .vibrates(false);
     }
+
+    // --------------------------------------------------------------
+    // TODO: Snoozing functionality not necessary. Delete methods.
 
     public void snooze(int minutes) {
         if (minutes <= 0 || minutes > MAX_MINUTES_CAN_SNOOZE)
@@ -59,7 +88,7 @@ public abstract class Alarm {
     }
 
     public long snoozingUntil() {
-        return snoozingUntilMillis;
+        return isSnoozed() ? snoozingUntilMillis : 0;
     }
 
     public boolean isSnoozed() {
@@ -69,6 +98,8 @@ public abstract class Alarm {
         }
         return true;
     }
+
+    // --------------------------------------------------------------
 
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
@@ -89,9 +120,14 @@ public abstract class Alarm {
     }
 
     public boolean hasRecurrence() {
+        return numRecurringDays() > 0;
+    }
+
+    public int numRecurringDays() {
+        int count = 0;
         for (boolean b : recurringDays())
-            if (b) return true;
-        return false;
+            if (b) count++;
+        return count;
     }
 
     public long ringsAt() {
@@ -133,6 +169,22 @@ public abstract class Alarm {
         return ringsIn() <= hours * 3600000;
     }
 
+    public JSONObject toJsonObject() {
+        try {
+            return new JSONObject()
+                    .put(KEY_ENABLED, enabled)
+                    .put(KEY_ID, id())
+                    .put(KEY_HOUR, hour())
+                    .put(KEY_MINUTES, minutes())
+                    .put(KEY_RECURRING_DAYS, new JSONArray(recurringDays()))
+                    .put(KEY_LABEL, label())
+                    .put(KEY_RINGTONE, ringtone())
+                    .put(KEY_VIBRATES, vibrates());
+        } catch (JSONException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     @AutoValue.Builder
     public abstract static class Builder {
         // Builder is mutable, so these are inherently setter methods.
@@ -166,14 +218,15 @@ public abstract class Alarm {
         }
     }
 
+    private static void checkDay(int day) {
+        if (day < SUNDAY || day > SATURDAY) {
+            throw new IllegalArgumentException("Invalid day of week: " + day);
+        }
+    }
+
     private static void checkTime(int hour, int minutes) {
         if (hour < 0 || hour > 23 || minutes < 0 || minutes > 59) {
             throw new IllegalStateException("Hour and minutes invalid");
         }
-    }
-
-    private static void checkDay(int day) {
-        if (day < SUNDAY || day > SATURDAY)
-            throw new IllegalArgumentException("Invalid day " + day);
     }
 }

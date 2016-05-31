@@ -10,9 +10,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.philliphsu.clock2.Alarm;
 import com.philliphsu.clock2.R;
 import com.philliphsu.clock2.alarms.dummy.DummyContent;
-import com.philliphsu.clock2.alarms.dummy.DummyContent.DummyItem;
 
 /**
  * A fragment representing a list of Items.
@@ -32,8 +32,7 @@ public class AlarmsFragment extends Fragment {
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
      */
-    public AlarmsFragment() {
-    }
+    public AlarmsFragment() {}
 
     // TODO: Customize parameter initialization
     @SuppressWarnings("unused")
@@ -57,7 +56,7 @@ public class AlarmsFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_alarms_list, container, false);
+        View view = inflater.inflate(R.layout.fragment_alarms, container, false);
 
         // Set the adapter
         if (view instanceof RecyclerView) {
@@ -102,7 +101,6 @@ public class AlarmsFragment extends Fragment {
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnListFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void onListFragmentInteraction(DummyItem item);
+        void onListFragmentInteraction(Alarm item);
     }
 }

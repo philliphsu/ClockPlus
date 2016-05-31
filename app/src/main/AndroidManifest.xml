@@ -35,6 +35,7 @@
             android:enabled="true"
             android:exported="false">
         </receiver>
+
     </application>
 
 </manifest>

@@ -1,19 +1,18 @@
 package com.philliphsu.clock2;
 
-import com.philliphsu.clock2.ringtone.RingtoneService;
-
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.robolectric.RobolectricGradleTestRunner;
+import org.robolectric.annotation.Config;
 
 /**
  * Created by Phillip Hsu on 5/28/2016.
  *
  * TODO: Write unit tests...
  */
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(RobolectricGradleTestRunner.class)
+@Config(constants = BuildConfig.class)
 public class RingtoneServiceTest {
 
-    @Mock RingtoneService mRingtoneService;
+
 
 }

@@ -5,6 +5,7 @@ import org.junit.Test;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
+import static com.philliphsu.clock2.DaysOfWeek.SUNDAY;
 import static java.lang.System.out;
 import static java.util.Calendar.HOUR_OF_DAY;
 import static java.util.Calendar.MILLISECOND;
@@ -24,14 +25,14 @@ public class AlarmTest {
         Alarm alarm = Alarm.builder().build();
         
         // Some true, some false
-        for (int i = Alarm.SUNDAY; i <= Alarm.SATURDAY; i++) {
+        for (int i = SUNDAY; i <= DaysOfWeek.SATURDAY; i++) {
             alarm.setRecurring(i, i % 2 == 0);
             assertTrue(alarm.isRecurring(i) == (i % 2 == 0));
         }
         assertTrue(alarm.hasRecurrence());
         
         // All false
-        for (int i = Alarm.SUNDAY; i <= Alarm.SATURDAY; i++) {
+        for (int i = DaysOfWeek.SUNDAY; i <= DaysOfWeek.SATURDAY; i++) {
             alarm.setRecurring(i, false);
             assertFalse(alarm.isRecurring(i));
         }

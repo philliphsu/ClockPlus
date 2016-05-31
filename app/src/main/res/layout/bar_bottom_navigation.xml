@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="horizontal"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content">
+
+    <!-- TODO: Use ColorStateLists for both the text and drawable resource to indicate checked state -->
+
+    <ToggleButton
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:drawableTop="@android:drawable/ic_delete"
+        android:drawablePadding="4dp"
+        android:background="?android:attr/selectableItemBackground"
+        android:textOff="World Clock"
+        android:textOn="World Clock"
+        android:textAllCaps="false"
+        android:checked="true"/>
+
+    <ToggleButton
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:drawableTop="@android:drawable/ic_delete"
+        android:drawablePadding="4dp"
+        android:background="?android:attr/selectableItemBackground"
+        android:textOff="Alarms"
+        android:textOn="Alarms"
+        android:textAllCaps="false"
+        android:checked="true"/>
+
+    <ToggleButton
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:drawableTop="@android:drawable/ic_delete"
+        android:drawablePadding="4dp"
+        android:background="?android:attr/selectableItemBackground"
+        android:textOff="Timers"
+        android:textOn="Timers"
+        android:textAllCaps="false"
+        android:checked="true"/>
+
+    <ToggleButton
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:drawableTop="@android:drawable/ic_delete"
+        android:drawablePadding="4dp"
+        android:background="?android:attr/selectableItemBackground"
+        android:textOff="Stopwatch"
+        android:textOn="Stopwatch"
+        android:textAllCaps="false"
+        android:checked="true"/>
+
+</LinearLayout>
