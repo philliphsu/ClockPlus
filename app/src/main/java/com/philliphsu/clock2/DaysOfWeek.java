@@ -43,7 +43,7 @@ public class DaysOfWeek {
         sAppContext = context.getApplicationContext();
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         // TODO First day of week preference. Entries are the full days' names and values are their respective integers.
-        String preferredFirstDay = prefs.getString("", "1");
+        String preferredFirstDay = prefs.getString("", "0");
         if (sInstance == null || !preferredFirstDay.equals(sLastPreferredFirstDay)) {
             sLastPreferredFirstDay = preferredFirstDay;
             sInstance = new DaysOfWeek(Integer.parseInt(preferredFirstDay));

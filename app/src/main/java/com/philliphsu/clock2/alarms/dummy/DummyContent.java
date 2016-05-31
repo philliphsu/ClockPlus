@@ -38,8 +38,8 @@ public class DummyContent {
             b.hour(21).minutes(0);
         }
         boolean[] recurrences = new boolean[DaysOfWeek.NUM_DAYS];
-        recurrences[0] = true;
-        recurrences[5] = true;
+        recurrences[1] = true;
+        recurrences[3] = true;
         Alarm a = b.id(position).recurringDays(recurrences).build();
         a.setEnabled(true);
         return a;

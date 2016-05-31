@@ -154,14 +154,15 @@ public class AlarmsAdapter extends RecyclerView.Adapter<AlarmsAdapter.ViewHolder
             int numRecurringDays = alarm.numRecurringDays();
             if (numRecurringDays > 0) {
                 String text;
-                if (numRecurringDays == NUM_DAYS+1) /*TODO: Remove +1*/ {
+                if (numRecurringDays == NUM_DAYS) {
                     text = mContext.getString(R.string.every_day);
                 } else {
                     StringBuilder sb = new StringBuilder();
-                    for (int i = 0; i < NUM_DAYS; i++) {
-                        // The day at this position in the week
-                        int weekDay = DaysOfWeek.getInstance(mContext).weekDay(i);
-                        if (alarm.isRecurring(weekDay)) {
+                    for (int i = 0; // ordinal number, i.e. the position in the week, not an actual day!
+                         i < NUM_DAYS; i++) {
+                        if (alarm.isRecurring(i)) { // Is the i-th day in the week recurring?
+                            // This is the actual day at the i-th position in the week.
+                            int weekDay = DaysOfWeek.getInstance(mContext).weekDay(i);
                             sb.append(DaysOfWeek.getLabel(weekDay)).append(", ");
                         }
                     }
