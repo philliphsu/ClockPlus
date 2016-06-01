@@ -6,25 +6,22 @@ import android.content.Intent;
 import android.media.RingtoneManager;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.philliphsu.clock2.alarms.AlarmsFragment;
+import com.philliphsu.clock2.editalarm.EditAlarmActivity;
 import com.philliphsu.clock2.ringtone.RingtoneActivity;
 
-public class MainActivity extends AppCompatActivity implements AlarmsFragment.OnAlarmInteractionListener {
+public class MainActivity extends BaseActivity implements AlarmsFragment.OnAlarmInteractionListener {
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -44,10 +41,7 @@ public class MainActivity extends AppCompatActivity implements AlarmsFragment.On
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
@@ -63,6 +57,8 @@ public class MainActivity extends AppCompatActivity implements AlarmsFragment.On
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                startActivity(new Intent(MainActivity.this, EditAlarmActivity.class));
+                /*
                 scheduleAlarm();
                 Snackbar.make(view, "Alarm set for 1 minute from now", Snackbar.LENGTH_INDEFINITE)
                         .setAction("Dismiss", new View.OnClickListener() {
@@ -77,17 +73,24 @@ public class MainActivity extends AppCompatActivity implements AlarmsFragment.On
                                 sendBroadcast(intent);
                             }
                         }).show();
+                        */
             }
         });
-
     }
 
+    @Override
+    protected int layoutResId() {
+        return R.layout.activity_main;
+    }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
+    protected int menuResId() {
+        return R.menu.menu_main;
+    }
+
+    @Override
+    protected boolean isDisplayHomeUpEnabled() {
+        return false;
     }
 
     @Override
@@ -180,7 +183,7 @@ public class MainActivity extends AppCompatActivity implements AlarmsFragment.On
 
     @Override
     public void onListItemInteraction(Alarm item) {
-        // TODO react to click
+        startActivity(new Intent(this, EditAlarmActivity.class));
     }
 
     private void scheduleAlarm() {

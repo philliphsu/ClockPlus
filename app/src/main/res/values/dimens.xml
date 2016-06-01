@@ -9,4 +9,6 @@
     <dimen name="item_padding_end">16dp</dimen>
     <dimen name="item_margin_between_elements">4dp</dimen>
     <dimen name="alarm_time_text_size">48sp</dimen>
+    <dimen name="app_bar_height">180dp</dimen>
+    <dimen name="text_margin">16dp</dimen>
 </resources>

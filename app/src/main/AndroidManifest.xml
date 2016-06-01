@@ -36,6 +36,15 @@
             android:exported="false">
         </receiver>
 
+        <activity
+            android:name=".editalarm.EditAlarmActivity"
+            android:label="@string/title_activity_edit_alarm"
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.philliphsu.clock2.MainActivity"/>
+        </activity>
     </application>
 
 </manifest>
