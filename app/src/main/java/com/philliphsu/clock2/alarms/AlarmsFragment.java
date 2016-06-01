@@ -13,7 +13,8 @@ import android.view.ViewGroup;
 import com.philliphsu.clock2.Alarm;
 import com.philliphsu.clock2.OnListItemInteractionListener;
 import com.philliphsu.clock2.R;
-import com.philliphsu.clock2.alarms.dummy.DummyContent;
+import com.philliphsu.clock2.model.AlarmsRepository;
+import com.philliphsu.clock2.model.BaseRepository;
 
 /**
  * A fragment representing a list of Items.
@@ -21,13 +22,16 @@ import com.philliphsu.clock2.alarms.dummy.DummyContent;
  * Activities containing this fragment MUST implement the {@link OnAlarmInteractionListener}
  * interface.
  */
-public class AlarmsFragment extends Fragment {
+public class AlarmsFragment extends Fragment implements BaseRepository.DataObserver<Alarm> {
 
     // TODO: Customize parameter argument names
     private static final String ARG_COLUMN_COUNT = "column-count";
     // TODO: Customize parameters
     private int mColumnCount = 1;
     private OnAlarmInteractionListener mListener;
+
+    private AlarmsAdapter mAdapter;
+    private AlarmsRepository mRepo;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -68,17 +72,19 @@ public class AlarmsFragment extends Fragment {
             } else {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
-            recyclerView.setAdapter(new AlarmsAdapter(DummyContent.ITEMS, mListener));
+            mAdapter = new AlarmsAdapter(mRepo.getItems(), mListener);
+            recyclerView.setAdapter(mAdapter);
         }
         return view;
     }
-
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
         if (context instanceof OnAlarmInteractionListener) {
             mListener = (OnAlarmInteractionListener) context;
+            mRepo = AlarmsRepository.getInstance(context);
+            mRepo.registerDataObserver(this);
         } else {
             throw new RuntimeException(context.toString()
                     + " must implement OnAlarmInteractionListener");
@@ -89,6 +95,21 @@ public class AlarmsFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    @Override
+    public void onItemAdded(Alarm item) {
+        mAdapter.addItem(item);
+    }
+
+    @Override
+    public void onItemDeleted(Alarm item) {
+        mAdapter.removeItem(item);
+    }
+
+    @Override
+    public void onItemUpdated(Alarm oldItem, Alarm newItem) {
+        mAdapter.updateItem(oldItem, newItem);
     }
 
     /**

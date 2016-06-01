@@ -7,11 +7,14 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ToggleButton;
 
+import com.philliphsu.clock2.Alarm;
 import com.philliphsu.clock2.BaseActivity;
 import com.philliphsu.clock2.DaysOfWeek;
 import com.philliphsu.clock2.R;
+import com.philliphsu.clock2.model.AlarmsRepository;
 
 import butterknife.Bind;
+import butterknife.OnClick;
 
 public class EditAlarmActivity extends BaseActivity {
 
@@ -45,6 +48,11 @@ public class EditAlarmActivity extends BaseActivity {
     @Override
     protected boolean isDisplayShowTitleEnabled() {
         return true;
+    }
+
+    @OnClick(R.id.save)
+    void save() {
+        AlarmsRepository.getInstance(this).addItem(Alarm.builder().build());
     }
 
     private void setWeekDaysText() {

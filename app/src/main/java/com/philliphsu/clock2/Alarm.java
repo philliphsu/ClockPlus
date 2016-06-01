@@ -1,6 +1,9 @@
 package com.philliphsu.clock2;
 
+import android.support.annotation.NonNull;
+
 import com.google.auto.value.AutoValue;
+import com.philliphsu.clock2.model.JsonSerializable;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -16,12 +19,12 @@ import static com.philliphsu.clock2.DaysOfWeek.SUNDAY;
  * Created by Phillip Hsu on 5/26/2016.
  */
 @AutoValue
-public abstract class Alarm {
+public abstract class Alarm implements JsonSerializable {
     private static final int MAX_MINUTES_CAN_SNOOZE = 30; // TODO: Delete this along with all snooze stuff.
 
     // JSON property names
     private static final String KEY_ENABLED = "enabled";
-    private static final String KEY_ID = "id";
+    //private static final String KEY_ID = "id"; // Defined in JsonSerializable
     private static final String KEY_HOUR = "hour";
     private static final String KEY_MINUTES = "minutes";
     private static final String KEY_RECURRING_DAYS = "recurring_days";
@@ -34,7 +37,7 @@ public abstract class Alarm {
     private boolean enabled;
     // ================================
 
-    public abstract long id(); // TODO: Counter in the repository. Set this field as the repo creates instances.
+    //public abstract long id();
     public abstract int hour();
     public abstract int minutes();
     @SuppressWarnings("mutable")
@@ -48,11 +51,16 @@ public abstract class Alarm {
 
     public static Alarm create(JSONObject jsonObject) {
         try {
+            JSONArray a = (JSONArray) jsonObject.get(KEY_RECURRING_DAYS);
+            boolean[] recurringDays = new boolean[a.length()];
+            for (int i = 0; i < recurringDays.length; i++) {
+                recurringDays[i] = a.getBoolean(i);
+            }
             Alarm alarm = new AutoValue_Alarm.Builder()
                     .id(jsonObject.getLong(KEY_ID))
                     .hour(jsonObject.getInt(KEY_HOUR))
                     .minutes(jsonObject.getInt(KEY_MINUTES))
-                    .recurringDays((boolean[]) jsonObject.get(KEY_RECURRING_DAYS))
+                    .recurringDays(recurringDays)
                     .label(jsonObject.getString(KEY_LABEL))
                     .ringtone(jsonObject.getString(KEY_RINGTONE))
                     .vibrates(jsonObject.getBoolean(KEY_VIBRATES))
@@ -69,7 +77,7 @@ public abstract class Alarm {
         // Fields that were not set when build() is called will throw an exception.
         // TODO: How can QualityMatters get away with not setting defaults?????
         return new AutoValue_Alarm.Builder()
-                .id(-1)
+                //.id(-1) // Set when build() is called
                 .hour(0)
                 .minutes(0)
                 .recurringDays(new boolean[DaysOfWeek.NUM_DAYS])
@@ -77,9 +85,6 @@ public abstract class Alarm {
                 .ringtone("")
                 .vibrates(false);
     }
-
-    // --------------------------------------------------------------
-    // TODO: Snoozing functionality not necessary. Delete methods.
 
     public void snooze(int minutes) {
         if (minutes <= 0 || minutes > MAX_MINUTES_CAN_SNOOZE)
@@ -98,8 +103,6 @@ public abstract class Alarm {
         }
         return true;
     }
-
-    // --------------------------------------------------------------
 
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
@@ -169,6 +172,8 @@ public abstract class Alarm {
         return ringsIn() <= hours * 3600000;
     }
 
+    @Override
+    @NonNull
     public JSONObject toJsonObject() {
         try {
             return new JSONObject()
@@ -187,6 +192,7 @@ public abstract class Alarm {
 
     @AutoValue.Builder
     public abstract static class Builder {
+        private static long idCount = 0;
         // Builder is mutable, so these are inherently setter methods.
         // By omitting the set- prefix, we reduce the number of changes required to define the Builder
         // class after copying and pasting the accessor fields here.
@@ -212,6 +218,7 @@ public abstract class Alarm {
         /*not public*/abstract Alarm autoBuild();
 
         public Alarm build() {
+            this.id(idCount++);
             Alarm alarm = autoBuild();
             checkTime(alarm.hour(), alarm.minutes());
             return alarm;
