@@ -57,7 +57,7 @@ public class MainActivity extends BaseActivity implements AlarmsFragment.OnAlarm
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(MainActivity.this, EditAlarmActivity.class));
+                startEditAlarmActivity(-1);
                 /*
                 scheduleAlarm();
                 Snackbar.make(view, "Alarm set for 1 minute from now", Snackbar.LENGTH_INDEFINITE)
@@ -77,6 +77,8 @@ public class MainActivity extends BaseActivity implements AlarmsFragment.OnAlarm
             }
         });
     }
+
+
 
     @Override
     protected int layoutResId() {
@@ -183,7 +185,13 @@ public class MainActivity extends BaseActivity implements AlarmsFragment.OnAlarm
 
     @Override
     public void onListItemInteraction(Alarm item) {
-        startActivity(new Intent(this, EditAlarmActivity.class));
+        startEditAlarmActivity(item.id());
+    }
+
+    private void startEditAlarmActivity(long alarmId) {
+        Intent intent = new Intent(this, EditAlarmActivity.class);
+        intent.putExtra(EditAlarmActivity.EXTRA_ALARM_ID, alarmId);
+        startActivity(intent);
     }
 
     private void scheduleAlarm() {

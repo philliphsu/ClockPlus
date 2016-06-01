@@ -2,6 +2,7 @@ package com.philliphsu.clock2.editalarm;
 
 import android.os.Bundle;
 import android.support.v7.widget.SwitchCompat;
+import android.text.format.DateFormat;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -13,10 +14,14 @@ import com.philliphsu.clock2.DaysOfWeek;
 import com.philliphsu.clock2.R;
 import com.philliphsu.clock2.model.AlarmsRepository;
 
+import java.util.Date;
+
 import butterknife.Bind;
 import butterknife.OnClick;
 
 public class EditAlarmActivity extends BaseActivity {
+
+    public static final String EXTRA_ALARM_ID = "com.philliphsu.clock2.editalarm.extra.ALARM_ID";
 
     @Bind(R.id.save) Button mSave;
     @Bind(R.id.delete) Button mDelete;
@@ -31,8 +36,19 @@ public class EditAlarmActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setWeekDaysText();
         getSupportActionBar().setTitle("Snoozing until 12:40 PM");
+        setWeekDaysText();
+        long alarmId = getIntent().getLongExtra(EXTRA_ALARM_ID, -1);
+        if (alarmId > -1) {
+            Alarm alarm = AlarmsRepository.getInstance(this).getItem(alarmId);
+            if (alarm != null) {
+                mSwitch.setChecked(alarm.isEnabled());
+                mTimeText.setText(DateFormat.getTimeFormat(this).format(new Date(alarm.ringsAt())));
+                for (int i = 0; i < mDays.length; i++) {
+                    mDays[i].setChecked(alarm.isRecurring(i));
+                }
+            }
+        }
     }
 
     @Override
@@ -52,7 +68,19 @@ public class EditAlarmActivity extends BaseActivity {
 
     @OnClick(R.id.save)
     void save() {
-        AlarmsRepository.getInstance(this).addItem(Alarm.builder().build());
+        boolean[] days = new boolean[7];
+        days[0] = true;
+        Alarm a = Alarm.builder()
+                .recurringDays(days)
+                .build();
+        AlarmsRepository.getInstance(this).addItem(a);
+        finish();
+    }
+
+    @OnClick(R.id.delete)
+    void delete() {
+        //AlarmsRepository.getInstance(this).deleteItem();
+        finish();
     }
 
     private void setWeekDaysText() {
