@@ -13,13 +13,13 @@ public class DaysOfWeekTest {
     @Test
     public void testSundayAsFirstDayOfWeek() {
         DaysOfWeek days = new DaysOfWeek(SUNDAY);
-        assertEquals(days.weekDay(0), SUNDAY);
-        assertEquals(days.weekDay(1), MONDAY);
-        assertEquals(days.weekDay(2), TUESDAY);
-        assertEquals(days.weekDay(3), WEDNESDAY);
-        assertEquals(days.weekDay(4), THURSDAY);
-        assertEquals(days.weekDay(5), FRIDAY);
-        assertEquals(days.weekDay(6), SATURDAY);
+        assertEquals(days.weekDayAt(0), SUNDAY);
+        assertEquals(days.weekDayAt(1), MONDAY);
+        assertEquals(days.weekDayAt(2), TUESDAY);
+        assertEquals(days.weekDayAt(3), WEDNESDAY);
+        assertEquals(days.weekDayAt(4), THURSDAY);
+        assertEquals(days.weekDayAt(5), FRIDAY);
+        assertEquals(days.weekDayAt(6), SATURDAY);
 
         assertEquals(days.positionOf(SUNDAY), 0);
         assertEquals(days.positionOf(MONDAY), 1);
@@ -33,13 +33,13 @@ public class DaysOfWeekTest {
     @Test
     public void testSaturdayAsFirstDayOfWeek() {
         DaysOfWeek days = new DaysOfWeek(SATURDAY);
-        assertEquals(days.weekDay(0), SATURDAY);
-        assertEquals(days.weekDay(1), SUNDAY);
-        assertEquals(days.weekDay(2), MONDAY);
-        assertEquals(days.weekDay(3), TUESDAY);
-        assertEquals(days.weekDay(4), WEDNESDAY);
-        assertEquals(days.weekDay(5), THURSDAY);
-        assertEquals(days.weekDay(6), FRIDAY);
+        assertEquals(days.weekDayAt(0), SATURDAY);
+        assertEquals(days.weekDayAt(1), SUNDAY);
+        assertEquals(days.weekDayAt(2), MONDAY);
+        assertEquals(days.weekDayAt(3), TUESDAY);
+        assertEquals(days.weekDayAt(4), WEDNESDAY);
+        assertEquals(days.weekDayAt(5), THURSDAY);
+        assertEquals(days.weekDayAt(6), FRIDAY);
 
         assertEquals(days.positionOf(SUNDAY), 1);
         assertEquals(days.positionOf(MONDAY), 2);
@@ -53,13 +53,13 @@ public class DaysOfWeekTest {
     @Test
     public void testMondayAsFirstDayOfWeek() {
         DaysOfWeek days = new DaysOfWeek(MONDAY);
-        assertEquals(days.weekDay(0), MONDAY);
-        assertEquals(days.weekDay(1), TUESDAY);
-        assertEquals(days.weekDay(2), WEDNESDAY);
-        assertEquals(days.weekDay(3), THURSDAY);
-        assertEquals(days.weekDay(4), FRIDAY);
-        assertEquals(days.weekDay(5), SATURDAY);
-        assertEquals(days.weekDay(6), SUNDAY);
+        assertEquals(days.weekDayAt(0), MONDAY);
+        assertEquals(days.weekDayAt(1), TUESDAY);
+        assertEquals(days.weekDayAt(2), WEDNESDAY);
+        assertEquals(days.weekDayAt(3), THURSDAY);
+        assertEquals(days.weekDayAt(4), FRIDAY);
+        assertEquals(days.weekDayAt(5), SATURDAY);
+        assertEquals(days.weekDayAt(6), SUNDAY);
 
         assertEquals(days.positionOf(SUNDAY), 6);
         assertEquals(days.positionOf(MONDAY), 0);
@@ -68,7 +68,5 @@ public class DaysOfWeekTest {
         assertEquals(days.positionOf(THURSDAY), 3);
         assertEquals(days.positionOf(FRIDAY), 4);
         assertEquals(days.positionOf(SATURDAY), 5);
-
-        System.out.println(days.toString());
     }
 }

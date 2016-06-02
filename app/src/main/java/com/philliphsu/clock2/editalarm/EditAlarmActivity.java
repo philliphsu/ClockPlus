@@ -19,6 +19,7 @@ import java.util.Date;
 import butterknife.Bind;
 import butterknife.OnClick;
 
+import static com.philliphsu.clock2.DaysOfWeek.SATURDAY;
 import static com.philliphsu.clock2.DaysOfWeek.SUNDAY;
 
 public class EditAlarmActivity extends BaseActivity {
@@ -46,11 +47,11 @@ public class EditAlarmActivity extends BaseActivity {
             if (alarm != null) {
                 mSwitch.setChecked(alarm.isEnabled());
                 mTimeText.setText(DateFormat.getTimeFormat(this).format(new Date(alarm.ringsAt())));
-                for (int i = 0; i < mDays.length; i++) {
-                    // What day is at this position in the week?
-                    int weekDay = DaysOfWeek.getInstance(this).weekDay(i);
-                    // We toggle the button at this position because it represents that day
-                    mDays[i].setChecked(alarm.isRecurring(weekDay));
+                for (int i = SUNDAY; i <= SATURDAY; i++) {
+                    // What position in the week is this day located at?
+                    int at = DaysOfWeek.getInstance(this).positionOf(i);
+                    // Toggle the button that corresponds to this day
+                    mDays[at].setChecked(alarm.isRecurring(i));
                 }
             }
         }
@@ -74,7 +75,9 @@ public class EditAlarmActivity extends BaseActivity {
     @OnClick(R.id.save)
     void save() {
         boolean[] days = new boolean[7];
-        days[SUNDAY] = true;
+        days[0] = true;
+        days[1] = true;
+        days[6] = true;
         Alarm a = Alarm.builder()
                 .recurringDays(days)
                 .build();
@@ -90,7 +93,7 @@ public class EditAlarmActivity extends BaseActivity {
 
     private void setWeekDaysText() {
         for (int i = 0; i < mDays.length; i++) {
-            int weekDay = DaysOfWeek.getInstance(this).weekDay(i);
+            int weekDay = DaysOfWeek.getInstance(this).weekDayAt(i);
             String label = DaysOfWeek.getLabel(weekDay);
             mDays[i].setTextOn(label);
             mDays[i].setTextOff(label);

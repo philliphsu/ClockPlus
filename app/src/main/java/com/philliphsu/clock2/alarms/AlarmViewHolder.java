@@ -97,7 +97,7 @@ public class AlarmViewHolder extends BaseViewHolder<Alarm> {
                 StringBuilder sb = new StringBuilder();
                 for (int i = 0 /* Ordinal days*/; i < NUM_DAYS; i++) {
                     // What day is at this position in the week?
-                    int weekDay = DaysOfWeek.getInstance(getContext()).weekDay(i);
+                    int weekDay = DaysOfWeek.getInstance(getContext()).weekDayAt(i);
                     if (alarm.isRecurring(weekDay)) {
                         sb.append(DaysOfWeek.getLabel(weekDay)).append(", ");
                     }
