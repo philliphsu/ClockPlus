@@ -3,6 +3,7 @@ package com.philliphsu.clock2;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import android.support.annotation.VisibleForTesting;
 import android.util.Log;
 
 import java.util.Arrays;
@@ -57,11 +58,21 @@ public class DaysOfWeek {
         return sAppContext.getString(LABELS_RES[weekDay]);
     }
 
-    /** @return the week day whose order is specified by {@code ordinalDay} */
-    public int weekDay(int ordinalDay) {
-        if (ordinalDay < 0 || ordinalDay > 6)
+    /** @return the week day at {@code position} within the user-defined week */
+    public int weekDay(int position) {
+        if (position < 0 || position > 6)
             throw new ArrayIndexOutOfBoundsException("Ordinal day out of range");
-        return DAYS[ordinalDay];
+        return DAYS[position];
+    }
+
+    /** @return the position of the {@code weekDay} within the user-defined week */
+    public int positionOf(int weekDay) {
+        if (weekDay < SUNDAY || weekDay > SATURDAY)
+            throw new ArrayIndexOutOfBoundsException("Week day ("+weekDay+") out of range");
+        for (int i = 0; i < DAYS.length; i++)
+            if (DAYS[i] == weekDay)
+                return i;
+        return -1;
     }
 
     @Override
@@ -71,7 +82,8 @@ public class DaysOfWeek {
                 + "}";
     }
 
-    private DaysOfWeek(int firstDayOfWeek) {
+    @VisibleForTesting
+    DaysOfWeek(int firstDayOfWeek) {
         if (firstDayOfWeek != SATURDAY && firstDayOfWeek != SUNDAY && firstDayOfWeek != MONDAY)
             throw new IllegalArgumentException("Invalid first day of week: " + firstDayOfWeek);
         DAYS[0] = firstDayOfWeek;
