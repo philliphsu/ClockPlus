@@ -6,11 +6,13 @@ import android.content.Intent;
 import android.media.RingtoneManager;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -22,6 +24,7 @@ import com.philliphsu.clock2.editalarm.EditAlarmActivity;
 import com.philliphsu.clock2.ringtone.RingtoneActivity;
 
 public class MainActivity extends BaseActivity implements AlarmsFragment.OnAlarmInteractionListener {
+    private static final String TAG = "MainActivity";
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -77,8 +80,6 @@ public class MainActivity extends BaseActivity implements AlarmsFragment.OnAlarm
             }
         });
     }
-
-
 
     @Override
     protected int layoutResId() {
@@ -158,9 +159,8 @@ public class MainActivity extends BaseActivity implements AlarmsFragment.OnAlarm
         @Override
         public Fragment getItem(int position) {
             // getItem is called to instantiate the fragment for the given page.
-            // Return a PlaceholderFragment (defined as a static inner class below).
-            //return PlaceholderFragment.newInstance(position + 1);
-            return AlarmsFragment.newInstance(1);
+            return position == 0 ? AlarmsFragment.newInstance(1)
+                    : PlaceholderFragment.newInstance(position + 1);
         }
 
         @Override
@@ -184,8 +184,23 @@ public class MainActivity extends BaseActivity implements AlarmsFragment.OnAlarm
     }
 
     @Override
-    public void onListItemInteraction(Alarm item) {
+    public void onListItemClick(Alarm item) {
         startEditAlarmActivity(item.id());
+    }
+
+    @Override
+    public void onListItemDeleted(Alarm item) {
+        Log.d(TAG, "Deleted " + item.toString());
+        Snackbar.make(findViewById(R.id.main_content),
+                getString(R.string.snackbar_item_deleted, "Alarm"),
+                Snackbar.LENGTH_LONG) // TODO: not long enough?
+                .setAction(R.string.snackbar_undo_item_deleted, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        // TODO get AlarmsFragment instance and restore the alarm
+                    }
+                })
+                .show();
     }
 
     private void startEditAlarmActivity(long alarmId) {

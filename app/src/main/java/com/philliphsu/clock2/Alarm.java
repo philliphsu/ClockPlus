@@ -64,7 +64,7 @@ public abstract class Alarm implements JsonSerializable {
                     .label(jsonObject.getString(KEY_LABEL))
                     .ringtone(jsonObject.getString(KEY_RINGTONE))
                     .vibrates(jsonObject.getBoolean(KEY_VIBRATES))
-                    .build();
+                    .rebuild();
             alarm.setEnabled(jsonObject.getBoolean(KEY_ENABLED));
             return alarm;
         } catch (JSONException e) {
@@ -218,8 +218,16 @@ public abstract class Alarm implements JsonSerializable {
         /*not public*/abstract Alarm autoBuild();
 
         public Alarm build() {
-            this.id(idCount++);
+            this.id(++idCount); // TOneverDO: change to post-increment without also adding offset of 1 to idCount in rebuild()
             Alarm alarm = autoBuild();
+            checkTime(alarm.hour(), alarm.minutes());
+            return alarm;
+        }
+
+        /** Should only be called when recreating an instance from JSON */
+        private Alarm rebuild() {
+            Alarm alarm = autoBuild();
+            idCount = alarm.id(); // prevent future instances from id collision
             checkTime(alarm.hour(), alarm.minutes());
             return alarm;
         }

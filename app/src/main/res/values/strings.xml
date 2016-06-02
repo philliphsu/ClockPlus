@@ -6,10 +6,17 @@
     <string name="title_activity_ringtone">Clock+</string>
     <string name="dummy_button">Dummy Button</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
+
     <string name="title_activity_edit_alarm">EditAlarmActivity</string>
     <string name="save">Save</string>
     <string name="delete">Delete</string>
     <string name="default_alarm_time_12h">12:00 AM</string>
+    <string name="title_snoozing_until">Snoozing until %1$s</string>
+    <string name="dismiss_now">Dismiss now</string>
+    <string name="done_snoozing">Done snoozing</string>
+
+    <string name="snackbar_item_deleted">%1$s deleted</string>
+    <string name="snackbar_undo_item_deleted">Undo</string>
 
     <string name="sun">Sun</string>
     <string name="mon">Mon</string>

@@ -16,6 +16,9 @@ import com.philliphsu.clock2.R;
 import com.philliphsu.clock2.model.AlarmsRepository;
 import com.philliphsu.clock2.model.BaseRepository;
 
+import butterknife.Bind;
+import butterknife.ButterKnife;
+
 /**
  * A fragment representing a list of Items.
  * <p/>
@@ -29,9 +32,11 @@ public class AlarmsFragment extends Fragment implements BaseRepository.DataObser
     // TODO: Customize parameters
     private int mColumnCount = 1;
     private OnAlarmInteractionListener mListener;
+    private AlarmsRepository mRepo;
 
     private AlarmsAdapter mAdapter;
-    private AlarmsRepository mRepo;
+
+    @Bind(R.id.list) RecyclerView mList;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -62,20 +67,23 @@ public class AlarmsFragment extends Fragment implements BaseRepository.DataObser
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_alarms, container, false);
-
+        ButterKnife.bind(this, view);
         // Set the adapter
-        if (view instanceof RecyclerView) {
-            Context context = view.getContext();
-            RecyclerView recyclerView = (RecyclerView) view;
-            if (mColumnCount <= 1) {
-                recyclerView.setLayoutManager(new LinearLayoutManager(context));
-            } else {
-                recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
-            }
-            mAdapter = new AlarmsAdapter(mRepo.getItems(), mListener);
-            recyclerView.setAdapter(mAdapter);
+        Context context = view.getContext();
+        if (mColumnCount <= 1) {
+            mList.setLayoutManager(new LinearLayoutManager(context));
+        } else {
+            mList.setLayoutManager(new GridLayoutManager(context, mColumnCount));
         }
+        mAdapter = new AlarmsAdapter(mRepo.getItems(), mListener);
+        mList.setAdapter(mAdapter);
         return view;
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        ButterKnife.unbind(this); // Only for fragments!
     }
 
     @Override
@@ -83,28 +91,31 @@ public class AlarmsFragment extends Fragment implements BaseRepository.DataObser
         super.onAttach(context);
         if (context instanceof OnAlarmInteractionListener) {
             mListener = (OnAlarmInteractionListener) context;
-            mRepo = AlarmsRepository.getInstance(context);
-            mRepo.registerDataObserver(this);
         } else {
             throw new RuntimeException(context.toString()
                     + " must implement OnAlarmInteractionListener");
         }
+        mRepo = AlarmsRepository.getInstance(context);
+        mRepo.registerDataObserver(this);
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
         mListener = null;
+        mRepo.unregisterDataObserver();
+        mRepo = null;
     }
 
     @Override
     public void onItemAdded(Alarm item) {
-        mAdapter.addItem(item);
+        mList.smoothScrollToPosition(mAdapter.addItem(item));
     }
 
     @Override
     public void onItemDeleted(Alarm item) {
         mAdapter.removeItem(item);
+        mListener.onListItemDeleted(item);
     }
 
     @Override

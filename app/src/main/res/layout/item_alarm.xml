@@ -65,7 +65,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/recurring_days"
-        android:text="Dismiss now"
+        android:text="@string/dismiss_now"
         style="@style/Widget.AppCompat.Button.Colored"/>
 
 </RelativeLayout>
