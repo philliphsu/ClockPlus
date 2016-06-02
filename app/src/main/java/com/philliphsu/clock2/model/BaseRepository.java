@@ -23,7 +23,7 @@ public abstract class BaseRepository<T extends JsonSerializable> implements Repo
     // the intention is that we hold onto the global context so this
     // never gets GCed for the lifetime of the app.
     @NonNull private final Context mContext;
-    @NonNull private final List<T> mItems;
+    @NonNull private final List<T> mItems; // TODO: Consider ArrayMap<Long, T>?
     @NonNull private final JsonIoHelper<T> mIoHelper;
 
     // TODO: Test that the callbacks work.

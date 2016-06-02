@@ -77,7 +77,7 @@ public abstract class Alarm implements JsonSerializable {
         // Fields that were not set when build() is called will throw an exception.
         // TODO: How can QualityMatters get away with not setting defaults?????
         return new AutoValue_Alarm.Builder()
-                //.id(-1) // Set when build() is called
+                .id(-1)
                 .hour(0)
                 .minutes(0)
                 .recurringDays(new boolean[DaysOfWeek.NUM_DAYS])
@@ -192,16 +192,16 @@ public abstract class Alarm implements JsonSerializable {
 
     @AutoValue.Builder
     public abstract static class Builder {
-        private static long idCount = 0;
+        private static long idCount = 0; // TODO: change to AtomicLong?
         // Builder is mutable, so these are inherently setter methods.
         // By omitting the set- prefix, we reduce the number of changes required to define the Builder
         // class after copying and pasting the accessor fields here.
         public abstract Builder id(long id);
         public abstract Builder hour(int hour);
         public abstract Builder minutes(int minutes);
-        /* // TODO: If using an immutable collection instead, can use its Builder instance
-           // and provide an "accumulating" method
-        abstract boolean[] recurringDays();
+        // TODO: If using an immutable collection instead, can use its Builder instance
+        // and provide an "accumulating" method
+        /*abstract boolean[] recurringDays();
         public final Builder setRecurring(int day, boolean recurs) {
             checkDay(day)
             recurringDays()[day] = recurs;
@@ -209,6 +209,12 @@ public abstract class Alarm implements JsonSerializable {
         }
         */
         public abstract Builder recurringDays(boolean[] recurringDays);
+        /*
+        public final Builder recurringDay(boolean[] recurringDays) {
+            this.recurringDays = Arrays.copyOf(recurringDays, NUM_DAYS);
+            return this;
+        }
+        */
         public abstract Builder label(String label);
         public abstract Builder ringtone(String ringtone);
         public abstract Builder vibrates(boolean vibrates);
