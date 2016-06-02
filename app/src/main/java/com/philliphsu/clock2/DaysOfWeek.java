@@ -58,7 +58,6 @@ public class DaysOfWeek {
     }
 
     /** @return the week day whose order is specified by {@code ordinalDay} */
-    // Compiler complains if annotated with @Day
     public int weekDay(int ordinalDay) {
         if (ordinalDay < 0 || ordinalDay > 6)
             throw new ArrayIndexOutOfBoundsException("Ordinal day out of range");
@@ -72,7 +71,7 @@ public class DaysOfWeek {
                 + "}";
     }
 
-    private DaysOfWeek(int firstDayOfWeek /*Compiler complains if annotated with @Day*/) {
+    private DaysOfWeek(int firstDayOfWeek) {
         if (firstDayOfWeek != SATURDAY && firstDayOfWeek != SUNDAY && firstDayOfWeek != MONDAY)
             throw new IllegalArgumentException("Invalid first day of week: " + firstDayOfWeek);
         DAYS[0] = firstDayOfWeek;

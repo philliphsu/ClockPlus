@@ -95,11 +95,10 @@ public class AlarmViewHolder extends BaseViewHolder<Alarm> {
                 text = getContext().getString(R.string.every_day);
             } else {
                 StringBuilder sb = new StringBuilder();
-                for (int i = 0; // ordinal number, i.e. the position in the week, not an actual day!
-                     i < NUM_DAYS; i++) {
-                    if (alarm.isRecurring(i)) { // Is the i-th day in the week recurring?
-                        // This is the actual day at the i-th position in the week.
-                        int weekDay = DaysOfWeek.getInstance(getContext()).weekDay(i);
+                for (int i = 0 /* Ordinal days*/; i < NUM_DAYS; i++) {
+                    // What day is at this position in the week?
+                    int weekDay = DaysOfWeek.getInstance(getContext()).weekDay(i);
+                    if (alarm.isRecurring(weekDay)) {
                         sb.append(DaysOfWeek.getLabel(weekDay)).append(", ");
                     }
                 }

@@ -19,6 +19,8 @@ import java.util.Date;
 import butterknife.Bind;
 import butterknife.OnClick;
 
+import static com.philliphsu.clock2.DaysOfWeek.SUNDAY;
+
 public class EditAlarmActivity extends BaseActivity {
 
     public static final String EXTRA_ALARM_ID = "com.philliphsu.clock2.editalarm.extra.ALARM_ID";
@@ -45,7 +47,10 @@ public class EditAlarmActivity extends BaseActivity {
                 mSwitch.setChecked(alarm.isEnabled());
                 mTimeText.setText(DateFormat.getTimeFormat(this).format(new Date(alarm.ringsAt())));
                 for (int i = 0; i < mDays.length; i++) {
-                    mDays[i].setChecked(alarm.isRecurring(i));
+                    // What day is at this position in the week?
+                    int weekDay = DaysOfWeek.getInstance(this).weekDay(i);
+                    // We toggle the button at this position because it represents that day
+                    mDays[i].setChecked(alarm.isRecurring(weekDay));
                 }
             }
         }
@@ -69,7 +74,7 @@ public class EditAlarmActivity extends BaseActivity {
     @OnClick(R.id.save)
     void save() {
         boolean[] days = new boolean[7];
-        days[0] = true;
+        days[SUNDAY] = true;
         Alarm a = Alarm.builder()
                 .recurringDays(days)
                 .build();
