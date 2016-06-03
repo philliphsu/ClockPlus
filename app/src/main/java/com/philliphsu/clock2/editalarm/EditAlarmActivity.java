@@ -11,6 +11,7 @@ import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.format.DateFormat;
 import android.text.style.RelativeSizeSpan;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -230,6 +231,16 @@ public class EditAlarmActivity extends BaseActivity implements AlarmNumpad.KeyLi
 
     @OnClick(R.id.save)
     void save() {
+        int hour;
+        int minutes;
+        try {
+            hour = mNumpad.getHours();
+            minutes = mNumpad.getMinutes();
+        } catch (IllegalStateException e) {
+            Log.e(TAG, e.getMessage());
+            return;
+        }
+
         boolean[] days = new boolean[NUM_DAYS];
         for (int i = SUNDAY; i <= SATURDAY; i++) {
             // What position in the week is this day located at?
@@ -238,7 +249,8 @@ public class EditAlarmActivity extends BaseActivity implements AlarmNumpad.KeyLi
             days[i] = mDays[pos].isChecked();
         }
         Alarm a = Alarm.builder()
-                // TODO: set hour and minute
+                .hour(hour)
+                .minutes(minutes)
                 .ringtone(mSelectedRingtoneUri.toString())
                 .recurringDays(days) // TODO: See https://github.com/google/auto/blob/master/value/userguide/howto.md#mutable_property
                 .label(mLabel.getText().toString())
@@ -287,6 +299,18 @@ public class EditAlarmActivity extends BaseActivity implements AlarmNumpad.KeyLi
         if (checked && mTimeText.length() == 0) {
             mNumpad.setTime(0, 0);
         }
+    }
+
+    @OnClick(R.id.numpad)
+    void captureClickEvent() {
+        /*
+         * ====================== DO NOT IMPLEMENT =====================================
+         * A stray click in the vicinity of the persistent footer buttons, even while
+         * they are covered by the numpad, will still have the click event call through
+         * to those buttons. This captures the buttons' click events as long as the numpad
+         * is in view.
+         * =============================================================================
+         */
     }
 
     private void setWeekDaysText() {
