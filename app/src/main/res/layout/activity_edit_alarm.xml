@@ -99,7 +99,10 @@
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
-                    android:textAllCaps="true"/>
+                    android:textAllCaps="true"
+                    android:textStyle="bold"
+                    android:background="?selectableItemBackground"
+                    android:textColor="@color/toggle_alarm_days"/>
 
                 <ToggleButton
                     android:id="@+id/day1"
@@ -107,6 +110,9 @@
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:textAllCaps="true"
+                    android:textStyle="bold"
+                    android:background="?selectableItemBackground"
+                    android:textColor="@color/toggle_alarm_days"
                     />
 
                 <ToggleButton
@@ -115,6 +121,9 @@
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:textAllCaps="true"
+                    android:textStyle="bold"
+                    android:background="?selectableItemBackground"
+                    android:textColor="@color/toggle_alarm_days"
                     />
 
                 <ToggleButton
@@ -123,6 +132,9 @@
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:textAllCaps="true"
+                    android:textStyle="bold"
+                    android:background="?selectableItemBackground"
+                    android:textColor="@color/toggle_alarm_days"
                     />
 
                 <ToggleButton
@@ -131,6 +143,9 @@
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:textAllCaps="true"
+                    android:textStyle="bold"
+                    android:background="?selectableItemBackground"
+                    android:textColor="@color/toggle_alarm_days"
                     />
 
                 <ToggleButton
@@ -139,6 +154,9 @@
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:textAllCaps="true"
+                    android:textStyle="bold"
+                    android:background="?selectableItemBackground"
+                    android:textColor="@color/toggle_alarm_days"
                     />
 
                 <ToggleButton
@@ -147,6 +165,9 @@
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:textAllCaps="true"
+                    android:textStyle="bold"
+                    android:background="?selectableItemBackground"
+                    android:textColor="@color/toggle_alarm_days"
                     />
 
             </LinearLayout>
