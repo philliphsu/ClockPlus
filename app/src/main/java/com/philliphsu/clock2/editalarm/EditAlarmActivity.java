@@ -58,12 +58,14 @@ public class EditAlarmActivity extends BaseActivity implements AlarmNumpad.KeyLi
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setWeekDaysText();
+        mNumpad.setKeyListener(this);
         long alarmId = getIntent().getLongExtra(EXTRA_ALARM_ID, -1);
         if (alarmId > -1) {
             mAlarm = AlarmsRepository.getInstance(this).getItem(alarmId);
             if (mAlarm != null) {
+                mNumpad.setTime(mAlarm.hour(), mAlarm.minutes());
                 mSwitch.setChecked(mAlarm.isEnabled());
-                mTimeText.setText(getTimeFormat(this).format(new Date(mAlarm.ringsAt())));
+                //mTimeText.setText(getTimeFormat(this).format(new Date(mAlarm.ringsAt())));
                 for (int i = SUNDAY; i <= SATURDAY; i++) {
                     // What position in the week is this day located at?
                     int at = DaysOfWeek.getInstance(this).positionOf(i);
@@ -98,7 +100,6 @@ public class EditAlarmActivity extends BaseActivity implements AlarmNumpad.KeyLi
             mSelectedRingtoneUri = RingtoneManager.getActualDefaultRingtoneUri(this, RingtoneManager.TYPE_ALARM);
             mNumpad.setVisibility(View.VISIBLE);
         }
-        mNumpad.setKeyListener(this);
         updateRingtoneButtonText();
     }
 
@@ -152,21 +153,25 @@ public class EditAlarmActivity extends BaseActivity implements AlarmNumpad.KeyLi
     public void onAcceptChanges() {
         mNumpad.setVisibility(View.GONE);
         mSwitch.setChecked(true);
+        mSwitch.requestFocus();
     }
 
     @Override
     public void onNumberInput(String formattedInput) {
         mTimeText.setText(formattedInput);
+        mTimeText.setSelection(mTimeText.length());
     }
 
     @Override
     public void onCollapse() {
         mNumpad.setVisibility(View.GONE);
+        mSwitch.requestFocus();
     }
 
     @Override
     public void onBackspace(String newStr) {
         mTimeText.setText(newStr);
+        mTimeText.setSelection(mTimeText.length());
         if (!mNumpad.checkTimeValid() && mSwitch.isChecked()) {
             mSwitch.setChecked(false);
         }
@@ -176,11 +181,14 @@ public class EditAlarmActivity extends BaseActivity implements AlarmNumpad.KeyLi
     public void onLongBackspace() {
         mTimeText.setText("");
         mSwitch.setChecked(false);
+        mTimeText.setSelection(0);
     }
 
     @OnTouch(R.id.input_time)
     boolean touch(MotionEvent event) {
-        mNumpad.setVisibility(View.VISIBLE);
+        if (event.getActionMasked() == MotionEvent.ACTION_UP && mNumpad.getVisibility() != View.VISIBLE) {
+            mNumpad.setVisibility(View.VISIBLE);
+        }
         return true;
     }
 
