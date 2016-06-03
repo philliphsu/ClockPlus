@@ -33,7 +33,7 @@ import static com.philliphsu.clock2.DaysOfWeek.NUM_DAYS;
 import static com.philliphsu.clock2.DaysOfWeek.SATURDAY;
 import static com.philliphsu.clock2.DaysOfWeek.SUNDAY;
 
-public class EditAlarmActivity extends BaseActivity implements AlarmEditText.OnBackPressListener {
+public class EditAlarmActivity extends BaseActivity implements AlarmNumpad.KeyListener {
     private static final String TAG = "EditAlarmActivity";
     public static final String EXTRA_ALARM_ID = "com.philliphsu.clock2.editalarm.extra.ALARM_ID";
 
@@ -46,7 +46,7 @@ public class EditAlarmActivity extends BaseActivity implements AlarmEditText.OnB
     @Bind(R.id.save) Button mSave;
     @Bind(R.id.delete) Button mDelete;
     @Bind(R.id.on_off) SwitchCompat mSwitch;
-    @Bind(R.id.input_time) AlarmEditText mTimeText;
+    @Bind(R.id.input_time) EditText mTimeText;
     @Bind({R.id.day0, R.id.day1, R.id.day2, R.id.day3, R.id.day4, R.id.day5, R.id.day6})
     ToggleButton[] mDays;
     @Bind(R.id.label) EditText mLabel;
@@ -98,8 +98,8 @@ public class EditAlarmActivity extends BaseActivity implements AlarmEditText.OnB
             mSelectedRingtoneUri = RingtoneManager.getActualDefaultRingtoneUri(this, RingtoneManager.TYPE_ALARM);
             mNumpad.setVisibility(View.VISIBLE);
         }
+        mNumpad.setKeyListener(this);
         updateRingtoneButtonText();
-        mTimeText.setOnBackPressListener(this);
     }
 
     @Override
@@ -139,11 +139,43 @@ public class EditAlarmActivity extends BaseActivity implements AlarmEditText.OnB
         return 0;
     }
 
-    /** Handle back press when virtual keyboard is shown */
     @Override
-    public void onBackPress() {
-        // TODO: Hide your numpad.
+    public void onBackPressed() {
+        if (mNumpad.getVisibility() == View.VISIBLE) {
+            mNumpad.setVisibility(View.GONE);
+        } else {
+            super.onBackPressed();
+        }
+    }
+
+    @Override
+    public void onAcceptChanges() {
         mNumpad.setVisibility(View.GONE);
+        mSwitch.setChecked(true);
+    }
+
+    @Override
+    public void onNumberInput(String formattedInput) {
+        mTimeText.setText(formattedInput);
+    }
+
+    @Override
+    public void onCollapse() {
+        mNumpad.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void onBackspace(String newStr) {
+        mTimeText.setText(newStr);
+        if (!mNumpad.checkTimeValid() && mSwitch.isChecked()) {
+            mSwitch.setChecked(false);
+        }
+    }
+
+    @Override
+    public void onLongBackspace() {
+        mTimeText.setText("");
+        mSwitch.setChecked(false);
     }
 
     @OnTouch(R.id.input_time)

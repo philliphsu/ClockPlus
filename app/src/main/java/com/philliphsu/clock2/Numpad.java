@@ -39,7 +39,7 @@ public abstract class Numpad extends TableLayout {
 
     public interface KeyListener {
         void onNumberInput(String number);
-        void onCollapse(); // TODO: useless?
+        void onCollapse();
         void onBackspace(String newStr);
         void onLongBackspace();
     }
@@ -103,6 +103,18 @@ public abstract class Numpad extends TableLayout {
             @Override
             public boolean onLongClick(View v) {
                 return longBackspace();
+            }
+        });
+    }
+
+    protected final void buildCollapse(int r, int c) {
+        mCollapse = (ImageButton) buildButton(R.layout.numpad_collapse, r, c);
+
+        mCollapse.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                checkKeyListenerSet();
+                mKeyListener.onCollapse();
             }
         });
     }

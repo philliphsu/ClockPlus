@@ -5,8 +5,10 @@ import android.util.AttributeSet;
 import android.view.KeyEvent;
 
 /**
- * Created by Phillip Hsu on 6/2/2016.
+ * Couldn't figure out how to draw the numpad over the system keyboard, so
+ * the callback interface provided here is of no use to us.
  */
+@Deprecated
 public class AlarmEditText extends android.support.v7.widget.AppCompatEditText {
 
     private OnBackPressListener mOnBackPressListener;

@@ -430,12 +430,12 @@ public class AlarmNumpad extends Numpad {
 
         newRow();
         buildBackspace(getChildCount() - 1, 2);
-//        buildCollapse(getChildCount() - 1, 0);
+        buildCollapse(getChildCount() - 1, 0);
         // The FAB is wrapped in a FrameLayout
         FrameLayout frame = (FrameLayout)
                 buildButton(R.layout.numpad_fab, getChildCount() - 1, 1);
         fab = (FloatingActionButton) frame.getChildAt(0);
-        //fab.setBackgroundTintList(getResources().getColorStateList(R.color.on_enabled_change_fab));
+        fab.setBackgroundTintList(getResources().getColorStateList(R.color.on_enabled_change_fab));
 
         fab.setEnabled(false);
 

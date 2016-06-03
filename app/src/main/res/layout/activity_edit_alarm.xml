@@ -74,7 +74,7 @@
                     android:layout_centerVertical="true"/>
 
                 <!-- TODO: Find out how to get a touch ripple; foreground attr didn't work -->
-                <com.philliphsu.clock2.editalarm.AlarmEditText
+                <EditText
                     android:id="@+id/input_time"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
