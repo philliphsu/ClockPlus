@@ -19,6 +19,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.philliphsu.clock2.Alarm;
@@ -30,6 +31,7 @@ import com.philliphsu.clock2.model.AlarmsRepository;
 import java.util.Date;
 
 import butterknife.Bind;
+import butterknife.OnCheckedChanged;
 import butterknife.OnClick;
 import butterknife.OnTouch;
 
@@ -120,7 +122,7 @@ public class EditAlarmActivity extends BaseActivity implements AlarmNumpad.KeyLi
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         // TODO: Read upcoming threshold preference
-        if (mAlarm != null && (mAlarm.ringsWithinHours(2) || mAlarm.isSnoozed())) {
+        if (mAlarm != null && mAlarm.isEnabled() && (mAlarm.ringsWithinHours(2) || mAlarm.isSnoozed())) {
             if (menu.findItem(ID_MENU_ITEM) == null) {
                 // Create dynamically because there is almost nothing we can statically define
                 // in a layout resource.
@@ -260,6 +262,31 @@ public class EditAlarmActivity extends BaseActivity implements AlarmNumpad.KeyLi
             AlarmsRepository.getInstance(this).deleteItem(mAlarm);
         }
         finish();
+    }
+
+    // This isn't actually concerned with setting the alarm on/off.
+    // It only checks if the touch event is valid to be processed.
+    // The actual toggling of on/off is handled when the OnCheckedChange
+    // event is fired. See #onChecked(boolean) below.
+    @OnTouch(R.id.on_off)
+    boolean toggleSwitch(MotionEvent event) {
+        // Event captured on start of pressed gesture
+        if (event.getActionMasked() == MotionEvent.ACTION_DOWN) {
+            if (mTimeText.length() == 0 || mNumpad.checkTimeValid()) {
+                return false; // proceed to call through
+            } else {
+                Toast.makeText(this, "Enter a valid time first.", Toast.LENGTH_SHORT).show();
+                return true; // capture and end the touch event here
+            }
+        }
+        return false;
+    }
+
+    @OnCheckedChanged(R.id.on_off)
+    void onChecked(boolean checked) {
+        if (checked && mTimeText.length() == 0) {
+            mNumpad.setTime(0, 0);
+        }
     }
 
     private void setWeekDaysText() {
