@@ -65,18 +65,10 @@ public class EditAlarmActivity extends BaseActivity implements
         super.onCreate(savedInstanceState);
         setWeekDaysText();
         mNumpad.setKeyListener(this);
-        // This block doesn't seem to be "MVP-able"...
-        if (DateFormat.is24HourFormat(this)) {
-            mTimeText.setHint(R.string.default_alarm_time_24h);
-        } else {
-            SpannableString s = new SpannableString(getString(R.string.default_alarm_time_12h));
-            // Since we know the string's contents, we can pass in a hardcoded range
-            s.setSpan(AMPM_SIZE_SPAN, 5, 8, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-            mTimeText.setHint(s);
-        }
         mPresenter = new EditAlarmPresenter(this,
                 AlarmsRepository.getInstance(this),
                 getIntent().getLongExtra(EXTRA_ALARM_ID, -1));
+        mPresenter.setTimeTextHint();
     }
 
     @Override
@@ -103,9 +95,7 @@ public class EditAlarmActivity extends BaseActivity implements
         // Since this Activity doesn't host fragments, not necessary?
         //super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_PICK_RINGTONE && resultCode == RESULT_OK) {
-            // Since the entire method is tied to lifecycle events, we can't really
-            // move anything to the presenter.
-            // Actions involving changes to *your* models, business domain, etc. are appropriate for "MVPing".
+            // TODO: How can we make this MVP?
             mSelectedRingtoneUri = data.getParcelableExtra(RingtoneManager.EXTRA_RINGTONE_PICKED_URI);
             updateRingtoneButtonText();
         }
@@ -139,15 +129,7 @@ public class EditAlarmActivity extends BaseActivity implements
 
     @Override
     public void onNumberInput(String formattedInput) {
-        // Don't see how we can MVP this...
-        if (formattedInput.contains("AM") || formattedInput.contains("PM")) {
-            SpannableString s = new SpannableString(formattedInput);
-            s.setSpan(AMPM_SIZE_SPAN, formattedInput.indexOf(" "), formattedInput.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-            mTimeText.setText(s, TextView.BufferType.SPANNABLE);
-        } else {
-            mTimeText.setText(formattedInput);
-        }
-        mTimeText.setSelection(mTimeText.length());
+        mPresenter.onNumberInput(formattedInput);
     }
 
     @Override
@@ -157,20 +139,17 @@ public class EditAlarmActivity extends BaseActivity implements
 
     @Override
     public void onBackspace(String newStr) {
-        // Don't see how we can MVP this...
-        mTimeText.setText(newStr);
-        mTimeText.setSelection(mTimeText.length());
-        if (!mNumpad.checkTimeValid() && mSwitch.isChecked()) {
-            mSwitch.setChecked(false);
-        }
+        mPresenter.onBackspace(newStr);
     }
 
     @Override
     public void onLongBackspace() {
-        // MVP can be used here, but it just seems like pointless rerouting
+        /*
         mTimeText.setText("");
         mSwitch.setChecked(false);
         mTimeText.setSelection(0);
+        */
+        mPresenter.onBackspace("");
     }
 
     @Override
@@ -222,6 +201,7 @@ public class EditAlarmActivity extends BaseActivity implements
             if (mTimeText.length() == 0 || mNumpad.checkTimeValid()) {
                 return false; // proceed to call through
             } else {
+                // TODO: is there anything to MVP?
                 Toast.makeText(this, "Enter a valid time first.", Toast.LENGTH_SHORT).show();
                 return true; // capture and end the touch event here
             }
@@ -232,6 +212,7 @@ public class EditAlarmActivity extends BaseActivity implements
     @OnCheckedChanged(R.id.on_off)
     void onChecked(boolean checked) {
         if (checked && mTimeText.length() == 0) {
+            // TODO: is there anything to MVP?
             mNumpad.setTime(0, 0);
         }
     }
@@ -249,6 +230,7 @@ public class EditAlarmActivity extends BaseActivity implements
     }
 
     private void setWeekDaysText() {
+        // TODO: is there anything to MVP?
         for (int i = 0; i < mDays.length; i++) {
             int weekDay = DaysOfWeek.getInstance(this).weekDayAt(i);
             String label = DaysOfWeek.getLabel(weekDay);
@@ -377,5 +359,38 @@ public class EditAlarmActivity extends BaseActivity implements
         ActionBar ab = getSupportActionBar();
         ab.setDisplayShowTitleEnabled(true);
         ab.setTitle(title);
+    }
+
+    @Override
+    public void setTimeTextHint() {
+        if (DateFormat.is24HourFormat(this)) {
+            mTimeText.setHint(R.string.default_alarm_time_24h);
+        } else {
+            SpannableString s = new SpannableString(getString(R.string.default_alarm_time_12h));
+            // Since we know the string's contents, we can pass in a hardcoded range
+            s.setSpan(AMPM_SIZE_SPAN, 5, 8, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            mTimeText.setHint(s);
+        }
+    }
+
+    @Override
+    public void showTimeText(String formattedInput) {
+        if (formattedInput.contains("AM") || formattedInput.contains("PM")) {
+            SpannableString s = new SpannableString(formattedInput);
+            s.setSpan(AMPM_SIZE_SPAN, formattedInput.indexOf(" "), formattedInput.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            mTimeText.setText(s, TextView.BufferType.SPANNABLE);
+        } else {
+            mTimeText.setText(formattedInput);
+        }
+        mTimeText.setSelection(mTimeText.length());
+    }
+
+    @Override
+    public void showTimeTextPostBackspace(String newStr) {
+        mTimeText.setText(newStr);
+        mTimeText.setSelection(mTimeText.length());
+        if (!mNumpad.checkTimeValid() && mSwitch.isChecked()) {
+            mSwitch.setChecked(false);
+        }
     }
 }

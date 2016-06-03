@@ -99,8 +99,8 @@ public class EditAlarmPresenter implements EditAlarmContract.Presenter {
     }
 
     @Override
-    public void backspace() {
-
+    public void onBackspace(String newStr) {
+        mView.showTimeTextPostBackspace(newStr);
     }
 
     @Override
@@ -124,6 +124,16 @@ public class EditAlarmPresenter implements EditAlarmContract.Presenter {
     @Override
     public void openRingtonePickerDialog() {
         mView.showRingtonePickerDialog();
+    }
+
+    @Override
+    public void setTimeTextHint() {
+        mView.setTimeTextHint();
+    }
+
+    @Override
+    public void onNumberInput(String formattedInput) {
+        mView.showTimeText(formattedInput);
     }
 
     private void showDetails() {

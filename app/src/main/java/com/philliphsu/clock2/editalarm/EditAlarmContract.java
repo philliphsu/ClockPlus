@@ -13,6 +13,9 @@ public interface EditAlarmContract {
         void showEditorClosed();
         void showNumpad(boolean show);
         void showRingtonePickerDialog();
+        void setTimeTextHint();
+        void showTimeText(String timeText);
+        void showTimeTextPostBackspace(String newStr);
         int getHour();
         int getMinutes();
         boolean isEnabled();
@@ -28,9 +31,11 @@ public interface EditAlarmContract {
         void showNumpad();
         void hideNumpad();
         // not sure
-        void backspace();
+        void onBackspace(String newStr);
         void acceptNumpadChanges();
         void onPrepareOptionsMenu();
         void openRingtonePickerDialog();
+        void setTimeTextHint();
+        void onNumberInput(String formattedInput);
     }
 }
