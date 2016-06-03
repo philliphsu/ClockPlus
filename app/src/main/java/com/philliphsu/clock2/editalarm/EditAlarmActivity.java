@@ -144,11 +144,6 @@ public class EditAlarmActivity extends BaseActivity implements
 
     @Override
     public void onLongBackspace() {
-        /*
-        mTimeText.setText("");
-        mSwitch.setChecked(false);
-        mTimeText.setSelection(0);
-        */
         mPresenter.onBackspace("");
     }
 

@@ -149,9 +149,9 @@ public class AlarmNumpad extends Numpad {
     protected boolean longBackspace() {
         boolean consumed = super.longBackspace();
         mFormattedInput.delete(0, mFormattedInput.length());
-        notifyOnLongBackspaceListener();
         updateNumpadStates();
         mAmPmState = UNSPECIFIED;
+        notifyOnLongBackspaceListener();
         return consumed;
     }
 
