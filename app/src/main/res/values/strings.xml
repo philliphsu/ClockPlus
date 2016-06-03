@@ -26,6 +26,22 @@
     <string name="fri">Fri</string>
     <string name="sat">Sat</string>
     <string name="every_day">Every day</string>
+
+    <string name="zero">0</string>
+    <string name="one">1</string>
+    <string name="two">2</string>
+    <string name="three">3</string>
+    <string name="four">4</string>
+    <string name="five">5</string>
+    <string name="six">6</string>
+    <string name="seven">7</string>
+    <string name="eight">8</string>
+    <string name="nine">9</string>
+    <string name="left_alt_24hr">:00</string>
+    <string name="right_alt_24hr">:30</string>
+    <string name="am">AM</string>
+    <string name="pm">PM</string>
+
     <string name="large_text">
         "Material is the metaphor.\n\n"
 

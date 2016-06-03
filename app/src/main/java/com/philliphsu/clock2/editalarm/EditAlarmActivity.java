@@ -9,6 +9,8 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.widget.SwitchCompat;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
+import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -24,13 +26,15 @@ import java.util.Date;
 
 import butterknife.Bind;
 import butterknife.OnClick;
+import butterknife.OnTouch;
 
 import static android.text.format.DateFormat.getTimeFormat;
 import static com.philliphsu.clock2.DaysOfWeek.NUM_DAYS;
 import static com.philliphsu.clock2.DaysOfWeek.SATURDAY;
 import static com.philliphsu.clock2.DaysOfWeek.SUNDAY;
 
-public class EditAlarmActivity extends BaseActivity {
+public class EditAlarmActivity extends BaseActivity implements AlarmEditText.OnBackPressListener {
+    private static final String TAG = "EditAlarmActivity";
     public static final String EXTRA_ALARM_ID = "com.philliphsu.clock2.editalarm.extra.ALARM_ID";
 
     private static final int REQUEST_PICK_RINGTONE = 0;
@@ -42,12 +46,13 @@ public class EditAlarmActivity extends BaseActivity {
     @Bind(R.id.save) Button mSave;
     @Bind(R.id.delete) Button mDelete;
     @Bind(R.id.on_off) SwitchCompat mSwitch;
-    @Bind(R.id.input_time) EditText mTimeText;
+    @Bind(R.id.input_time) AlarmEditText mTimeText;
     @Bind({R.id.day0, R.id.day1, R.id.day2, R.id.day3, R.id.day4, R.id.day5, R.id.day6})
     ToggleButton[] mDays;
     @Bind(R.id.label) EditText mLabel;
     @Bind(R.id.ringtone) Button mRingtone;
     @Bind(R.id.vibrate) CheckBox mVibrate;
+    @Bind(R.id.numpad) AlarmNumpad mNumpad;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,8 +81,12 @@ public class EditAlarmActivity extends BaseActivity {
                     ab.setDisplayShowTitleEnabled(true);
                     ab.setTitle(title);
                 }
+                // Editing alarm so don't show
+                mNumpad.setVisibility(View.GONE);
             } else {
                 // TODO default values
+                // No alarm retrieved with this id
+                mNumpad.setVisibility(View.VISIBLE);
             }
         } else {
             // Initializing to Settings.System.DEFAULT_ALARM_ALERT_URI will show
@@ -87,8 +96,10 @@ public class EditAlarmActivity extends BaseActivity {
             // Compare with getDefaultUri(int), which returns the symbolic URI instead of the
             // actual sound URI. For TYPE_ALARM, this actually returns the same constant.
             mSelectedRingtoneUri = RingtoneManager.getActualDefaultRingtoneUri(this, RingtoneManager.TYPE_ALARM);
+            mNumpad.setVisibility(View.VISIBLE);
         }
         updateRingtoneButtonText();
+        mTimeText.setOnBackPressListener(this);
     }
 
     @Override
@@ -126,6 +137,19 @@ public class EditAlarmActivity extends BaseActivity {
     @Override
     protected int menuResId() {
         return 0;
+    }
+
+    /** Handle back press when virtual keyboard is shown */
+    @Override
+    public void onBackPress() {
+        // TODO: Hide your numpad.
+        mNumpad.setVisibility(View.GONE);
+    }
+
+    @OnTouch(R.id.input_time)
+    boolean touch(MotionEvent event) {
+        mNumpad.setVisibility(View.VISIBLE);
+        return true;
     }
 
     @OnClick(R.id.ringtone)

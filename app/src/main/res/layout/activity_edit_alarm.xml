@@ -74,7 +74,7 @@
                     android:layout_centerVertical="true"/>
 
                 <!-- TODO: Find out how to get a touch ripple; foreground attr didn't work -->
-                <EditText
+                <com.philliphsu.clock2.editalarm.AlarmEditText
                     android:id="@+id/input_time"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -190,5 +190,15 @@
         </LinearLayout>
 
     </ScrollView>
+
+    <com.philliphsu.clock2.editalarm.AlarmNumpad
+        android:id="@+id/numpad"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorPrimary"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark"
+        android:elevation="4dp"
+        android:layout_alignParentBottom="true"
+        android:visibility="gone"/>
 
 </RelativeLayout>

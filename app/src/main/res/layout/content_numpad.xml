@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!--
+      ~ The children of a TableLayout cannot specify the layout_width attribute.
+      ~ Width is always MATCH_PARENT. However, the layout_height attribute can be
+      ~ defined by a child; default value is WRAP_CONTENT. If the child is a
+      ~ TableRow, then the height is always WRAP_CONTENT.
+    -->
+
+   <TableRow>
+      <Button style="@style/NumberButton"
+              android:id="@+id/one"
+              android:text="@string/one"/>
+      <Button style="@style/NumberButton"
+              android:id="@+id/two"
+              android:text="@string/two"/>
+      <Button style="@style/NumberButton"
+              android:id="@+id/three"
+              android:text="@string/three"/>
+   </TableRow>
+
+   <TableRow>
+      <Button style="@style/NumberButton"
+              android:id="@+id/four"
+              android:text="@string/four"/>
+      <Button style="@style/NumberButton"
+              android:id="@+id/five"
+              android:text="@string/five"/>
+      <Button style="@style/NumberButton"
+              android:id="@+id/six"
+              android:text="@string/six"/>
+   </TableRow>
+
+   <TableRow>
+      <Button style="@style/NumberButton"
+              android:id="@+id/seven"
+              android:text="@string/seven"/>
+      <Button style="@style/NumberButton"
+              android:id="@+id/eight"
+              android:text="@string/eight"/>
+      <Button style="@style/NumberButton"
+              android:id="@+id/nine"
+              android:text="@string/nine"/>
+   </TableRow>
+
+   <TableRow>
+      <Space android:layout_weight="1"
+             android:layout_height="match_parent"/>
+      <Button style="@style/NumberButton"
+              android:id="@+id/zero"
+              android:text="@string/zero"/>
+      <Space android:layout_weight="1"
+             android:layout_height="match_parent"/>
+   </TableRow>
+
+</merge>
