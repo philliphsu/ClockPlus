@@ -172,6 +172,10 @@ public abstract class Alarm implements JsonSerializable {
         return ringsIn() <= hours * 3600000;
     }
 
+    public int intId() {
+        return (int) id();
+    }
+
     @Override
     @NonNull
     public JSONObject toJsonObject() {

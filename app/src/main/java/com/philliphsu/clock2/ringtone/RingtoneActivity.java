@@ -4,14 +4,16 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.media.RingtoneManager;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 
+import com.philliphsu.clock2.Alarm;
 import com.philliphsu.clock2.R;
 import com.philliphsu.clock2.UpcomingAlarmReceiver;
+import com.philliphsu.clock2.editalarm.AlarmUtils;
+import com.philliphsu.clock2.model.AlarmsRepository;
 
 import static com.philliphsu.clock2.util.Preconditions.checkNotNull;
 
@@ -24,19 +26,27 @@ import static com.philliphsu.clock2.util.Preconditions.checkNotNull;
  */
 public class RingtoneActivity extends AppCompatActivity {
 
+    // Shared with RingtoneService
+    public static final String EXTRA_ITEM_ID = "com.philliphsu.clock2.ringtone.extra.ITEM_ID";
+
+    private Alarm mAlarm;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_ringtone);
+        long id = getIntent().getLongExtra(EXTRA_ITEM_ID, -1);
+        if (id < 0) {
+            throw new IllegalStateException("Cannot start RingtoneActivity without item's id");
+        }
+        mAlarm = checkNotNull(AlarmsRepository.getInstance(this).getItem(id));
+
         // Play the ringtone
-        Uri ringtone = checkNotNull(getIntent().getData());
-        Intent intent = new Intent(this, RingtoneService.class).setData(ringtone);
+        Intent intent = new Intent(this, RingtoneService.class)
+                .putExtra(EXTRA_ITEM_ID, mAlarm.id());
         startService(intent);
-        // Cancel the upcoming alarm notification
-        Intent intent2 = new Intent(this, UpcomingAlarmReceiver.class)
-                .setAction(UpcomingAlarmReceiver.ACTION_CANCEL_NOTIFICATION);
-        sendBroadcast(intent2);
+
+        AlarmUtils.removeUpcomingAlarmNotification(this, mAlarm);
 
         Button snooze = (Button) findViewById(R.id.btn_snooze);
         snooze.setOnClickListener(new View.OnClickListener() {

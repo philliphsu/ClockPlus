@@ -14,8 +14,11 @@ import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
+import com.philliphsu.clock2.Alarm;
 import com.philliphsu.clock2.R;
+import com.philliphsu.clock2.model.AlarmsRepository;
 
+import static com.philliphsu.clock2.util.DateFormatUtils.formatTime;
 import static com.philliphsu.clock2.util.Preconditions.checkNotNull;
 
 /**
@@ -26,12 +29,16 @@ import static com.philliphsu.clock2.util.Preconditions.checkNotNull;
  * navigate away from the Activity without making an action. But if they do accidentally navigate away,
  * they have plenty of time to make the desired action via the notification.
  */
-public class RingtoneService extends Service {
+public class RingtoneService extends Service { // TODO: abstract this, make subclasses
     private static final String TAG = "RingtoneService";
 
     private AudioManager mAudioManager;
     private Ringtone mRingtone;
+    private Alarm mAlarm;
+    private String mNormalRingTime;
     private boolean mAutoSilenced = false;
+    // TODO: Using Handler for this is ill-suited? Alarm ringing could outlast the
+    // application's life. Use AlarmManager API instead.
     private final Handler mSilenceHandler = new Handler();
     private final Runnable mSilenceRunnable = new Runnable() {
         @Override
@@ -50,16 +57,21 @@ public class RingtoneService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (mAudioManager == null && mRingtone == null) {
-            Uri ringtone = checkNotNull(intent.getData());
+            long id = intent.getLongExtra(RingtoneActivity.EXTRA_ITEM_ID, -1);
+            mAlarm = checkNotNull(AlarmsRepository.getInstance(this).getItem(id));
             // TODO: The below call requires a notification, and there is no way to provide one suitable
             // for both Alarms and Timers. Consider making this class abstract, and have subclasses
             // implement an abstract method that calls startForeground(). You would then call that
             // method here instead.
+            String title = mAlarm.label().isEmpty()
+                    ? getString(R.string.alarm)
+                    : mAlarm.label();
+            mNormalRingTime = formatTime(this, System.currentTimeMillis()); // now
             Notification note = new NotificationCompat.Builder(this)
                     // Required contents
                     .setSmallIcon(R.mipmap.ic_launcher) // TODO: alarm icon
-                    .setContentTitle("Foreground RingtoneService")
-                    .setContentText("Ringtone is playing in the foreground.")
+                    .setContentTitle(title)
+                    .setContentText(mNormalRingTime)
                     .build();
             startForeground(R.id.ringtone_service_notification, note); // TOneverDO: Pass 0 as the first argument
 
@@ -72,6 +84,7 @@ public class RingtoneService extends Service {
                     // Request permanent focus, as ringing could last several minutes
                     AudioManager.AUDIOFOCUS_GAIN);
             if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
+                Uri ringtone = Uri.parse(mAlarm.ringtone());
                 mRingtone = RingtoneManager.getRingtone(this, ringtone);
                 // Deprecated, but the alternative AudioAttributes requires API 21
                 mRingtone.setStreamType(AudioManager.STREAM_ALARM);
@@ -94,11 +107,15 @@ public class RingtoneService extends Service {
             // TODO: You should probably do this in the appropriate subclass.
             NotificationManager nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
             Notification note = new NotificationCompat.Builder(this)
-                    .setContentTitle("Missed alarm")
-                    .setContentText("Regular alarm time here")
+                    .setContentTitle(getString(R.string.missed_alarm))
+                    .setContentText(mNormalRingTime)
                     .setSmallIcon(R.mipmap.ic_launcher)
+                    //.setShowWhen(true) // TODO: Is it shown by default?
                     .build();
-            nm.notify("tag", 0, note);
+            // A tag with the name of the subclass is used in addition to the item's id to prevent
+            // conflicting notifications for items of different class types. Items of any class type
+            // have ids starting from 0.
+            nm.notify(getClass().getName(), mAlarm.intId(), note);
         }
         stopForeground(true);
     }

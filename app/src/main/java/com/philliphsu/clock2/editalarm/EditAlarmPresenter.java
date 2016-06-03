@@ -31,6 +31,11 @@ public class EditAlarmPresenter implements EditAlarmContract.Presenter {
 
     @Override
     public void loadAlarm(long alarmId) {
+        // Can't load alarm in ctor because showDetails() calls
+        // showTime(), which calls setTime() on the numpad, which
+        // fires onNumberInput() events, which routes to the presenter,
+        // which would not be initialized yet because we still haven't
+        // returned from the ctor.
         mAlarm = alarmId > -1 ? mRepository.getItem(alarmId) : null;
         showDetails();
     }

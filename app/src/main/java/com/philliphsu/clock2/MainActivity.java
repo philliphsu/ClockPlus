@@ -1,9 +1,6 @@
 package com.philliphsu.clock2;
 
-import android.app.AlarmManager;
-import android.app.PendingIntent;
 import android.content.Intent;
-import android.media.RingtoneManager;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -21,7 +18,6 @@ import android.widget.TextView;
 
 import com.philliphsu.clock2.alarms.AlarmsFragment;
 import com.philliphsu.clock2.editalarm.EditAlarmActivity;
-import com.philliphsu.clock2.ringtone.RingtoneActivity;
 
 public class MainActivity extends BaseActivity implements AlarmsFragment.OnAlarmInteractionListener {
     private static final String TAG = "MainActivity";
@@ -61,22 +57,6 @@ public class MainActivity extends BaseActivity implements AlarmsFragment.OnAlarm
             @Override
             public void onClick(View view) {
                 startEditAlarmActivity(-1);
-                /*
-                scheduleAlarm();
-                Snackbar.make(view, "Alarm set for 1 minute from now", Snackbar.LENGTH_INDEFINITE)
-                        .setAction("Dismiss", new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
-                                PendingIntent pi = alarmIntent(true);
-                                am.cancel(pi);
-                                pi.cancel();
-                                Intent intent = new Intent(MainActivity.this, UpcomingAlarmReceiver.class)
-                                        .setAction(UpcomingAlarmReceiver.ACTION_CANCEL_NOTIFICATION);
-                                sendBroadcast(intent);
-                            }
-                        }).show();
-                        */
             }
         });
     }
@@ -207,47 +187,5 @@ public class MainActivity extends BaseActivity implements AlarmsFragment.OnAlarm
         Intent intent = new Intent(this, EditAlarmActivity.class);
         intent.putExtra(EditAlarmActivity.EXTRA_ALARM_ID, alarmId);
         startActivity(intent);
-    }
-
-    private void scheduleAlarm() {
-        AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
-        // If there is already an alarm for this Intent scheduled (with the equality of two
-        // intents being defined by filterEquals(Intent)), then it will be removed and replaced
-        // by this one. For most of our uses, the relevant criteria for equality will be the
-        // action, the data, and the class (component). Although not documented, the request code
-        // of a PendingIntent is also considered to determine equality of two intents.
-
-        // WAKEUP alarm types wake the CPU up, but NOT the screen. If that is what you want, you need
-        // to handle that yourself by using a wakelock, etc..
-        // We use a WAKEUP alarm to send the upcoming alarm notification so it goes off even if the
-        // device is asleep. Otherwise, it will not go off until the device is turned back on.
-        // todo: use alarm's ring time - (number of hours to be notified in advance, converted to millis)
-        am.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), notifyUpcomingAlarmIntent());
-        // todo: get alarm's ring time
-        am.setExact(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + 10000, alarmIntent(false));
-    }
-
-    private static int alarmCount;
-
-    private PendingIntent alarmIntent(boolean retrievePrevious) {
-        // TODO: Use appropriate subclass instead
-        Intent intent = new Intent(this, RingtoneActivity.class)
-                .setData(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM));
-        // TODO: Pass in the id of the alarm to the intent. Alternatively, if the upcoming alarm note
-        // only needs to show the alarm's ring time, just pass in the alarm's ringsAt().
-        // TODO: Use unique request codes per alarm.
-        // If a PendingIntent with this request code already exists, then we are likely modifying
-        // an alarm, so we should cancel the existing intent.
-        int requestCode = retrievePrevious ? alarmCount - 1 : alarmCount++;
-        int flag = retrievePrevious
-                ? PendingIntent.FLAG_NO_CREATE
-                : PendingIntent.FLAG_CANCEL_CURRENT;
-        return PendingIntent.getActivity(this, requestCode, intent, flag);
-    }
-
-    private PendingIntent notifyUpcomingAlarmIntent() {
-        Intent intent = new Intent(this, UpcomingAlarmReceiver.class);
-        // TODO: Use unique request codes per alarm.
-        return PendingIntent.getBroadcast(this, alarmCount, intent, PendingIntent.FLAG_CANCEL_CURRENT);
     }
 }

@@ -7,6 +7,7 @@
     <string name="dummy_button">Dummy Button</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
 
+    <!-- ================================= EDIT ALARM ACTIVITY ==================================-->
     <string name="title_activity_edit_alarm">EditAlarmActivity</string>
     <string name="save">Save</string>
     <string name="delete">Delete</string>
@@ -15,9 +16,18 @@
     <string name="title_snoozing_until">Snoozing until %1$s</string>
     <string name="dismiss_now">Dismiss now</string>
     <string name="done_snoozing">Done snoozing</string>
-
+    <!-- ======================================================================================= -->
+    
+    <!-- ==================================== NOTIFICATIONS ==================================== -->
+    <string name="upcoming_alarm">Upcoming alarm</string>
+    <string name="alarm">Alarm</string>
+    <string name="missed_alarm">Missed alarm</string>
+    <!-- ======================================================================================= -->
+    
+    <!-- ==================================== MAIN ACTIVITY ==================================== -->
     <string name="snackbar_item_deleted">%1$s deleted</string>
     <string name="snackbar_undo_item_deleted">Undo</string>
+    <!-- ======================================================================================= -->
 
     <string name="sun">Sun</string>
     <string name="mon">Mon</string>
