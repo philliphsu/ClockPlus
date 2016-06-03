@@ -7,6 +7,10 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.SwitchCompat;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.format.DateFormat;
+import android.text.style.RelativeSizeSpan;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -14,6 +18,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.ToggleButton;
 
 import com.philliphsu.clock2.Alarm;
@@ -36,6 +41,7 @@ import static com.philliphsu.clock2.DaysOfWeek.SUNDAY;
 public class EditAlarmActivity extends BaseActivity implements AlarmNumpad.KeyListener {
     private static final String TAG = "EditAlarmActivity";
     public static final String EXTRA_ALARM_ID = "com.philliphsu.clock2.editalarm.extra.ALARM_ID";
+    private static final RelativeSizeSpan AMPM_SIZE_SPAN = new RelativeSizeSpan(0.5f);
 
     private static final int REQUEST_PICK_RINGTONE = 0;
     private static final int ID_MENU_ITEM = 0;
@@ -59,6 +65,14 @@ public class EditAlarmActivity extends BaseActivity implements AlarmNumpad.KeyLi
         super.onCreate(savedInstanceState);
         setWeekDaysText();
         mNumpad.setKeyListener(this);
+        if (DateFormat.is24HourFormat(this)) {
+            mTimeText.setHint(R.string.default_alarm_time_24h);
+        } else {
+            SpannableString s = new SpannableString(getString(R.string.default_alarm_time_12h));
+            // Since we know the string's contents, we can pass in a hardcoded range
+            s.setSpan(AMPM_SIZE_SPAN, 5, 8, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            mTimeText.setHint(s);
+        }
         long alarmId = getIntent().getLongExtra(EXTRA_ALARM_ID, -1);
         if (alarmId > -1) {
             mAlarm = AlarmsRepository.getInstance(this).getItem(alarmId);
@@ -158,7 +172,13 @@ public class EditAlarmActivity extends BaseActivity implements AlarmNumpad.KeyLi
 
     @Override
     public void onNumberInput(String formattedInput) {
-        mTimeText.setText(formattedInput);
+        if (formattedInput.contains("AM") || formattedInput.contains("PM")) {
+            SpannableString s = new SpannableString(formattedInput);
+            s.setSpan(AMPM_SIZE_SPAN, formattedInput.indexOf(" "), formattedInput.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            mTimeText.setText(s, TextView.BufferType.SPANNABLE);
+        } else {
+            mTimeText.setText(formattedInput);
+        }
         mTimeText.setSelection(mTimeText.length());
     }
 
