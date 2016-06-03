@@ -3,13 +3,16 @@ package com.philliphsu.clock2.editalarm;
 /**
  * Created by Phillip Hsu on 6/2/2016.
  */
-public interface AlarmEditor {
+public interface EditAlarmContract {
 
     interface View extends AlarmContract.View {
+        void showTime(int hour, int minutes);
         void showRecurringDays(int weekDay, boolean recurs);
         void showRingtone(String ringtone);
         void showVibrates(boolean vibrates);
         void showEditorClosed();
+        void showNumpad(boolean show);
+        void showRingtonePickerDialog();
         int getHour();
         int getMinutes();
         boolean isEnabled();
@@ -22,5 +25,12 @@ public interface AlarmEditor {
     interface Presenter extends AlarmContract.Presenter {
         void save();
         void delete();
+        void showNumpad();
+        void hideNumpad();
+        // not sure
+        void backspace();
+        void acceptNumpadChanges();
+        void onPrepareOptionsMenu();
+        void openRingtonePickerDialog();
     }
 }

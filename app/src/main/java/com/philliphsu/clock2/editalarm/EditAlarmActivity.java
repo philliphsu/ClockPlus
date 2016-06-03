@@ -4,14 +4,12 @@ import android.content.Intent;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.SwitchCompat;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.format.DateFormat;
 import android.text.style.RelativeSizeSpan;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -23,7 +21,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
-import com.philliphsu.clock2.Alarm;
 import com.philliphsu.clock2.BaseActivity;
 import com.philliphsu.clock2.DaysOfWeek;
 import com.philliphsu.clock2.R;
@@ -37,11 +34,11 @@ import butterknife.OnClick;
 import butterknife.OnTouch;
 
 import static android.text.format.DateFormat.getTimeFormat;
-import static com.philliphsu.clock2.DaysOfWeek.NUM_DAYS;
-import static com.philliphsu.clock2.DaysOfWeek.SATURDAY;
-import static com.philliphsu.clock2.DaysOfWeek.SUNDAY;
+import static com.philliphsu.clock2.util.Preconditions.checkNotNull;
 
-public class EditAlarmActivity extends BaseActivity implements AlarmNumpad.KeyListener {
+public class EditAlarmActivity extends BaseActivity implements
+        EditAlarmContract.View,
+        AlarmNumpad.KeyListener {
     private static final String TAG = "EditAlarmActivity";
     public static final String EXTRA_ALARM_ID = "com.philliphsu.clock2.editalarm.extra.ALARM_ID";
     private static final RelativeSizeSpan AMPM_SIZE_SPAN = new RelativeSizeSpan(0.5f);
@@ -49,7 +46,7 @@ public class EditAlarmActivity extends BaseActivity implements AlarmNumpad.KeyLi
     private static final int REQUEST_PICK_RINGTONE = 0;
     private static final int ID_MENU_ITEM = 0;
 
-    @Nullable private Alarm mAlarm;
+    private EditAlarmContract.Presenter mPresenter;
     private Uri mSelectedRingtoneUri;
 
     @Bind(R.id.save) Button mSave;
@@ -68,6 +65,7 @@ public class EditAlarmActivity extends BaseActivity implements AlarmNumpad.KeyLi
         super.onCreate(savedInstanceState);
         setWeekDaysText();
         mNumpad.setKeyListener(this);
+        // This block doesn't seem to be "MVP-able"...
         if (DateFormat.is24HourFormat(this)) {
             mTimeText.setHint(R.string.default_alarm_time_24h);
         } else {
@@ -76,65 +74,28 @@ public class EditAlarmActivity extends BaseActivity implements AlarmNumpad.KeyLi
             s.setSpan(AMPM_SIZE_SPAN, 5, 8, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
             mTimeText.setHint(s);
         }
-        long alarmId = getIntent().getLongExtra(EXTRA_ALARM_ID, -1);
-        if (alarmId > -1) {
-            mAlarm = AlarmsRepository.getInstance(this).getItem(alarmId);
-            if (mAlarm != null) {
-                mNumpad.setTime(mAlarm.hour(), mAlarm.minutes());
-                mSwitch.setChecked(mAlarm.isEnabled());
-                //mTimeText.setText(getTimeFormat(this).format(new Date(mAlarm.ringsAt())));
-                for (int i = SUNDAY; i <= SATURDAY; i++) {
-                    // What position in the week is this day located at?
-                    int at = DaysOfWeek.getInstance(this).positionOf(i);
-                    // Toggle the button that corresponds to this day
-                    mDays[at].setChecked(mAlarm.isRecurring(i));
-                }
-                mLabel.setText(mAlarm.label());
-                mSelectedRingtoneUri = Uri.parse(mAlarm.ringtone());
-                mVibrate.setChecked(mAlarm.vibrates());
-                if (mAlarm.isSnoozed()) {
-                    String title = getString(R.string.title_snoozing_until,
-                            getTimeFormat(this).format(new Date(mAlarm.snoozingUntil()))
-                    );
-                    ActionBar ab = getSupportActionBar();
-                    ab.setDisplayShowTitleEnabled(true);
-                    ab.setTitle(title);
-                }
-                // Editing alarm so don't show
-                mNumpad.setVisibility(View.GONE);
-            } else {
-                // TODO default values
-                // No alarm retrieved with this id
-                mNumpad.setVisibility(View.VISIBLE);
-            }
-        } else {
-            // Initializing to Settings.System.DEFAULT_ALARM_ALERT_URI will show
-            // "Default ringtone (Name)" on the button text, and won't show the
-            // selection on the dialog when first opened. (unless you choose to show
-            // the default item in the intent extra?)
-            // Compare with getDefaultUri(int), which returns the symbolic URI instead of the
-            // actual sound URI. For TYPE_ALARM, this actually returns the same constant.
-            mSelectedRingtoneUri = RingtoneManager.getActualDefaultRingtoneUri(this, RingtoneManager.TYPE_ALARM);
-            mNumpad.setVisibility(View.VISIBLE);
-        }
-        updateRingtoneButtonText();
+        mPresenter = new EditAlarmPresenter(this,
+                AlarmsRepository.getInstance(this),
+                getIntent().getLongExtra(EXTRA_ALARM_ID, -1));
     }
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        // TODO: Read upcoming threshold preference
-        if (mAlarm != null && mAlarm.isEnabled() && (mAlarm.ringsWithinHours(2) || mAlarm.isSnoozed())) {
-            if (menu.findItem(ID_MENU_ITEM) == null) {
-                // Create dynamically because there is almost nothing we can statically define
-                // in a layout resource.
-                menu.add(0 /*group*/, ID_MENU_ITEM, 0 /*order*/,
-                        mAlarm.isSnoozed() ? R.string.done_snoozing : R.string.dismiss_now)
-                        .setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_IF_ROOM)
-                        .setIcon(android.R.drawable.ic_delete);
-                // TODO: Show correct icon based on which is happening
-            }
-        }
+        mPresenter.onPrepareOptionsMenu();
         return super.onPrepareOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_dismiss_now:
+                mPresenter.dismissNow();
+                return true;
+            case R.id.action_done_snoozing:
+                mPresenter.endSnoozing();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -142,6 +103,9 @@ public class EditAlarmActivity extends BaseActivity implements AlarmNumpad.KeyLi
         // Since this Activity doesn't host fragments, not necessary?
         //super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_PICK_RINGTONE && resultCode == RESULT_OK) {
+            // Since the entire method is tied to lifecycle events, we can't really
+            // move anything to the presenter.
+            // Actions involving changes to *your* models, business domain, etc. are appropriate for "MVPing".
             mSelectedRingtoneUri = data.getParcelableExtra(RingtoneManager.EXTRA_RINGTONE_PICKED_URI);
             updateRingtoneButtonText();
         }
@@ -154,13 +118,15 @@ public class EditAlarmActivity extends BaseActivity implements AlarmNumpad.KeyLi
 
     @Override
     protected int menuResId() {
-        return 0;
+        return R.menu.menu_edit_alarm;
     }
 
     @Override
     public void onBackPressed() {
+        // This if check must be here unless you want to write a presenter
+        // method called isNumpadOpen()...
         if (mNumpad.getVisibility() == View.VISIBLE) {
-            mNumpad.setVisibility(View.GONE);
+            mPresenter.hideNumpad();
         } else {
             super.onBackPressed();
         }
@@ -168,13 +134,12 @@ public class EditAlarmActivity extends BaseActivity implements AlarmNumpad.KeyLi
 
     @Override
     public void onAcceptChanges() {
-        mNumpad.setVisibility(View.GONE);
-        mSwitch.setChecked(true);
-        mSwitch.requestFocus();
+        mPresenter.acceptNumpadChanges();
     }
 
     @Override
     public void onNumberInput(String formattedInput) {
+        // Don't see how we can MVP this...
         if (formattedInput.contains("AM") || formattedInput.contains("PM")) {
             SpannableString s = new SpannableString(formattedInput);
             s.setSpan(AMPM_SIZE_SPAN, formattedInput.indexOf(" "), formattedInput.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
@@ -187,12 +152,12 @@ public class EditAlarmActivity extends BaseActivity implements AlarmNumpad.KeyLi
 
     @Override
     public void onCollapse() {
-        mNumpad.setVisibility(View.GONE);
-        mSwitch.requestFocus();
+        mPresenter.hideNumpad();
     }
 
     @Override
     public void onBackspace(String newStr) {
+        // Don't see how we can MVP this...
         mTimeText.setText(newStr);
         mTimeText.setSelection(mTimeText.length());
         if (!mNumpad.checkTimeValid() && mSwitch.isChecked()) {
@@ -202,21 +167,14 @@ public class EditAlarmActivity extends BaseActivity implements AlarmNumpad.KeyLi
 
     @Override
     public void onLongBackspace() {
+        // MVP can be used here, but it just seems like pointless rerouting
         mTimeText.setText("");
         mSwitch.setChecked(false);
         mTimeText.setSelection(0);
     }
 
-    @OnTouch(R.id.input_time)
-    boolean touch(MotionEvent event) {
-        if (event.getActionMasked() == MotionEvent.ACTION_UP && mNumpad.getVisibility() != View.VISIBLE) {
-            mNumpad.setVisibility(View.VISIBLE);
-        }
-        return true;
-    }
-
-    @OnClick(R.id.ringtone)
-    void ringtone() {
+    @Override
+    public void showRingtonePickerDialog() {
         Intent intent = new Intent(RingtoneManager.ACTION_RINGTONE_PICKER);
         intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE, RingtoneManager.TYPE_ALARM)
                 .putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_SILENT, false)
@@ -224,56 +182,33 @@ public class EditAlarmActivity extends BaseActivity implements AlarmNumpad.KeyLi
                 .putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, mSelectedRingtoneUri)
                 // Whether to show "Default" item in the list
                 .putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_DEFAULT, false); // TODO: false?
-                // The ringtone that plays when default option is selected
-                //.putExtra(RingtoneManager.EXTRA_RINGTONE_DEFAULT_URI, DEFAULT_TONE);
+        // The ringtone that plays when default option is selected
+        //.putExtra(RingtoneManager.EXTRA_RINGTONE_DEFAULT_URI, DEFAULT_TONE);
         startActivityForResult(intent, REQUEST_PICK_RINGTONE);
+    }
+
+    @OnTouch(R.id.input_time)
+    boolean touch(MotionEvent event) {
+        if (event.getActionMasked() == MotionEvent.ACTION_UP && mNumpad.getVisibility() != View.VISIBLE) {
+            mPresenter.showNumpad();
+        }
+        return true;
+    }
+
+    @OnClick(R.id.ringtone)
+    void ringtone() {
+        mPresenter.openRingtonePickerDialog();
     }
 
     @OnClick(R.id.save)
     void save() {
-        int hour;
-        int minutes;
-        try {
-            hour = mNumpad.getHours();
-            minutes = mNumpad.getMinutes();
-        } catch (IllegalStateException e) {
-            Log.e(TAG, e.getMessage());
-            return;
-        }
+        mPresenter.save();
 
-        boolean[] days = new boolean[NUM_DAYS];
-        for (int i = SUNDAY; i <= SATURDAY; i++) {
-            // What position in the week is this day located at?
-            int pos = DaysOfWeek.getInstance(this).positionOf(i);
-            // Set the state of this day according to its corresponding button
-            days[i] = mDays[pos].isChecked();
-        }
-        Alarm a = Alarm.builder()
-                .hour(hour)
-                .minutes(minutes)
-                .ringtone(mSelectedRingtoneUri.toString())
-                .recurringDays(days) // TODO: See https://github.com/google/auto/blob/master/value/userguide/howto.md#mutable_property
-                .label(mLabel.getText().toString())
-                .vibrates(mVibrate.isChecked())
-                .build();
-        a.setEnabled(mSwitch.isChecked());
-        if (mAlarm != null) {
-            // TODO: Cancel any alarm scheduled with the old alarm's ID
-            // TODO: Schedule the new alarm
-            AlarmsRepository.getInstance(this).updateItem(mAlarm, a);
-        } else {
-            // TODO: Schedule the new alarm
-            AlarmsRepository.getInstance(this).addItem(a);
-        }
-        finish();
     }
 
     @OnClick(R.id.delete)
     void delete() {
-        if (mAlarm != null) {
-            AlarmsRepository.getInstance(this).deleteItem(mAlarm);
-        }
-        finish();
+        mPresenter.delete();
     }
 
     // This isn't actually concerned with setting the alarm on/off.
@@ -325,5 +260,122 @@ public class EditAlarmActivity extends BaseActivity implements AlarmNumpad.KeyLi
 
     private void updateRingtoneButtonText() {
         mRingtone.setText(RingtoneManager.getRingtone(this, mSelectedRingtoneUri).getTitle(this));
+    }
+
+    @Override
+    public void showRecurringDays(int weekDay, boolean recurs) {
+        // What position in the week is this day located at?
+        int at = DaysOfWeek.getInstance(this).positionOf(weekDay);
+        // Toggle the button that corresponds to this day
+        mDays[at].setChecked(recurs);
+    }
+
+    @Override
+    public void showRingtone(String ringtone) {
+        // Initializing to Settings.System.DEFAULT_ALARM_ALERT_URI will show
+        // "Default ringtone (Name)" on the button text, and won't show the
+        // selection on the dialog when first opened. (unless you choose to show
+        // the default item in the intent extra?)
+        // Compare with getDefaultUri(int), which returns the symbolic URI instead of the
+        // actual sound URI. For TYPE_ALARM, this actually returns the same constant.
+        if (null == ringtone || ringtone.isEmpty()) {
+            mSelectedRingtoneUri = RingtoneManager.getActualDefaultRingtoneUri(this, RingtoneManager.TYPE_ALARM);
+        } else {
+            mSelectedRingtoneUri = Uri.parse(ringtone);
+        }
+        updateRingtoneButtonText();
+    }
+
+    @Override
+    public void showVibrates(boolean vibrates) {
+        mVibrate.setChecked(vibrates);
+    }
+
+    @Override
+    public void showEditorClosed() {
+        finish();
+    }
+
+    @Override
+    public int getHour() {
+        return mNumpad.getHours();
+    }
+
+    @Override
+    public int getMinutes() {
+        return mNumpad.getMinutes();
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return mSwitch.isChecked();
+    }
+
+    @Override
+    public boolean isRecurringDay(int weekDay) {
+        // What position in the week is this day located at?
+        int pos = DaysOfWeek.getInstance(this).positionOf(weekDay);
+        // Return the state of this day according to its button
+        return mDays[pos].isChecked();
+    }
+
+    @Override
+    public String getLabel() {
+        return mLabel.getText().toString();
+    }
+
+    @Override
+    public String getRingtone() {
+        return mSelectedRingtoneUri.toString();
+    }
+
+    @Override
+    public boolean vibrates() {
+        return mVibrate.isChecked();
+    }
+
+    @Override
+    public void showTime(int hour, int minutes) {
+        mNumpad.setTime(hour, minutes);
+    }
+
+    @Override
+    public void showLabel(String label) {
+        mLabel.setText(label);
+    }
+
+    @Override
+    public void showEnabled(boolean enabled) {
+        mSwitch.setChecked(enabled);
+    }
+
+    @Override
+    public void showNumpad(boolean show) {
+        mNumpad.setVisibility(show ? View.VISIBLE : View.GONE);
+    }
+
+    @Override
+    public void showCanDismissNow() {
+        Menu menu = checkNotNull(getMenu());
+        MenuItem item = menu.findItem(R.id.action_dismiss_now);
+        if (!item.isVisible()) {
+            item.setVisible(true);
+            menu.findItem(R.id.action_done_snoozing).setVisible(false);
+        }
+    }
+
+    @Override
+    public void showSnoozed(Date snoozingUntilMillis) {
+        Menu menu = checkNotNull(getMenu());
+        MenuItem item = menu.findItem(R.id.action_done_snoozing);
+        if (!item.isVisible()) {
+            item.setVisible(true);
+            menu.findItem(R.id.action_dismiss_now).setVisible(false);
+        }
+        String title = getString(R.string.title_snoozing_until,
+                getTimeFormat(this).format(snoozingUntilMillis));
+        ActionBar ab = getSupportActionBar();
+        ab.setDisplayShowTitleEnabled(true);
+        ab.setTitle(title);
     }
 }
