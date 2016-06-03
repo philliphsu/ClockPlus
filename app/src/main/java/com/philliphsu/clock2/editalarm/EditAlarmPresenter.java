@@ -21,14 +21,17 @@ public class EditAlarmPresenter implements EditAlarmContract.Presenter {
 
     @NonNull private final EditAlarmContract.View mView;
     @NonNull private final Repository<Alarm> mRepository;
-    @Nullable private final Alarm mAlarm;
+    @Nullable private Alarm mAlarm;
 
     public EditAlarmPresenter(@NonNull EditAlarmContract.View view,
-                              @NonNull Repository<Alarm> repository,
-                              long alarmId) {
+                              @NonNull Repository<Alarm> repository) {
         mView = view;
         mRepository = repository;
-        mAlarm = alarmId > -1 ? repository.getItem(alarmId) : null;
+    }
+
+    @Override
+    public void loadAlarm(long alarmId) {
+        mAlarm = alarmId > -1 ? mRepository.getItem(alarmId) : null;
         showDetails();
     }
 

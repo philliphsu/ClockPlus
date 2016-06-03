@@ -65,9 +65,8 @@ public class EditAlarmActivity extends BaseActivity implements
         super.onCreate(savedInstanceState);
         setWeekDaysText();
         mNumpad.setKeyListener(this);
-        mPresenter = new EditAlarmPresenter(this,
-                AlarmsRepository.getInstance(this),
-                getIntent().getLongExtra(EXTRA_ALARM_ID, -1));
+        mPresenter = new EditAlarmPresenter(this, AlarmsRepository.getInstance(this));
+        mPresenter.loadAlarm(getIntent().getLongExtra(EXTRA_ALARM_ID, -1));
         mPresenter.setTimeTextHint();
     }
 

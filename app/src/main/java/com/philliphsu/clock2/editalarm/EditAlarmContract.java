@@ -26,6 +26,7 @@ public interface EditAlarmContract {
     }
 
     interface Presenter extends AlarmContract.Presenter {
+        void loadAlarm(long id);
         void save();
         void delete();
         void showNumpad();
