@@ -74,6 +74,13 @@ public class EditAlarmPresenter implements EditAlarmContract.Presenter {
             mRepository.addItem(a);
         }
 
+        if (a.isEnabled()) {
+            // TODO: Consider passing in some interface during construction that abstracts away the
+            // Context required to call AlarmUtils.scheduleAlarm(), so we can call it here instead.
+            // It doesn't seem right that this task is delegated to the View.
+            mView.scheduleAlarm(a);
+        }
+
         mView.showEditorClosed();
     }
 

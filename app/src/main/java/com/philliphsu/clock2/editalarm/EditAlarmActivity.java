@@ -21,6 +21,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
+import com.philliphsu.clock2.Alarm;
 import com.philliphsu.clock2.BaseActivity;
 import com.philliphsu.clock2.DaysOfWeek;
 import com.philliphsu.clock2.R;
@@ -176,7 +177,6 @@ public class EditAlarmActivity extends BaseActivity implements
     @OnClick(R.id.save)
     void save() {
         mPresenter.save();
-
     }
 
     @OnClick(R.id.delete)
@@ -386,5 +386,10 @@ public class EditAlarmActivity extends BaseActivity implements
         if (!mNumpad.checkTimeValid() && mSwitch.isChecked()) {
             mSwitch.setChecked(false);
         }
+    }
+
+    @Override
+    public void scheduleAlarm(Alarm alarm) {
+        AlarmUtils.scheduleAlarm(this, alarm);
     }
 }

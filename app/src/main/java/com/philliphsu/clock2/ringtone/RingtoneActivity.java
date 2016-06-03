@@ -1,9 +1,6 @@
 package com.philliphsu.clock2.ringtone;
 
-import android.app.AlarmManager;
-import android.app.PendingIntent;
 import android.content.Intent;
-import android.media.RingtoneManager;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -11,7 +8,6 @@ import android.widget.Button;
 
 import com.philliphsu.clock2.Alarm;
 import com.philliphsu.clock2.R;
-import com.philliphsu.clock2.UpcomingAlarmReceiver;
 import com.philliphsu.clock2.editalarm.AlarmUtils;
 import com.philliphsu.clock2.model.AlarmsRepository;
 
@@ -41,12 +37,12 @@ public class RingtoneActivity extends AppCompatActivity {
         }
         mAlarm = checkNotNull(AlarmsRepository.getInstance(this).getItem(id));
 
+        AlarmUtils.removeUpcomingAlarmNotification(this, mAlarm);
+
         // Play the ringtone
         Intent intent = new Intent(this, RingtoneService.class)
                 .putExtra(EXTRA_ITEM_ID, mAlarm.id());
         startService(intent);
-
-        AlarmUtils.removeUpcomingAlarmNotification(this, mAlarm);
 
         Button snooze = (Button) findViewById(R.id.btn_snooze);
         snooze.setOnClickListener(new View.OnClickListener() {
@@ -90,6 +86,8 @@ public class RingtoneActivity extends AppCompatActivity {
 
     private void snooze() {
         // Schedule another launch
+        AlarmUtils.scheduleAlarm(this, mAlarm);
+        /*
         Intent intent = new Intent(this, RingtoneActivity.class)
                 .setData(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM));
         PendingIntent pi = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
@@ -99,6 +97,7 @@ public class RingtoneActivity extends AppCompatActivity {
         Intent intent2 = new Intent(this, UpcomingAlarmReceiver.class)
                 .setAction(UpcomingAlarmReceiver.ACTION_SHOW_SNOOZING);
         sendBroadcast(intent2);
+        */
         dismiss();
     }
 

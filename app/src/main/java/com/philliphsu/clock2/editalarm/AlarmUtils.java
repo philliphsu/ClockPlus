@@ -39,8 +39,10 @@ public final class AlarmUtils {
         // We use a WAKEUP alarm to send the upcoming alarm notification so it goes off even if the
         // device is asleep. Otherwise, it will not go off until the device is turned back on.
         // todo: read shared prefs for number of hours to be notified in advance
-        am.set(AlarmManager.RTC_WAKEUP, alarm.ringsAt() - 2*3600000, notifyUpcomingAlarmIntent(context, alarm, false));
-        am.setExact(AlarmManager.RTC_WAKEUP, alarm.ringsAt(), alarmIntent(context, alarm, false));
+        long ringAt = alarm.isSnoozed() ? alarm.snoozingUntil() : alarm.ringsAt();
+        // If snoozed, upcoming note posted immediately.
+        am.set(AlarmManager.RTC_WAKEUP, ringAt - 2*3600000, notifyUpcomingAlarmIntent(context, alarm, false));
+        am.setExact(AlarmManager.RTC_WAKEUP, ringAt, alarmIntent(context, alarm, false));
     }
 
     public static void unscheduleAlarm(Context c, Alarm a) {
@@ -79,6 +81,12 @@ public final class AlarmUtils {
     private static PendingIntent notifyUpcomingAlarmIntent(Context context, Alarm alarm, boolean retrievePrevious) {
         Intent intent = new Intent(context, UpcomingAlarmReceiver.class)
                 .putExtra(UpcomingAlarmReceiver.EXTRA_ALARM_ID, alarm.id());
+        if (alarm.isSnoozed()) {
+            // TODO: Will this affect retrieving a previous instance? Say if the previous instance
+            // didn't have this action set initially, but at a later time we made a new instance
+            // with it set.
+            intent.setAction(UpcomingAlarmReceiver.ACTION_SHOW_SNOOZING);
+        }
         int flag = retrievePrevious ? FLAG_NO_CREATE : FLAG_CANCEL_CURRENT;
         PendingIntent pi = PendingIntent.getBroadcast(context, alarm.intId(), intent, flag);
         if (retrievePrevious) {

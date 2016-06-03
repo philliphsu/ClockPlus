@@ -1,5 +1,7 @@
 package com.philliphsu.clock2.editalarm;
 
+import com.philliphsu.clock2.Alarm;
+
 /**
  * Created by Phillip Hsu on 6/2/2016.
  */
@@ -16,6 +18,7 @@ public interface EditAlarmContract {
         void setTimeTextHint();
         void showTimeText(String timeText);
         void showTimeTextPostBackspace(String newStr);
+        void scheduleAlarm(Alarm alarm);
         int getHour();
         int getMinutes();
         boolean isEnabled();

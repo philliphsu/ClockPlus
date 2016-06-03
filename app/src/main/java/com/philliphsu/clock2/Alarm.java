@@ -104,6 +104,10 @@ public abstract class Alarm implements JsonSerializable {
         return true;
     }
 
+    public void stopSnoozing() {
+        snoozingUntilMillis = 0;
+    }
+
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
     }
