@@ -85,18 +85,9 @@ public class RingtoneActivity extends AppCompatActivity {
     }
 
     private void snooze() {
+        mAlarm.snooze(1); // TODO: Read snooze duration from prefs
         AlarmUtils.scheduleAlarm(this, mAlarm);
-        /*
-        Intent intent = new Intent(this, RingtoneActivity.class)
-                .setData(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM));
-        PendingIntent pi = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
-        AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
-        am.setExact(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + 10000, pi);
-        // Post snoozing notif right away
-        Intent intent2 = new Intent(this, UpcomingAlarmReceiver.class)
-                .setAction(UpcomingAlarmReceiver.ACTION_SHOW_SNOOZING);
-        sendBroadcast(intent2);
-        */
+        AlarmsRepository.getInstance(this).saveItems();
         dismiss();
     }
 

@@ -22,7 +22,11 @@
         <activity
             android:name=".ringtone.RingtoneActivity"
             android:label="@string/title_activity_ringtone"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/AppTheme.NoActionBar"
+            android:excludeFromRecents="true"
+            android:finishOnTaskLaunch="true"
+            android:launchMode="singleTask"
+            android:taskAffinity="com.philliphsu.clock2.RingtoneActivity">
         </activity>
 
         <service

@@ -8,6 +8,7 @@ import android.content.Intent;
 import com.philliphsu.clock2.Alarm;
 import com.philliphsu.clock2.UpcomingAlarmReceiver;
 import com.philliphsu.clock2.ringtone.RingtoneActivity;
+import com.philliphsu.clock2.ringtone.RingtoneService;
 
 import static android.app.PendingIntent.FLAG_CANCEL_CURRENT;
 import static android.app.PendingIntent.FLAG_NO_CREATE;
@@ -57,6 +58,9 @@ public final class AlarmUtils {
         pi.cancel();
 
         removeUpcomingAlarmNotification(c, a);
+
+        // If service is not running, nothing happens
+        c.stopService(new Intent(c, RingtoneService.class));
     }
 
     public static void removeUpcomingAlarmNotification(Context c, Alarm a) {

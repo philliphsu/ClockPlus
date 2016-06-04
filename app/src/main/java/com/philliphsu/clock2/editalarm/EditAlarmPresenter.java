@@ -100,7 +100,8 @@ public class EditAlarmPresenter implements EditAlarmContract.Presenter {
     @Override
     public void stopSnoozing() {
         dismissNow(); // MUST be first, see AlarmUtils.notifyUpcomingAlarmIntent()
-        mAlarm.stopSnoozing(); // TOneverDO: move this from last line
+        mAlarm.stopSnoozing(); // TOneverDO: before dismissNow()
+        mRepository.saveItems();
     }
 
     @Override

@@ -110,7 +110,6 @@ public class RingtoneService extends Service { // TODO: abstract this, make subc
                     .setContentTitle(getString(R.string.missed_alarm))
                     .setContentText(mNormalRingTime)
                     .setSmallIcon(R.mipmap.ic_launcher)
-                    //.setShowWhen(true) // TODO: Is it shown by default?
                     .build();
             // A tag with the name of the subclass is used in addition to the item's id to prevent
             // conflicting notifications for items of different class types. Items of any class type

@@ -23,6 +23,7 @@ public abstract class Alarm implements JsonSerializable {
     private static final int MAX_MINUTES_CAN_SNOOZE = 30; // TODO: Delete this along with all snooze stuff.
 
     // JSON property names
+    private static final String KEY_SNOOZING_UNTIL_MILLIS = "snoozing_until_millis";
     private static final String KEY_ENABLED = "enabled";
     //private static final String KEY_ID = "id"; // Defined in JsonSerializable
     private static final String KEY_HOUR = "hour";
@@ -66,6 +67,7 @@ public abstract class Alarm implements JsonSerializable {
                     .vibrates(jsonObject.getBoolean(KEY_VIBRATES))
                     .rebuild();
             alarm.setEnabled(jsonObject.getBoolean(KEY_ENABLED));
+            alarm.snoozingUntilMillis = jsonObject.getLong(KEY_SNOOZING_UNTIL_MILLIS);
             return alarm;
         } catch (JSONException e) {
             throw new RuntimeException(e);
@@ -185,6 +187,7 @@ public abstract class Alarm implements JsonSerializable {
     public JSONObject toJsonObject() {
         try {
             return new JSONObject()
+                    .put(KEY_SNOOZING_UNTIL_MILLIS, snoozingUntilMillis)
                     .put(KEY_ENABLED, enabled)
                     .put(KEY_ID, id())
                     .put(KEY_HOUR, hour())
