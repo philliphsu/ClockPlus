@@ -45,7 +45,7 @@ public final class AlarmUtils {
         am.setExact(AlarmManager.RTC_WAKEUP, ringAt, alarmIntent(context, alarm, false));
     }
 
-    public static void unscheduleAlarm(Context c, Alarm a) {
+    public static void cancelAlarm(Context c, Alarm a) {
         AlarmManager am = (AlarmManager) c.getSystemService(Context.ALARM_SERVICE);
 
         PendingIntent pi = alarmIntent(c, a, true);

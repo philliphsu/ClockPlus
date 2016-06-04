@@ -39,6 +39,7 @@ import static com.philliphsu.clock2.util.Preconditions.checkNotNull;
 
 public class EditAlarmActivity extends BaseActivity implements
         EditAlarmContract.View,
+        AlarmUtilsHelper,
         AlarmNumpad.KeyListener {
     private static final String TAG = "EditAlarmActivity";
     public static final String EXTRA_ALARM_ID = "com.philliphsu.clock2.editalarm.extra.ALARM_ID";
@@ -66,7 +67,7 @@ public class EditAlarmActivity extends BaseActivity implements
         super.onCreate(savedInstanceState);
         setWeekDaysText();
         mNumpad.setKeyListener(this);
-        mPresenter = new EditAlarmPresenter(this, AlarmsRepository.getInstance(this));
+        mPresenter = new EditAlarmPresenter(this, AlarmsRepository.getInstance(this), this);
         mPresenter.loadAlarm(getIntent().getLongExtra(EXTRA_ALARM_ID, -1));
         mPresenter.setTimeTextHint();
     }
@@ -84,7 +85,7 @@ public class EditAlarmActivity extends BaseActivity implements
                 mPresenter.dismissNow();
                 return true;
             case R.id.action_done_snoozing:
-                mPresenter.endSnoozing();
+                mPresenter.stopSnoozing();
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -391,5 +392,10 @@ public class EditAlarmActivity extends BaseActivity implements
     @Override
     public void scheduleAlarm(Alarm alarm) {
         AlarmUtils.scheduleAlarm(this, alarm);
+    }
+
+    @Override
+    public void cancelAlarm(Alarm alarm) {
+        AlarmUtils.cancelAlarm(this, alarm);
     }
 }

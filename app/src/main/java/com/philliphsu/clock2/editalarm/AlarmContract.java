@@ -16,6 +16,6 @@ interface AlarmContract {
 
     interface Presenter {
         void dismissNow();
-        void endSnoozing();
+        void stopSnoozing();
     }
 }

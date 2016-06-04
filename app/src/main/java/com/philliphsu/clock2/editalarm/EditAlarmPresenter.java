@@ -12,6 +12,7 @@ import java.util.Date;
 import static com.philliphsu.clock2.DaysOfWeek.NUM_DAYS;
 import static com.philliphsu.clock2.DaysOfWeek.SATURDAY;
 import static com.philliphsu.clock2.DaysOfWeek.SUNDAY;
+import static com.philliphsu.clock2.util.Preconditions.checkNotNull;
 
 /**
  * Created by Phillip Hsu on 6/3/2016.
@@ -21,12 +22,15 @@ public class EditAlarmPresenter implements EditAlarmContract.Presenter {
 
     @NonNull private final EditAlarmContract.View mView;
     @NonNull private final Repository<Alarm> mRepository;
+    @NonNull private final AlarmUtilsHelper mAlarmUtilsHelper;
     @Nullable private Alarm mAlarm;
 
     public EditAlarmPresenter(@NonNull EditAlarmContract.View view,
-                              @NonNull Repository<Alarm> repository) {
+                              @NonNull Repository<Alarm> repository,
+                              @NonNull AlarmUtilsHelper helper) {
         mView = view;
         mRepository = repository;
+        mAlarmUtilsHelper = helper;
     }
 
     @Override
@@ -66,19 +70,14 @@ public class EditAlarmPresenter implements EditAlarmContract.Presenter {
                 .build();
         a.setEnabled(mView.isEnabled());
         if (mAlarm != null) {
-            // TODO: Cancel any alarm scheduled with the old alarm's ID
-            // TODO: Schedule the new alarm
+            mAlarmUtilsHelper.cancelAlarm(mAlarm);
             mRepository.updateItem(mAlarm, a);
         } else {
-            // TODO: Schedule the new alarm
             mRepository.addItem(a);
         }
 
         if (a.isEnabled()) {
-            // TODO: Consider passing in some interface during construction that abstracts away the
-            // Context required to call AlarmUtils.scheduleAlarm(), so we can call it here instead.
-            // It doesn't seem right that this task is delegated to the View.
-            mView.scheduleAlarm(a);
+            mAlarmUtilsHelper.scheduleAlarm(a);
         }
 
         mView.showEditorClosed();
@@ -87,20 +86,21 @@ public class EditAlarmPresenter implements EditAlarmContract.Presenter {
     @Override
     public void delete() {
         if (mAlarm != null) {
-            mRepository.deleteItem(mAlarm);
+            mAlarmUtilsHelper.cancelAlarm(mAlarm); // (1)
+            mRepository.deleteItem(mAlarm); // TOneverDO: before (1)
         }
         mView.showEditorClosed();
     }
 
     @Override
     public void dismissNow() {
-        // TODO: Cancel the alarm scheduled
+        mAlarmUtilsHelper.cancelAlarm(checkNotNull(mAlarm));
     }
 
     @Override
-    public void endSnoozing() {
-        // TODO: Write method in ALarm class called endSnoozing()
-        // Cancel the alarm scheduled
+    public void stopSnoozing() {
+        dismissNow(); // MUST be first, see AlarmUtils.notifyUpcomingAlarmIntent()
+        mAlarm.stopSnoozing(); // TOneverDO: move this from last line
     }
 
     @Override

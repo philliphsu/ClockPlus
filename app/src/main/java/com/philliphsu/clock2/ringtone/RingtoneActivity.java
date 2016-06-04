@@ -85,7 +85,6 @@ public class RingtoneActivity extends AppCompatActivity {
     }
 
     private void snooze() {
-        // Schedule another launch
         AlarmUtils.scheduleAlarm(this, mAlarm);
         /*
         Intent intent = new Intent(this, RingtoneActivity.class)

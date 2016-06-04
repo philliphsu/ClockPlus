@@ -131,6 +131,6 @@ public class RingtoneService extends Service { // TODO: abstract this, make subc
         /*int minutes = Integer.parseInt(pref.getString(
                 getString(R.string.key_silence_after),
                 "15"));*/
-        mSilenceHandler.postDelayed(mSilenceRunnable, 10000);
+        mSilenceHandler.postDelayed(mSilenceRunnable, 20000);
     }
 }
