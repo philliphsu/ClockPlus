@@ -9,6 +9,7 @@ import android.media.AudioManager;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
@@ -28,6 +29,17 @@ import static com.philliphsu.clock2.util.Preconditions.checkNotNull;
  * of the RingtoneService will be tied to that of its RingtoneActivity because users are not likely to
  * navigate away from the Activity without making an action. But if they do accidentally navigate away,
  * they have plenty of time to make the desired action via the notification.
+ *
+ * This is both a started and bound service. See https://developer.android.com/guide/components/bound-services.html#Lifecycle
+ * "... the service runs until the service stops itself with stopSelf() or another component
+ * calls stopService(), regardless of whether it is bound to any clients."
+ * The regardless phrase didn't work for me. I had to unbind in RingtoneActivity first before calling
+ * stopSelf() on this service for the ringtone to stop playing.
+ * TODO: Consider making this purely a bound service, so you don't have to bind/unbind AND start/stop
+ * manually. Instead of implementing onStartCommand() and calling startService(), you would write a public
+ * method that the activity calls to start playing the ringtone. When the activity calls its onDestroy(), it unbinds
+ * itself from this service, and the system will know to destroy this service instead of you manually
+ * calling stopSelf() or stopService().
  */
 public class RingtoneService extends Service { // TODO: abstract this, make subclasses
     private static final String TAG = "RingtoneService";
@@ -37,6 +49,7 @@ public class RingtoneService extends Service { // TODO: abstract this, make subc
     private Alarm mAlarm;
     private String mNormalRingTime;
     private boolean mAutoSilenced = false;
+    private RingtoneCallback mRingtoneCallback;
     // TODO: Using Handler for this is ill-suited? Alarm ringing could outlast the
     // application's life. Use AlarmManager API instead.
     private final Handler mSilenceHandler = new Handler();
@@ -44,9 +57,17 @@ public class RingtoneService extends Service { // TODO: abstract this, make subc
         @Override
         public void run() {
             mAutoSilenced = true;
+            if (mRingtoneCallback != null) {
+                // Finish the activity, which fires onDestroy() and then unbinds itself from this service.
+                // All clients must be unbound before stopSelf() (and stopService()?) will succeed.
+                // See https://developer.android.com/guide/components/bound-services.html#Lifecycle
+                // Figure 1 regarding the lifecycle of started and bound services.
+                mRingtoneCallback.onAutoSilence();
+            }
             stopSelf();
         }
     };
+    private final IBinder mBinder = new RingtoneBinder();
 
     // TODO: Apply the setting for "Silence after" here by using an AlarmManager to
     // schedule an alarm in the future to stop this service, and also update the foreground
@@ -121,7 +142,22 @@ public class RingtoneService extends Service { // TODO: abstract this, make subc
 
     @Override
     public IBinder onBind(Intent intent) {
-        return null; // Binding to this service is not supported
+        return mBinder;
+    }
+
+    public void setRingtoneCallback(RingtoneCallback callback) {
+        mRingtoneCallback = callback;
+    }
+
+    // Needed so clients can get the Service instance and e.g. call setRingtoneCallback().
+    public class RingtoneBinder extends Binder {
+        RingtoneService getService() {
+            return RingtoneService.this;
+        }
+    }
+
+    public interface RingtoneCallback {
+        void onAutoSilence();
     }
 
     private void scheduleAutoSilence() {

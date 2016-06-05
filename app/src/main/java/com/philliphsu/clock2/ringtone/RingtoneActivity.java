@@ -1,7 +1,11 @@
 package com.philliphsu.clock2.ringtone;
 
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
@@ -20,7 +24,8 @@ import static com.philliphsu.clock2.util.Preconditions.checkNotNull;
  * TODO: Make this abstract and make appropriate subclasses for Alarms and Timers.
  * TODO: Implement dismiss and extend logic here.
  */
-public class RingtoneActivity extends AppCompatActivity {
+public class RingtoneActivity extends AppCompatActivity implements RingtoneService.RingtoneCallback {
+    private static final String TAG = "RingtoneActivity";
 
     // Shared with RingtoneService
     public static final String EXTRA_ITEM_ID = "com.philliphsu.clock2.ringtone.extra.ITEM_ID";
@@ -37,12 +42,15 @@ public class RingtoneActivity extends AppCompatActivity {
         }
         mAlarm = checkNotNull(AlarmsRepository.getInstance(this).getItem(id));
 
+        // TODO: If the upcoming alarm notification isn't present, verify other notifications aren't affected.
+        // This could be the case if we're starting a new instance of this activity after leaving the first launch.
         AlarmUtils.removeUpcomingAlarmNotification(this, mAlarm);
 
         // Play the ringtone
         Intent intent = new Intent(this, RingtoneService.class)
                 .putExtra(EXTRA_ITEM_ID, mAlarm.id());
         startService(intent);
+        bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
 
         Button snooze = (Button) findViewById(R.id.btn_snooze);
         snooze.setOnClickListener(new View.OnClickListener() {
@@ -84,6 +92,24 @@ public class RingtoneActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    public void onBackPressed() {
+        // Capture the back press and return. We want to limit the user's options for leaving
+        // this activity as much as possible.
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unbindService(mConnection);
+    }
+
+    @Override
+    public void onAutoSilence() {
+        // Service should have stopped itself by this point
+        finish();
+    }
+
     private void snooze() {
         mAlarm.snooze(1); // TODO: Read snooze duration from prefs
         AlarmUtils.scheduleAlarm(this, mAlarm);
@@ -97,4 +123,19 @@ public class RingtoneActivity extends AppCompatActivity {
         // TODO: Do we need to cancel the PendingIntent and the alarm in AlarmManager?
         finish();
     }
+
+    private RingtoneService mBoundService; // TODO: Don't need? Only used locally in ServiceConnection.
+
+    private ServiceConnection mConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            mBoundService = ((RingtoneService.RingtoneBinder) service).getService();
+            mBoundService.setRingtoneCallback(RingtoneActivity.this);
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            mBoundService = null;
+        }
+    };
 }
