@@ -7,7 +7,9 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 
 import com.philliphsu.clock2.Alarm;
@@ -36,11 +38,18 @@ public class RingtoneActivity extends AppCompatActivity implements RingtoneServi
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ringtone);
+
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
+
         long id = getIntent().getLongExtra(EXTRA_ITEM_ID, -1);
         if (id < 0) {
             throw new IllegalStateException("Cannot start RingtoneActivity without item's id");
         }
         mAlarm = checkNotNull(AlarmsRepository.getInstance(this).getItem(id));
+        Log.d(TAG, "Ringing alarm " + mAlarm);
 
         // TODO: If the upcoming alarm notification isn't present, verify other notifications aren't affected.
         // This could be the case if we're starting a new instance of this activity after leaving the first launch.
@@ -66,6 +75,20 @@ public class RingtoneActivity extends AppCompatActivity implements RingtoneServi
                 dismiss();
             }
         });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        //super.onNewIntent(intent); // Not needed since no fragments hosted?
+        // Calling recreate() would recreate this with its current intent, not the new intent passed in here.
+        mBoundService.onNewActivity(); // notify alarm missed
+        finish(); // destroy this, unbind from service, and stop service
+        startActivity(intent);
     }
 
     @Override
@@ -101,13 +124,16 @@ public class RingtoneActivity extends AppCompatActivity implements RingtoneServi
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        // According to the lifecycle diagram, you unbind from the service first and then stop the service.
         unbindService(mConnection);
+        // TODO: Use appropriate subclass
+        // If service is not running, nothing happens.
+        stopService(new Intent(this, RingtoneService.class));
     }
 
     @Override
     public void onAutoSilence() {
-        // Service should have stopped itself by this point
-        finish();
+        dismiss();
     }
 
     private void snooze() {
@@ -118,13 +144,11 @@ public class RingtoneActivity extends AppCompatActivity implements RingtoneServi
     }
 
     private void dismiss() {
-        // TODO: Use appropriate subclass
-        stopService(new Intent(this, RingtoneService.class));
         // TODO: Do we need to cancel the PendingIntent and the alarm in AlarmManager?
         finish();
     }
 
-    private RingtoneService mBoundService; // TODO: Don't need? Only used locally in ServiceConnection.
+    private RingtoneService mBoundService;
 
     private ServiceConnection mConnection = new ServiceConnection() {
         @Override

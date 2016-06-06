@@ -4,6 +4,7 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 
 import com.philliphsu.clock2.Alarm;
 import com.philliphsu.clock2.UpcomingAlarmReceiver;
@@ -24,10 +25,12 @@ import static com.philliphsu.clock2.util.Preconditions.checkNotNull;
  * TODO: Adapt this to Timers too...
  */
 public final class AlarmUtils {
+    private static final String TAG = "AlarmUtils";
 
     private AlarmUtils() {}
 
     public static void scheduleAlarm(Context context, Alarm alarm) {
+        Log.d(TAG, "Scheduling alarm " + alarm);
         AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         // If there is already an alarm for this Intent scheduled (with the equality of two
         // intents being defined by filterEquals(Intent)), then it will be removed and replaced

@@ -64,7 +64,6 @@ public class RingtoneService extends Service { // TODO: abstract this, make subc
                 // Figure 1 regarding the lifecycle of started and bound services.
                 mRingtoneCallback.onAutoSilence();
             }
-            stopSelf();
         }
     };
     private final IBinder mBinder = new RingtoneBinder();
@@ -78,6 +77,7 @@ public class RingtoneService extends Service { // TODO: abstract this, make subc
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (mAudioManager == null && mRingtone == null) {
+            Log.d(TAG, "RingtoneService starting");
             long id = intent.getLongExtra(RingtoneActivity.EXTRA_ITEM_ID, -1);
             mAlarm = checkNotNull(AlarmsRepository.getInstance(this).getItem(id));
             // TODO: The below call requires a notification, and there is no way to provide one suitable
@@ -145,8 +145,17 @@ public class RingtoneService extends Service { // TODO: abstract this, make subc
         return mBinder;
     }
 
+    public void playRingtone() {
+        // TODO
+    }
+
     public void setRingtoneCallback(RingtoneCallback callback) {
         mRingtoneCallback = callback;
+    }
+
+    public void onNewActivity() {
+        mAutoSilenced = true;
+        //stopSelf();
     }
 
     // Needed so clients can get the Service instance and e.g. call setRingtoneCallback().
@@ -166,6 +175,6 @@ public class RingtoneService extends Service { // TODO: abstract this, make subc
         /*int minutes = Integer.parseInt(pref.getString(
                 getString(R.string.key_silence_after),
                 "15"));*/
-        mSilenceHandler.postDelayed(mSilenceRunnable, 20000);
+        //mSilenceHandler.postDelayed(mSilenceRunnable, 10000);
     }
 }

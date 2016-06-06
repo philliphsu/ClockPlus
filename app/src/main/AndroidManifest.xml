@@ -23,6 +23,7 @@
             android:name=".ringtone.RingtoneActivity"
             android:label="@string/title_activity_ringtone"
             android:theme="@style/AppTheme.NoActionBar"
+            android:launchMode="singleTask"
             android:excludeFromRecents="true"
             android:taskAffinity="com.philliphsu.clock2.RingtoneActivity">
         </activity>
