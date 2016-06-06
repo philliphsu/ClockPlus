@@ -50,6 +50,7 @@ public final class AlarmUtils {
     }
 
     public static void cancelAlarm(Context c, Alarm a) {
+        Log.d(TAG, "Cancelling alarm " + a);
         AlarmManager am = (AlarmManager) c.getSystemService(Context.ALARM_SERVICE);
 
         PendingIntent pi = alarmIntent(c, a, true);

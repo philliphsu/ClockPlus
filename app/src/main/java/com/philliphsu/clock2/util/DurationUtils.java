@@ -27,7 +27,7 @@ public class DurationUtils {
         if (abbreviate) {
             if (numHours == 0) {
                 if (numMins == 0) {
-                    res = R.string.abbrev_less_than_one_minute; // TODO: verify formatArgs can be passed in but are ignored
+                    res = R.string.abbrev_less_than_one_minute;
                 } else {
                     res = R.string.abbrev_minutes;
                 }
@@ -41,7 +41,7 @@ public class DurationUtils {
         } else {
             if (numHours == 0) {
                 if (numMins == 0) {
-                    res = R.string.less_than_one_minute; // TODO: verify formatArgs can be passed in but are ignored
+                    res = R.string.less_than_one_minute;
                 } else if (numMins == 1) {
                     res = R.string.minute;
                 } else {
