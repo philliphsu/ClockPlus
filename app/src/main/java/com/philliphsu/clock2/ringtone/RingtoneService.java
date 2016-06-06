@@ -29,17 +29,6 @@ import static com.philliphsu.clock2.util.Preconditions.checkNotNull;
  * of the RingtoneService will be tied to that of its RingtoneActivity because users are not likely to
  * navigate away from the Activity without making an action. But if they do accidentally navigate away,
  * they have plenty of time to make the desired action via the notification.
- *
- * This is both a started and bound service. See https://developer.android.com/guide/components/bound-services.html#Lifecycle
- * "... the service runs until the service stops itself with stopSelf() or another component
- * calls stopService(), regardless of whether it is bound to any clients."
- * The regardless phrase didn't work for me. I had to unbind in RingtoneActivity first before calling
- * stopSelf() on this service for the ringtone to stop playing.
- * TODO: Consider making this purely a bound service, so you don't have to bind/unbind AND start/stop
- * manually. Instead of implementing onStartCommand() and calling startService(), you would write a public
- * method that the activity calls to start playing the ringtone. When the activity calls its onDestroy(), it unbinds
- * itself from this service, and the system will know to destroy this service instead of you manually
- * calling stopSelf() or stopService().
  */
 public class RingtoneService extends Service { // TODO: abstract this, make subclasses
     private static final String TAG = "RingtoneService";
@@ -57,6 +46,7 @@ public class RingtoneService extends Service { // TODO: abstract this, make subc
         @Override
         public void run() {
             mAutoSilenced = true;
+            mRingtone.stop(); // don't wait for activity to finish and unbind
             if (mRingtoneCallback != null) {
                 // Finish the activity, which fires onDestroy() and then unbinds itself from this service.
                 // All clients must be unbound before stopSelf() (and stopService()?) will succeed.
@@ -170,6 +160,6 @@ public class RingtoneService extends Service { // TODO: abstract this, make subc
         /*int minutes = Integer.parseInt(pref.getString(
                 getString(R.string.key_silence_after),
                 "15"));*/
-        //mSilenceHandler.postDelayed(mSilenceRunnable, 10000);
+        mSilenceHandler.postDelayed(mSilenceRunnable, 10000);
     }
 }

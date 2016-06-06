@@ -80,8 +80,7 @@ public class RingtoneActivity extends AppCompatActivity implements RingtoneServi
         //super.onNewIntent(intent); // Not needed since no fragments hosted?
         if (mBound) {
             mBoundService.interrupt(); // prepare to notify the alarm was missed
-            // Cannot rely on finish() to call onDestroy() on time before the activity is restarted,
-            // so unbind from the service manually.
+            // Cannot rely on finish() to call onDestroy() on time before the activity is restarted.
             unbindService();
             // Calling recreate() would recreate this with its current intent, not the new intent passed in here.
             finish();
@@ -139,6 +138,7 @@ public class RingtoneActivity extends AppCompatActivity implements RingtoneServi
 
     private void dismiss() {
         // TODO: Do we need to cancel the PendingIntent and the alarm in AlarmManager?
+        unbindService(); // don't wait for finish() to call onDestroy()
         finish();
     }
 
