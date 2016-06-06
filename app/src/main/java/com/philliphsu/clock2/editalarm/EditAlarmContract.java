@@ -16,6 +16,7 @@ public interface EditAlarmContract {
         void setTimeTextHint();
         void showTimeText(String timeText);
         void showTimeTextPostBackspace(String newStr);
+        void showTimeTextFocused(boolean focused);
         int getHour();
         int getMinutes();
         boolean isEnabled();
@@ -38,5 +39,6 @@ public interface EditAlarmContract {
         void openRingtonePickerDialog();
         void setTimeTextHint();
         void onNumberInput(String formattedInput);
+        void focusTimeText();
     }
 }

@@ -152,6 +152,11 @@ public class EditAlarmPresenter implements EditAlarmContract.Presenter {
         mView.showTimeText(formattedInput);
     }
 
+    @Override
+    public void focusTimeText() {
+        mView.showTimeTextFocused(true);
+    }
+
     private void showDetails() {
         if (mAlarm != null) {
             mView.showTime(mAlarm.hour(), mAlarm.minutes());
@@ -167,8 +172,10 @@ public class EditAlarmPresenter implements EditAlarmContract.Presenter {
             }
             // Editing so don't show
             mView.showNumpad(false);
+            mView.showTimeTextFocused(false);
         } else {
             // TODO default values
+            mView.showTimeTextFocused(true);
             mView.showRingtone(""); // gets default ringtone
             mView.showNumpad(true);
         }

@@ -35,6 +35,9 @@ import butterknife.OnClick;
 import butterknife.OnTouch;
 
 import static android.text.format.DateFormat.getTimeFormat;
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
+import static com.philliphsu.clock2.util.KeyboardUtils.hideKeyboard;
 import static com.philliphsu.clock2.util.Preconditions.checkNotNull;
 
 public class EditAlarmActivity extends BaseActivity implements
@@ -148,24 +151,17 @@ public class EditAlarmActivity extends BaseActivity implements
         mPresenter.onBackspace("");
     }
 
-    @Override
-    public void showRingtonePickerDialog() {
-        Intent intent = new Intent(RingtoneManager.ACTION_RINGTONE_PICKER);
-        intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE, RingtoneManager.TYPE_ALARM)
-                .putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_SILENT, false)
-                // The ringtone to show as selected when the dialog is opened
-                .putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, mSelectedRingtoneUri)
-                // Whether to show "Default" item in the list
-                .putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_DEFAULT, false); // TODO: false?
-        // The ringtone that plays when default option is selected
-        //.putExtra(RingtoneManager.EXTRA_RINGTONE_DEFAULT_URI, DEFAULT_TONE);
-        startActivityForResult(intent, REQUEST_PICK_RINGTONE);
-    }
-
     @OnTouch(R.id.input_time)
     boolean touch(MotionEvent event) {
-        if (event.getActionMasked() == MotionEvent.ACTION_UP && mNumpad.getVisibility() != View.VISIBLE) {
-            mPresenter.showNumpad();
+        if (event.getActionMasked() == MotionEvent.ACTION_UP) {
+            hideKeyboard(this); // If not open, does nothing.
+            mPresenter.focusTimeText();
+            if (mNumpad.getVisibility() != View.VISIBLE) {
+                // TODO: If keyboard was open, consider adding delay to opening the numpad.
+                // Otherwise, it opens immediately behind the keyboard as it is still animating
+                // out of the window.
+                mPresenter.showNumpad();
+            }
         }
         return true;
     }
@@ -202,6 +198,14 @@ public class EditAlarmActivity extends BaseActivity implements
             }
         }
         return false;
+    }
+
+    @OnTouch(R.id.label)
+    boolean touchLabel(MotionEvent event) {
+        if (event.getActionMasked() == MotionEvent.ACTION_UP && mNumpad.getVisibility() == VISIBLE) {
+            mPresenter.hideNumpad();
+        }
+        return false; // don't capture
     }
 
     @OnCheckedChanged(R.id.on_off)
@@ -328,7 +332,7 @@ public class EditAlarmActivity extends BaseActivity implements
 
     @Override
     public void showNumpad(boolean show) {
-        mNumpad.setVisibility(show ? View.VISIBLE : View.GONE);
+        mNumpad.setVisibility(show ? VISIBLE : GONE);
     }
 
     @Override
@@ -386,6 +390,31 @@ public class EditAlarmActivity extends BaseActivity implements
         mTimeText.setSelection(mTimeText.length());
         if (!mNumpad.checkTimeValid() && mSwitch.isChecked()) {
             mSwitch.setChecked(false);
+        }
+    }
+
+    @Override
+    public void showRingtonePickerDialog() {
+        Intent intent = new Intent(RingtoneManager.ACTION_RINGTONE_PICKER);
+        intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE, RingtoneManager.TYPE_ALARM)
+                .putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_SILENT, false)
+                // The ringtone to show as selected when the dialog is opened
+                .putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, mSelectedRingtoneUri)
+                // Whether to show "Default" item in the list
+                .putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_DEFAULT, false); // TODO: false?
+        // The ringtone that plays when default option is selected
+        //.putExtra(RingtoneManager.EXTRA_RINGTONE_DEFAULT_URI, DEFAULT_TONE);
+        startActivityForResult(intent, REQUEST_PICK_RINGTONE);
+    }
+
+    @Override
+    public void showTimeTextFocused(boolean focused) {
+        if (focused) {
+            mTimeText.requestFocus();
+            // Move cursor to end
+            mTimeText.setSelection(mTimeText.length());
+        } else {
+            mTimeText.clearFocus(); // TODO: not cleared! focus needs to go to a neighboring view.
         }
     }
 
