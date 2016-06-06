@@ -26,6 +26,7 @@ import com.philliphsu.clock2.BaseActivity;
 import com.philliphsu.clock2.DaysOfWeek;
 import com.philliphsu.clock2.R;
 import com.philliphsu.clock2.model.AlarmsRepository;
+import com.philliphsu.clock2.util.DurationUtils;
 
 import java.util.Date;
 
@@ -421,6 +422,9 @@ public class EditAlarmActivity extends BaseActivity implements
     @Override
     public void scheduleAlarm(Alarm alarm) {
         AlarmUtils.scheduleAlarm(this, alarm);
+        String message = getString(R.string.alarm_set_for,
+                DurationUtils.toString(this, alarm.ringsIn(), false /*abbreviate?*/));
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show();
     }
 
     @Override

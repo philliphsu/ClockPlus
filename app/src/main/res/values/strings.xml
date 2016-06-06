@@ -16,6 +16,24 @@
     <string name="title_snoozing_until">Snoozing until %1$s</string>
     <string name="dismiss_now">Dismiss now</string>
     <string name="done_snoozing">Done snoozing</string>
+    <string name="alarm_set_for">Alarm set for %1$s from now.</string>
+    <!-- ======================================================================================= -->
+
+    <!-- ==================================== TOASTS ==================================== -->
+    <string name="hour_and_minute">%1$d hour and %2$d minute</string>
+    <string name="hour_and_minutes">%1$d hour and %2$d minutes</string>
+    <string name="hours_and_minute">%1$d hours and %2$d minute</string>
+    <string name="hours_and_minutes">%1$d hours and %2$d minutes</string>
+    <string name="hour">%1$d hour</string>
+    <string name="hours">%1$d hours</string>
+    <string name="minute">%2$d minute</string>
+    <string name="minutes">%2$d minutes</string>
+    <string name="less_than_one_minute">less than 1 minute</string>
+
+    <string name="abbrev_hours_and_minutes">%1$dh %2$dm</string>
+    <string name="abbrev_hours">%1$dh</string>
+    <string name="abbrev_minutes">%2$dm</string>
+    <string name="abbrev_less_than_one_minute">&lt;1m</string>
     <!-- ======================================================================================= -->
     
     <!-- ==================================== NOTIFICATIONS ==================================== -->
