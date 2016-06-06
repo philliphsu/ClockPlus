@@ -76,10 +76,41 @@ public class RingtoneService extends Service { // TODO: abstract this, make subc
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        // If killed while started, don't recreate
+        return START_NOT_STICKY;
+    }
+
+    @Override
+    public void onDestroy() {
+        Log.d(TAG, "onDestroy()");
+        mRingtone.stop();
+        mAudioManager.abandonAudioFocus(null); // no listener was set
+        mSilenceHandler.removeCallbacks(mSilenceRunnable);
+        if (mAutoSilenced) {
+            // Post notification that alarm was missed, or timer expired.
+            // TODO: You should probably do this in the appropriate subclass.
+            NotificationManager nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+            Notification note = new NotificationCompat.Builder(this)
+                    .setContentTitle(getString(R.string.missed_alarm))
+                    .setContentText(mNormalRingTime)
+                    .setSmallIcon(R.mipmap.ic_launcher)
+                    .build();
+            // A tag with the name of the subclass is used in addition to the item's id to prevent
+            // conflicting notifications for items of different class types. Items of any class type
+            // have ids starting from 0.
+            nm.notify(getClass().getName(), mAlarm.intId(), note);
+        }
+        stopForeground(true);
+    }
+
+    @Override
+    public IBinder onBind(Intent intent) {
+        return mBinder;
+    }
+
+    public void playRingtone(long itemId) {
         if (mAudioManager == null && mRingtone == null) {
-            Log.d(TAG, "RingtoneService starting");
-            long id = intent.getLongExtra(RingtoneActivity.EXTRA_ITEM_ID, -1);
-            mAlarm = checkNotNull(AlarmsRepository.getInstance(this).getItem(id));
+            mAlarm = checkNotNull(AlarmsRepository.getInstance(this).getItem(itemId));
             // TODO: The below call requires a notification, and there is no way to provide one suitable
             // for both Alarms and Timers. Consider making this class abstract, and have subclasses
             // implement an abstract method that calls startForeground(). You would then call that
@@ -113,40 +144,6 @@ public class RingtoneService extends Service { // TODO: abstract this, make subc
                 scheduleAutoSilence();
             }
         }
-        // If killed while started, don't recreate
-        return START_NOT_STICKY;
-    }
-
-    @Override
-    public void onDestroy() {
-        Log.d(TAG, "onDestroy()");
-        mRingtone.stop();
-        mAudioManager.abandonAudioFocus(null); // no listener was set
-        mSilenceHandler.removeCallbacks(mSilenceRunnable);
-        if (mAutoSilenced) {
-            // Post notification that alarm was missed, or timer expired.
-            // TODO: You should probably do this in the appropriate subclass.
-            NotificationManager nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-            Notification note = new NotificationCompat.Builder(this)
-                    .setContentTitle(getString(R.string.missed_alarm))
-                    .setContentText(mNormalRingTime)
-                    .setSmallIcon(R.mipmap.ic_launcher)
-                    .build();
-            // A tag with the name of the subclass is used in addition to the item's id to prevent
-            // conflicting notifications for items of different class types. Items of any class type
-            // have ids starting from 0.
-            nm.notify(getClass().getName(), mAlarm.intId(), note);
-        }
-        stopForeground(true);
-    }
-
-    @Override
-    public IBinder onBind(Intent intent) {
-        return mBinder;
-    }
-
-    public void playRingtone() {
-        // TODO
     }
 
     public void setRingtoneCallback(RingtoneCallback callback) {
