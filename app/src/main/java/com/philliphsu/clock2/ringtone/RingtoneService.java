@@ -12,12 +12,12 @@ import android.net.Uri;
 import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
+import android.support.annotation.NonNull;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import com.philliphsu.clock2.Alarm;
 import com.philliphsu.clock2.R;
-import com.philliphsu.clock2.model.AlarmsRepository;
 
 import static com.philliphsu.clock2.util.DateFormatUtils.formatTime;
 import static com.philliphsu.clock2.util.Preconditions.checkNotNull;
@@ -102,9 +102,9 @@ public class RingtoneService extends Service { // TODO: abstract this, make subc
         return mBinder;
     }
 
-    public void playRingtone(long itemId) {
+    public void playRingtone(@NonNull Alarm alarm) {
         if (mAudioManager == null && mRingtone == null) {
-            mAlarm = checkNotNull(AlarmsRepository.getInstance(this).getItem(itemId));
+            mAlarm = checkNotNull(alarm);
             // TODO: The below call requires a notification, and there is no way to provide one suitable
             // for both Alarms and Timers. Consider making this class abstract, and have subclasses
             // implement an abstract method that calls startForeground(). You would then call that
@@ -144,9 +144,13 @@ public class RingtoneService extends Service { // TODO: abstract this, make subc
         mRingtoneCallback = callback;
     }
 
-    public void onNewActivity() {
+    /**
+     * A way for clients to interrupt the currently running instance of this service. Interrupting
+     * the service is akin to prematurely auto silencing the ringtone right now. <b>Clients MUST
+     * unbind from this service immediately after interrupting.</b>
+     */
+    public void interrupt() {
         mAutoSilenced = true;
-        //stopSelf();
     }
 
     // Needed so clients can get the Service instance and e.g. call setRingtoneCallback().

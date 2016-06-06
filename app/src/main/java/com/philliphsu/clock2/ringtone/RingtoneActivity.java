@@ -33,6 +33,7 @@ public class RingtoneActivity extends AppCompatActivity implements RingtoneServi
     public static final String EXTRA_ITEM_ID = "com.philliphsu.clock2.ringtone.extra.ITEM_ID";
 
     private Alarm mAlarm;
+    private boolean mBound = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,10 +56,7 @@ public class RingtoneActivity extends AppCompatActivity implements RingtoneServi
         // This could be the case if we're starting a new instance of this activity after leaving the first launch.
         AlarmUtils.removeUpcomingAlarmNotification(this, mAlarm);
 
-        // Play the ringtone
-        Intent intent = new Intent(this, RingtoneService.class)
-                .putExtra(EXTRA_ITEM_ID, mAlarm.id());
-        startService(intent);
+        Intent intent = new Intent(this, RingtoneService.class);
         bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
 
         Button snooze = (Button) findViewById(R.id.btn_snooze);
@@ -78,17 +76,17 @@ public class RingtoneActivity extends AppCompatActivity implements RingtoneServi
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-    }
-
-    @Override
     protected void onNewIntent(Intent intent) {
         //super.onNewIntent(intent); // Not needed since no fragments hosted?
-        // Calling recreate() would recreate this with its current intent, not the new intent passed in here.
-        mBoundService.onNewActivity(); // notify alarm missed
-        finish(); // destroy this, unbind from service, and stop service
-        startActivity(intent);
+        if (mBound) {
+            mBoundService.interrupt(); // prepare to notify the alarm was missed
+            // Cannot rely on finish() to call onDestroy() on time before the activity is restarted,
+            // so unbind from the service manually.
+            unbindService();
+            // Calling recreate() would recreate this with its current intent, not the new intent passed in here.
+            finish();
+            startActivity(intent);
+        }
     }
 
     @Override
@@ -124,11 +122,7 @@ public class RingtoneActivity extends AppCompatActivity implements RingtoneServi
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        // According to the lifecycle diagram, you unbind from the service first and then stop the service.
-        unbindService(mConnection);
-        // TODO: Use appropriate subclass
-        // If service is not running, nothing happens.
-        stopService(new Intent(this, RingtoneService.class));
+        unbindService();
     }
 
     @Override
@@ -148,18 +142,28 @@ public class RingtoneActivity extends AppCompatActivity implements RingtoneServi
         finish();
     }
 
+    private void unbindService() {
+        if (mBound) {
+            unbindService(mConnection);
+            mBound = false;
+        }
+    }
+
     private RingtoneService mBoundService;
 
     private ServiceConnection mConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             mBoundService = ((RingtoneService.RingtoneBinder) service).getService();
+            mBoundService.playRingtone(mAlarm);
             mBoundService.setRingtoneCallback(RingtoneActivity.this);
+            mBound = true;
         }
 
         @Override
         public void onServiceDisconnected(ComponentName name) {
             mBoundService = null;
+            mBound = false;
         }
     };
 }
