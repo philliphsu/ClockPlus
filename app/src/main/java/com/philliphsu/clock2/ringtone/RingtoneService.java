@@ -2,6 +2,7 @@ package com.philliphsu.clock2.ringtone;
 
 import android.app.Notification;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -18,6 +19,8 @@ import android.util.Log;
 
 import com.philliphsu.clock2.Alarm;
 import com.philliphsu.clock2.R;
+import com.philliphsu.clock2.editalarm.AlarmUtils;
+import com.philliphsu.clock2.model.AlarmsRepository;
 
 import static com.philliphsu.clock2.util.DateFormatUtils.formatTime;
 import static com.philliphsu.clock2.util.Preconditions.checkNotNull;
@@ -32,6 +35,12 @@ import static com.philliphsu.clock2.util.Preconditions.checkNotNull;
  */
 public class RingtoneService extends Service { // TODO: abstract this, make subclasses
     private static final String TAG = "RingtoneService";
+
+    /* TOneverDO: not private */
+    private static final String ACTION_SNOOZE = "com.philliphsu.clock2.ringtone.action.SNOOZE";
+    private static final String ACTION_DISMISS = "com.philliphsu.clock2.ringtone.action.DISMISS";
+    // TODO: Same value as RingtoneActivity.EXTRA_ITEM_ID. Is it important enough to define a different constant?
+    private static final String EXTRA_ITEM_ID = "com.philliphsu.clock2.ringtone.extra.ITEM_ID";
 
     private AudioManager mAudioManager;
     private Ringtone mRingtone;
@@ -52,7 +61,7 @@ public class RingtoneService extends Service { // TODO: abstract this, make subc
                 // All clients must be unbound before stopSelf() (and stopService()?) will succeed.
                 // See https://developer.android.com/guide/components/bound-services.html#Lifecycle
                 // Figure 1 regarding the lifecycle of started and bound services.
-                mRingtoneCallback.onAutoSilence();
+                mRingtoneCallback.onServiceFinish();
             }
         }
     };
@@ -63,6 +72,31 @@ public class RingtoneService extends Service { // TODO: abstract this, make subc
     // notification to say "alarm missed" in the case of Alarms or "timer expired" for Timers.
     // If Alarms and Timers will have distinct settings for this, then consider doing this
     // operation in the respective subclass of this service.
+
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        // Although this is a bound service, we override this method because this class is reused for
+        // handling the notification actions for the presently ringing alarm. From the docs of Context#startService():
+        // "Using startService() overrides the default service lifetime that is managed by
+        // bindService(Intent, ServiceConnection, int): it requires the service to remain running until
+        // stopService(Intent)* is called, regardless of whether any clients are connected to it."
+        // * Would stopSelf() also work?
+
+        if (ACTION_SNOOZE.equals(intent.getAction())) {
+            long id = intent.getLongExtra(EXTRA_ITEM_ID, -1);
+            if (id < 0) throw new IllegalStateException("No item id set");
+            Alarm alarm = checkNotNull(AlarmsRepository.getInstance(this).getItem(id));
+            alarm.snooze(1); // TODO: read snooze duration in prefs
+            AlarmUtils.scheduleAlarm(this, alarm);
+        }
+        stopSelf(startId);
+        if (mRingtoneCallback != null) {
+            mRingtoneCallback.onServiceFinish();
+        }
+
+        return START_NOT_STICKY; // If killed while started, don't recreate. Should be sufficient.
+    }
 
     @Override
     public void onDestroy() {
@@ -108,6 +142,12 @@ public class RingtoneService extends Service { // TODO: abstract this, make subc
                     .setSmallIcon(R.mipmap.ic_launcher) // TODO: alarm icon
                     .setContentTitle(title)
                     .setContentText(mNormalRingTime)
+                    .addAction(R.mipmap.ic_launcher,
+                            getString(R.string.snooze),
+                            getPendingIntent(ACTION_SNOOZE, mAlarm))
+                    .addAction(R.mipmap.ic_launcher,
+                            getString(R.string.dismiss),
+                            getPendingIntent(ACTION_DISMISS, mAlarm))
                     .build();
             startForeground(R.id.ringtone_service_notification, note); // TOneverDO: Pass 0 as the first argument
 
@@ -151,7 +191,7 @@ public class RingtoneService extends Service { // TODO: abstract this, make subc
     }
 
     public interface RingtoneCallback {
-        void onAutoSilence();
+        void onServiceFinish();
     }
 
     private void scheduleAutoSilence() {
@@ -160,6 +200,17 @@ public class RingtoneService extends Service { // TODO: abstract this, make subc
         /*int minutes = Integer.parseInt(pref.getString(
                 getString(R.string.key_silence_after),
                 "15"));*/
-        mSilenceHandler.postDelayed(mSilenceRunnable, 10000);
+        mSilenceHandler.postDelayed(mSilenceRunnable, 20000);
+    }
+
+    private PendingIntent getPendingIntent(@NonNull String action, Alarm alarm) {
+        Intent intent = new Intent(this, getClass())
+                .setAction(action)
+                .putExtra(EXTRA_ITEM_ID, alarm.id());
+        return PendingIntent.getService(
+                this,
+                alarm.intId(),
+                intent,
+                PendingIntent.FLAG_ONE_SHOT);
     }
 }

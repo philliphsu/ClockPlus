@@ -11,12 +11,14 @@ import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.philliphsu.clock2.Alarm;
 import com.philliphsu.clock2.R;
 import com.philliphsu.clock2.editalarm.AlarmUtils;
 import com.philliphsu.clock2.model.AlarmsRepository;
 
+import static com.philliphsu.clock2.util.DateFormatUtils.formatTime;
 import static com.philliphsu.clock2.util.Preconditions.checkNotNull;
 
 /**
@@ -125,7 +127,7 @@ public class RingtoneActivity extends AppCompatActivity implements RingtoneServi
     }
 
     @Override
-    public void onAutoSilence() {
+    public void onServiceFinish() {
         dismiss();
     }
 
@@ -133,6 +135,9 @@ public class RingtoneActivity extends AppCompatActivity implements RingtoneServi
         mAlarm.snooze(1); // TODO: Read snooze duration from prefs
         AlarmUtils.scheduleAlarm(this, mAlarm);
         AlarmsRepository.getInstance(this).saveItems();
+        // Display toast
+        String message = getString(R.string.title_snoozing_until, formatTime(this, mAlarm.snoozingUntil()));
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show();
         dismiss();
     }
 

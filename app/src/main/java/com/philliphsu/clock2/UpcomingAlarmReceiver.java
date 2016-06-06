@@ -17,15 +17,12 @@ import static com.philliphsu.clock2.util.Preconditions.checkNotNull;
 
 public class UpcomingAlarmReceiver extends BroadcastReceiver {
     private static final String TAG = "UpcomingAlarmReceiver";
+    /*TOneverDO: not private*/
+    private static final String ACTION_DISMISS_NOW = "com.philliphsu.clock2.action.DISMISS_NOW";
 
-    public static final String ACTION_CANCEL_NOTIFICATION
-            = "com.philliphsu.clock2.action.CANCEL_NOTIFICATION";
-    public static final String ACTION_SHOW_SNOOZING
-            = "com.philliphsu.clock2.action.SHOW_SNOOZING";
-    /*TOneverDO: not private*/ private static final String ACTION_DISMISS_NOW
-            = "com.philliphsu.clock2.action.DISMISS_NOW";
-    public static final String EXTRA_ALARM_ID
-            = "com.philliphsu.clock2.extra.ALARM_ID";
+    public static final String ACTION_CANCEL_NOTIFICATION = "com.philliphsu.clock2.action.CANCEL_NOTIFICATION";
+    public static final String ACTION_SHOW_SNOOZING = "com.philliphsu.clock2.action.SHOW_SNOOZING";
+    public static final String EXTRA_ALARM_ID = "com.philliphsu.clock2.extra.ALARM_ID";
 
     @Override
     public void onReceive(Context context, Intent intent) {
