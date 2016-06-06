@@ -75,12 +75,6 @@ public class RingtoneService extends Service { // TODO: abstract this, make subc
     // operation in the respective subclass of this service.
 
     @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        // If killed while started, don't recreate
-        return START_NOT_STICKY;
-    }
-
-    @Override
     public void onDestroy() {
         Log.d(TAG, "onDestroy()");
         mRingtone.stop();
