@@ -12,6 +12,10 @@ import java.util.concurrent.TimeUnit;
  * Created by Phillip Hsu on 6/6/2016.
  */
 public class DurationUtils {
+    public static final int HOURS = 0;
+    public static final int MINUTES = 1;
+    public static final int SECONDS = 2;
+    public static final int MILLIS = 3;
 
     /** Return a string representing the duration, formatted in hours and minutes.
      * TODO: Need to adapt this to represent all time fields eventually */

@@ -31,18 +31,19 @@ import static com.philliphsu.clock2.util.DateFormatUtils.formatTime;
 /**
  * Created by Phillip Hsu on 5/31/2016.
  */
-public class AlarmViewHolder extends BaseViewHolder<Alarm> {
+public class AlarmViewHolder extends BaseViewHolder<Alarm> implements AlarmCountdown.OnTickListener {
     private static final RelativeSizeSpan AMPM_SIZE_SPAN = new RelativeSizeSpan(0.5f);
 
     @Bind(R.id.time) TextView mTime;
     @Bind(R.id.on_off_switch) SwitchCompat mSwitch;
     @Bind(R.id.label) TextView mLabel;
-    @Bind(R.id.countdown) TextView mCountdown; // TODO: Change type to NextAlarmText, once you move that class to this project
+    @Bind(R.id.countdown) AlarmCountdown mCountdown;
     @Bind(R.id.recurring_days) TextView mDays;
     @Bind(R.id.dismiss) Button mDismissButton;
 
     public AlarmViewHolder(ViewGroup parent, OnListItemInteractionListener<Alarm> listener) {
         super(parent, R.layout.item_alarm, listener);
+        mCountdown.setOnTickListener(this);
     }
 
     @Override
@@ -88,9 +89,14 @@ public class AlarmViewHolder extends BaseViewHolder<Alarm> {
         bindDays(num > 0, text);
     }
 
+    @Override
+    public void onTick() {
+        mCountdown.showAsText(getAlarm().ringsIn());
+    }
+
     @OnClick(R.id.dismiss)
     void onClick() {
-        AlarmUtils.cancelAlarm(getContext(), getItem());
+        AlarmUtils.cancelAlarm(getContext(), getAlarm());
         bindDismissButton(false, ""); // Will be set to correct text the next time we bind.
         // TODO: Check if alarm has no recurrence, then turn it off.
     }
@@ -113,11 +119,11 @@ public class AlarmViewHolder extends BaseViewHolder<Alarm> {
 
     private void bindCountdown(boolean enabled, long remainingTime) {
         if (enabled) {
-            //TODO:mCountdown.showAsText(remainingTime);
-            //TODO:mCountdown.getTickHandler().startTicking(true)
+            mCountdown.showAsText(remainingTime);
+            mCountdown.startTicking(true);
             mCountdown.setVisibility(VISIBLE);
         } else {
-            //TODO:mCountdown.getTickHandler().stopTicking();
+            mCountdown.stopTicking();
             mCountdown.setVisibility(GONE);
         }
     }
@@ -139,5 +145,9 @@ public class AlarmViewHolder extends BaseViewHolder<Alarm> {
 
     private void setVisibility(@NonNull View view, boolean visible) {
         view.setVisibility(visible ? VISIBLE : GONE);
+    }
+
+    private Alarm getAlarm() {
+        return getItem();
     }
 }

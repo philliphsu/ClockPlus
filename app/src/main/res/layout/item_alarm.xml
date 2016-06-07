@@ -42,7 +42,7 @@
         android:layout_below="@id/time_layout"
         android:layout_marginBottom="@dimen/item_margin_between_elements"/>
 
-    <TextView
+    <com.philliphsu.clock2.alarms.AlarmCountdown
         android:id="@+id/countdown"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
