@@ -1,7 +1,5 @@
 package com.philliphsu.clock2.alarms;
 
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.SwitchCompat;
 import android.text.SpannableString;
@@ -54,13 +52,8 @@ public class AlarmViewHolder extends BaseViewHolder<Alarm> {
         bindSwitch(alarm.isEnabled());
         bindCountdown(alarm.isEnabled(), alarm.ringsIn());
 
-        // TODO: shared prefs
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getContext());
-        // how many hours before alarm is considered upcoming
-        /*int hoursBeforeUpcoming = Integer.parseInt(prefs.getString(
-                    mContext.getString(-1TODO:R.string.key_notify_me_of_upcoming_alarms),
-                    "2"));*/
-        boolean visible = alarm.isEnabled() && (alarm.ringsWithinHours(2) || alarm.isSnoozed());
+        int hoursBeforeUpcoming = AlarmUtils.hoursBeforeUpcoming(getContext());
+        boolean visible = alarm.isEnabled() && (alarm.ringsWithinHours(hoursBeforeUpcoming) || alarm.isSnoozed());
         String buttonText = alarm.isSnoozed()
                 ? getContext().getString(R.string.title_snoozing_until, formatTime(getContext(), alarm.snoozingUntil()))
                 : getContext().getString(R.string.dismiss_now);
@@ -102,8 +95,6 @@ public class AlarmViewHolder extends BaseViewHolder<Alarm> {
         // TODO: Check if alarm has no recurrence, then turn it off.
     }
 
-    // TODO: Break onBind() into smaller helper method calls. Then, you can update certain
-    // pieces of the VH on demand without having to rebind the whole thing.
     private void bindTime(Date date) {
         String time = DateFormat.getTimeFormat(getContext()).format(date);
         if (DateFormat.is24HourFormat(getContext())) {

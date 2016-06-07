@@ -51,9 +51,9 @@
             android:key="@string/key_first_day_of_week"
             android:title="@string/title_first_day_of_week"
             android:dialogTitle="@string/title_first_day_of_week"
-            android:entries="@array/array_first_day_of_week"
-            android:entryValues="@array/array_first_day_of_week"
-            android:defaultValue="@string/sunday"
+            android:entries="@array/entries_first_day_of_week"
+            android:entryValues="@array/values_first_day_of_week"
+            android:defaultValue="@string/value_sunday"
             android:summary="%s"/>
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/title_category_timers">

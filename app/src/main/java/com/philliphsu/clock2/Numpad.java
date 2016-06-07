@@ -28,7 +28,7 @@ public abstract class Numpad extends TableLayout {
 
     // Derived classes need to build this themselves via buildBackspace().
     private ImageButton mBackspace;
-    private ImageButton mCollapse; // TODO: useless?
+    private ImageButton mCollapse;
     private int[] mInput;
     private int mCount = 0;
     private KeyListener mKeyListener;

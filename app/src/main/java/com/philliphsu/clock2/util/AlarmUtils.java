@@ -4,9 +4,12 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.preference.PreferenceManager;
+import android.support.annotation.StringRes;
 import android.util.Log;
 
 import com.philliphsu.clock2.Alarm;
+import com.philliphsu.clock2.R;
 import com.philliphsu.clock2.UpcomingAlarmReceiver;
 import com.philliphsu.clock2.ringtone.RingtoneActivity;
 import com.philliphsu.clock2.ringtone.RingtoneService;
@@ -42,10 +45,10 @@ public final class AlarmUtils {
         // to handle that yourself by using a wakelock, etc..
         // We use a WAKEUP alarm to send the upcoming alarm notification so it goes off even if the
         // device is asleep. Otherwise, it will not go off until the device is turned back on.
-        // todo: read shared prefs for number of hours to be notified in advance
         long ringAt = alarm.isSnoozed() ? alarm.snoozingUntil() : alarm.ringsAt();
         // If snoozed, upcoming note posted immediately.
-        am.set(AlarmManager.RTC_WAKEUP, ringAt - 2*3600000, notifyUpcomingAlarmIntent(context, alarm, false));
+        am.set(AlarmManager.RTC_WAKEUP, ringAt - hoursBeforeUpcoming(context) * 3600000,
+                notifyUpcomingAlarmIntent(context, alarm, false));
         am.setExact(AlarmManager.RTC_WAKEUP, ringAt, alarmIntent(context, alarm, false));
     }
 
@@ -72,6 +75,28 @@ public final class AlarmUtils {
                 .setAction(UpcomingAlarmReceiver.ACTION_CANCEL_NOTIFICATION)
                 .putExtra(UpcomingAlarmReceiver.EXTRA_ALARM_ID, a.id());
         c.sendBroadcast(intent);
+    }
+
+    public static int snoozeDuration(Context c) {
+        return readPreference(c, R.string.key_snooze_duration, 10);
+    }
+
+    // TODO: Consider renaming to hoursToNotifyInAdvance()
+    public static int hoursBeforeUpcoming(Context c) {
+        return readPreference(c, R.string.key_notify_me_of_upcoming_alarms, 2);
+    }
+
+    public static int minutesToSilenceAfter(Context c) {
+        return readPreference(c, R.string.key_silence_after, 15);
+    }
+
+    public static int firstDayOfWeek(Context c) {
+        return readPreference(c, R.string.key_first_day_of_week, 0 /* Sunday */);
+    }
+
+    public static int readPreference(Context c, @StringRes int key, int defaultValue) {
+        String value = PreferenceManager.getDefaultSharedPreferences(c).getString(c.getString(key), null);
+        return null == value ? defaultValue : Integer.parseInt(value);
     }
 
     private static PendingIntent alarmIntent(Context context, Alarm alarm, boolean retrievePrevious) {

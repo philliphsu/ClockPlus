@@ -19,8 +19,8 @@ import android.util.Log;
 
 import com.philliphsu.clock2.Alarm;
 import com.philliphsu.clock2.R;
-import com.philliphsu.clock2.util.AlarmUtils;
 import com.philliphsu.clock2.model.AlarmsRepository;
+import com.philliphsu.clock2.util.AlarmUtils;
 
 import static com.philliphsu.clock2.util.DateFormatUtils.formatTime;
 import static com.philliphsu.clock2.util.Preconditions.checkNotNull;
@@ -67,13 +67,6 @@ public class RingtoneService extends Service { // TODO: abstract this, make subc
     };
     private final IBinder mBinder = new RingtoneBinder();
 
-    // TODO: Apply the setting for "Silence after" here by using an AlarmManager to
-    // schedule an alarm in the future to stop this service, and also update the foreground
-    // notification to say "alarm missed" in the case of Alarms or "timer expired" for Timers.
-    // If Alarms and Timers will have distinct settings for this, then consider doing this
-    // operation in the respective subclass of this service.
-
-
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         // Although this is a bound service, we override this method because this class is reused for
@@ -89,7 +82,7 @@ public class RingtoneService extends Service { // TODO: abstract this, make subc
             long id = intent.getLongExtra(EXTRA_ITEM_ID, -1);
             if (id < 0) throw new IllegalStateException("No item id set");
             Alarm alarm = checkNotNull(AlarmsRepository.getInstance(this).getItem(id));
-            alarm.snooze(1); // TODO: read snooze duration in prefs
+            alarm.snooze(AlarmUtils.snoozeDuration(this));
             AlarmUtils.scheduleAlarm(this, alarm);
         }
         stopSelf(startId);
@@ -196,13 +189,12 @@ public class RingtoneService extends Service { // TODO: abstract this, make subc
         void onServiceFinish();
     }
 
+    // TODO: For Timers, update the foreground notification to say "timer expired". Also,
+    // if Alarms and Timers will have distinct settings for the minutes to silence after, then consider
+    // doing this in the respective subclass of this service.
     private void scheduleAutoSilence() {
-        // TODO: Read prefs
-        //SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
-        /*int minutes = Integer.parseInt(pref.getString(
-                getString(R.string.key_silence_after),
-                "15"));*/
-        mSilenceHandler.postDelayed(mSilenceRunnable, 20000);
+        int minutes = AlarmUtils.minutesToSilenceAfter(this);
+        mSilenceHandler.postDelayed(mSilenceRunnable, minutes * 60000);
     }
 
     private PendingIntent getPendingIntent(@NonNull String action, Alarm alarm) {

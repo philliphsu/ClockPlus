@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.StringRes;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.SwitchCompat;
 import android.text.SpannableString;
@@ -25,6 +26,7 @@ import com.philliphsu.clock2.Alarm;
 import com.philliphsu.clock2.BaseActivity;
 import com.philliphsu.clock2.DaysOfWeek;
 import com.philliphsu.clock2.R;
+import com.philliphsu.clock2.SharedPreferencesHelper;
 import com.philliphsu.clock2.model.AlarmsRepository;
 import com.philliphsu.clock2.util.AlarmUtils;
 import com.philliphsu.clock2.util.DurationUtils;
@@ -42,10 +44,10 @@ import static android.view.View.VISIBLE;
 import static com.philliphsu.clock2.util.KeyboardUtils.hideKeyboard;
 import static com.philliphsu.clock2.util.Preconditions.checkNotNull;
 
-public class EditAlarmActivity extends BaseActivity implements
+public class EditAlarmActivity extends BaseActivity implements AlarmNumpad.KeyListener,
         EditAlarmContract.View,
         AlarmUtilsHelper,
-        AlarmNumpad.KeyListener {
+        SharedPreferencesHelper {
     private static final String TAG = "EditAlarmActivity";
     public static final String EXTRA_ALARM_ID = "com.philliphsu.clock2.editalarm.extra.ALARM_ID";
     private static final RelativeSizeSpan AMPM_SIZE_SPAN = new RelativeSizeSpan(0.5f);
@@ -72,7 +74,7 @@ public class EditAlarmActivity extends BaseActivity implements
         super.onCreate(savedInstanceState);
         setWeekDaysText();
         mNumpad.setKeyListener(this);
-        mPresenter = new EditAlarmPresenter(this, AlarmsRepository.getInstance(this), this);
+        mPresenter = new EditAlarmPresenter(this, AlarmsRepository.getInstance(this), this, this);
         mPresenter.loadAlarm(getIntent().getLongExtra(EXTRA_ALARM_ID, -1));
         mPresenter.setTimeTextHint();
     }
@@ -431,5 +433,10 @@ public class EditAlarmActivity extends BaseActivity implements
     @Override
     public void cancelAlarm(Alarm alarm) {
         AlarmUtils.cancelAlarm(this, alarm);
+    }
+
+    @Override
+    public int getInt(@StringRes int key, int defaultValue) {
+        return AlarmUtils.readPreference(this, key, defaultValue);
     }
 }

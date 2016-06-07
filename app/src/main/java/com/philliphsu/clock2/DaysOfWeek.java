@@ -1,10 +1,10 @@
 package com.philliphsu.clock2;
 
 import android.content.Context;
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
 import android.support.annotation.VisibleForTesting;
 import android.util.Log;
+
+import com.philliphsu.clock2.util.AlarmUtils;
 
 import java.util.Arrays;
 
@@ -38,16 +38,14 @@ public class DaysOfWeek {
     
     private static Context sAppContext;
     private static DaysOfWeek sInstance;
-    private static String sLastPreferredFirstDay;
+    private static int sLastPreferredFirstDay;
 
     public static DaysOfWeek getInstance(Context context) {
         sAppContext = context.getApplicationContext();
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        // TODO First day of week preference. Entries are the full days' names and values are their respective integers.
-        String preferredFirstDay = prefs.getString("", "0");
-        if (sInstance == null || !preferredFirstDay.equals(sLastPreferredFirstDay)) {
+        int preferredFirstDay = AlarmUtils.firstDayOfWeek(context);
+        if (sInstance == null || preferredFirstDay != sLastPreferredFirstDay) {
             sLastPreferredFirstDay = preferredFirstDay;
-            sInstance = new DaysOfWeek(Integer.parseInt(preferredFirstDay));
+            sInstance = new DaysOfWeek(preferredFirstDay);
         }
         Log.d(TAG, sInstance.toString());
         return sInstance;

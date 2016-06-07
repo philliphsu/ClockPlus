@@ -15,8 +15,8 @@ import android.widget.Toast;
 
 import com.philliphsu.clock2.Alarm;
 import com.philliphsu.clock2.R;
-import com.philliphsu.clock2.util.AlarmUtils;
 import com.philliphsu.clock2.model.AlarmsRepository;
+import com.philliphsu.clock2.util.AlarmUtils;
 
 import static com.philliphsu.clock2.util.DateFormatUtils.formatTime;
 import static com.philliphsu.clock2.util.Preconditions.checkNotNull;
@@ -132,7 +132,8 @@ public class RingtoneActivity extends AppCompatActivity implements RingtoneServi
     }
 
     private void snooze() {
-        mAlarm.snooze(1); // TODO: Read snooze duration from prefs
+        int snoozeMins = AlarmUtils.snoozeDuration(this);
+        mAlarm.snooze(snoozeMins);
         AlarmUtils.scheduleAlarm(this, mAlarm);
         AlarmsRepository.getInstance(this).saveItems();
         // Display toast

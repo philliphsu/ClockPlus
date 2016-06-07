@@ -72,9 +72,17 @@
     <string name="saturday">Saturday</string>
     <string name="sunday">Sunday</string>
     <string name="monday">Monday</string>
-    <string-array name="array_first_day_of_week">
+    <string name="value_saturday">6</string>
+    <string name="value_sunday">0</string>
+    <string name="value_monday">1</string>
+    <string-array name="entries_first_day_of_week">
         <item>@string/saturday</item>
         <item>@string/sunday</item>
         <item>@string/monday</item>
+    </string-array>
+    <string-array name="values_first_day_of_week">
+        <item>@string/value_saturday</item>
+        <item>@string/value_sunday</item>
+        <item>@string/value_monday</item>
     </string-array>
 </resources>

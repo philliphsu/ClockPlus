@@ -5,6 +5,8 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.philliphsu.clock2.Alarm;
+import com.philliphsu.clock2.R;
+import com.philliphsu.clock2.SharedPreferencesHelper;
 import com.philliphsu.clock2.model.Repository;
 
 import java.util.Date;
@@ -23,14 +25,17 @@ public class EditAlarmPresenter implements EditAlarmContract.Presenter {
     @NonNull private final EditAlarmContract.View mView;
     @NonNull private final Repository<Alarm> mRepository;
     @NonNull private final AlarmUtilsHelper mAlarmUtilsHelper;
+    @NonNull private final SharedPreferencesHelper mSharedPreferencesHelper;
     @Nullable private Alarm mAlarm;
 
     public EditAlarmPresenter(@NonNull EditAlarmContract.View view,
                               @NonNull Repository<Alarm> repository,
-                              @NonNull AlarmUtilsHelper helper) {
+                              @NonNull AlarmUtilsHelper helper,
+                              @NonNull SharedPreferencesHelper sharedPreferencesHelper) {
         mView = view;
         mRepository = repository;
         mAlarmUtilsHelper = helper;
+        mSharedPreferencesHelper = sharedPreferencesHelper;
     }
 
     @Override
@@ -128,8 +133,8 @@ public class EditAlarmPresenter implements EditAlarmContract.Presenter {
     @Override
     public void onPrepareOptionsMenu() {
         if (mAlarm != null && mAlarm.isEnabled()) {
-            // TODO: Read upcoming threshold preference
-            if ((mAlarm.ringsWithinHours(2))) {
+            int hoursBeforeUpcoming = mSharedPreferencesHelper.getInt(R.string.key_notify_me_of_upcoming_alarms, 2);
+            if ((mAlarm.ringsWithinHours(hoursBeforeUpcoming))) {
                 mView.showCanDismissNow();
             } else if (mAlarm.isSnoozed()) {
                 mView.showSnoozed(new Date(mAlarm.snoozingUntil()));
