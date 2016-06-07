@@ -2,6 +2,7 @@ package com.philliphsu.clock2;
 
 import android.media.AudioManager;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.CallSuper;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.MenuRes;
@@ -35,7 +36,7 @@ public abstract class BaseActivity extends AppCompatActivity {
         // When false, the system sets the default values only if this method has
         // never been called in the past (or the KEY_HAS_SET_DEFAULT_VALUES in the
         // default value shared preferences file is false).
-//TODO        PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
+        PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
         // Direct volume changes to the alarm stream
         setVolumeControlStream(AudioManager.STREAM_ALARM);
         ButterKnife.bind(this);

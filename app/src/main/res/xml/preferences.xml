@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+                  xmlns:app="http://schemas.android.com/apk/res-auto">
+    <PreferenceCategory android:title="@string/pref_category_world_clock">
+        <ListPreference
+            android:key="pref_show_time_offsets_from"
+            android:title="@string/pref_show_time_offsets_from"
+            android:dialogTitle="@string/pref_show_time_offsets_from"
+            android:entries="@array/pref_show_time_offsets_from_array"
+            android:entryValues="@array/pref_show_time_offsets_from_array"
+            android:defaultValue="@string/pref_show_time_offsets_from_local"
+            android:summary="%s"/>
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/pref_category_alarms">
+        <ListPreference
+            android:key="pref_time_picker_style"
+            android:title="@string/pref_time_picker_style"
+            android:dialogTitle="@string/pref_time_picker_style"
+            android:entries="@array/pref_time_picker_style_array"
+            android:entryValues="@array/pref_time_picker_style_array"
+            android:defaultValue="@string/pref_time_picker_style_number_pad"
+            android:summary="%s"/>
+        <ListPreference
+            android:key="@string/key_silence_after"
+            android:title="@string/title_silence_after"
+            android:dialogTitle="@string/title_silence_after"
+            android:entries="@array/entries_duration"
+            android:entryValues="@array/values_duration"
+            android:defaultValue="1"
+            android:summary="%s"/>
+        <ListPreference
+            android:key="pref_snooze_duration"
+            android:title="@string/pref_snooze_duration"
+            android:dialogTitle="@string/pref_snooze_duration"
+            android:entries="@array/entries_duration"
+            android:entryValues="@array/values_duration"
+            android:defaultValue="1"
+            android:summary="%s"/>
+        <Preference
+            android:key="@string/key_alarm_volume"
+            android:title="@string/title_alarm_volume"/>
+        <ListPreference
+            android:key="@string/key_notify_me_of_upcoming_alarms"
+            android:title="@string/title_notify_me_of_upcoming_alarms"
+            android:dialogTitle="@string/title_notify_me_of_upcoming_alarms"
+            android:entries="@array/entries_notify_me_of_upcoming_alarms"
+            android:entryValues="@array/values_notify_me_of_upcoming_alarms"
+            android:defaultValue="2"
+            android:summary="%s"/>
+        <ListPreference
+            android:key="pref_first_day_of_week"
+            android:title="@string/pref_first_day_of_week"
+            android:dialogTitle="@string/pref_first_day_of_week"
+            android:entries="@array/pref_first_day_of_week_array"
+            android:entryValues="@array/pref_first_day_of_week_array"
+            android:defaultValue="@string/pref_first_day_of_week_sunday"
+            android:summary="%s"/>
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/pref_category_timers">
+        <RingtonePreference
+            android:key="pref_timer_ringtone"
+            android:title="@string/pref_timer_ringtone"
+            android:ringtoneType="alarm"
+            android:defaultValue="content://settings/system/alarm_alert"/>
+    </PreferenceCategory>
+</PreferenceScreen>

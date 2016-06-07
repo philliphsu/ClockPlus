@@ -18,6 +18,7 @@ import android.widget.TextView;
 
 import com.philliphsu.clock2.alarms.AlarmsFragment;
 import com.philliphsu.clock2.editalarm.EditAlarmActivity;
+import com.philliphsu.clock2.settings.SettingsActivity;
 
 public class MainActivity extends BaseActivity implements AlarmsFragment.OnAlarmInteractionListener {
     private static final String TAG = "MainActivity";
@@ -85,6 +86,7 @@ public class MainActivity extends BaseActivity implements AlarmsFragment.OnAlarm
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            startActivity(new Intent(this, SettingsActivity.class));
             return true;
         }
 

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Silence after -->
+    <string name="key_silence_after">key_silence_after</string>
+    <string name="title_silence_after">Silence after</string>
+
+    <!-- Durations for silence after & snooze duration -->
+    <string-array name="entries_duration">
+        <item>1 minute</item>
+        <item>5 minutes</item>
+        <item>10 minutes</item>
+        <item>15 minutes</item>
+        <item>20 minutes</item>
+        <item>25 minutes</item>
+        <item>30 minutes</item>
+    </string-array>
+    <string-array name="values_duration">
+        <item>1</item>
+        <item>5</item>
+        <item>10</item>
+        <item>15</item>
+        <item>20</item>
+        <item>25</item>
+        <item>30</item>
+    </string-array>
+
+    <!-- Alarm volume -->
+    <string name="key_alarm_volume">key_alarm_volume</string>
+    <string name="title_alarm_volume">Alarm volume</string>
+
+    <!-- Upcoming alarm threshold -->
+    <string name="key_notify_me_of_upcoming_alarms">key_notify_me_of_upcoming_alarms</string>
+    <string name="title_notify_me_of_upcoming_alarms">Notify me of upcoming alarms</string>
+    <string-array name="entries_notify_me_of_upcoming_alarms">
+        <item>1 hour before</item>
+        <item>2 hours before</item>
+        <item>3 hours before</item>
+        <item>4 hours before</item>
+        <item>5 hours before</item>
+        <item>6 hours before</item>
+        <item>7 hours before</item>
+        <item>8 hours before</item>
+    </string-array>
+    <string-array name="values_notify_me_of_upcoming_alarms">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+        <item>7</item>
+        <item>8</item>
+    </string-array>
+</resources>
