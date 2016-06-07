@@ -67,6 +67,9 @@ public final class AlarmUtils {
         removeUpcomingAlarmNotification(c, a);
 
         // If service is not running, nothing happens
+        // TODO: Since RingtoneService is a bound service, will this destroy the service after returning?
+        // Note that if a stopped service still has ServiceConnection objects bound to it with the
+        // BIND_AUTO_CREATE set, it will not be destroyed until all of these bindings are removed.
         c.stopService(new Intent(c, RingtoneService.class));
     }
 

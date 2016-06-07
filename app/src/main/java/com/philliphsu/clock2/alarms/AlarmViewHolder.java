@@ -96,7 +96,11 @@ public class AlarmViewHolder extends BaseViewHolder<Alarm> implements AlarmCount
 
     @OnClick(R.id.dismiss)
     void onClick() {
-        AlarmUtils.cancelAlarm(getContext(), getAlarm());
+        Alarm alarm = getAlarm();
+        AlarmUtils.cancelAlarm(getContext(), alarm);
+        if (alarm.isSnoozed()) {
+            alarm.stopSnoozing(); // TOneverDO: before cancelAlarm()
+        }
         bindDismissButton(false, ""); // Will be set to correct text the next time we bind.
         // TODO: Check if alarm has no recurrence, then turn it off.
     }
