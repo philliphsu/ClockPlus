@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="title_category_timers">Timers</string>
+
+    <string name="key_timer_ringtone">key_timer_ringtone</string>
+    <string name="title_timer_ringtone">Ringtone</string>
+</resources>

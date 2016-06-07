@@ -23,8 +23,7 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.xml.preferences);
         // Set ringtone summary
-        setSummary(getPreferenceScreen().getSharedPreferences(),
-                SettingsActivity.KEY_PREF_TIMER_RINGTONE);
+        setSummary(getPreferenceScreen().getSharedPreferences(), getString(R.string.key_timer_ringtone));
         findPreference(getString(R.string.key_alarm_volume))
                 .setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override

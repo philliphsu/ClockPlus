@@ -1,24 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
                   xmlns:app="http://schemas.android.com/apk/res-auto">
-    <PreferenceCategory android:title="@string/pref_category_world_clock">
+    <PreferenceCategory android:title="@string/title_category_world_clock">
         <ListPreference
-            android:key="pref_show_time_offsets_from"
-            android:title="@string/pref_show_time_offsets_from"
-            android:dialogTitle="@string/pref_show_time_offsets_from"
-            android:entries="@array/pref_show_time_offsets_from_array"
-            android:entryValues="@array/pref_show_time_offsets_from_array"
-            android:defaultValue="@string/pref_show_time_offsets_from_local"
+            android:key="@string/key_show_time_offsets_from"
+            android:title="@string/title_show_time_offsets_from"
+            android:dialogTitle="@string/title_show_time_offsets_from"
+            android:entries="@array/array_show_time_offsets_from"
+            android:entryValues="@array/array_show_time_offsets_from"
+            android:defaultValue="@string/local_time"
             android:summary="%s"/>
     </PreferenceCategory>
-    <PreferenceCategory android:title="@string/pref_category_alarms">
+    <PreferenceCategory android:title="@string/title_category_alarms">
         <ListPreference
-            android:key="pref_time_picker_style"
-            android:title="@string/pref_time_picker_style"
-            android:dialogTitle="@string/pref_time_picker_style"
-            android:entries="@array/pref_time_picker_style_array"
-            android:entryValues="@array/pref_time_picker_style_array"
-            android:defaultValue="@string/pref_time_picker_style_number_pad"
+            android:key="@string/key_time_picker_style"
+            android:title="@string/title_time_picker_style"
+            android:dialogTitle="@string/title_time_picker_style"
+            android:entries="@array/array_time_picker_styles"
+            android:entryValues="@array/array_time_picker_styles"
+            android:defaultValue="@string/number_pad"
             android:summary="%s"/>
         <ListPreference
             android:key="@string/key_silence_after"
@@ -29,9 +29,9 @@
             android:defaultValue="1"
             android:summary="%s"/>
         <ListPreference
-            android:key="pref_snooze_duration"
-            android:title="@string/pref_snooze_duration"
-            android:dialogTitle="@string/pref_snooze_duration"
+            android:key="@string/key_snooze_duration"
+            android:title="@string/title_snooze_duration"
+            android:dialogTitle="@string/title_snooze_duration"
             android:entries="@array/entries_duration"
             android:entryValues="@array/values_duration"
             android:defaultValue="1"
@@ -48,18 +48,18 @@
             android:defaultValue="2"
             android:summary="%s"/>
         <ListPreference
-            android:key="pref_first_day_of_week"
-            android:title="@string/pref_first_day_of_week"
-            android:dialogTitle="@string/pref_first_day_of_week"
-            android:entries="@array/pref_first_day_of_week_array"
-            android:entryValues="@array/pref_first_day_of_week_array"
-            android:defaultValue="@string/pref_first_day_of_week_sunday"
+            android:key="@string/key_first_day_of_week"
+            android:title="@string/title_first_day_of_week"
+            android:dialogTitle="@string/title_first_day_of_week"
+            android:entries="@array/array_first_day_of_week"
+            android:entryValues="@array/array_first_day_of_week"
+            android:defaultValue="@string/sunday"
             android:summary="%s"/>
     </PreferenceCategory>
-    <PreferenceCategory android:title="@string/pref_category_timers">
+    <PreferenceCategory android:title="@string/title_category_timers">
         <RingtonePreference
-            android:key="pref_timer_ringtone"
-            android:title="@string/pref_timer_ringtone"
+            android:key="@string/key_timer_ringtone"
+            android:title="@string/title_timer_ringtone"
             android:ringtoneType="alarm"
             android:defaultValue="content://settings/system/alarm_alert"/>
     </PreferenceCategory>

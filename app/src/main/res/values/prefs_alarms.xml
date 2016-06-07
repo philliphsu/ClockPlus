@@ -1,9 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="title_category_alarms">Alarms</string>
+
+    <!-- Time picker style -->
+    <string name="key_time_picker_style">key_time_picker_style</string>
+    <string name="title_time_picker_style">Time picker style</string>
+    <string name="number_pad">Number pad</string>
+    <string name="radial_clock">Radial clock</string>
+    <string-array name="array_time_picker_styles">
+        <item>@string/number_pad</item>
+        <item>@string/radial_clock</item>
+    </string-array>
+
     <!-- Silence after -->
     <string name="key_silence_after">key_silence_after</string>
     <string name="title_silence_after">Silence after</string>
-
+    <!-- Snooze duration -->
+    <string name="key_snooze_duration">key_snooze_duration</string>
+    <string name="title_snooze_duration">Snooze duration</string>
     <!-- Durations for silence after & snooze duration -->
     <string-array name="entries_duration">
         <item>1 minute</item>
@@ -50,5 +64,17 @@
         <item>6</item>
         <item>7</item>
         <item>8</item>
+    </string-array>
+
+    <!-- First day of week -->
+    <string name="key_first_day_of_week">key_first_day_of_week</string>
+    <string name="title_first_day_of_week">First day of week</string>
+    <string name="saturday">Saturday</string>
+    <string name="sunday">Sunday</string>
+    <string name="monday">Monday</string>
+    <string-array name="array_first_day_of_week">
+        <item>@string/saturday</item>
+        <item>@string/sunday</item>
+        <item>@string/monday</item>
     </string-array>
 </resources>

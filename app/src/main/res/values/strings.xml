@@ -49,40 +49,7 @@
     <string name="snackbar_undo_item_deleted">Undo</string>
     <!-- ======================================================================================= -->
 
-    <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~ Settings ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
     <string name="title_activity_settings">Settings</string>
-    <!-- World Clock -->
-    <string name="pref_category_world_clock">World Clock</string>
-    <string name="pref_show_time_offsets_from">Show time offsets from</string>
-    <string name="pref_show_time_offsets_from_local">Local time</string>
-    <string name="pref_show_time_offsets_from_gmt">GMT</string>
-    <string-array name="pref_show_time_offsets_from_array">
-        <item>@string/pref_show_time_offsets_from_local</item>
-        <item>@string/pref_show_time_offsets_from_gmt</item>
-    </string-array>
-    <!-- Alarms -->
-    <string name="pref_category_alarms">Alarms</string>
-    <string name="pref_time_picker_style">Time picker style</string>
-    <string name="pref_time_picker_style_number_pad">Number pad</string>
-    <string name="pref_time_picker_style_radial_clock">Radial clock</string>
-    <string-array name="pref_time_picker_style_array">
-        <item>@string/pref_time_picker_style_number_pad</item>
-        <item>@string/pref_time_picker_style_radial_clock</item>
-    </string-array>
-    <string name="pref_snooze_duration">Snooze duration</string>
-    <string name="pref_first_day_of_week">First day of week</string>
-    <string name="pref_first_day_of_week_saturday">Saturday</string>
-    <string name="pref_first_day_of_week_sunday">Sunday</string>
-    <string name="pref_first_day_of_week_monday">Monday</string>
-    <string-array name="pref_first_day_of_week_array">
-        <item>@string/pref_first_day_of_week_saturday</item>
-        <item>@string/pref_first_day_of_week_sunday</item>
-        <item>@string/pref_first_day_of_week_monday</item>
-    </string-array>
-    <!-- Timers -->
-    <string name="pref_category_timers">Timers</string>
-    <string name="pref_timer_ringtone">Ringtone</string>
-    <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
 
     <string name="sun">Sun</string>
     <string name="mon">Mon</string>
