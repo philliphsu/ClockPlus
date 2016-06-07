@@ -2,11 +2,13 @@ package com.philliphsu.clock2.alarms;
 
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.SwitchCompat;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.format.DateFormat;
 import android.text.style.RelativeSizeSpan;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
@@ -16,14 +18,17 @@ import com.philliphsu.clock2.BaseViewHolder;
 import com.philliphsu.clock2.DaysOfWeek;
 import com.philliphsu.clock2.OnListItemInteractionListener;
 import com.philliphsu.clock2.R;
+import com.philliphsu.clock2.util.AlarmUtils;
 
 import java.util.Date;
 
 import butterknife.Bind;
+import butterknife.OnClick;
 
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 import static com.philliphsu.clock2.DaysOfWeek.NUM_DAYS;
+import static com.philliphsu.clock2.util.DateFormatUtils.formatTime;
 
 /**
  * Created by Phillip Hsu on 5/31/2016.
@@ -45,7 +50,62 @@ public class AlarmViewHolder extends BaseViewHolder<Alarm> {
     @Override
     public void onBind(Alarm alarm) {
         super.onBind(alarm);
-        String time = DateFormat.getTimeFormat(getContext()).format(new Date(alarm.ringsAt()));
+        bindTime(new Date(alarm.ringsAt()));
+        bindSwitch(alarm.isEnabled());
+        bindCountdown(alarm.isEnabled(), alarm.ringsIn());
+
+        // TODO: shared prefs
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getContext());
+        // how many hours before alarm is considered upcoming
+        /*int hoursBeforeUpcoming = Integer.parseInt(prefs.getString(
+                    mContext.getString(-1TODO:R.string.key_notify_me_of_upcoming_alarms),
+                    "2"));*/
+        boolean visible = alarm.isEnabled() && (alarm.ringsWithinHours(2) || alarm.isSnoozed());
+        String buttonText = alarm.isSnoozed()
+                ? getContext().getString(R.string.title_snoozing_until, formatTime(getContext(), alarm.snoozingUntil()))
+                : getContext().getString(R.string.dismiss_now);
+        // TODO: Register dynamic broadcast receiver in this class to listen for
+        // when this alarm crosses the upcoming threshold, so we can show this button.
+        bindDismissButton(visible, buttonText);
+
+        // Should also be visible even if alarm has no label so mCountdown is properly positioned next
+        // to mLabel. That is, mCountdown's layout position is dependent on mLabel being present.
+        boolean labelVisible = alarm.label().length() > 0 || mCountdown.getVisibility() == VISIBLE;
+        bindLabel(labelVisible, alarm.label());
+
+        int num = alarm.numRecurringDays();
+        String text;
+        if (num == NUM_DAYS) {
+            text = getContext().getString(R.string.every_day);
+        } else if (num == 0) {
+            text = "";
+        } else {
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0 /* Ordinal days*/; i < NUM_DAYS; i++) {
+                // What day is at this position in the week?
+                int weekDay = DaysOfWeek.getInstance(getContext()).weekDayAt(i);
+                if (alarm.isRecurring(weekDay)) {
+                    sb.append(DaysOfWeek.getLabel(weekDay)).append(", ");
+                }
+            }
+            // Cut off the last comma and space
+            sb.delete(sb.length() - 2, sb.length());
+            text = sb.toString();
+        }
+        bindDays(num > 0, text);
+    }
+
+    @OnClick(R.id.dismiss)
+    void onClick() {
+        AlarmUtils.cancelAlarm(getContext(), getItem());
+        bindDismissButton(false, ""); // Will be set to correct text the next time we bind.
+        // TODO: Check if alarm has no recurrence, then turn it off.
+    }
+
+    // TODO: Break onBind() into smaller helper method calls. Then, you can update certain
+    // pieces of the VH on demand without having to rebind the whole thing.
+    private void bindTime(Date date) {
+        String time = DateFormat.getTimeFormat(getContext()).format(date);
         if (DateFormat.is24HourFormat(getContext())) {
             mTime.setText(time);
         } else {
@@ -54,62 +114,39 @@ public class AlarmViewHolder extends BaseViewHolder<Alarm> {
             s.setSpan(AMPM_SIZE_SPAN, time.indexOf(" "), time.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
             mTime.setText(s, TextView.BufferType.SPANNABLE);
         }
+    }
 
-        if (alarm.isEnabled()) {
-            mSwitch.setChecked(true);
-            //TODO:mCountdown.showAsText(alarm.ringsIn());
+    private void bindSwitch(boolean enabled) {
+        mSwitch.setChecked(enabled);
+    }
+
+    private void bindCountdown(boolean enabled, long remainingTime) {
+        if (enabled) {
+            //TODO:mCountdown.showAsText(remainingTime);
+            //TODO:mCountdown.getTickHandler().startTicking(true)
             mCountdown.setVisibility(VISIBLE);
-            //todo:mCountdown.getTickHandler().startTicking(true)
-            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getContext());
-            // how many hours before alarm is considered upcoming
-            // TODO: shared prefs
-            /*int hoursBeforeUpcoming = Integer.parseInt(prefs.getString(
-                    mContext.getString(-1TODO:R.string.key_notify_me_of_upcoming_alarms),
-                    "2"));*/
-            if (alarm.ringsWithinHours(2) || alarm.isSnoozed()) {
-                // TODO: Register dynamic broadcast receiver in this class to listen for
-                // when this alarm crosses the upcoming threshold, so we can show this button.
-                mDismissButton.setVisibility(VISIBLE);
-            } else {
-                mDismissButton.setVisibility(GONE);
-            }
         } else {
-            mSwitch.setChecked(false);
-            mCountdown.setVisibility(GONE);
             //TODO:mCountdown.getTickHandler().stopTicking();
-            mDismissButton.setVisibility(GONE);
+            mCountdown.setVisibility(GONE);
         }
+    }
 
-        mLabel.setText(alarm.label());
-        if (mLabel.length() == 0 && mCountdown.getVisibility() != VISIBLE) {
-            mLabel.setVisibility(GONE);
-        } else {
-            // needed for proper positioning of mCountdown
-            mLabel.setVisibility(VISIBLE);
-        }
+    private void bindDismissButton(boolean visible, String buttonText) {
+        setVisibility(mDismissButton, visible);
+        mDismissButton.setText(buttonText);
+    }
 
-        int numRecurringDays = alarm.numRecurringDays();
-        if (numRecurringDays > 0) {
-            String text;
-            if (numRecurringDays == NUM_DAYS) {
-                text = getContext().getString(R.string.every_day);
-            } else {
-                StringBuilder sb = new StringBuilder();
-                for (int i = 0 /* Ordinal days*/; i < NUM_DAYS; i++) {
-                    // What day is at this position in the week?
-                    int weekDay = DaysOfWeek.getInstance(getContext()).weekDayAt(i);
-                    if (alarm.isRecurring(weekDay)) {
-                        sb.append(DaysOfWeek.getLabel(weekDay)).append(", ");
-                    }
-                }
-                // Cut off the last comma and space
-                sb.delete(sb.length() - 2, sb.length());
-                text = sb.toString();
-            }
-            mDays.setText(text);
-            mDays.setVisibility(VISIBLE);
-        } else {
-            mDays.setVisibility(GONE);
-        }
+    private void bindLabel(boolean visible, String label) {
+        setVisibility(mLabel, visible);
+        mLabel.setText(label);
+    }
+
+    private void bindDays(boolean visible, String text) {
+        setVisibility(mDays, visible);
+        mDays.setText(text);
+    }
+
+    private void setVisibility(@NonNull View view, boolean visible) {
+        view.setVisibility(visible ? VISIBLE : GONE);
     }
 }

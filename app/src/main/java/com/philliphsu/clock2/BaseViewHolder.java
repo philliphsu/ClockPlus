@@ -41,6 +41,10 @@ public abstract class BaseViewHolder<T> extends RecyclerView.ViewHolder implemen
         return mContext;
     }
 
+    public final T getItem() {
+        return mItem;
+    }
+
     @Override
     public final void onClick(View v) {
         if (mListener != null) {

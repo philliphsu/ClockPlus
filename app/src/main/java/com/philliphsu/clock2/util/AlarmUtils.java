@@ -1,4 +1,4 @@
-package com.philliphsu.clock2.editalarm;
+package com.philliphsu.clock2.util;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;

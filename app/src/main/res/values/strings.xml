@@ -37,13 +37,13 @@
     <string name="abbrev_minutes">%2$dm</string>
     <string name="abbrev_less_than_one_minute">&lt;1m</string>
     <!-- ======================================================================================= -->
-    
+
     <!-- ==================================== NOTIFICATIONS ==================================== -->
     <string name="upcoming_alarm">Upcoming alarm</string>
     <string name="alarm">Alarm</string>
     <string name="missed_alarm">Missed alarm</string>
     <!-- ======================================================================================= -->
-    
+
     <!-- ==================================== MAIN ACTIVITY ==================================== -->
     <string name="snackbar_item_deleted">%1$s deleted</string>
     <string name="snackbar_undo_item_deleted">Undo</string>

@@ -19,7 +19,7 @@ import android.util.Log;
 
 import com.philliphsu.clock2.Alarm;
 import com.philliphsu.clock2.R;
-import com.philliphsu.clock2.editalarm.AlarmUtils;
+import com.philliphsu.clock2.util.AlarmUtils;
 import com.philliphsu.clock2.model.AlarmsRepository;
 
 import static com.philliphsu.clock2.util.DateFormatUtils.formatTime;
@@ -77,11 +77,13 @@ public class RingtoneService extends Service { // TODO: abstract this, make subc
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         // Although this is a bound service, we override this method because this class is reused for
-        // handling the notification actions for the presently ringing alarm. From the docs of Context#startService():
+        // handling the notification actions for the presently ringing alarm.
+        // Although the docs of Context#startService() says this:
         // "Using startService() overrides the default service lifetime that is managed by
         // bindService(Intent, ServiceConnection, int): it requires the service to remain running until
-        // stopService(Intent)* is called, regardless of whether any clients are connected to it."
-        // * Would stopSelf() also work?
+        // stopService(Intent) [or stopSelf()] is called, regardless of whether any clients are connected to it."
+        // I have found the regardless part does not apply here. You MUST also unbind any clients from this service
+        // at the same time you stop this service!
 
         if (ACTION_SNOOZE.equals(intent.getAction())) {
             long id = intent.getLongExtra(EXTRA_ITEM_ID, -1);
@@ -92,7 +94,7 @@ public class RingtoneService extends Service { // TODO: abstract this, make subc
         }
         stopSelf(startId);
         if (mRingtoneCallback != null) {
-            mRingtoneCallback.onServiceFinish();
+            mRingtoneCallback.onServiceFinish(); // tell client to unbind from this service
         }
 
         return START_NOT_STICKY; // If killed while started, don't recreate. Should be sufficient.

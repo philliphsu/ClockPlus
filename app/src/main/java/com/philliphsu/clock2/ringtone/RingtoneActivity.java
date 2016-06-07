@@ -15,7 +15,7 @@ import android.widget.Toast;
 
 import com.philliphsu.clock2.Alarm;
 import com.philliphsu.clock2.R;
-import com.philliphsu.clock2.editalarm.AlarmUtils;
+import com.philliphsu.clock2.util.AlarmUtils;
 import com.philliphsu.clock2.model.AlarmsRepository;
 
 import static com.philliphsu.clock2.util.DateFormatUtils.formatTime;

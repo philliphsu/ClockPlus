@@ -13,6 +13,8 @@ import java.util.concurrent.TimeUnit;
  */
 public class DurationUtils {
 
+    /** Return a string representing the duration, formatted in hours and minutes.
+     * TODO: Need to adapt this to represent all time fields eventually */
     public static String toString(Context context, long millis, boolean abbreviate) {
         long[] fields = breakdown(millis);
         long numHours = fields[0];
@@ -20,6 +22,11 @@ public class DurationUtils {
         long numSecs = fields[2]; // only considered for rounding of minutes
         if (numSecs >= 31) {
             numMins++;
+            numSecs = 0; // Not totally necessary since it won't be considered any more
+            if (numMins == 60) {
+                numHours++;
+                numMins = 0;
+            }
         }
 
         @StringRes int res;

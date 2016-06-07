@@ -8,7 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.v4.app.NotificationCompat;
 
-import com.philliphsu.clock2.editalarm.AlarmUtils;
+import com.philliphsu.clock2.util.AlarmUtils;
 import com.philliphsu.clock2.model.AlarmsRepository;
 
 import static android.app.PendingIntent.FLAG_ONE_SHOT;
