@@ -102,12 +102,13 @@ public class EditAlarmPresenter implements EditAlarmContract.Presenter {
     @Override
     public void dismissNow() {
         mAlarmUtilsHelper.cancelAlarm(checkNotNull(mAlarm));
+        // cancelAlarm() should have turned off this alarm if appropriate
+        mView.showEnabled(mAlarm.isEnabled());
     }
 
     @Override
     public void stopSnoozing() {
         dismissNow(); // MUST be first, see AlarmUtils.notifyUpcomingAlarmIntent()
-
         // AlarmUtils.cancelAlarm() does this for you if snoozed
         /*
         mAlarm.stopSnoozing(); // TOneverDO: before dismissNow()
@@ -140,6 +141,9 @@ public class EditAlarmPresenter implements EditAlarmContract.Presenter {
     public void onPrepareOptionsMenu() {
         if (mAlarm != null && mAlarm.isEnabled()) {
             int hoursBeforeUpcoming = mSharedPreferencesHelper.getInt(R.string.key_notify_me_of_upcoming_alarms, 2);
+            // TODO: Schedule task with handler to show the menu item when it is time. Handler is fine because
+            // the task only needs to be done if the activity is being viewed. (I think) if the process of this
+            // app is killed, then the handler is also killed.
             if ((mAlarm.ringsWithinHours(hoursBeforeUpcoming))) {
                 mView.showCanDismissNow();
             } else if (mAlarm.isSnoozed()) {
@@ -178,9 +182,6 @@ public class EditAlarmPresenter implements EditAlarmContract.Presenter {
             mView.showLabel(mAlarm.label());
             mView.showRingtone(mAlarm.ringtone());
             mView.showVibrates(mAlarm.vibrates());
-            if (mAlarm.isSnoozed()) {
-                mView.showSnoozed(new Date(mAlarm.snoozingUntil()));
-            }
             // Editing so don't show
             mView.showNumpad(false);
             mView.showTimeTextFocused(false);

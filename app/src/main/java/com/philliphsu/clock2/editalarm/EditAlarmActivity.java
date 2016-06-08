@@ -80,6 +80,7 @@ public class EditAlarmActivity extends BaseActivity implements AlarmNumpad.KeyLi
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
+        // TODO: Snooze menu item when alarm is ringing.
         mPresenter.onPrepareOptionsMenu();
         return super.onPrepareOptionsMenu(menu);
     }
@@ -89,9 +90,12 @@ public class EditAlarmActivity extends BaseActivity implements AlarmNumpad.KeyLi
         switch (item.getItemId()) {
             case R.id.action_dismiss_now:
                 mPresenter.dismissNow();
+                item.setVisible(false);
                 return true;
             case R.id.action_done_snoozing:
                 mPresenter.stopSnoozing();
+                item.setVisible(false);
+                getSupportActionBar().setDisplayShowTitleEnabled(false); // TODO: Move to presenter?
                 return true;
         }
         return super.onOptionsItemSelected(item);

@@ -92,8 +92,8 @@ public final class AlarmUtils {
             save(c);
         }
 
-        if (a.ringsIn() <= HOURS.toMillis(hoursBeforeUpcoming(c))) {
-            String time = formatTime(c, a.ringsAt());
+        if (a.ringsIn() <= HOURS.toMillis(hoursBeforeUpcoming(c)) || a.isSnoozed()) {
+            String time = formatTime(c, a.isSnoozed() ? a.snoozingUntil() : a.ringsAt());
             String text = c.getString(R.string.upcoming_alarm_dismissed, time);
             Toast.makeText(c, text, Toast.LENGTH_LONG).show();
         }
