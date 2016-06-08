@@ -28,6 +28,7 @@ import com.philliphsu.clock2.DaysOfWeek;
 import com.philliphsu.clock2.R;
 import com.philliphsu.clock2.SharedPreferencesHelper;
 import com.philliphsu.clock2.model.AlarmsRepository;
+import com.philliphsu.clock2.ringtone.RingtoneActivity;
 import com.philliphsu.clock2.util.AlarmUtils;
 
 import java.util.Date;
@@ -433,6 +434,11 @@ public class EditAlarmActivity extends BaseActivity implements AlarmNumpad.KeyLi
     @Override
     public void cancelAlarm(Alarm alarm, boolean showToast) {
         AlarmUtils.cancelAlarm(this, alarm, showToast);
+        if (RingtoneActivity.isAlive()) {
+            Intent intent = new Intent(this, RingtoneActivity.class)
+                    .setAction(RingtoneActivity.ACTION_UNBIND);
+            startActivity(intent);
+        }
     }
 
     @Override

@@ -31,14 +31,18 @@ public class RingtoneActivity extends AppCompatActivity implements RingtoneServi
 
     // Shared with RingtoneService
     public static final String EXTRA_ITEM_ID = "com.philliphsu.clock2.ringtone.extra.ITEM_ID";
+    public static final String ACTION_UNBIND = "com.philliphsu.clock2.ringtone.action.UNBIND";
 
     private Alarm mAlarm;
     private boolean mBound = false;
+
+    private static boolean sIsAlive = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ringtone);
+        sIsAlive = true;
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
@@ -80,15 +84,22 @@ public class RingtoneActivity extends AppCompatActivity implements RingtoneServi
     protected void onNewIntent(Intent intent) {
         //super.onNewIntent(intent); // Not needed since no fragments hosted?
         if (mBound) {
-            mBoundService.interrupt(); // prepare to notify the alarm was missed
-            /*
-            // Cannot rely on finish() to call onDestroy() on time before the activity is restarted.
-            unbindService();
-            // Calling recreate() would recreate this with its current intent, not the new intent passed in here.
-            finish();
-            */
-            dismiss(); // unbinds and finishes for you
-            startActivity(intent);
+            if (ACTION_UNBIND.equals(intent.getAction())) {
+                // Someone else wants us to unbind
+                sIsAlive = false; // don't wait until onDestroy() to reset
+                //dismiss();
+                unbindAndFinish();
+            } else {
+                mBoundService.interrupt(); // prepare to notify the alarm was missed
+                /*
+                // Cannot rely on finish() to call onDestroy() on time before the activity is restarted.
+                unbindService();
+                // Calling recreate() would recreate this with its current intent, not the new intent passed in here.
+                finish();
+                */
+                unbindAndFinish();
+                startActivity(intent);
+            }
         }
     }
 
@@ -126,37 +137,28 @@ public class RingtoneActivity extends AppCompatActivity implements RingtoneServi
     protected void onDestroy() {
         super.onDestroy();
         unbindService();
+        sIsAlive = false;
     }
 
     @Override
     public void onServiceFinish() {
-        dismiss();
+        unbindAndFinish();
+    }
+
+    public static boolean isAlive() {
+        return sIsAlive;
     }
 
     private void snooze() {
         AlarmUtils.snoozeAlarm(this, mAlarm);
-        // TODO: If dismiss() calls AlarmUtils.cancelAlarm(), don't call dismiss().
-        dismiss();
         // Can't call dismiss() because we don't want to also call cancelAlarm()! Why? For example,
         // we don't want the alarm, if it has no recurrence, to be turned off right now.
-        //unbindService(); // don't wait for finish() to call onDestroy()
-        //finish();
+        unbindAndFinish();
     }
 
     private void dismiss() {
-        // TODO: Do we really need to cancel the PendingIntent and the alarm in AlarmManager? They've
-        // already fired, so what point is there to cancelling them?
-        // ===================================== WARNING ==========================================
-        // If you call cancelAlarm(), then you MUST make sure you are not interfering with a recent
-        // scheduleAlarm() or snoozeAlarm() call. This can actually be the case, so I recommend you
-        // do NOT call it! A PendingIntent and alarm that have already been fired won't bother
-        // you, so just let it sit until the next time the same Alarm is scheduled and they subsequently
-        // get cancelled!
-        // ========================================================================================
-        //AlarmUtils.cancelAlarm(this, mAlarm); // not necessary?
-
-        unbindService(); // don't wait for finish() to call onDestroy()
-        finish();
+        AlarmUtils.cancelAlarm(this, mAlarm, false);
+        unbindAndFinish();
     }
 
     private void unbindService() {
@@ -164,6 +166,11 @@ public class RingtoneActivity extends AppCompatActivity implements RingtoneServi
             unbindService(mConnection);
             mBound = false;
         }
+    }
+
+    private void unbindAndFinish() {
+        unbindService(); // don't wait for finish() to call onDestroy()
+        finish();
     }
 
     private RingtoneService mBoundService;

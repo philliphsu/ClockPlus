@@ -77,25 +77,18 @@ public class RingtoneService extends Service { // TODO: abstract this, make subc
         // stopService(Intent) [or stopSelf()] is called, regardless of whether any clients are connected to it."
         // I have found the regardless part does not apply here. You MUST also unbind any clients from this service
         // at the same time you stop this service!
-        String action = intent.getAction();
-        if (!action.equals(ACTION_SNOOZE) && !action.equals(ACTION_DISMISS))
-            throw new UnsupportedOperationException();
+        long id = intent.getLongExtra(EXTRA_ITEM_ID, -1);
+        if (id < 0)
+            throw new IllegalStateException("No item id set");
+        Alarm alarm = checkNotNull(AlarmsRepository.getInstance(this).getItem(id));
 
         if (ACTION_SNOOZE.equals(intent.getAction())) {
-            long id = intent.getLongExtra(EXTRA_ITEM_ID, -1);
-            if (id < 0)
-                throw new IllegalStateException("No item id set");
-            Alarm alarm = checkNotNull(AlarmsRepository.getInstance(this).getItem(id));
             AlarmUtils.snoozeAlarm(this, alarm);
+        } else if (ACTION_DISMISS.equals(intent.getAction())) {
+            AlarmUtils.cancelAlarm(this, alarm, false);
+        } else {
+            throw new UnsupportedOperationException();
         }
-        // ============================== WARNING ===================================
-        // I AM RECOMMENDING MYSELF TO NOT DO ANYTHING FOR ACTION_DISMISS.
-        // We don't really need to cancel the PendingIntent and the alarm in AlarmManager if
-        // they've already been fired. We can just let it sit! See the similar warning
-        // in RingtoneActivity#dismiss().
-        // /*else if (ACTION_DISMISS.equals(intent.getAction())) {
-        //    AlarmUtils.cancelAlarm(this, alarm);
-        // }*/
         // ==========================================================================
         stopSelf(startId);
         if (mRingtoneCallback != null) {
@@ -193,7 +186,7 @@ public class RingtoneService extends Service { // TODO: abstract this, make subc
     // Needed so clients can get the Service instance and e.g. call setRingtoneCallback().
     public class RingtoneBinder extends Binder {
         RingtoneService getService() {
-            return RingtoneService.this;
+            return RingtoneService.this; // Precludes the class from being static!
         }
     }
 
