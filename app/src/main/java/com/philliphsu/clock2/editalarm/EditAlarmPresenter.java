@@ -91,7 +91,9 @@ public class EditAlarmPresenter implements EditAlarmContract.Presenter {
     @Override
     public void delete() {
         if (mAlarm != null) {
-            mAlarmUtilsHelper.cancelAlarm(mAlarm); // (1)
+            if (mAlarm.isEnabled()) {
+                mAlarmUtilsHelper.cancelAlarm(mAlarm); // (1)
+            }
             mRepository.deleteItem(mAlarm); // TOneverDO: before (1)
         }
         mView.showEditorClosed();
@@ -105,8 +107,12 @@ public class EditAlarmPresenter implements EditAlarmContract.Presenter {
     @Override
     public void stopSnoozing() {
         dismissNow(); // MUST be first, see AlarmUtils.notifyUpcomingAlarmIntent()
+
+        // AlarmUtils.cancelAlarm() does this for you if snoozed
+        /*
         mAlarm.stopSnoozing(); // TOneverDO: before dismissNow()
         mRepository.saveItems();
+        */
     }
 
     @Override

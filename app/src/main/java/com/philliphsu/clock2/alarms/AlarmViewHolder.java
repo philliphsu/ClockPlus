@@ -16,6 +16,7 @@ import com.philliphsu.clock2.BaseViewHolder;
 import com.philliphsu.clock2.DaysOfWeek;
 import com.philliphsu.clock2.OnListItemInteractionListener;
 import com.philliphsu.clock2.R;
+import com.philliphsu.clock2.model.AlarmsRepository;
 import com.philliphsu.clock2.util.AlarmUtils;
 
 import java.util.Date;
@@ -52,41 +53,9 @@ public class AlarmViewHolder extends BaseViewHolder<Alarm> implements AlarmCount
         bindTime(new Date(alarm.ringsAt()));
         bindSwitch(alarm.isEnabled());
         bindCountdown(alarm.isEnabled(), alarm.ringsIn());
-
-        int hoursBeforeUpcoming = AlarmUtils.hoursBeforeUpcoming(getContext());
-        boolean visible = alarm.isEnabled() && (alarm.ringsWithinHours(hoursBeforeUpcoming) || alarm.isSnoozed());
-        String buttonText = alarm.isSnoozed()
-                ? getContext().getString(R.string.title_snoozing_until, formatTime(getContext(), alarm.snoozingUntil()))
-                : getContext().getString(R.string.dismiss_now);
-        // TODO: Register dynamic broadcast receiver in this class to listen for
-        // when this alarm crosses the upcoming threshold, so we can show this button.
-        bindDismissButton(visible, buttonText);
-
-        // Should also be visible even if alarm has no label so mCountdown is properly positioned next
-        // to mLabel. That is, mCountdown's layout position is dependent on mLabel being present.
-        boolean labelVisible = alarm.label().length() > 0 || mCountdown.getVisibility() == VISIBLE;
-        bindLabel(labelVisible, alarm.label());
-
-        int num = alarm.numRecurringDays();
-        String text;
-        if (num == NUM_DAYS) {
-            text = getContext().getString(R.string.every_day);
-        } else if (num == 0) {
-            text = "";
-        } else {
-            StringBuilder sb = new StringBuilder();
-            for (int i = 0 /* Ordinal days*/; i < NUM_DAYS; i++) {
-                // What day is at this position in the week?
-                int weekDay = DaysOfWeek.getInstance(getContext()).weekDayAt(i);
-                if (alarm.isRecurring(weekDay)) {
-                    sb.append(DaysOfWeek.getLabel(weekDay)).append(", ");
-                }
-            }
-            // Cut off the last comma and space
-            sb.delete(sb.length() - 2, sb.length());
-            text = sb.toString();
-        }
-        bindDays(num > 0, text);
+        bindDismissButton(alarm);
+        bindLabel(alarm);
+        bindDays(alarm);
     }
 
     @Override
@@ -95,14 +64,26 @@ public class AlarmViewHolder extends BaseViewHolder<Alarm> implements AlarmCount
     }
 
     @OnClick(R.id.dismiss)
-    void onClick() {
-        Alarm alarm = getAlarm();
-        AlarmUtils.cancelAlarm(getContext(), alarm);
-        if (alarm.isSnoozed()) {
-            alarm.stopSnoozing(); // TOneverDO: before cancelAlarm()
-        }
+    void dismiss() {
+        AlarmUtils.cancelAlarm(getContext(), getAlarm());
         bindDismissButton(false, ""); // Will be set to correct text the next time we bind.
-        // TODO: Check if alarm has no recurrence, then turn it off.
+        // If cancelAlarm() modified the alarm's fields, then it will save changes for you.
+    }
+
+    @OnClick(R.id.on_off_switch)
+    void toggle() {
+        Alarm alarm = getAlarm();
+        alarm.setEnabled(mSwitch.isChecked());
+        if (alarm.isEnabled()) {
+            AlarmUtils.scheduleAlarm(getContext(), alarm);
+            bindCountdown(true, alarm.ringsIn());
+            bindDismissButton(alarm);
+        } else {
+            AlarmUtils.cancelAlarm(getContext(), alarm); // might save repo
+            bindCountdown(false, -1);
+            bindDismissButton(false, "");
+        }
+        save(); // TODO: Problem! If cancelAlarm() saves the repo, this is a redundant call!
     }
 
     private void bindTime(Date date) {
@@ -132,14 +113,55 @@ public class AlarmViewHolder extends BaseViewHolder<Alarm> implements AlarmCount
         }
     }
 
+    private void bindDismissButton(Alarm alarm) {
+        int hoursBeforeUpcoming = AlarmUtils.hoursBeforeUpcoming(getContext());
+        boolean visible = alarm.isEnabled() && (alarm.ringsWithinHours(hoursBeforeUpcoming) || alarm.isSnoozed());
+        String buttonText = alarm.isSnoozed()
+                ? getContext().getString(R.string.title_snoozing_until, formatTime(getContext(), alarm.snoozingUntil()))
+                : getContext().getString(R.string.dismiss_now);
+        // TODO: Register dynamic broadcast receiver in this class to listen for
+        // when this alarm crosses the upcoming threshold, so we can show this button.
+        bindDismissButton(visible, buttonText);
+    }
+
     private void bindDismissButton(boolean visible, String buttonText) {
         setVisibility(mDismissButton, visible);
         mDismissButton.setText(buttonText);
     }
 
+    private void bindLabel(Alarm alarm) {
+        // Should also be visible even if alarm has no label so mCountdown is properly positioned next
+        // to mLabel. That is, mCountdown's layout position is dependent on mLabel being present.
+        boolean labelVisible = alarm.label().length() > 0 || mCountdown.getVisibility() == VISIBLE;
+        bindLabel(labelVisible, alarm.label());
+    }
+
     private void bindLabel(boolean visible, String label) {
         setVisibility(mLabel, visible);
         mLabel.setText(label);
+    }
+
+    private void bindDays(Alarm alarm) {
+        int num = alarm.numRecurringDays();
+        String text;
+        if (num == NUM_DAYS) {
+            text = getContext().getString(R.string.every_day);
+        } else if (num == 0) {
+            text = "";
+        } else {
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0 /* Ordinal days*/; i < NUM_DAYS; i++) {
+                // What day is at this position in the week?
+                int weekDay = DaysOfWeek.getInstance(getContext()).weekDayAt(i);
+                if (alarm.isRecurring(weekDay)) {
+                    sb.append(DaysOfWeek.getLabel(weekDay)).append(", ");
+                }
+            }
+            // Cut off the last comma and space
+            sb.delete(sb.length() - 2, sb.length());
+            text = sb.toString();
+        }
+        bindDays(num > 0, text);
     }
 
     private void bindDays(boolean visible, String text) {
@@ -153,5 +175,9 @@ public class AlarmViewHolder extends BaseViewHolder<Alarm> implements AlarmCount
 
     private Alarm getAlarm() {
         return getItem();
+    }
+
+    private void save() {
+        AlarmsRepository.getInstance(getContext()).saveItems();
     }
 }

@@ -11,14 +11,12 @@ import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.Toast;
 
 import com.philliphsu.clock2.Alarm;
 import com.philliphsu.clock2.R;
 import com.philliphsu.clock2.model.AlarmsRepository;
 import com.philliphsu.clock2.util.AlarmUtils;
 
-import static com.philliphsu.clock2.util.DateFormatUtils.formatTime;
 import static com.philliphsu.clock2.util.Preconditions.checkNotNull;
 
 /**
@@ -132,18 +130,16 @@ public class RingtoneActivity extends AppCompatActivity implements RingtoneServi
     }
 
     private void snooze() {
-        int snoozeMins = AlarmUtils.snoozeDuration(this);
-        mAlarm.snooze(snoozeMins);
-        AlarmUtils.scheduleAlarm(this, mAlarm);
-        AlarmsRepository.getInstance(this).saveItems();
-        // Display toast
-        String message = getString(R.string.title_snoozing_until, formatTime(this, mAlarm.snoozingUntil()));
-        Toast.makeText(this, message, Toast.LENGTH_LONG).show();
-        dismiss();
+        AlarmUtils.snoozeAlarm(this, mAlarm);
+        // Can't call dismiss() because we don't want to also call cancelAlarm()! Why? For example,
+        // we don't want the alarm, if it has no recurrence, to be turned off immediately.
+        unbindService(); // don't wait for finish() to call onDestroy()
+        finish();
     }
 
     private void dismiss() {
         // TODO: Do we need to cancel the PendingIntent and the alarm in AlarmManager?
+        AlarmUtils.cancelAlarm(this, mAlarm);
         unbindService(); // don't wait for finish() to call onDestroy()
         finish();
     }

@@ -7,16 +7,19 @@ import android.content.Intent;
 import android.preference.PreferenceManager;
 import android.support.annotation.StringRes;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.philliphsu.clock2.Alarm;
 import com.philliphsu.clock2.R;
 import com.philliphsu.clock2.UpcomingAlarmReceiver;
+import com.philliphsu.clock2.model.AlarmsRepository;
 import com.philliphsu.clock2.ringtone.RingtoneActivity;
 import com.philliphsu.clock2.ringtone.RingtoneService;
 
 import static android.app.PendingIntent.FLAG_CANCEL_CURRENT;
 import static android.app.PendingIntent.FLAG_NO_CREATE;
 import static android.app.PendingIntent.getActivity;
+import static com.philliphsu.clock2.util.DateFormatUtils.formatTime;
 import static com.philliphsu.clock2.util.Preconditions.checkNotNull;
 
 /**
@@ -50,6 +53,18 @@ public final class AlarmUtils {
         am.set(AlarmManager.RTC_WAKEUP, ringAt - hoursBeforeUpcoming(context) * 3600000,
                 notifyUpcomingAlarmIntent(context, alarm, false));
         am.setExact(AlarmManager.RTC_WAKEUP, ringAt, alarmIntent(context, alarm, false));
+
+        // Display toast
+        String message;
+        if (alarm.isSnoozed()) {
+            message = context.getString(R.string.title_snoozing_until,
+                    formatTime(context, alarm.snoozingUntil()));
+        } else {
+            message = context.getString(R.string.alarm_set_for,
+                    DurationUtils.toString(context, alarm.ringsIn(), false /*abbreviate?*/));
+        }
+        // TODO: Will toasts show for any Context? e.g. IntentService can't do anything on UI thread.
+        Toast.makeText(context, message, Toast.LENGTH_LONG).show();
     }
 
     public static void cancelAlarm(Context c, Alarm a) {
@@ -66,11 +81,27 @@ public final class AlarmUtils {
 
         removeUpcomingAlarmNotification(c, a);
 
+        if (a.isSnoozed()) {
+            a.stopSnoozing();
+            save(c);
+        }
+
+        if (!a.hasRecurrence()) {
+            a.setEnabled(false);
+            save(c);
+        }
+
         // If service is not running, nothing happens
         // TODO: Since RingtoneService is a bound service, will this destroy the service after returning?
         // Note that if a stopped service still has ServiceConnection objects bound to it with the
         // BIND_AUTO_CREATE set, it will not be destroyed until all of these bindings are removed.
         c.stopService(new Intent(c, RingtoneService.class));
+    }
+
+    public static void snoozeAlarm(Context c, Alarm a) {
+        a.snooze(AlarmUtils.snoozeDuration(c));
+        AlarmUtils.scheduleAlarm(c, a);
+        save(c);
     }
 
     public static void removeUpcomingAlarmNotification(Context c, Alarm a) {
@@ -129,5 +160,9 @@ public final class AlarmUtils {
             checkNotNull(pi);
         }
         return pi;
+    }
+
+    private static void save(Context c) {
+        AlarmsRepository.getInstance(c).saveItems();
     }
 }

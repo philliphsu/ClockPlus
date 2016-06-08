@@ -77,14 +77,19 @@ public class RingtoneService extends Service { // TODO: abstract this, make subc
         // stopService(Intent) [or stopSelf()] is called, regardless of whether any clients are connected to it."
         // I have found the regardless part does not apply here. You MUST also unbind any clients from this service
         // at the same time you stop this service!
+        long id = intent.getLongExtra(EXTRA_ITEM_ID, -1);
+        if (id < 0)
+            throw new IllegalStateException("No item id set");
+        Alarm alarm = checkNotNull(AlarmsRepository.getInstance(this).getItem(id));
 
         if (ACTION_SNOOZE.equals(intent.getAction())) {
-            long id = intent.getLongExtra(EXTRA_ITEM_ID, -1);
-            if (id < 0) throw new IllegalStateException("No item id set");
-            Alarm alarm = checkNotNull(AlarmsRepository.getInstance(this).getItem(id));
-            alarm.snooze(AlarmUtils.snoozeDuration(this));
-            AlarmUtils.scheduleAlarm(this, alarm);
+            AlarmUtils.snoozeAlarm(this, alarm);
+        } else if (ACTION_DISMISS.equals(intent.getAction())) {
+            AlarmUtils.cancelAlarm(this, alarm);
+        } else {
+            throw new UnsupportedOperationException();
         }
+
         stopSelf(startId);
         if (mRingtoneCallback != null) {
             mRingtoneCallback.onServiceFinish(); // tell client to unbind from this service
