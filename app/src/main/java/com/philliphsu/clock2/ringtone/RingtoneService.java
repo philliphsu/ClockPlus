@@ -56,6 +56,7 @@ public class RingtoneService extends Service { // TODO: abstract this, make subc
         public void run() {
             mAutoSilenced = true;
             mRingtone.stop(); // don't wait for activity to finish and unbind
+            AlarmUtils.cancelAlarm(RingtoneService.this, mAlarm, false);
             if (mRingtoneCallback != null) {
                 // Finish the activity, which fires onDestroy() and then unbinds itself from this service.
                 // All clients must be unbound before stopSelf() (and stopService()?) will succeed.

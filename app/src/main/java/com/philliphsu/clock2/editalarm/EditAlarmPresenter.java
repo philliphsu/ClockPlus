@@ -75,7 +75,10 @@ public class EditAlarmPresenter implements EditAlarmContract.Presenter {
                 .build();
         a.setEnabled(mView.isEnabled());
         if (mAlarm != null) {
-            mAlarmUtilsHelper.cancelAlarm(mAlarm, false);
+            if (mAlarm.isEnabled()) {
+                Log.d(TAG, "Cancelling old alarm first");
+                mAlarmUtilsHelper.cancelAlarm(mAlarm, false);
+            }
             mRepository.updateItem(mAlarm, a);
         } else {
             mRepository.addItem(a);
@@ -92,9 +95,9 @@ public class EditAlarmPresenter implements EditAlarmContract.Presenter {
     public void delete() {
         if (mAlarm != null) {
             if (mAlarm.isEnabled()) {
-                mAlarmUtilsHelper.cancelAlarm(mAlarm, false); // (1)
+                mAlarmUtilsHelper.cancelAlarm(mAlarm, false);
             }
-            mRepository.deleteItem(mAlarm); // TOneverDO: before (1)
+            mRepository.deleteItem(mAlarm);
         }
         mView.showEditorClosed();
     }
