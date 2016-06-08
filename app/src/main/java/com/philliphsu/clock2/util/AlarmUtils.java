@@ -21,6 +21,7 @@ import static android.app.PendingIntent.FLAG_NO_CREATE;
 import static android.app.PendingIntent.getActivity;
 import static com.philliphsu.clock2.util.DateFormatUtils.formatTime;
 import static com.philliphsu.clock2.util.Preconditions.checkNotNull;
+import static java.util.concurrent.TimeUnit.HOURS;
 
 /**
  * Created by Phillip Hsu on 6/3/2016.
@@ -50,7 +51,7 @@ public final class AlarmUtils {
         // device is asleep. Otherwise, it will not go off until the device is turned back on.
         long ringAt = alarm.isSnoozed() ? alarm.snoozingUntil() : alarm.ringsAt();
         // If snoozed, upcoming note posted immediately.
-        am.set(AlarmManager.RTC_WAKEUP, ringAt - hoursBeforeUpcoming(context) * 3600000,
+        am.set(AlarmManager.RTC_WAKEUP, ringAt - HOURS.toMillis(hoursBeforeUpcoming(context)),
                 notifyUpcomingAlarmIntent(context, alarm, false));
         am.setExact(AlarmManager.RTC_WAKEUP, ringAt, alarmIntent(context, alarm, false));
 
@@ -89,6 +90,12 @@ public final class AlarmUtils {
         if (!a.hasRecurrence()) {
             a.setEnabled(false);
             save(c);
+        }
+
+        if (a.ringsIn() <= HOURS.toMillis(hoursBeforeUpcoming(c))) {
+            String time = formatTime(c, a.ringsAt());
+            String text = c.getString(R.string.upcoming_alarm_dismissed, time);
+            Toast.makeText(c, text, Toast.LENGTH_LONG).show();
         }
 
         // If service is not running, nothing happens

@@ -36,6 +36,8 @@
     <string name="abbrev_hours">%1$dh</string>
     <string name="abbrev_minutes">%2$dm</string>
     <string name="abbrev_less_than_one_minute">&lt;1m</string>
+
+    <string name="upcoming_alarm_dismissed">%1$s alarm dismissed.</string>
     <!-- ======================================================================================= -->
 
     <!-- ==================================== NOTIFICATIONS ==================================== -->

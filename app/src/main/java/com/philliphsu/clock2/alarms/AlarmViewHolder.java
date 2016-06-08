@@ -6,6 +6,7 @@ import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.format.DateFormat;
 import android.text.style.RelativeSizeSpan;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -22,7 +23,9 @@ import com.philliphsu.clock2.util.AlarmUtils;
 import java.util.Date;
 
 import butterknife.Bind;
+import butterknife.OnCheckedChanged;
 import butterknife.OnClick;
+import butterknife.OnTouch;
 
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
@@ -65,11 +68,24 @@ public class AlarmViewHolder extends BaseViewHolder<Alarm> implements AlarmCount
 
     @OnClick(R.id.dismiss)
     void dismiss() {
+        // TOneverDO: AlarmUtils.cancelAlarm() otherwise it will be called twice
+        mSwitch.setPressed(true); // needed so the OnCheckedChange event calls through
+        bindSwitch(false); // fires OnCheckedChange to do the binding for you
+        /*
         AlarmUtils.cancelAlarm(getContext(), getAlarm());
+        if (!getAlarm().isEnabled()) {
+            // TOneverDO: mSwitch.setPressed(true);
+            bindSwitch(false); // will fire OnCheckedChange, but switch isn't set as pressed so nothing happens.
+            bindCountdown(false, -1);
+        }
         bindDismissButton(false, ""); // Will be set to correct text the next time we bind.
         // If cancelAlarm() modified the alarm's fields, then it will save changes for you.
+        */
     }
 
+    // Changed in favor or OnCheckedChange
+    /*
+    @Deprecated
     @OnClick(R.id.on_off_switch)
     void toggle() {
         Alarm alarm = getAlarm();
@@ -84,6 +100,36 @@ public class AlarmViewHolder extends BaseViewHolder<Alarm> implements AlarmCount
             bindDismissButton(false, "");
         }
         save(); // TODO: Problem! If cancelAlarm() saves the repo, this is a redundant call!
+    }
+    */
+
+    @OnTouch(R.id.on_off_switch)
+    boolean slide(MotionEvent event) {
+        if (event.getActionMasked() == MotionEvent.ACTION_MOVE) {
+            mSwitch.setPressed(true); // needed so the OnCheckedChange event calls through
+        }
+        return false; // proceed as usual
+    }
+
+    @OnCheckedChanged(R.id.on_off_switch)
+    void toggle(boolean checked) {
+        if (mSwitch.isPressed()) { // needed to distinguish automatic calls when VH binds from actual presses
+            // don't need to toggle the switch state
+            Alarm alarm = getAlarm();
+            alarm.setEnabled(checked);
+            if (alarm.isEnabled()) {
+                // TODO: On Moto X, upcoming notification doesn't post immediately
+                AlarmUtils.scheduleAlarm(getContext(), alarm);
+                bindCountdown(true, alarm.ringsIn());
+                bindDismissButton(alarm);
+            } else {
+                AlarmUtils.cancelAlarm(getContext(), alarm); // might save repo
+                bindCountdown(false, -1);
+                bindDismissButton(false, "");
+            }
+            save(); // TODO: Problem! If cancelAlarm() saves the repo, this is a redundant call!
+            mSwitch.setPressed(false); // clear the pressed focus, esp. if setPressed(true) was called manually
+        }
     }
 
     private void bindTime(Date date) {
