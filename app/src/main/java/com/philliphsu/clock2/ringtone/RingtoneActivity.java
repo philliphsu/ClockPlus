@@ -132,7 +132,7 @@ public class RingtoneActivity extends AppCompatActivity implements RingtoneServi
     private void snooze() {
         AlarmUtils.snoozeAlarm(this, mAlarm);
         // Can't call dismiss() because we don't want to also call cancelAlarm()! Why? For example,
-        // we don't want the alarm, if it has no recurrence, to be turned off immediately.
+        // we don't want the alarm, if it has no recurrence, to be turned off right now.
         unbindService(); // don't wait for finish() to call onDestroy()
         finish();
     }
