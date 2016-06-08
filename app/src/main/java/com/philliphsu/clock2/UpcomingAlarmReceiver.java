@@ -37,7 +37,7 @@ public class UpcomingAlarmReceiver extends BroadcastReceiver {
         } else {
             Alarm alarm = checkNotNull(AlarmsRepository.getInstance(context).getItem(id));
             if (ACTION_DISMISS_NOW.equals(intent.getAction())) {
-                AlarmUtils.cancelAlarm(context, alarm);
+                AlarmUtils.cancelAlarm(context, alarm, true);
             } else {
                 // Prepare notification
                 String title;

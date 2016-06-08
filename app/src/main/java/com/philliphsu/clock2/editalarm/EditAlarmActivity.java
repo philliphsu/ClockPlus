@@ -431,8 +431,8 @@ public class EditAlarmActivity extends BaseActivity implements AlarmNumpad.KeyLi
     }
 
     @Override
-    public void cancelAlarm(Alarm alarm) {
-        AlarmUtils.cancelAlarm(this, alarm);
+    public void cancelAlarm(Alarm alarm, boolean showToast) {
+        AlarmUtils.cancelAlarm(this, alarm, showToast);
     }
 
     @Override

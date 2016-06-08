@@ -7,5 +7,5 @@ import com.philliphsu.clock2.Alarm;
  */
 public interface AlarmUtilsHelper {
     void scheduleAlarm(Alarm alarm);
-    void cancelAlarm(Alarm alarm);
+    void cancelAlarm(Alarm alarm, boolean showToast);
 }

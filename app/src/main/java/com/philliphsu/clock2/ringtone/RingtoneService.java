@@ -89,8 +89,10 @@ public class RingtoneService extends Service { // TODO: abstract this, make subc
             AlarmUtils.snoozeAlarm(this, alarm);
         }
         // ============================== WARNING ===================================
-        // DO NOT DO ANYTHING FOR ACTION_DISMISS. RingtoneActivity's current implementation of
-        // onServiceFinish() calls cancelAlarm for you!
+        // I AM RECOMMENDING MYSELF TO NOT DO ANYTHING FOR ACTION_DISMISS.
+        // We don't really need to cancel the PendingIntent and the alarm in AlarmManager if
+        // they've already been fired. We can just let it sit! See the similar warning
+        // in RingtoneActivity#dismiss().
         // /*else if (ACTION_DISMISS.equals(intent.getAction())) {
         //    AlarmUtils.cancelAlarm(this, alarm);
         // }*/

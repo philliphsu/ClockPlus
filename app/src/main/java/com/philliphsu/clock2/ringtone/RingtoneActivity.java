@@ -59,6 +59,7 @@ public class RingtoneActivity extends AppCompatActivity implements RingtoneServi
         Intent intent = new Intent(this, RingtoneService.class);
         bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
 
+        // TODO: Butterknife binding
         Button snooze = (Button) findViewById(R.id.btn_snooze);
         snooze.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -80,10 +81,13 @@ public class RingtoneActivity extends AppCompatActivity implements RingtoneServi
         //super.onNewIntent(intent); // Not needed since no fragments hosted?
         if (mBound) {
             mBoundService.interrupt(); // prepare to notify the alarm was missed
+            /*
             // Cannot rely on finish() to call onDestroy() on time before the activity is restarted.
             unbindService();
             // Calling recreate() would recreate this with its current intent, not the new intent passed in here.
             finish();
+            */
+            dismiss(); // unbinds and finishes for you
             startActivity(intent);
         }
     }
@@ -131,15 +135,26 @@ public class RingtoneActivity extends AppCompatActivity implements RingtoneServi
 
     private void snooze() {
         AlarmUtils.snoozeAlarm(this, mAlarm);
+        // TODO: If dismiss() calls AlarmUtils.cancelAlarm(), don't call dismiss().
+        dismiss();
         // Can't call dismiss() because we don't want to also call cancelAlarm()! Why? For example,
         // we don't want the alarm, if it has no recurrence, to be turned off right now.
-        unbindService(); // don't wait for finish() to call onDestroy()
-        finish();
+        //unbindService(); // don't wait for finish() to call onDestroy()
+        //finish();
     }
 
     private void dismiss() {
-        // TODO: Do we need to cancel the PendingIntent and the alarm in AlarmManager?
-        AlarmUtils.cancelAlarm(this, mAlarm);
+        // TODO: Do we really need to cancel the PendingIntent and the alarm in AlarmManager? They've
+        // already fired, so what point is there to cancelling them?
+        // ===================================== WARNING ==========================================
+        // If you call cancelAlarm(), then you MUST make sure you are not interfering with a recent
+        // scheduleAlarm() or snoozeAlarm() call. This can actually be the case, so I recommend you
+        // do NOT call it! A PendingIntent and alarm that have already been fired won't bother
+        // you, so just let it sit until the next time the same Alarm is scheduled and they subsequently
+        // get cancelled!
+        // ========================================================================================
+        //AlarmUtils.cancelAlarm(this, mAlarm); // not necessary?
+
         unbindService(); // don't wait for finish() to call onDestroy()
         finish();
     }

@@ -123,7 +123,7 @@ public class AlarmViewHolder extends BaseViewHolder<Alarm> implements AlarmCount
                 bindCountdown(true, alarm.ringsIn());
                 bindDismissButton(alarm);
             } else {
-                AlarmUtils.cancelAlarm(getContext(), alarm); // might save repo
+                AlarmUtils.cancelAlarm(getContext(), alarm, true); // might save repo
                 bindCountdown(false, -1);
                 bindDismissButton(false, "");
             }

@@ -68,7 +68,7 @@ public final class AlarmUtils {
         Toast.makeText(context, message, Toast.LENGTH_LONG).show();
     }
 
-    public static void cancelAlarm(Context c, Alarm a) {
+    public static void cancelAlarm(Context c, Alarm a, boolean showToast) {
         Log.d(TAG, "Cancelling alarm " + a);
         AlarmManager am = (AlarmManager) c.getSystemService(Context.ALARM_SERVICE);
 
@@ -82,20 +82,21 @@ public final class AlarmUtils {
 
         removeUpcomingAlarmNotification(c, a);
 
+        // TOneverDO: Place block after making value changes to the alarm.
+        if (showToast && (a.ringsIn() <= HOURS.toMillis(hoursBeforeUpcoming(c)) || a.isSnoozed())) {
+            String time = formatTime(c, a.isSnoozed() ? a.snoozingUntil() : a.ringsAt());
+            String text = c.getString(R.string.upcoming_alarm_dismissed, time);
+            Toast.makeText(c, text, Toast.LENGTH_LONG).show();
+        }
+
         if (a.isSnoozed()) {
             a.stopSnoozing();
-            save(c);
+            save(c); // TODO: not necessary?
         }
 
         if (!a.hasRecurrence()) {
             a.setEnabled(false);
-            save(c);
-        }
-
-        if (a.ringsIn() <= HOURS.toMillis(hoursBeforeUpcoming(c)) || a.isSnoozed()) {
-            String time = formatTime(c, a.isSnoozed() ? a.snoozingUntil() : a.ringsAt());
-            String text = c.getString(R.string.upcoming_alarm_dismissed, time);
-            Toast.makeText(c, text, Toast.LENGTH_LONG).show();
+            save(c); // TODO: not necessary?
         }
 
         // If service is not running, nothing happens
@@ -108,7 +109,7 @@ public final class AlarmUtils {
     public static void snoozeAlarm(Context c, Alarm a) {
         a.snooze(AlarmUtils.snoozeDuration(c));
         AlarmUtils.scheduleAlarm(c, a);
-        save(c);
+        save(c); // TODO: not necessary?
     }
 
     public static void removeUpcomingAlarmNotification(Context c, Alarm a) {
