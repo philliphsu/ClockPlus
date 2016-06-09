@@ -68,9 +68,9 @@ public class AlarmViewHolder extends BaseViewHolder<Alarm> implements AlarmCount
 
     @OnClick(R.id.dismiss)
     void dismiss() {
-        // TOneverDO: AlarmUtils.cancelAlarm() otherwise it will be called twice
         mSwitch.setPressed(true); // needed so the OnCheckedChange event calls through
         bindSwitch(false); // fires OnCheckedChange to do the binding for you
+        // TOneverDO: AlarmUtils.cancelAlarm() otherwise it will be called twice
         /*
         AlarmUtils.cancelAlarm(getContext(), getAlarm());
         if (!getAlarm().isEnabled()) {
@@ -123,11 +123,10 @@ public class AlarmViewHolder extends BaseViewHolder<Alarm> implements AlarmCount
                 bindCountdown(true, alarm.ringsIn());
                 bindDismissButton(alarm);
             } else {
-                AlarmUtils.cancelAlarm(getContext(), alarm, true); // might save repo
+                AlarmUtils.cancelAlarm(getContext(), alarm, true); // saves repo
                 bindCountdown(false, -1);
                 bindDismissButton(false, "");
             }
-            save(); // TODO: Problem! If cancelAlarm() saves the repo, this is a redundant call!
             mSwitch.setPressed(false); // clear the pressed focus, esp. if setPressed(true) was called manually
         }
     }

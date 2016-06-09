@@ -91,13 +91,13 @@ public final class AlarmUtils {
 
         if (a.isSnoozed()) {
             a.stopSnoozing();
-            save(c); // TODO: not necessary?
         }
 
         if (!a.hasRecurrence()) {
             a.setEnabled(false);
-            save(c); // TODO: not necessary?
         }
+
+        save(c); // Save any changes
 
         // If service is not running, nothing happens
         // TODO: Since RingtoneService is a bound service, will this destroy the service after returning?
@@ -109,7 +109,7 @@ public final class AlarmUtils {
     public static void snoozeAlarm(Context c, Alarm a) {
         a.snooze(AlarmUtils.snoozeDuration(c));
         AlarmUtils.scheduleAlarm(c, a);
-        save(c); // TODO: not necessary?
+        save(c);
     }
 
     public static void removeUpcomingAlarmNotification(Context c, Alarm a) {

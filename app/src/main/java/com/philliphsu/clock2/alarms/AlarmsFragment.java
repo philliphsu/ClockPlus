@@ -81,6 +81,12 @@ public class AlarmsFragment extends Fragment implements BaseRepository.DataObser
     }
 
     @Override
+    public void onPause() {
+        super.onPause();
+        AlarmsRepository.getInstance(getActivity()).saveItems();
+    }
+
+    @Override
     public void onDestroyView() {
         super.onDestroyView();
         ButterKnife.unbind(this); // Only for fragments!
