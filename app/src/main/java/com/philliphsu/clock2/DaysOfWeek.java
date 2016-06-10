@@ -11,7 +11,7 @@ import java.util.Arrays;
 /**
  * Created by Phillip Hsu on 5/30/2016.
  */
-public class DaysOfWeek {
+public class DaysOfWeek implements DaysOfWeekHelper {
     private static final String TAG = "DaysOfWeek";
     // DAY_OF_WEEK constants in Calendar class not zero-based
     public static final int SUNDAY    = 0;
@@ -56,14 +56,14 @@ public class DaysOfWeek {
         return sAppContext.getString(LABELS_RES[weekDay]);
     }
 
-    /** @return the week day at {@code position} within the user-defined week */
+    @Override
     public int weekDayAt(int position) {
         if (position < 0 || position > 6)
             throw new ArrayIndexOutOfBoundsException("Ordinal day out of range");
         return DAYS[position];
     }
 
-    /** @return the position of the {@code weekDay} within the user-defined week */
+    @Override
     public int positionOf(int weekDay) {
         if (weekDay < SUNDAY || weekDay > SATURDAY)
             throw new ArrayIndexOutOfBoundsException("Week day ("+weekDay+") out of range");

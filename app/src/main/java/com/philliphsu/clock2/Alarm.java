@@ -12,6 +12,7 @@ import org.json.JSONObject;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
+import static com.philliphsu.clock2.DaysOfWeek.NUM_DAYS;
 import static com.philliphsu.clock2.DaysOfWeek.SATURDAY;
 import static com.philliphsu.clock2.DaysOfWeek.SUNDAY;
 
@@ -20,7 +21,7 @@ import static com.philliphsu.clock2.DaysOfWeek.SUNDAY;
  */
 @AutoValue
 public abstract class Alarm implements JsonSerializable {
-    private static final int MAX_MINUTES_CAN_SNOOZE = 30; // TODO: Delete this along with all snooze stuff.
+    private static final int MAX_MINUTES_CAN_SNOOZE = 30;
 
     // JSON property names
     private static final String KEY_SNOOZING_UNTIL_MILLIS = "snoozing_until_millis";
@@ -82,7 +83,7 @@ public abstract class Alarm implements JsonSerializable {
                 .id(-1)
                 .hour(0)
                 .minutes(0)
-                .recurringDays(new boolean[DaysOfWeek.NUM_DAYS])
+                .recurringDays(new boolean[NUM_DAYS])
                 .label("")
                 .ringtone("")
                 .vibrates(false);
@@ -146,26 +147,57 @@ public abstract class Alarm implements JsonSerializable {
         calendar.set(Calendar.MINUTE, minutes());
         calendar.set(Calendar.SECOND, 0);
         calendar.set(Calendar.MILLISECOND, 0);
-        if (calendar.getTimeInMillis() <= System.currentTimeMillis()) {
-            // The specified time has passed for today
-            // TODO: This should be wrapped in an if (!hasRecurrence())?
-            calendar.add(Calendar.HOUR_OF_DAY, 24);
-            // TODO: Else, compute ring time for the next closest recurring day
+
+        if (!hasRecurrence()) {
+            if (calendar.getTimeInMillis() <= System.currentTimeMillis()) {
+                // The specified time has passed for today
+                calendar.add(Calendar.HOUR_OF_DAY, 24);
+            }
+        } else {
+            // Compute the ring time just for the next closest recurring day.
+            // Remember that day constants defined in the Calendar class are not zero-based like ours, so we have to
+            // compensate with an offset of magnitude one, with the appropriate sign based on the situation.
+            int weekdayToday = calendar.get(Calendar.DAY_OF_WEEK);
+            int numDaysFromToday = -1;
+
+            for (int i = weekdayToday; i <= Calendar.SATURDAY; i++) {
+                if (isRecurring(i - 1 /*match up with our day constant*/)) {
+                    if (i == weekdayToday) {
+                        if (calendar.getTimeInMillis() > System.currentTimeMillis()) {
+                            // The normal ring time has not passed yet
+                            numDaysFromToday = 0;
+                            break;
+                        }
+                    } else {
+                        numDaysFromToday = i - weekdayToday;
+                        break;
+                    }
+                }
+            }
+
+            // Not computed yet
+            if (numDaysFromToday < 0) {
+                for (int i = Calendar.SUNDAY; i < weekdayToday; i++) {
+                    if (isRecurring(i - 1 /*match up with our day constant*/)) {
+                        numDaysFromToday = Calendar.SATURDAY - weekdayToday + i;
+                        break;
+                    }
+                }
+            }
+
+            // Still not computed yet. The only recurring day is weekdayToday,
+            // and its normal ring time has already passed.
+            if (numDaysFromToday < 0 && isRecurring(weekdayToday - 1)
+                    && calendar.getTimeInMillis() <= System.currentTimeMillis()) {
+                numDaysFromToday = 7;
+            }
+
+            if (numDaysFromToday < 0)
+                throw new IllegalStateException("How did we get here?");
+
+            calendar.add(Calendar.HOUR_OF_DAY, 24 * numDaysFromToday);
         }
 
-        /* // Not fully thought out or completed!
-        // TODO: Compute ring time for the next closest recurring day
-        for (int i = 0; i < NUM_DAYS; i++) {
-            // The constants for the days defined in Calendar are
-            // not zero-based, but we are, so we must add 1.
-            int day = i + 1; // day for this index
-            int calendarDay = mCalendar.get(Calendar.DAY_OF_WEEK);
-            if (mRecurringDays[day]) {
-                mCalendar.add(Calendar.DAY_OF_WEEK, day);
-                break;
-            }
-        }
-        */
         return calendar.getTimeInMillis();
     }
 
@@ -238,14 +270,16 @@ public abstract class Alarm implements JsonSerializable {
             this.id(++idCount); // TOneverDO: change to post-increment without also adding offset of 1 to idCount in rebuild()
             Alarm alarm = autoBuild();
             checkTime(alarm.hour(), alarm.minutes());
+            checkRecurringDaysArrayLength(alarm.recurringDays());
             return alarm;
         }
 
-        /** Should only be called when recreating an instance from JSON */
+        /** <b>Should only be called when recreating an instance from JSON</b> */
         private Alarm rebuild() {
             Alarm alarm = autoBuild();
             idCount = alarm.id(); // prevent future instances from id collision
             checkTime(alarm.hour(), alarm.minutes());
+            checkRecurringDaysArrayLength(alarm.recurringDays());
             return alarm;
         }
     }
@@ -259,6 +293,12 @@ public abstract class Alarm implements JsonSerializable {
     private static void checkTime(int hour, int minutes) {
         if (hour < 0 || hour > 23 || minutes < 0 || minutes > 59) {
             throw new IllegalStateException("Hour and minutes invalid");
+        }
+    }
+
+    private static void checkRecurringDaysArrayLength(boolean[] b) {
+        if (b.length != NUM_DAYS) {
+            throw new IllegalStateException("Invalid length for recurring days array");
         }
     }
 }
