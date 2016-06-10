@@ -109,51 +109,35 @@ public class AlarmTest {
                     int hours = 0;
                     int minutes = 0;
 
+                    if (h > hC || (h == hC && m > mC)) {
+                        if (D < D_C) {
+                            days = Calendar.SATURDAY - D_C + D;
+                        } else if (D == D_C) {
+                            days = 0; // upcoming on the same day
+                        } else {
+                            days = D - D_C;
+                        }
+                    } else if (h <= hC) {
+                        if (D < D_C) {
+                            days = Calendar.SATURDAY - D_C + D - 1;
+                        } else if (D == D_C) {
+                            days = 6;
+                        } else {
+                            days = D - D_C - 1;
+                        }
+                    }
+
                     if (h <= hC) {
                         if (m <= mC) {
-                            // Subtract 1 from the days because the hours and minutes
-                            // calculation will already count to the next day.
-                            if (D < D_C) {
-                                days = Calendar.SATURDAY - D_C + D - 1;
-                            } else if (D == D_C) {
-                                days = 6;
-                            } else {
-                                days = D - D_C - 1;
-                            }
-                            // Subtract 1 from the hours because the minutes calculation
-                            // will already count to the next hour.
                             hours = 23 - hC + h;
                             minutes = 60 - mC + m;
                         } else {
                             minutes = m - mC;
                             if (h < hC) {
-                                if (D < D_C) {
-                                    days = Calendar.SATURDAY - D_C + D - 1;
-                                } else if (D == D_C) {
-                                    days = 6;
-                                } else {
-                                    days = D - D_C - 1;
-                                }
                                 hours = 24 - hC + h;
-                            } else /*if (h == hC)*/ {
-                                if (D < D_C) {
-                                    days = Calendar.SATURDAY - D_C + D;
-                                } else if (D == D_C) {
-                                    days = 0; // upcoming on the same day
-                                } else {
-                                    days = D - D_C;
-                                }
                             }
                         }
                     } else {
-                        if (D < D_C) {
-                            days = Calendar.SATURDAY - D_C + D;
-                        } else if (D == D_C) {
-                            days = 0;
-                        } else {
-                            days = D - D_C;
-                        }
-
                         if (m <= mC) {
                             hours = h - hC - 1;
                             minutes = 60 - mC + m;
