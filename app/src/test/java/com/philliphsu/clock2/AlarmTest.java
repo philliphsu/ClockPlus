@@ -48,7 +48,7 @@ public class AlarmTest {
     }
 
     @Test
-    public void alarm_RingsAt_ReturnsCorrectRingTime() {
+    public void alarm_RingsAt_NoRecurrence_ReturnsCorrectRingTime() {
         GregorianCalendar now = new GregorianCalendar();
         for (int h = 0; h < 24; h++) {
             for (int m = 0; m < 60; m++) {
@@ -56,28 +56,36 @@ public class AlarmTest {
                 int hC = now.get(HOUR_OF_DAY); // Current hour
                 int mC = now.get(MINUTE);      // Current minute
                 Alarm a = Alarm.builder().hour(h).minutes(m).build();
-                long calculatedRingTime;
+
+                // Quantities until the ring time (h, m)
+                int hours = 0;
+                int minutes = 0;
+
                 if (h <= hC) {
                     if (m <= mC) {
-                        calculatedRingTime = (23-hC+h)*3600000 + (60-mC+m)*60000;
+                        hours = 23 - hC + h;
+                        minutes = 60 - mC + m;
                     } else {
-                        calculatedRingTime = (m-mC)*60000;
+                        minutes = m - mC;
                         if (h < hC) {
-                            calculatedRingTime += (24-hC+h)*3600000;
+                            hours = 24 - hC + h;
                         }
                     }
                 } else {
                     if (m <= mC) {
-                        calculatedRingTime = (h-hC-1)*3600000+(60-mC+m)*60000;
+                        hours = h - hC - 1;
+                        minutes = 60 - mC + m;
                     } else {
-                        calculatedRingTime = (h-hC)*3600000+(m-mC)*60000;
+                        hours = h - hC;
+                        minutes = m - mC;
                     }
                 }
-                now.setTimeInMillis(now.getTimeInMillis() + calculatedRingTime);
+                now.add(HOUR_OF_DAY, hours);
+                now.add(MINUTE, minutes);
                 now.set(SECOND, 0);
                 now.set(MILLISECOND, 0);
                 assertEquals(a.ringsAt(), now.getTimeInMillis());
-                // VERY IMPORTANT TO RESET AT THE END!!!! THIS TOOK A WHOLE FUCKING DAY OF BUG HUNTING!!!
+                // VERY IMPORTANT TO RESET AT THE END!!!!
                 now.setTimeInMillis(System.currentTimeMillis());
             }
         }
@@ -86,62 +94,78 @@ public class AlarmTest {
     @Test
     public void alarm_RingsAt_RecurringDays_ReturnsCorrectRingTime() {
         Calendar cal = new GregorianCalendar();
-        int weekDayToday = cal.get(Calendar.DAY_OF_WEEK);
+        int D_C = cal.get(Calendar.DAY_OF_WEEK);
 
         for (int h = 0; h < 24; h++) {
             for (int m = 0; m < 60; m++) {
-                for (int d = SUNDAY; d <= SATURDAY; d++) {
-                    out.println(String.format("Testing %02d:%02d for day %d", h, m, d));
+                for (int D = Calendar.SUNDAY; D <= Calendar.SATURDAY; D++) {
+                    out.println("Testing (h, m, d) = ("+h+", "+m+", "+ (D-1) +")");
                     int hC = cal.get(HOUR_OF_DAY); // Current hour
                     int mC = cal.get(MINUTE);      // Current minute
                     Alarm a = Alarm.builder().hour(h).minutes(m).build();
-                    a.setRecurring(d, true);
-                    long calculatedRingTime;
-                    boolean calculatedToNextDay = true;
+                    a.setRecurring(D - 1, true);
+
+                    int days = 0;
+                    int hours = 0;
+                    int minutes = 0;
+
                     if (h <= hC) {
                         if (m <= mC) {
-                            calculatedRingTime = (23 - hC + h) * 3600000 + (60 - mC + m) * 60000;
-                        } else {
-                            calculatedRingTime = (m - mC) * 60000;
-                            if (h < hC) {
-                                calculatedRingTime += (24 - hC + h) * 3600000;
+                            // Subtract 1 from the days because the hours and minutes
+                            // calculation will already count to the next day.
+                            if (D < D_C) {
+                                days = Calendar.SATURDAY - D_C + D - 1;
+                            } else if (D == D_C) {
+                                days = 6;
                             } else {
-                                // h == hC
-                                calculatedToNextDay = false;
+                                days = D - D_C - 1;
+                            }
+                            // Subtract 1 from the hours because the minutes calculation
+                            // will already count to the next hour.
+                            hours = 23 - hC + h;
+                            minutes = 60 - mC + m;
+                        } else {
+                            minutes = m - mC;
+                            if (h < hC) {
+                                if (D < D_C) {
+                                    days = Calendar.SATURDAY - D_C + D - 1;
+                                } else if (D == D_C) {
+                                    days = 6;
+                                } else {
+                                    days = D - D_C - 1;
+                                }
+                                hours = 24 - hC + h;
+                            } else /*if (h == hC)*/ {
+                                if (D < D_C) {
+                                    days = Calendar.SATURDAY - D_C + D;
+                                } else if (D == D_C) {
+                                    days = 0; // upcoming on the same day
+                                } else {
+                                    days = D - D_C;
+                                }
                             }
                         }
                     } else {
-                        if (m <= mC) {
-                            calculatedRingTime = (h - hC - 1) * 3600000 + (60 - mC + m) * 60000;
+                        if (D < D_C) {
+                            days = Calendar.SATURDAY - D_C + D;
+                        } else if (D == D_C) {
+                            days = 0;
                         } else {
-                            calculatedRingTime = (h - hC) * 3600000 + (m - mC) * 60000;
+                            days = D - D_C;
                         }
-                        calculatedToNextDay = false;
+
+                        if (m <= mC) {
+                            hours = h - hC - 1;
+                            minutes = 60 - mC + m;
+                        } else {
+                            hours = h - hC;
+                            minutes = m - mC;
+                        }
                     }
 
-                    int day = d + 1; // Match up with day constant defined in Calendar class
-                    int amount = calculatedToNextDay ? d : day; // the amount to add on
-                    if (day > weekDayToday) {
-                        calculatedRingTime += 24 * (amount - weekDayToday) * 3600000;
-                    } else if (day < weekDayToday) {
-                        calculatedRingTime += 24 * (Calendar.SATURDAY - weekDayToday + amount) * 3600000;
-                    } else {
-                        long initialTime = cal.getTimeInMillis();
-                        // Temporarily add on whatever we have so far
-                        cal.setTimeInMillis(initialTime + calculatedRingTime);
-                        cal.set(SECOND, 0);
-                        cal.set(MILLISECOND, 0);
-                        if (calculatedToNextDay) {
-                            // Temporarily subtract off a whole day's worth of millis
-                            cal.add(HOUR_OF_DAY, -24);
-                        }
-                        if (cal.getTimeInMillis() <= System.currentTimeMillis()) {
-                            calculatedRingTime += 24 * (calculatedToNextDay ? 6 : 7) * 3600000;
-                        }
-                        cal.setTimeInMillis(initialTime);
-                    }
-
-                    cal.setTimeInMillis(cal.getTimeInMillis() + calculatedRingTime);
+                    cal.add(HOUR_OF_DAY, 24 * days);
+                    cal.add(HOUR_OF_DAY, hours);
+                    cal.add(MINUTE, minutes);
                     cal.set(SECOND, 0);
                     cal.set(MILLISECOND, 0);
                     assertEquals(a.ringsAt(), cal.getTimeInMillis());
@@ -155,46 +179,53 @@ public class AlarmTest {
     @Test
     public void alarm_RingsAt_AllRecurringDays_ReturnsCorrectRingTime() {
         // The results of this test should be the same as the normal ringsAt test:
-        // alarm_RingsAt_ReturnsCorrectRingTime().
+        // alarm_RingsAt_NoRecurrence_ReturnsCorrectRingTime().
         GregorianCalendar now = new GregorianCalendar();
         for (int h = 0; h < 24; h++) {
             for (int m = 0; m < 60; m++) {
-                out.println(String.format("Testing %02d:%02d", h, m));
                 int hC = now.get(HOUR_OF_DAY); // Current hour
                 int mC = now.get(MINUTE);      // Current minute
                 Alarm a = Alarm.builder().hour(h).minutes(m).build();
                 for (int i = 0; i < 7; i++) {
                     a.setRecurring(i, true);
                 }
-                long calculatedRingTime;
+
+                // Quantities until the ring time (h, m)
+                int hours = 0;
+                int minutes = 0;
+
                 if (h <= hC) {
                     if (m <= mC) {
-                        calculatedRingTime = (23-hC+h)*3600000 + (60-mC+m)*60000;
+                        hours = 23 - hC + h;
+                        minutes = 60 - mC + m;
                     } else {
-                        calculatedRingTime = (m-mC)*60000;
+                        minutes = m - mC;
                         if (h < hC) {
-                            calculatedRingTime += (24-hC+h)*3600000;
+                            hours = 24 - hC + h;
                         }
                     }
                 } else {
                     if (m <= mC) {
-                        calculatedRingTime = (h-hC-1)*3600000+(60-mC+m)*60000;
+                        hours = h - hC - 1;
+                        minutes = 60 - mC + m;
                     } else {
-                        calculatedRingTime = (h-hC)*3600000+(m-mC)*60000;
+                        hours = h - hC;
+                        minutes = m - mC;
                     }
                 }
-                now.setTimeInMillis(now.getTimeInMillis() + calculatedRingTime);
+                now.add(HOUR_OF_DAY, hours);
+                now.add(MINUTE, minutes);
                 now.set(SECOND, 0);
                 now.set(MILLISECOND, 0);
                 assertEquals(a.ringsAt(), now.getTimeInMillis());
-                // VERY IMPORTANT TO RESET AT THE END!!!! THIS TOOK A WHOLE FUCKING DAY OF BUG HUNTING!!!
+                // VERY IMPORTANT TO RESET AT THE END!!!!
                 now.setTimeInMillis(System.currentTimeMillis());
             }
         }
     }
 
     @Test
-    public void alarm_RingsAt_CurrentDayRecurring_ReturnsCorrectRingTime() {
+    public void alarm_RingsAt_RecurringDayIsCurrentDay_ReturnsCorrectRingTime() {
         Calendar cal = new GregorianCalendar();
         int dC = cal.get(Calendar.DAY_OF_WEEK) - 1; // Current week day, converted to our values
 
