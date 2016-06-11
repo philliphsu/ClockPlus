@@ -22,19 +22,41 @@
     <!-- ======================================================================================= -->
 
     <!-- ==================================== TOASTS ==================================== -->
-    <string name="hour_and_minute">%1$d hour and %2$d minute</string>
-    <string name="hour_and_minutes">%1$d hour and %2$d minutes</string>
-    <string name="hours_and_minute">%1$d hours and %2$d minute</string>
-    <string name="hours_and_minutes">%1$d hours and %2$d minutes</string>
-    <string name="hour">%1$d hour</string>
-    <string name="hours">%1$d hours</string>
-    <string name="minute">%2$d minute</string>
-    <string name="minutes">%2$d minutes</string>
+    <string name="day_hour_and_minute">1 day, 1 hour, and 1 minute</string>
+    <string name="days_hour_and_minute">%1$d days, 1 hour, and 1 minute</string>
+    <string name="days_hours_and_minute">%1$d days, %2$d hours, and 1 minute</string>
+    <string name="days_hour_and_minutes">%1$d days, 1 hours, and %3$d minutes</string>
+    <string name="days_hours_and_minutes">%1$d days, %2$d hours, and %3$d minutes</string>
+    <string name="day_hours_and_minute">1 day, %2$d hours, and 1 minute</string>
+    <string name="day_hours_and_minutes">1 day, %2$d hours, and %3$d minutes</string>
+    <string name="day_hour_and_minutes">1 day, 1 hour, and %3$d minutes</string>
+    <string name="day_and_hour">1 day and 1 hour</string>
+    <string name="days_and_hour">%1$d days and 1 hour</string>
+    <string name="day_and_hours">1 day and %2$d hours</string>
+    <string name="days_and_hours">%1$d days and %2$d hours</string>
+    <string name="day_and_minute">1 day and 1 minute</string>
+    <string name="days_and_minute">%1$d days and 1 minute</string>
+    <string name="day_and_minutes">1 day and %3$d minutes</string>
+    <string name="days_and_minutes">%1$d days and %3$d minutes</string>
+    <string name="hour_and_minute">1 hour and 1 minute</string>
+    <string name="hour_and_minutes">1 hour and %3$d minutes</string>
+    <string name="hours_and_minute">%2$d hours and 1 minute</string>
+    <string name="hours_and_minutes">%2$d hours and %3$d minutes</string>
+    <string name="day">1 day</string>
+    <string name="days">%1$d days</string>
+    <string name="hour">1 hour</string>
+    <string name="hours">%2$d hours</string>
+    <string name="minute">1 minute</string>
+    <string name="minutes">%3$d minutes</string>
     <string name="less_than_one_minute">less than 1 minute</string>
 
-    <string name="abbrev_hours_and_minutes">%1$dh %2$dm</string>
-    <string name="abbrev_hours">%1$dh</string>
-    <string name="abbrev_minutes">%2$dm</string>
+    <string name="abbrev_days_hours_and_minutes">%1$dd %2$dh %3$dm</string>
+    <string name="abbrev_days_and_hours">%1$dd %2$dh</string>
+    <string name="abbrev_days_and_minutes">%1$dd %3$dm</string>
+    <string name="abbrev_hours_and_minutes">%2$dh %3$dm</string>
+    <string name="abbrev_days">%1$dd</string>
+    <string name="abbrev_hours">%2$dh</string>
+    <string name="abbrev_minutes">%3$dm</string>
     <string name="abbrev_less_than_one_minute">&lt;1m</string>
 
     <string name="upcoming_alarm_dismissed">%1$s alarm dismissed.</string>
