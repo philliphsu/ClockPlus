@@ -8,8 +8,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.v4.app.NotificationCompat;
 
-import com.philliphsu.clock2.util.AlarmUtils;
 import com.philliphsu.clock2.model.AlarmsRepository;
+import com.philliphsu.clock2.util.AlarmUtils;
 
 import static android.app.PendingIntent.FLAG_ONE_SHOT;
 import static com.philliphsu.clock2.util.DateFormatUtils.formatTime;

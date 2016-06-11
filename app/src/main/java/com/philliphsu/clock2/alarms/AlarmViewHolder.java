@@ -119,7 +119,7 @@ public class AlarmViewHolder extends BaseViewHolder<Alarm> implements AlarmCount
             alarm.setEnabled(checked);
             if (alarm.isEnabled()) {
                 // TODO: On Moto X, upcoming notification doesn't post immediately
-                AlarmUtils.scheduleAlarm(getContext(), alarm);
+                AlarmUtils.scheduleAlarm(getContext(), alarm, true);
                 bindCountdown(true, alarm.ringsIn());
                 bindDismissButton(alarm);
             } else {

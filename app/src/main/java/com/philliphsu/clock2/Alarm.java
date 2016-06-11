@@ -33,17 +33,36 @@ public abstract class Alarm implements JsonSerializable {
     private static final String KEY_LABEL = "label";
     private static final String KEY_RINGTONE = "ringtone";
     private static final String KEY_VIBRATES = "vibrates";
+    private static final String KEY_RECURRENCE_IDS = "recurrence_ids";
 
     // ========= MUTABLE ==============
     private long snoozingUntilMillis;
     private boolean enabled;
+
+    // ------------------------------------------ TODO --------------------------------------------
+    // The problem with using a counter to assign the unique ids is that you need to restore the counter
+    // between application sessions to the last value used. This is something that can be easily forgotten,
+    // or worse, you can botch the code for the restoration, because it does feel hacky. Especially since
+    // you are now implementing recurring alarms with their own ids, restoring the counter to the correct
+    // value can be elusive to get right. Even if you do get it right, you had to painstakingly make sure
+    // your thought process was correct and know which value/object you would have to read the last value from.
+    //
+    // An alternative solution is to use UUID hashcodes as the unique ids. For our purposes, we shouldn't need
+    // to worry about the truncation of 128-bits to 32-bits because, practically, there aren't going to be that
+    // many Alarms out in memory to worry about id collisions. A significant pro to this solution is that you
+    // don't need to reset a counter to its previous value from an earlier session when you deserialize Alarms.
+    // Once you recreate an instance, the hashcode would be set and it's a done deal.
+    private final long[] recurrenceIds = new long[NUM_DAYS];
+    private final boolean[] recurringDays = new boolean[NUM_DAYS];
     // ================================
 
-    //public abstract long id();
+    //public abstract long id(); // TODO: Find the time to change to int?
     public abstract int hour();
     public abstract int minutes();
     @SuppressWarnings("mutable")
     // TODO: Consider using an immutable collection instead
+    // TODO: Consider maintaining this yourself. There's no practical value to having an array passed
+    // in during building.
     public abstract boolean[] recurringDays(); // array itself is immutable, but elements are not
     public abstract String label();
     public abstract String ringtone();
@@ -58,6 +77,13 @@ public abstract class Alarm implements JsonSerializable {
             for (int i = 0; i < recurringDays.length; i++) {
                 recurringDays[i] = a.getBoolean(i);
             }
+
+            a = (JSONArray) jsonObject.get(KEY_RECURRENCE_IDS);
+            long[] recurrenceIds = new long[a.length()];
+            for (int i = 0; i < recurrenceIds.length; i++) {
+                recurrenceIds[i] = a.getLong(i);
+            }
+
             Alarm alarm = new AutoValue_Alarm.Builder()
                     .id(jsonObject.getLong(KEY_ID))
                     .hour(jsonObject.getInt(KEY_HOUR))
@@ -66,6 +92,7 @@ public abstract class Alarm implements JsonSerializable {
                     .label(jsonObject.getString(KEY_LABEL))
                     .ringtone(jsonObject.getString(KEY_RINGTONE))
                     .vibrates(jsonObject.getBoolean(KEY_VIBRATES))
+                    .recurrenceIds(recurrenceIds)
                     .rebuild();
             alarm.setEnabled(jsonObject.getBoolean(KEY_ENABLED));
             alarm.snoozingUntilMillis = jsonObject.getLong(KEY_SNOOZING_UNTIL_MILLIS);
@@ -86,7 +113,8 @@ public abstract class Alarm implements JsonSerializable {
                 .recurringDays(new boolean[NUM_DAYS])
                 .label("")
                 .ringtone("")
-                .vibrates(false);
+                .vibrates(false)
+                .recurrenceIds(new long[NUM_DAYS]);
     }
 
     public void snooze(int minutes) {
@@ -227,7 +255,8 @@ public abstract class Alarm implements JsonSerializable {
                     .put(KEY_RECURRING_DAYS, new JSONArray(recurringDays()))
                     .put(KEY_LABEL, label())
                     .put(KEY_RINGTONE, ringtone())
-                    .put(KEY_VIBRATES, vibrates());
+                    .put(KEY_VIBRATES, vibrates())
+                    .put(KEY_RECURRENCE_IDS, new JSONArray(recurrenceIds));
         } catch (JSONException e) {
             throw new RuntimeException(e);
         }
@@ -261,6 +290,7 @@ public abstract class Alarm implements JsonSerializable {
         public abstract Builder label(String label);
         public abstract Builder ringtone(String ringtone);
         public abstract Builder vibrates(boolean vibrates);
+        public abstract Builder recurrenceIds(long[] recurrenceIds);
         // To enforce preconditions, split the build method into two. autoBuild() is hidden from
         // callers and is generated. You implement the public build(), which calls the generated
         // autoBuild() and performs your desired validations.
@@ -268,20 +298,25 @@ public abstract class Alarm implements JsonSerializable {
 
         public Alarm build() {
             this.id(++idCount); // TOneverDO: change to post-increment without also adding offset of 1 to idCount in rebuild()
+            // TODO: Set each recurrenceId in a loop
             Alarm alarm = autoBuild();
-            checkTime(alarm.hour(), alarm.minutes());
-            checkRecurringDaysArrayLength(alarm.recurringDays());
+            doChecks(alarm);
             return alarm;
         }
 
         /** <b>Should only be called when recreating an instance from JSON</b> */
         private Alarm rebuild() {
             Alarm alarm = autoBuild();
-            idCount = alarm.id(); // prevent future instances from id collision
-            checkTime(alarm.hour(), alarm.minutes());
-            checkRecurringDaysArrayLength(alarm.recurringDays());
+            //idCount = alarm.id(); // prevent future instances from id collision
+            idCount = alarm.recurrenceIds[6]; // the last id set
+            doChecks(alarm);
             return alarm;
         }
+    }
+
+    private static void doChecks(Alarm alarm) {
+        checkTime(alarm.hour(), alarm.minutes());
+        checkRecurringDaysArrayLength(alarm.recurringDays());
     }
 
     private static void checkDay(int day) {

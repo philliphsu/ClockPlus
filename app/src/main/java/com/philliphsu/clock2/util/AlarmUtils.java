@@ -36,7 +36,7 @@ public final class AlarmUtils {
 
     private AlarmUtils() {}
 
-    public static void scheduleAlarm(Context context, Alarm alarm) {
+    public static void scheduleAlarm(Context context, Alarm alarm, boolean showToast) {
         Log.d(TAG, "Scheduling alarm " + alarm);
         AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         // If there is already an alarm for this Intent scheduled (with the equality of two
@@ -55,17 +55,18 @@ public final class AlarmUtils {
                 notifyUpcomingAlarmIntent(context, alarm, false));
         am.setExact(AlarmManager.RTC_WAKEUP, ringAt, alarmIntent(context, alarm, false));
 
-        // Display toast
-        String message;
-        if (alarm.isSnoozed()) {
-            message = context.getString(R.string.title_snoozing_until,
-                    formatTime(context, alarm.snoozingUntil()));
-        } else {
-            message = context.getString(R.string.alarm_set_for,
-                    DurationUtils.toString(context, alarm.ringsIn(), false /*abbreviate?*/));
+        if (showToast) {
+            String message;
+            if (alarm.isSnoozed()) {
+                message = context.getString(R.string.title_snoozing_until,
+                        formatTime(context, alarm.snoozingUntil()));
+            } else {
+                message = context.getString(R.string.alarm_set_for,
+                        DurationUtils.toString(context, alarm.ringsIn(), false /*abbreviate?*/));
+            }
+            // TODO: Will toasts show for any Context? e.g. IntentService can't do anything on UI thread.
+            Toast.makeText(context, message, Toast.LENGTH_LONG).show();
         }
-        // TODO: Will toasts show for any Context? e.g. IntentService can't do anything on UI thread.
-        Toast.makeText(context, message, Toast.LENGTH_LONG).show();
     }
 
     public static void cancelAlarm(Context c, Alarm a, boolean showToast) {
@@ -108,7 +109,7 @@ public final class AlarmUtils {
 
     public static void snoozeAlarm(Context c, Alarm a) {
         a.snooze(AlarmUtils.snoozeDuration(c));
-        AlarmUtils.scheduleAlarm(c, a);
+        AlarmUtils.scheduleAlarm(c, a, true);
         save(c);
     }
 

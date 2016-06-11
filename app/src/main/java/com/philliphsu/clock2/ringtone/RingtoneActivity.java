@@ -64,7 +64,7 @@ public class RingtoneActivity extends AppCompatActivity implements RingtoneServi
         // workaround is to schedule one-time exact alarms, and reschedule each time after handling
         // an alarm delivery.
         if (mAlarm.hasRecurrence()) {
-            AlarmUtils.scheduleAlarm(this, mAlarm);
+            AlarmUtils.scheduleAlarm(this, mAlarm, false /*show toast?*/);
         }
 
         Intent intent = new Intent(this, RingtoneService.class);
