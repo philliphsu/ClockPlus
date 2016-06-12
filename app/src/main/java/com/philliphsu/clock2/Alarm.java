@@ -92,7 +92,6 @@ public abstract class Alarm implements JsonSerializable {
                     .label(jsonObject.getString(KEY_LABEL))
                     .ringtone(jsonObject.getString(KEY_RINGTONE))
                     .vibrates(jsonObject.getBoolean(KEY_VIBRATES))
-                    .recurrenceIds(recurrenceIds)
                     .rebuild();
             alarm.setEnabled(jsonObject.getBoolean(KEY_ENABLED));
             alarm.snoozingUntilMillis = jsonObject.getLong(KEY_SNOOZING_UNTIL_MILLIS);
@@ -113,8 +112,7 @@ public abstract class Alarm implements JsonSerializable {
                 .recurringDays(new boolean[NUM_DAYS])
                 .label("")
                 .ringtone("")
-                .vibrates(false)
-                .recurrenceIds(new long[NUM_DAYS]);
+                .vibrates(false);
     }
 
     public void snooze(int minutes) {
@@ -255,8 +253,7 @@ public abstract class Alarm implements JsonSerializable {
                     .put(KEY_RECURRING_DAYS, new JSONArray(recurringDays()))
                     .put(KEY_LABEL, label())
                     .put(KEY_RINGTONE, ringtone())
-                    .put(KEY_VIBRATES, vibrates())
-                    .put(KEY_RECURRENCE_IDS, new JSONArray(recurrenceIds));
+                    .put(KEY_VIBRATES, vibrates());
         } catch (JSONException e) {
             throw new RuntimeException(e);
         }
@@ -290,7 +287,6 @@ public abstract class Alarm implements JsonSerializable {
         public abstract Builder label(String label);
         public abstract Builder ringtone(String ringtone);
         public abstract Builder vibrates(boolean vibrates);
-        public abstract Builder recurrenceIds(long[] recurrenceIds);
         // To enforce preconditions, split the build method into two. autoBuild() is hidden from
         // callers and is generated. You implement the public build(), which calls the generated
         // autoBuild() and performs your desired validations.

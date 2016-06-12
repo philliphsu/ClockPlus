@@ -160,6 +160,71 @@ public class AlarmTest {
         }
     }
 
+    /*
+     * Set recurring days in a queue and test that, regardless, ringsAt() ALWAYS returns the ring time
+     * that is closest to the current day. In other words, the ring time that comes first in the queue.
+     */
+    @Test
+    public void alarm_RingsAt_QueueingRecurringDays_ReturnsClosestRingTime() {
+        Calendar cal = new GregorianCalendar();
+        int D_C = cal.get(Calendar.DAY_OF_WEEK);
+
+        for (int h = 0; h < 24; h++) {
+            for (int m = 0; m < 60; m++) {
+                Alarm a = Alarm.builder().hour(h).minutes(m).build();
+                for (int D = D_C; D <= Calendar.SATURDAY; D++) {
+                    out.println("Testing (h, m, d) = ("+h+", "+m+", "+ (D-1) +")");
+                    int hC = cal.get(HOUR_OF_DAY); // Current hour
+                    int mC = cal.get(MINUTE);      // Current minute
+                    a.setRecurring(D - 1, true);
+
+                    int days = 0;
+                    int hours = 0;
+                    int minutes = 0;
+
+                    if (D == D_C) {
+                        if (h > hC || (h == hC && m > mC)) {
+                            days = 0;
+                        } else if (h <= hC) {
+                            days = 6;
+                        }
+                    }
+
+                    if (h <= hC) {
+                        if (m <= mC) {
+                            hours = 23 - hC + h;
+                            minutes = 60 - mC + m;
+                        } else {
+                            minutes = m - mC;
+                            if (h < hC) {
+                                hours = 24 - hC + h;
+                            }
+                        }
+                    } else {
+                        if (m <= mC) {
+                            hours = h - hC - 1;
+                            minutes = 60 - mC + m;
+                        } else {
+                            hours = h - hC;
+                            minutes = m - mC;
+                        }
+                    }
+
+                    cal.add(HOUR_OF_DAY, 24 * days);
+                    cal.add(HOUR_OF_DAY, hours);
+                    cal.add(MINUTE, minutes);
+                    cal.set(SECOND, 0);
+                    cal.set(MILLISECOND, 0);
+
+                    long time = cal.getTimeInMillis();
+                    assertEquals(time, a.ringsAt());
+                    // RESET AT END!!!!
+                    cal.setTimeInMillis(System.currentTimeMillis());
+                }
+            }
+        }
+    }
+
     @Test
     public void alarm_RingsAt_AllRecurringDays_ReturnsCorrectRingTime() {
         // The results of this test should be the same as the normal ringsAt test:
