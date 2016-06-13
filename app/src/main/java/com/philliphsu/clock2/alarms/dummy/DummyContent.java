@@ -1,7 +1,6 @@
 package com.philliphsu.clock2.alarms.dummy;
 
 import com.philliphsu.clock2.Alarm;
-import com.philliphsu.clock2.DaysOfWeek;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,9 +36,7 @@ public class DummyContent {
         if (position % 2 == 0) {
             b.hour(21).minutes(0);
         }
-        boolean[] recurrences = new boolean[DaysOfWeek.NUM_DAYS];
-        recurrences[0] = true;
-        Alarm a = b.id(position).recurringDays(recurrences).build();
+        Alarm a = b.id(position).build();
         a.setEnabled(true);
         return a;
     }

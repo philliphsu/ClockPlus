@@ -11,7 +11,6 @@ import com.philliphsu.clock2.model.Repository;
 
 import java.util.Date;
 
-import static com.philliphsu.clock2.DaysOfWeek.NUM_DAYS;
 import static com.philliphsu.clock2.DaysOfWeek.SATURDAY;
 import static com.philliphsu.clock2.DaysOfWeek.SUNDAY;
 import static com.philliphsu.clock2.util.Preconditions.checkNotNull;
@@ -61,19 +60,18 @@ public class EditAlarmPresenter implements EditAlarmContract.Presenter {
             return;
         }
 
-        boolean[] days = new boolean[NUM_DAYS];
-        for (int i = SUNDAY; i <= SATURDAY; i++) {
-            days[i] = mView.isRecurringDay(i);
-        }
         Alarm a = Alarm.builder()
                 .hour(hour)
                 .minutes(minutes)
                 .ringtone(mView.getRingtone())
-                .recurringDays(days) // TODO: See https://github.com/google/auto/blob/master/value/userguide/howto.md#mutable_property
                 .label(mView.getLabel())
                 .vibrates(mView.vibrates())
                 .build();
         a.setEnabled(mView.isEnabled());
+        for (int i = SUNDAY; i <= SATURDAY; i++) {
+            a.setRecurring(i, mView.isRecurringDay(i));
+        }
+
         if (mAlarm != null) {
             if (mAlarm.isEnabled()) {
                 Log.d(TAG, "Cancelling old alarm first");

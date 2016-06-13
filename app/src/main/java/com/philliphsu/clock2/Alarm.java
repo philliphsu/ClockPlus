@@ -11,6 +11,7 @@ import org.json.JSONObject;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.concurrent.atomic.AtomicLong;
 
 import static com.philliphsu.clock2.DaysOfWeek.NUM_DAYS;
 import static com.philliphsu.clock2.DaysOfWeek.SATURDAY;
@@ -26,44 +27,23 @@ public abstract class Alarm implements JsonSerializable {
     // JSON property names
     private static final String KEY_SNOOZING_UNTIL_MILLIS = "snoozing_until_millis";
     private static final String KEY_ENABLED = "enabled";
+    private static final String KEY_RECURRING_DAYS = "recurring_days";
     //private static final String KEY_ID = "id"; // Defined in JsonSerializable
     private static final String KEY_HOUR = "hour";
     private static final String KEY_MINUTES = "minutes";
-    private static final String KEY_RECURRING_DAYS = "recurring_days";
     private static final String KEY_LABEL = "label";
     private static final String KEY_RINGTONE = "ringtone";
     private static final String KEY_VIBRATES = "vibrates";
-    private static final String KEY_RECURRENCE_IDS = "recurrence_ids";
 
     // ========= MUTABLE ==============
     private long snoozingUntilMillis;
     private boolean enabled;
-
-    // ------------------------------------------ TODO --------------------------------------------
-    // The problem with using a counter to assign the unique ids is that you need to restore the counter
-    // between application sessions to the last value used. This is something that can be easily forgotten,
-    // or worse, you can botch the code for the restoration, because it does feel hacky. Especially since
-    // you are now implementing recurring alarms with their own ids, restoring the counter to the correct
-    // value can be elusive to get right. Even if you do get it right, you had to painstakingly make sure
-    // your thought process was correct and know which value/object you would have to read the last value from.
-    //
-    // An alternative solution is to use UUID hashcodes as the unique ids. For our purposes, we shouldn't need
-    // to worry about the truncation of 128-bits to 32-bits because, practically, there aren't going to be that
-    // many Alarms out in memory to worry about id collisions. A significant pro to this solution is that you
-    // don't need to reset a counter to its previous value from an earlier session when you deserialize Alarms.
-    // Once you recreate an instance, the hashcode would be set and it's a done deal.
-    private final long[] recurrenceIds = new long[NUM_DAYS];
     private final boolean[] recurringDays = new boolean[NUM_DAYS];
     // ================================
 
-    //public abstract long id(); // TODO: Find the time to change to int?
+    //public abstract long id();
     public abstract int hour();
     public abstract int minutes();
-    @SuppressWarnings("mutable")
-    // TODO: Consider using an immutable collection instead
-    // TODO: Consider maintaining this yourself. There's no practical value to having an array passed
-    // in during building.
-    public abstract boolean[] recurringDays(); // array itself is immutable, but elements are not
     public abstract String label();
     public abstract String ringtone();
     public abstract boolean vibrates();
@@ -72,29 +52,22 @@ public abstract class Alarm implements JsonSerializable {
 
     public static Alarm create(JSONObject jsonObject) {
         try {
-            JSONArray a = (JSONArray) jsonObject.get(KEY_RECURRING_DAYS);
-            boolean[] recurringDays = new boolean[a.length()];
-            for (int i = 0; i < recurringDays.length; i++) {
-                recurringDays[i] = a.getBoolean(i);
-            }
-
-            a = (JSONArray) jsonObject.get(KEY_RECURRENCE_IDS);
-            long[] recurrenceIds = new long[a.length()];
-            for (int i = 0; i < recurrenceIds.length; i++) {
-                recurrenceIds[i] = a.getLong(i);
-            }
-
             Alarm alarm = new AutoValue_Alarm.Builder()
                     .id(jsonObject.getLong(KEY_ID))
                     .hour(jsonObject.getInt(KEY_HOUR))
                     .minutes(jsonObject.getInt(KEY_MINUTES))
-                    .recurringDays(recurringDays)
                     .label(jsonObject.getString(KEY_LABEL))
                     .ringtone(jsonObject.getString(KEY_RINGTONE))
                     .vibrates(jsonObject.getBoolean(KEY_VIBRATES))
                     .rebuild();
             alarm.setEnabled(jsonObject.getBoolean(KEY_ENABLED));
             alarm.snoozingUntilMillis = jsonObject.getLong(KEY_SNOOZING_UNTIL_MILLIS);
+
+            JSONArray a = (JSONArray) jsonObject.get(KEY_RECURRING_DAYS);
+            for (int i = 0; i < a.length(); i++) {
+                alarm.recurringDays[i] = a.getBoolean(i);
+            }
+
             return alarm;
         } catch (JSONException e) {
             throw new RuntimeException(e);
@@ -104,12 +77,10 @@ public abstract class Alarm implements JsonSerializable {
     public static Builder builder() {
         // Unfortunately, default values must be provided for generated Builders.
         // Fields that were not set when build() is called will throw an exception.
-        // TODO: How can QualityMatters get away with not setting defaults?????
         return new AutoValue_Alarm.Builder()
                 .id(-1)
                 .hour(0)
                 .minutes(0)
-                .recurringDays(new boolean[NUM_DAYS])
                 .label("")
                 .ringtone("")
                 .vibrates(false);
@@ -145,14 +116,18 @@ public abstract class Alarm implements JsonSerializable {
         return enabled;
     }
 
+    public boolean[] recurringDays() {
+        return recurringDays;
+    }
+
     public void setRecurring(int day, boolean recurring) {
         checkDay(day);
-        recurringDays()[day] =  recurring;
+        recurringDays[day] = recurring;
     }
 
     public boolean isRecurring(int day) {
         checkDay(day);
-        return recurringDays()[day];
+        return recurringDays[day];
     }
 
     public boolean hasRecurrence() {
@@ -161,7 +136,7 @@ public abstract class Alarm implements JsonSerializable {
 
     public int numRecurringDays() {
         int count = 0;
-        for (boolean b : recurringDays())
+        for (boolean b : recurringDays)
             if (b) count++;
         return count;
     }
@@ -247,10 +222,10 @@ public abstract class Alarm implements JsonSerializable {
             return new JSONObject()
                     .put(KEY_SNOOZING_UNTIL_MILLIS, snoozingUntilMillis)
                     .put(KEY_ENABLED, enabled)
+                    .put(KEY_RECURRING_DAYS, new JSONArray(recurringDays))
                     .put(KEY_ID, id())
                     .put(KEY_HOUR, hour())
                     .put(KEY_MINUTES, minutes())
-                    .put(KEY_RECURRING_DAYS, new JSONArray(recurringDays()))
                     .put(KEY_LABEL, label())
                     .put(KEY_RINGTONE, ringtone())
                     .put(KEY_VIBRATES, vibrates());
@@ -261,29 +236,12 @@ public abstract class Alarm implements JsonSerializable {
 
     @AutoValue.Builder
     public abstract static class Builder {
-        private static long idCount = 0; // TODO: change to AtomicLong?
-        // Builder is mutable, so these are inherently setter methods.
+        private static final AtomicLong ID_COUNTER = new AtomicLong(0);
         // By omitting the set- prefix, we reduce the number of changes required to define the Builder
         // class after copying and pasting the accessor fields here.
         public abstract Builder id(long id);
         public abstract Builder hour(int hour);
         public abstract Builder minutes(int minutes);
-        // TODO: If using an immutable collection instead, can use its Builder instance
-        // and provide an "accumulating" method
-        /*abstract boolean[] recurringDays();
-        public final Builder setRecurring(int day, boolean recurs) {
-            checkDay(day)
-            recurringDays()[day] = recurs;
-            return this;
-        }
-        */
-        public abstract Builder recurringDays(boolean[] recurringDays);
-        /*
-        public final Builder recurringDay(boolean[] recurringDays) {
-            this.recurringDays = Arrays.copyOf(recurringDays, NUM_DAYS);
-            return this;
-        }
-        */
         public abstract Builder label(String label);
         public abstract Builder ringtone(String ringtone);
         public abstract Builder vibrates(boolean vibrates);
@@ -293,8 +251,7 @@ public abstract class Alarm implements JsonSerializable {
         /*not public*/abstract Alarm autoBuild();
 
         public Alarm build() {
-            this.id(++idCount); // TOneverDO: change to post-increment without also adding offset of 1 to idCount in rebuild()
-            // TODO: Set each recurrenceId in a loop
+            this.id(ID_COUNTER.incrementAndGet()); // TOneverDO: change to getAndIncrement() without also adding offset of 1 in rebuild()
             Alarm alarm = autoBuild();
             doChecks(alarm);
             return alarm;
@@ -303,8 +260,7 @@ public abstract class Alarm implements JsonSerializable {
         /** <b>Should only be called when recreating an instance from JSON</b> */
         private Alarm rebuild() {
             Alarm alarm = autoBuild();
-            //idCount = alarm.id(); // prevent future instances from id collision
-            idCount = alarm.recurrenceIds[6]; // the last id set
+            ID_COUNTER.set(alarm.id()); // prevent future instances from id collision
             doChecks(alarm);
             return alarm;
         }
@@ -312,7 +268,6 @@ public abstract class Alarm implements JsonSerializable {
 
     private static void doChecks(Alarm alarm) {
         checkTime(alarm.hour(), alarm.minutes());
-        checkRecurringDaysArrayLength(alarm.recurringDays());
     }
 
     private static void checkDay(int day) {
@@ -324,12 +279,6 @@ public abstract class Alarm implements JsonSerializable {
     private static void checkTime(int hour, int minutes) {
         if (hour < 0 || hour > 23 || minutes < 0 || minutes > 59) {
             throw new IllegalStateException("Hour and minutes invalid");
-        }
-    }
-
-    private static void checkRecurringDaysArrayLength(boolean[] b) {
-        if (b.length != NUM_DAYS) {
-            throw new IllegalStateException("Invalid length for recurring days array");
         }
     }
 }

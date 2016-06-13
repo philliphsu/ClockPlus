@@ -60,13 +60,6 @@ public class RingtoneActivity extends AppCompatActivity implements RingtoneServi
         // This could be the case if we're starting a new instance of this activity after leaving the first launch.
         AlarmUtils.removeUpcomingAlarmNotification(this, mAlarm);
 
-        // As of API 19, alarms scheduled with AlarmManager.setRepeating() are inexact. The recommended
-        // workaround is to schedule one-time exact alarms, and reschedule each time after handling
-        // an alarm delivery.
-        if (mAlarm.hasRecurrence()) {
-            AlarmUtils.scheduleAlarm(this, mAlarm, false /*show toast?*/);
-        }
-
         Intent intent = new Intent(this, RingtoneService.class);
         bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
 
@@ -165,6 +158,12 @@ public class RingtoneActivity extends AppCompatActivity implements RingtoneServi
 
     private void dismiss() {
         AlarmUtils.cancelAlarm(this, mAlarm, false);
+        // As of API 19, alarms scheduled with AlarmManager.setRepeating() are inexact. The recommended
+        // workaround is to schedule one-time exact alarms, and reschedule each time after handling
+        // an alarm delivery.
+        if (mAlarm.hasRecurrence()) {
+            AlarmUtils.scheduleAlarm(this, mAlarm, false /*show toast?*/);
+        }
         unbindAndFinish();
     }
 
