@@ -53,40 +53,8 @@ public class AlarmTest {
         for (int h = 0; h < 24; h++) {
             for (int m = 0; m < 60; m++) {
                 out.println(String.format("Testing %02d:%02d", h, m));
-                int hC = now.get(HOUR_OF_DAY); // Current hour
-                int mC = now.get(MINUTE);      // Current minute
                 Alarm a = Alarm.builder().hour(h).minutes(m).build();
-
-                // Quantities until the ring time (h, m)
-                int hours = 0;
-                int minutes = 0;
-
-                if (h <= hC) {
-                    if (m <= mC) {
-                        hours = 23 - hC + h;
-                        minutes = 60 - mC + m;
-                    } else {
-                        minutes = m - mC;
-                        if (h < hC) {
-                            hours = 24 - hC + h;
-                        }
-                    }
-                } else {
-                    if (m <= mC) {
-                        hours = h - hC - 1;
-                        minutes = 60 - mC + m;
-                    } else {
-                        hours = h - hC;
-                        minutes = m - mC;
-                    }
-                }
-                now.add(HOUR_OF_DAY, hours);
-                now.add(MINUTE, minutes);
-                now.set(SECOND, 0);
-                now.set(MILLISECOND, 0);
-                assertEquals(a.ringsAt(), now.getTimeInMillis());
-                // VERY IMPORTANT TO RESET AT THE END!!!!
-                now.setTimeInMillis(System.currentTimeMillis());
+                calculateRingTimeAndTest(h, m, 0 /*days*/, now, a.ringsAt());
             }
         }
     }
@@ -106,8 +74,6 @@ public class AlarmTest {
                     a.setRecurring(D - 1, true);
 
                     int days = 0;
-                    int hours = 0;
-                    int minutes = 0;
 
                     if (h > hC || (h == hC && m > mC)) {
                         if (D < D_C) {
@@ -127,34 +93,7 @@ public class AlarmTest {
                         }
                     }
 
-                    if (h <= hC) {
-                        if (m <= mC) {
-                            hours = 23 - hC + h;
-                            minutes = 60 - mC + m;
-                        } else {
-                            minutes = m - mC;
-                            if (h < hC) {
-                                hours = 24 - hC + h;
-                            }
-                        }
-                    } else {
-                        if (m <= mC) {
-                            hours = h - hC - 1;
-                            minutes = 60 - mC + m;
-                        } else {
-                            hours = h - hC;
-                            minutes = m - mC;
-                        }
-                    }
-
-                    cal.add(HOUR_OF_DAY, 24 * days);
-                    cal.add(HOUR_OF_DAY, hours);
-                    cal.add(MINUTE, minutes);
-                    cal.set(SECOND, 0);
-                    cal.set(MILLISECOND, 0);
-                    assertEquals(a.ringsAt(), cal.getTimeInMillis());
-                    // VERY IMPORTANT TO RESET AT THE END!!!!
-                    cal.setTimeInMillis(System.currentTimeMillis());
+                    calculateRingTimeAndTest(h, m, days, cal, a.ringsAt());
                 }
             }
         }
@@ -165,22 +104,20 @@ public class AlarmTest {
      * that is closest to the current day. In other words, the ring time that comes first in the queue.
      */
     @Test
-    public void alarm_RingsAt_QueueingRecurringDays_ReturnsClosestRingTime() {
+    public void alarm_RingsAt_ForwardQueueingRecurringDays() {
         Calendar cal = new GregorianCalendar();
         int D_C = cal.get(Calendar.DAY_OF_WEEK);
 
         for (int h = 0; h < 24; h++) {
             for (int m = 0; m < 60; m++) {
                 Alarm a = Alarm.builder().hour(h).minutes(m).build();
-                for (int D = D_C; D <= Calendar.SATURDAY; D++) {
+                for (int D = Calendar.SUNDAY; D <= Calendar.SATURDAY; D++) {
                     out.println("Testing (h, m, d) = ("+h+", "+m+", "+ (D-1) +")");
                     int hC = cal.get(HOUR_OF_DAY); // Current hour
                     int mC = cal.get(MINUTE);      // Current minute
                     a.setRecurring(D - 1, true);
 
                     int days = 0;
-                    int hours = 0;
-                    int minutes = 0;
 
                     if (D == D_C) {
                         if (h > hC || (h == hC && m > mC)) {
@@ -190,36 +127,99 @@ public class AlarmTest {
                         }
                     }
 
-                    if (h <= hC) {
-                        if (m <= mC) {
-                            hours = 23 - hC + h;
-                            minutes = 60 - mC + m;
+                    calculateRingTimeAndTest(h, m, days, cal, a.ringsAt());
+                }
+            }
+        }
+    }
+
+    /*
+     * Set recurring days in a queue and test that, regardless, ringsAt() ALWAYS returns the ring time
+     * that is closest to the current day. In other words, the ring time that comes first in the queue.
+     */
+    @Test
+    public void alarm_RingsAt_BackwardQueueingRecurringDays() {
+        Calendar cal = new GregorianCalendar();
+        int D_C = cal.get(Calendar.DAY_OF_WEEK);
+
+        for (int h = 0; h < 24; h++) {
+            for (int m = 0; m < 60; m++) {
+                Alarm a = Alarm.builder().hour(h).minutes(m).build();
+                for (int D = Calendar.SATURDAY; D >= Calendar.SUNDAY; D--) {
+                    out.println("Testing (h, m, d) = ("+h+", "+m+", "+ (D-1) +")");
+                    int hC = cal.get(HOUR_OF_DAY); // Current hour
+                    int mC = cal.get(MINUTE);      // Current minute
+                    a.setRecurring(D - 1, true);
+
+                    int days = 0;
+
+                    if (h > hC || (h == hC && m > mC)) {
+                        if (D < D_C) {
+                            days = Calendar.SATURDAY - D_C + D;
+                        } else if (D == D_C) {
+                            days = 0; // upcoming on the same day
                         } else {
-                            minutes = m - mC;
-                            if (h < hC) {
-                                hours = 24 - hC + h;
-                            }
+                            days = D - D_C;
                         }
-                    } else {
-                        if (m <= mC) {
-                            hours = h - hC - 1;
-                            minutes = 60 - mC + m;
+                    } else if (h <= hC) {
+                        if (D < D_C) {
+                            days = Calendar.SATURDAY - D_C + D - 1;
+                        } else if (D == D_C) {
+                            days = 0;
                         } else {
-                            hours = h - hC;
-                            minutes = m - mC;
+                            days = D - D_C - 1;
+                        }
+                    }
+                    
+                    calculateRingTimeAndTest(h, m, days, cal, a.ringsAt());
+                }
+            }
+        }
+    }
+
+    @Test
+    public void alarm_RingsAt_MiddleOutQueueingRecurringDays() {
+        Calendar cal = new GregorianCalendar();
+        int D_C = cal.get(Calendar.DAY_OF_WEEK);
+
+        for (int h = 0; h < 24; h++) {
+            for (int m = 0; m < 60; m++) {
+                Alarm a = Alarm.builder().hour(h).minutes(m).build();
+                a.setRecurring(DaysOfWeek.WEDNESDAY, true);
+                long wednesdayRingTime = a.ringsAt();
+                for (int D = Calendar.THURSDAY; D <= Calendar.SATURDAY; D++) {
+                    out.println("Wednesday ring time: " + wednesdayRingTime);
+                    // Check that the ring time is always on Wednesday
+                    a.setRecurring(D - 1, true);
+                    assertEquals(wednesdayRingTime, a.ringsAt());
+                }
+                for (int D = Calendar.TUESDAY; D >= Calendar.SUNDAY; D--) {
+                    // Check that the ring time is earlier after each iteration
+                    int hC = cal.get(HOUR_OF_DAY); // Current hour
+                    int mC = cal.get(MINUTE);      // Current minute
+                    a.setRecurring(D - 1, true);
+
+                    int days = 0;
+
+                    if (h > hC || (h == hC && m > mC)) {
+                        if (D < D_C) {
+                            days = Calendar.SATURDAY - D_C + D;
+                        } else if (D == D_C) {
+                            days = 0; // upcoming on the same day
+                        } else {
+                            days = D - D_C;
+                        }
+                    } else if (h <= hC) {
+                        if (D < D_C) {
+                            days = Calendar.SATURDAY - D_C + D - 1;
+                        } else if (D == D_C) {
+                            days = 0;
+                        } else {
+                            days = D - D_C - 1;
                         }
                     }
 
-                    cal.add(HOUR_OF_DAY, 24 * days);
-                    cal.add(HOUR_OF_DAY, hours);
-                    cal.add(MINUTE, minutes);
-                    cal.set(SECOND, 0);
-                    cal.set(MILLISECOND, 0);
-
-                    long time = cal.getTimeInMillis();
-                    assertEquals(time, a.ringsAt());
-                    // RESET AT END!!!!
-                    cal.setTimeInMillis(System.currentTimeMillis());
+                    calculateRingTimeAndTest(h, m, days, cal, a.ringsAt());
                 }
             }
         }
@@ -232,43 +232,11 @@ public class AlarmTest {
         GregorianCalendar now = new GregorianCalendar();
         for (int h = 0; h < 24; h++) {
             for (int m = 0; m < 60; m++) {
-                int hC = now.get(HOUR_OF_DAY); // Current hour
-                int mC = now.get(MINUTE);      // Current minute
                 Alarm a = Alarm.builder().hour(h).minutes(m).build();
                 for (int i = 0; i < 7; i++) {
                     a.setRecurring(i, true);
                 }
-
-                // Quantities until the ring time (h, m)
-                int hours = 0;
-                int minutes = 0;
-
-                if (h <= hC) {
-                    if (m <= mC) {
-                        hours = 23 - hC + h;
-                        minutes = 60 - mC + m;
-                    } else {
-                        minutes = m - mC;
-                        if (h < hC) {
-                            hours = 24 - hC + h;
-                        }
-                    }
-                } else {
-                    if (m <= mC) {
-                        hours = h - hC - 1;
-                        minutes = 60 - mC + m;
-                    } else {
-                        hours = h - hC;
-                        minutes = m - mC;
-                    }
-                }
-                now.add(HOUR_OF_DAY, hours);
-                now.add(MINUTE, minutes);
-                now.set(SECOND, 0);
-                now.set(MILLISECOND, 0);
-                assertEquals(a.ringsAt(), now.getTimeInMillis());
-                // VERY IMPORTANT TO RESET AT THE END!!!!
-                now.setTimeInMillis(System.currentTimeMillis());
+                calculateRingTimeAndTest(h, m, 0, now, a.ringsAt());
             }
         }
     }
@@ -476,5 +444,56 @@ public class AlarmTest {
             // Check if the snoozingUntilMillis is cleared
             assertEquals(0, alarm.snoozingUntil());
         }
+    }
+
+    /**
+     * Calculates the remaining time until the ring time (h, m) and tests if the
+     * calculated value agrees with the {@code expected} value. Callers are expected
+     * to calculate the number of days until this ring time (h, m) themselves, because
+     * the manner of its calculation is dependent on the recurrence situation.
+     * @param h the hours of the ring time under test
+     * @param m the minutes of the ring time under test
+     * @param days your calculated number of days until this ring time
+     * @param calendar the Calendar instantiated in your test
+     * @param expected the expected ring time to be compared against the calculated value
+     */
+    private void calculateRingTimeAndTest(int h, int m, int days, Calendar calendar, long expected) {
+        int hC = calendar.get(HOUR_OF_DAY); // Current hour
+        int mC = calendar.get(MINUTE);      // Current minute
+
+        int hours = 0;
+        int minutes = 0;
+
+        if (h <= hC) {
+            if (m <= mC) {
+                hours = 23 - hC + h;
+                minutes = 60 - mC + m;
+            } else {
+                minutes = m - mC;
+                if (h < hC) {
+                    hours = 24 - hC + h;
+                }
+            }
+        } else {
+            if (m <= mC) {
+                hours = h - hC - 1;
+                minutes = 60 - mC + m;
+            } else {
+                hours = h - hC;
+                minutes = m - mC;
+            }
+        }
+
+        calendar.add(HOUR_OF_DAY, 24 * days);
+        calendar.add(HOUR_OF_DAY, hours);
+        calendar.add(MINUTE, minutes);
+        calendar.set(SECOND, 0);
+        calendar.set(MILLISECOND, 0);
+
+        long time = calendar.getTimeInMillis();
+        out.println("Calculated time: " + time);
+        assertEquals(time, expected);
+        // RESET AT END!!!!
+        calendar.setTimeInMillis(System.currentTimeMillis());
     }
 }
