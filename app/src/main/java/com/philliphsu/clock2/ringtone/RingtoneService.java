@@ -4,7 +4,6 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
 import android.media.AudioManager;
 import android.media.Ringtone;
@@ -13,7 +12,9 @@ import android.net.Uri;
 import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.Vibrator;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
@@ -43,6 +44,7 @@ public class RingtoneService extends Service { // TODO: abstract this, make subc
     private static final String EXTRA_ITEM_ID = "com.philliphsu.clock2.ringtone.extra.ITEM_ID";
 
     private AudioManager mAudioManager;
+    @Nullable private Vibrator mVibrator;
     private Ringtone mRingtone;
     private Alarm mAlarm;
     private String mNormalRingTime;
@@ -55,8 +57,14 @@ public class RingtoneService extends Service { // TODO: abstract this, make subc
         @Override
         public void run() {
             mAutoSilenced = true;
-            mRingtone.stop(); // don't wait for activity to finish and unbind
-            AlarmUtils.cancelAlarm(RingtoneService.this, mAlarm, false);
+            // don't wait for activity to finish and unbind
+            // TODO: Is it really crucial for us to stop these immediately? User will probably not notice
+            // if this alarm gets to the point of auto-silencing.
+            mRingtone.stop();
+            if (mVibrator != null) {
+                mVibrator.cancel();
+            }
+            AlarmUtils.cancelAlarm(RingtoneService.this, mAlarm, false); // TODO do we really need to cancel the alarm and intent?
             if (mRingtoneCallback != null) {
                 // Finish the activity, which fires onDestroy() and then unbinds itself from this service.
                 // All clients must be unbound before stopSelf() (and stopService()?) will succeed.
@@ -86,7 +94,7 @@ public class RingtoneService extends Service { // TODO: abstract this, make subc
         if (ACTION_SNOOZE.equals(intent.getAction())) {
             AlarmUtils.snoozeAlarm(this, alarm);
         } else if (ACTION_DISMISS.equals(intent.getAction())) {
-            AlarmUtils.cancelAlarm(this, alarm, false);
+            AlarmUtils.cancelAlarm(this, alarm, false); // TODO do we really need to cancel the intent and alarm?
         } else {
             throw new UnsupportedOperationException();
         }
@@ -104,6 +112,9 @@ public class RingtoneService extends Service { // TODO: abstract this, make subc
         Log.d(TAG, "onDestroy()");
         mRingtone.stop();
         mAudioManager.abandonAudioFocus(null); // no listener was set
+        if (mVibrator != null) {
+            mVibrator.cancel();
+        }
         mSilenceHandler.removeCallbacks(mSilenceRunnable);
         if (mAutoSilenced) {
             // Post notification that alarm was missed, or timer expired.
@@ -152,7 +163,10 @@ public class RingtoneService extends Service { // TODO: abstract this, make subc
                     .build();
             startForeground(R.id.ringtone_service_notification, note); // TOneverDO: Pass 0 as the first argument
 
-            mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+            mAudioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
+            if (mAlarm.vibrates()) {
+                mVibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
+            }
             // Request audio focus first, so we don't play our ringtone on top of any
             // other apps that currently have playback.
             int result = mAudioManager.requestAudioFocus(
@@ -166,6 +180,14 @@ public class RingtoneService extends Service { // TODO: abstract this, make subc
                 // Deprecated, but the alternative AudioAttributes requires API 21
                 mRingtone.setStreamType(AudioManager.STREAM_ALARM);
                 mRingtone.play();
+                if (mVibrator != null) {
+                    mVibrator.vibrate(new long[] { // apply pattern
+                            0, // millis to wait before turning vibrator on
+                            500, // millis to keep vibrator on before turning off
+                            500, // millis to wait before turning back on
+                            500 // millis to keep on before turning off
+                    }, 2 /* start repeating at this index of the array, after one cycle */);
+                }
                 scheduleAutoSilence();
             }
         }

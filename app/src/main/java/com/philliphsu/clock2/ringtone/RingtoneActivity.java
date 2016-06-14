@@ -157,7 +157,7 @@ public class RingtoneActivity extends AppCompatActivity implements RingtoneServi
     }
 
     private void dismiss() {
-        AlarmUtils.cancelAlarm(this, mAlarm, false);
+        AlarmUtils.cancelAlarm(this, mAlarm, false); // TODO do we really need to cancel the intent and alarm?
         unbindAndFinish();
     }
 

@@ -433,7 +433,7 @@ public class EditAlarmActivity extends BaseActivity implements AlarmNumpad.KeyLi
 
     @Override
     public void cancelAlarm(Alarm alarm, boolean showToast) {
-        AlarmUtils.cancelAlarm(this, alarm, showToast); // TODO: Cancel only?
+        AlarmUtils.cancelAlarm(this, alarm, showToast);
         if (RingtoneActivity.isAlive()) {
             Intent intent = new Intent(this, RingtoneActivity.class)
                     .setAction(RingtoneActivity.ACTION_UNBIND);
