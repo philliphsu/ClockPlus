@@ -10,6 +10,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.philliphsu.clock2.Alarm;
+import com.philliphsu.clock2.PendingAlarmScheduler;
 import com.philliphsu.clock2.R;
 import com.philliphsu.clock2.UpcomingAlarmReceiver;
 import com.philliphsu.clock2.model.AlarmsRepository;
@@ -84,7 +85,7 @@ public final class AlarmUtils {
         removeUpcomingAlarmNotification(c, a);
 
         // TOneverDO: Place block after making value changes to the alarm.
-        if (showToast && (a.ringsIn() <= HOURS.toMillis(hoursBeforeUpcoming(c)) || a.isSnoozed())) {
+        if (showToast && (a.ringsWithinHours(hoursBeforeUpcoming(c)) || a.isSnoozed())) {
             String time = formatTime(c, a.isSnoozed() ? a.snoozingUntil() : a.ringsAt());
             String text = c.getString(R.string.upcoming_alarm_dismissed, time);
             Toast.makeText(c, text, Toast.LENGTH_LONG).show();
@@ -96,6 +97,19 @@ public final class AlarmUtils {
 
         if (!a.hasRecurrence()) {
             a.setEnabled(false);
+        } else {
+            if (a.isEnabled()) {
+                if (a.ringsWithinHours(hoursBeforeUpcoming(c))) {
+                    // Still upcoming today, so wait until the normal ring time passes before
+                    // rescheduling the alarm.
+                    Intent intent = new Intent(c, PendingAlarmScheduler.class)
+                            .putExtra(PendingAlarmScheduler.EXTRA_ALARM_ID, a.id());
+                    pi = PendingIntent.getBroadcast(c, a.intId(), intent, PendingIntent.FLAG_ONE_SHOT);
+                    am.set(AlarmManager.RTC_WAKEUP, a.ringsAt(), pi);
+                } else {
+                    scheduleAlarm(c, a, false);
+                }
+            }
         }
 
         save(c); // Save any changes
@@ -108,8 +122,8 @@ public final class AlarmUtils {
     }
 
     public static void snoozeAlarm(Context c, Alarm a) {
-        a.snooze(AlarmUtils.snoozeDuration(c));
-        AlarmUtils.scheduleAlarm(c, a, true);
+        a.snooze(snoozeDuration(c));
+        scheduleAlarm(c, a, true);
         save(c);
     }
 

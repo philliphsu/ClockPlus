@@ -158,12 +158,6 @@ public class RingtoneActivity extends AppCompatActivity implements RingtoneServi
 
     private void dismiss() {
         AlarmUtils.cancelAlarm(this, mAlarm, false);
-        // As of API 19, alarms scheduled with AlarmManager.setRepeating() are inexact. The recommended
-        // workaround is to schedule one-time exact alarms, and reschedule each time after handling
-        // an alarm delivery.
-        if (mAlarm.hasRecurrence()) {
-            AlarmUtils.scheduleAlarm(this, mAlarm, false /*show toast?*/);
-        }
         unbindAndFinish();
     }
 

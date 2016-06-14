@@ -20,9 +20,9 @@
         </activity>
         <activity
             android:name=".ringtone.RingtoneActivity"
+            android:excludeFromRecents="true"
             android:label="@string/title_activity_ringtone"
             android:launchMode="singleTask"
-            android:excludeFromRecents="true"
             android:taskAffinity="com.philliphsu.clock2.RingtoneActivity">
         </activity>
 
@@ -47,7 +47,6 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.philliphsu.clock2.MainActivity"/>
         </activity>
-
         <activity
             android:name=".settings.SettingsActivity"
             android:label="@string/title_activity_settings"
@@ -56,6 +55,12 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.philliphsu.clock2.MainActivity"/>
         </activity>
+
+        <receiver
+            android:name=".PendingAlarmScheduler"
+            android:enabled="true"
+            android:exported="false">
+        </receiver>
     </application>
 
 </manifest>
