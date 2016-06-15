@@ -9,7 +9,6 @@ import android.media.AudioManager;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
-import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Vibrator;
@@ -22,6 +21,7 @@ import com.philliphsu.clock2.Alarm;
 import com.philliphsu.clock2.R;
 import com.philliphsu.clock2.model.AlarmsRepository;
 import com.philliphsu.clock2.util.AlarmUtils;
+import com.philliphsu.clock2.util.LocalBroadcastHelper;
 
 import static com.philliphsu.clock2.util.DateFormatUtils.formatTime;
 import static com.philliphsu.clock2.util.Preconditions.checkNotNull;
@@ -33,6 +33,8 @@ import static com.philliphsu.clock2.util.Preconditions.checkNotNull;
  * of the RingtoneService will be tied to that of its RingtoneActivity because users are not likely to
  * navigate away from the Activity without making an action. But if they do accidentally navigate away,
  * they have plenty of time to make the desired action via the notification.
+ *
+ * TOneverDO: Change this to not be a started service!
  */
 public class RingtoneService extends Service { // TODO: abstract this, make subclasses
     private static final String TAG = "RingtoneService";
@@ -40,6 +42,8 @@ public class RingtoneService extends Service { // TODO: abstract this, make subc
     /* TOneverDO: not private */
     private static final String ACTION_SNOOZE = "com.philliphsu.clock2.ringtone.action.SNOOZE";
     private static final String ACTION_DISMISS = "com.philliphsu.clock2.ringtone.action.DISMISS";
+    // public okay
+    public static final String ACTION_NOTIFY_MISSED = "com.philliphsu.clock2.ringtone.action.NOTIFY_MISSED";
     // TODO: Same value as RingtoneActivity.EXTRA_ITEM_ID. Is it important enough to define a different constant?
     private static final String EXTRA_ITEM_ID = "com.philliphsu.clock2.ringtone.extra.ITEM_ID";
 
@@ -49,7 +53,6 @@ public class RingtoneService extends Service { // TODO: abstract this, make subc
     private Alarm mAlarm;
     private String mNormalRingTime;
     private boolean mAutoSilenced = false;
-    private RingtoneCallback mRingtoneCallback;
     // TODO: Using Handler for this is ill-suited? Alarm ringing could outlast the
     // application's life. Use AlarmManager API instead.
     private final Handler mSilenceHandler = new Handler();
@@ -57,51 +60,37 @@ public class RingtoneService extends Service { // TODO: abstract this, make subc
         @Override
         public void run() {
             mAutoSilenced = true;
-            // don't wait for activity to finish and unbind
-            // TODO: Is it really crucial for us to stop these immediately? User will probably not notice
-            // if this alarm gets to the point of auto-silencing.
-            mRingtone.stop();
-            if (mVibrator != null) {
-                mVibrator.cancel();
-            }
             AlarmUtils.cancelAlarm(RingtoneService.this, mAlarm, false); // TODO do we really need to cancel the alarm and intent?
-            if (mRingtoneCallback != null) {
-                // Finish the activity, which fires onDestroy() and then unbinds itself from this service.
-                // All clients must be unbound before stopSelf() (and stopService()?) will succeed.
-                // See https://developer.android.com/guide/components/bound-services.html#Lifecycle
-                // Figure 1 regarding the lifecycle of started and bound services.
-                mRingtoneCallback.onServiceFinish();
-            }
+            finishActivity();
+            stopSelf();
         }
     };
-    private final IBinder mBinder = new RingtoneBinder();
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        // Although this is a bound service, we override this method because this class is reused for
-        // handling the notification actions for the presently ringing alarm.
-        // Although the docs of Context#startService() says this:
-        // "Using startService() overrides the default service lifetime that is managed by
-        // bindService(Intent, ServiceConnection, int): it requires the service to remain running until
-        // stopService(Intent) [or stopSelf()] is called, regardless of whether any clients are connected to it."
-        // I have found the regardless part does not apply here. You MUST also unbind any clients from this service
-        // at the same time you stop this service!
         long id = intent.getLongExtra(EXTRA_ITEM_ID, -1);
         if (id < 0)
             throw new IllegalStateException("No item id set");
         Alarm alarm = checkNotNull(AlarmsRepository.getInstance(this).getItem(id));
 
-        if (ACTION_SNOOZE.equals(intent.getAction())) {
-            AlarmUtils.snoozeAlarm(this, alarm);
-        } else if (ACTION_DISMISS.equals(intent.getAction())) {
-            AlarmUtils.cancelAlarm(this, alarm, false); // TODO do we really need to cancel the intent and alarm?
+        // TODO: Refactor to use switch block
+        if (intent.getAction() == null || intent.getAction().isEmpty()) {
+            playRingtone(alarm);
+        } else if (ACTION_NOTIFY_MISSED.equals(intent.getAction())) {
+            mAutoSilenced = true;
+            stopSelf(startId);
+            // Activity finishes itself
         } else {
-            throw new UnsupportedOperationException();
-        }
-        // ==========================================================================
-        stopSelf(startId);
-        if (mRingtoneCallback != null) {
-            mRingtoneCallback.onServiceFinish(); // tell client to unbind from this service
+            if (ACTION_SNOOZE.equals(intent.getAction())) {
+                AlarmUtils.snoozeAlarm(this, alarm);
+            } else if (ACTION_DISMISS.equals(intent.getAction())) {
+                AlarmUtils.cancelAlarm(this, alarm, false); // TODO do we really need to cancel the intent and alarm?
+            } else {
+                throw new UnsupportedOperationException();
+            }
+            // ==========================================================================
+            stopSelf(startId);
+            finishActivity();
         }
 
         return START_NOT_STICKY; // If killed while started, don't recreate. Should be sufficient.
@@ -135,10 +124,10 @@ public class RingtoneService extends Service { // TODO: abstract this, make subc
 
     @Override
     public IBinder onBind(Intent intent) {
-        return mBinder;
+        return null;
     }
 
-    public void playRingtone(@NonNull Alarm alarm) {
+    private void playRingtone(@NonNull Alarm alarm) {
         if (mAudioManager == null && mRingtone == null) {
             mAlarm = checkNotNull(alarm);
             // TODO: The below call requires a notification, and there is no way to provide one suitable
@@ -193,36 +182,16 @@ public class RingtoneService extends Service { // TODO: abstract this, make subc
         }
     }
 
-    public void setRingtoneCallback(RingtoneCallback callback) {
-        mRingtoneCallback = callback;
-    }
-
-    /**
-     * A way for clients to interrupt the currently running instance of this service. Interrupting
-     * the service is akin to prematurely auto silencing the ringtone right now. <b>Clients MUST
-     * unbind from this service immediately after interrupting.</b>
-     */
-    public void interrupt() {
-        mAutoSilenced = true;
-    }
-
-    // Needed so clients can get the Service instance and e.g. call setRingtoneCallback().
-    public class RingtoneBinder extends Binder {
-        RingtoneService getService() {
-            return RingtoneService.this; // Precludes the class from being static!
-        }
-    }
-
-    public interface RingtoneCallback {
-        void onServiceFinish();
-    }
-
     // TODO: For Timers, update the foreground notification to say "timer expired". Also,
     // if Alarms and Timers will have distinct settings for the minutes to silence after, then consider
     // doing this in the respective subclass of this service.
     private void scheduleAutoSilence() {
         int minutes = AlarmUtils.minutesToSilenceAfter(this);
-        mSilenceHandler.postDelayed(mSilenceRunnable, minutes * 60000);
+        mSilenceHandler.postDelayed(mSilenceRunnable, /*minutes * 60000*/10000); // TODO: uncomment
+    }
+
+    private void finishActivity() {
+        LocalBroadcastHelper.sendBroadcast(this, RingtoneActivity.ACTION_FINISH);
     }
 
     private PendingIntent getPendingIntent(@NonNull String action, Alarm alarm) {

@@ -1,11 +1,11 @@
 package com.philliphsu.clock2.ringtone;
 
-import android.content.ComponentName;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
+import android.content.IntentFilter;
 import android.os.Bundle;
-import android.os.IBinder;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -24,19 +24,17 @@ import static com.philliphsu.clock2.util.Preconditions.checkNotNull;
  * status bar and navigation/system bar) with user interaction.
  *
  * TODO: Make this abstract and make appropriate subclasses for Alarms and Timers.
- * TODO: Implement dismiss and extend logic here.
  */
-public class RingtoneActivity extends AppCompatActivity implements RingtoneService.RingtoneCallback {
+public class RingtoneActivity extends AppCompatActivity {
     private static final String TAG = "RingtoneActivity";
 
     // Shared with RingtoneService
     public static final String EXTRA_ITEM_ID = "com.philliphsu.clock2.ringtone.extra.ITEM_ID";
-    public static final String ACTION_UNBIND = "com.philliphsu.clock2.ringtone.action.UNBIND";
-
-    private Alarm mAlarm;
-    private boolean mBound = false;
+    public static final String ACTION_FINISH = "com.philliphsu.clock2.ringtone.action.UNBIND";
 
     private static boolean sIsAlive = false;
+
+    private Alarm mAlarm;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,8 +58,9 @@ public class RingtoneActivity extends AppCompatActivity implements RingtoneServi
         // This could be the case if we're starting a new instance of this activity after leaving the first launch.
         AlarmUtils.removeUpcomingAlarmNotification(this, mAlarm);
 
-        Intent intent = new Intent(this, RingtoneService.class);
-        bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+        Intent intent = new Intent(this, RingtoneService.class)
+                .putExtra(EXTRA_ITEM_ID, id);
+        startService(intent);
 
         // TODO: Butterknife binding
         Button snooze = (Button) findViewById(R.id.btn_snooze);
@@ -81,26 +80,28 @@ public class RingtoneActivity extends AppCompatActivity implements RingtoneServi
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        LocalBroadcastManager.getInstance(this).registerReceiver(
+                mFinishReceiver, new IntentFilter(ACTION_FINISH));
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mFinishReceiver);
+    }
+
+    @Override
     protected void onNewIntent(Intent intent) {
         //super.onNewIntent(intent); // Not needed since no fragments hosted?
-        if (mBound) {
-            if (ACTION_UNBIND.equals(intent.getAction())) {
-                // Someone else wants us to unbind
-                sIsAlive = false; // don't wait until onDestroy() to reset
-                //dismiss();
-                unbindAndFinish();
-            } else {
-                mBoundService.interrupt(); // prepare to notify the alarm was missed
-                /*
-                // Cannot rely on finish() to call onDestroy() on time before the activity is restarted.
-                unbindService();
-                // Calling recreate() would recreate this with its current intent, not the new intent passed in here.
-                finish();
-                */
-                unbindAndFinish();
-                startActivity(intent);
-            }
-        }
+
+        // Notifies alarm missed and stops the service
+        // TODO: Find a better, cleaner way? Starting the service just to set a flag and stop itself
+        // is not very clear from this code. Perhaps the same Broadcast concept as done here.
+        startService(new Intent(this, RingtoneService.class).setAction(RingtoneService.ACTION_NOTIFY_MISSED));
+        finish();
+        startActivity(intent);
     }
 
     @Override
@@ -136,13 +137,7 @@ public class RingtoneActivity extends AppCompatActivity implements RingtoneServi
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        unbindService();
         sIsAlive = false;
-    }
-
-    @Override
-    public void onServiceFinish() {
-        unbindAndFinish();
     }
 
     public static boolean isAlive() {
@@ -153,41 +148,23 @@ public class RingtoneActivity extends AppCompatActivity implements RingtoneServi
         AlarmUtils.snoozeAlarm(this, mAlarm);
         // Can't call dismiss() because we don't want to also call cancelAlarm()! Why? For example,
         // we don't want the alarm, if it has no recurrence, to be turned off right now.
-        unbindAndFinish();
+        stopAndFinish();
     }
 
     private void dismiss() {
         AlarmUtils.cancelAlarm(this, mAlarm, false); // TODO do we really need to cancel the intent and alarm?
-        unbindAndFinish();
+        stopAndFinish();
     }
 
-    private void unbindService() {
-        if (mBound) {
-            unbindService(mConnection);
-            mBound = false;
-        }
-    }
-
-    private void unbindAndFinish() {
-        unbindService(); // don't wait for finish() to call onDestroy()
+    private void stopAndFinish() {
+        stopService(new Intent(this, RingtoneService.class));
         finish();
     }
 
-    private RingtoneService mBoundService;
-
-    private ServiceConnection mConnection = new ServiceConnection() {
+    private final BroadcastReceiver mFinishReceiver = new BroadcastReceiver() {
         @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            mBoundService = ((RingtoneService.RingtoneBinder) service).getService();
-            mBoundService.playRingtone(mAlarm);
-            mBoundService.setRingtoneCallback(RingtoneActivity.this);
-            mBound = true;
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-            mBoundService = null;
-            mBound = false;
+        public void onReceive(Context context, Intent intent) {
+            stopAndFinish();
         }
     };
 }
