@@ -4,7 +4,10 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.media.AudioManager;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
@@ -15,6 +18,7 @@ import android.os.Vibrator;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.philliphsu.clock2.Alarm;
@@ -65,6 +69,15 @@ public class RingtoneService extends Service { // TODO: abstract this, make subc
             stopSelf();
         }
     };
+    private final BroadcastReceiver mNotifyMissedReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            mAutoSilenced = true;
+            // TODO: Do we need to call AlarmUtils.cancelAlarm()?
+            stopSelf();
+            // Activity finishes itself
+        }
+    };
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -73,13 +86,8 @@ public class RingtoneService extends Service { // TODO: abstract this, make subc
             throw new IllegalStateException("No item id set");
         Alarm alarm = checkNotNull(AlarmsRepository.getInstance(this).getItem(id));
 
-        // TODO: Refactor to use switch block
-        if (intent.getAction() == null || intent.getAction().isEmpty()) {
+        if (intent.getAction() == null) {
             playRingtone(alarm);
-        } else if (ACTION_NOTIFY_MISSED.equals(intent.getAction())) {
-            mAutoSilenced = true;
-            stopSelf(startId);
-            // Activity finishes itself
         } else {
             if (ACTION_SNOOZE.equals(intent.getAction())) {
                 AlarmUtils.snoozeAlarm(this, alarm);
@@ -94,6 +102,13 @@ public class RingtoneService extends Service { // TODO: abstract this, make subc
         }
 
         return START_NOT_STICKY; // If killed while started, don't recreate. Should be sufficient.
+    }
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        LocalBroadcastManager.getInstance(this).registerReceiver(
+                mNotifyMissedReceiver, new IntentFilter(ACTION_NOTIFY_MISSED));
     }
 
     @Override
@@ -120,6 +135,7 @@ public class RingtoneService extends Service { // TODO: abstract this, make subc
             nm.notify(getClass().getName(), mAlarm.intId(), note);
         }
         stopForeground(true);
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mNotifyMissedReceiver);
     }
 
     @Override
@@ -187,7 +203,7 @@ public class RingtoneService extends Service { // TODO: abstract this, make subc
     // doing this in the respective subclass of this service.
     private void scheduleAutoSilence() {
         int minutes = AlarmUtils.minutesToSilenceAfter(this);
-        mSilenceHandler.postDelayed(mSilenceRunnable, /*minutes * 60000*/10000); // TODO: uncomment
+        mSilenceHandler.postDelayed(mSilenceRunnable, /*minutes * 60000*/70000); // TODO: uncomment
     }
 
     private void finishActivity() {

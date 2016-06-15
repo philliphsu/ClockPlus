@@ -16,6 +16,7 @@ import com.philliphsu.clock2.Alarm;
 import com.philliphsu.clock2.R;
 import com.philliphsu.clock2.model.AlarmsRepository;
 import com.philliphsu.clock2.util.AlarmUtils;
+import com.philliphsu.clock2.util.LocalBroadcastHelper;
 
 import static com.philliphsu.clock2.util.Preconditions.checkNotNull;
 
@@ -97,9 +98,7 @@ public class RingtoneActivity extends AppCompatActivity {
         //super.onNewIntent(intent); // Not needed since no fragments hosted?
 
         // Notifies alarm missed and stops the service
-        // TODO: Find a better, cleaner way? Starting the service just to set a flag and stop itself
-        // is not very clear from this code. Perhaps the same Broadcast concept as done here.
-        startService(new Intent(this, RingtoneService.class).setAction(RingtoneService.ACTION_NOTIFY_MISSED));
+        LocalBroadcastHelper.sendBroadcast(this, RingtoneService.ACTION_NOTIFY_MISSED);
         finish();
         startActivity(intent);
     }
