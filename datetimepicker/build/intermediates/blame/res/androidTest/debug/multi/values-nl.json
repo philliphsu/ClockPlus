@@ -1,0 +1,216 @@
+[
+    {
+        "outputFile": "C:\\AndroidDEV\\Clock+2\\datetimepicker\\build\\intermediates\\res\\merged\\androidTest\\debug\\values-nl\\values-nl.xml",
+        "map": [
+            {
+                "to": {
+                    "startLine": 2,
+                    "startColumn": 4,
+                    "startOffset": 105,
+                    "endColumn": 102,
+                    "endOffset": 203
+                },
+                "from": {
+                    "file": "C:\\AndroidDEV\\Clock+2\\datetimepicker\\build\\intermediates\\bundles\\debug\\res\\values-nl\\values-nl.xml",
+                    "position": {
+                        "startLine": 2,
+                        "startColumn": 4,
+                        "startOffset": 105,
+                        "endColumn": 102,
+                        "endOffset": 203
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 3,
+                    "startColumn": 4,
+                    "startOffset": 208,
+                    "endColumn": 109,
+                    "endOffset": 313
+                },
+                "from": {
+                    "file": "C:\\AndroidDEV\\Clock+2\\datetimepicker\\build\\intermediates\\bundles\\debug\\res\\values-nl\\values-nl.xml",
+                    "position": {
+                        "startLine": 3,
+                        "startColumn": 4,
+                        "startOffset": 208,
+                        "endColumn": 109,
+                        "endOffset": 313
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 4,
+                    "startColumn": 4,
+                    "startOffset": 318,
+                    "endColumn": 75,
+                    "endOffset": 389
+                },
+                "from": {
+                    "file": "C:\\AndroidDEV\\Clock+2\\datetimepicker\\build\\intermediates\\bundles\\debug\\res\\values-nl\\values-nl.xml",
+                    "position": {
+                        "startLine": 4,
+                        "startColumn": 4,
+                        "startOffset": 318,
+                        "endColumn": 75,
+                        "endOffset": 389
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 5,
+                    "startColumn": 4,
+                    "startOffset": 394,
+                    "endColumn": 112,
+                    "endOffset": 502
+                },
+                "from": {
+                    "file": "C:\\AndroidDEV\\Clock+2\\datetimepicker\\build\\intermediates\\bundles\\debug\\res\\values-nl\\values-nl.xml",
+                    "position": {
+                        "startLine": 5,
+                        "startColumn": 4,
+                        "startOffset": 394,
+                        "endColumn": 112,
+                        "endOffset": 502
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 6,
+                    "startColumn": 4,
+                    "startOffset": 507,
+                    "endColumn": 117,
+                    "endOffset": 620
+                },
+                "from": {
+                    "file": "C:\\AndroidDEV\\Clock+2\\datetimepicker\\build\\intermediates\\bundles\\debug\\res\\values-nl\\values-nl.xml",
+                    "position": {
+                        "startLine": 6,
+                        "startColumn": 4,
+                        "startOffset": 507,
+                        "endColumn": 117,
+                        "endOffset": 620
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 7,
+                    "startColumn": 4,
+                    "startOffset": 625,
+                    "endColumn": 117,
+                    "endOffset": 738
+                },
+                "from": {
+                    "file": "C:\\AndroidDEV\\Clock+2\\datetimepicker\\build\\intermediates\\bundles\\debug\\res\\values-nl\\values-nl.xml",
+                    "position": {
+                        "startLine": 7,
+                        "startColumn": 4,
+                        "startOffset": 625,
+                        "endColumn": 117,
+                        "endOffset": 738
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 8,
+                    "startColumn": 4,
+                    "startOffset": 743,
+                    "endColumn": 92,
+                    "endOffset": 831
+                },
+                "from": {
+                    "file": "C:\\AndroidDEV\\Clock+2\\datetimepicker\\build\\intermediates\\bundles\\debug\\res\\values-nl\\values-nl.xml",
+                    "position": {
+                        "startLine": 8,
+                        "startColumn": 4,
+                        "startOffset": 743,
+                        "endColumn": 92,
+                        "endOffset": 831
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 9,
+                    "startColumn": 4,
+                    "startOffset": 836,
+                    "endColumn": 86,
+                    "endOffset": 918
+                },
+                "from": {
+                    "file": "C:\\AndroidDEV\\Clock+2\\datetimepicker\\build\\intermediates\\bundles\\debug\\res\\values-nl\\values-nl.xml",
+                    "position": {
+                        "startLine": 9,
+                        "startColumn": 4,
+                        "startOffset": 836,
+                        "endColumn": 86,
+                        "endOffset": 918
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 10,
+                    "startColumn": 4,
+                    "startOffset": 923,
+                    "endColumn": 91,
+                    "endOffset": 1010
+                },
+                "from": {
+                    "file": "C:\\AndroidDEV\\Clock+2\\datetimepicker\\build\\intermediates\\bundles\\debug\\res\\values-nl\\values-nl.xml",
+                    "position": {
+                        "startLine": 10,
+                        "startColumn": 4,
+                        "startOffset": 923,
+                        "endColumn": 91,
+                        "endOffset": 1010
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 11,
+                    "startColumn": 4,
+                    "startOffset": 1015,
+                    "endColumn": 85,
+                    "endOffset": 1096
+                },
+                "from": {
+                    "file": "C:\\AndroidDEV\\Clock+2\\datetimepicker\\build\\intermediates\\bundles\\debug\\res\\values-nl\\values-nl.xml",
+                    "position": {
+                        "startLine": 11,
+                        "startColumn": 4,
+                        "startOffset": 1015,
+                        "endColumn": 85,
+                        "endOffset": 1096
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 12,
+                    "startColumn": 4,
+                    "startOffset": 1101,
+                    "endColumn": 91,
+                    "endOffset": 1188
+                },
+                "from": {
+                    "file": "C:\\AndroidDEV\\Clock+2\\datetimepicker\\build\\intermediates\\bundles\\debug\\res\\values-nl\\values-nl.xml",
+                    "position": {
+                        "startLine": 12,
+                        "startColumn": 4,
+                        "startOffset": 1101,
+                        "endColumn": 91,
+                        "endOffset": 1188
+                    }
+                }
+            }
+        ]
+    }
+]

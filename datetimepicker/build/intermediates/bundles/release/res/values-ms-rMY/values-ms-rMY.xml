@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:ns1="urn:oasis:names:tc:xliff:document:1.2">
+    <string msgid="3968620852217927702" name="day_picker_description">"Grid bulan hari"</string>
+    <string msgid="6908431551612331381" name="deleted_key">"<ns1:g id="KEY">%1$s</ns1:g> dipadamkan"</string>
+    <string msgid="7007948707597430919" name="done_label">"Selesai"</string>
+    <string msgid="7586639618712934060" name="hour_picker_description">"Penggelangsar bulatan jam"</string>
+    <string msgid="2674929164900463786" name="item_is_selected">"<ns1:g id="ITEM">%1$s</ns1:g> dipilih"</string>
+    <string msgid="6024811202872705251" name="minute_picker_description">"Penggelangsar bulatan minit"</string>
+    <string msgid="3973338219107019769" name="select_day">"Pilih bulan dan hari"</string>
+    <string msgid="7651068754188418859" name="select_hours">"Pilih jam"</string>
+    <string msgid="8327182090226828481" name="select_minutes">"Pilih minit"</string>
+    <string msgid="2603330600102539372" name="select_year">"Pilih tahun"</string>
+    <string msgid="6963340404644587098" name="year_picker_description">"Senarai tahun"</string>
+</resources>

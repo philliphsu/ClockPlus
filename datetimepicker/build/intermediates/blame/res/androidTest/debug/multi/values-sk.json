@@ -1,0 +1,216 @@
+[
+    {
+        "outputFile": "C:\\AndroidDEV\\Clock+2\\datetimepicker\\build\\intermediates\\res\\merged\\androidTest\\debug\\values-sk\\values-sk.xml",
+        "map": [
+            {
+                "to": {
+                    "startLine": 2,
+                    "startColumn": 4,
+                    "startOffset": 105,
+                    "endColumn": 102,
+                    "endOffset": 203
+                },
+                "from": {
+                    "file": "C:\\AndroidDEV\\Clock+2\\datetimepicker\\build\\intermediates\\bundles\\debug\\res\\values-sk\\values-sk.xml",
+                    "position": {
+                        "startLine": 2,
+                        "startColumn": 4,
+                        "startOffset": 105,
+                        "endColumn": 102,
+                        "endOffset": 203
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 3,
+                    "startColumn": 4,
+                    "startOffset": 208,
+                    "endColumn": 109,
+                    "endOffset": 313
+                },
+                "from": {
+                    "file": "C:\\AndroidDEV\\Clock+2\\datetimepicker\\build\\intermediates\\bundles\\debug\\res\\values-sk\\values-sk.xml",
+                    "position": {
+                        "startLine": 3,
+                        "startColumn": 4,
+                        "startOffset": 208,
+                        "endColumn": 109,
+                        "endOffset": 313
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 4,
+                    "startColumn": 4,
+                    "startOffset": 318,
+                    "endColumn": 75,
+                    "endOffset": 389
+                },
+                "from": {
+                    "file": "C:\\AndroidDEV\\Clock+2\\datetimepicker\\build\\intermediates\\bundles\\debug\\res\\values-sk\\values-sk.xml",
+                    "position": {
+                        "startLine": 4,
+                        "startColumn": 4,
+                        "startOffset": 318,
+                        "endColumn": 75,
+                        "endOffset": 389
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 5,
+                    "startColumn": 4,
+                    "startOffset": 394,
+                    "endColumn": 103,
+                    "endOffset": 493
+                },
+                "from": {
+                    "file": "C:\\AndroidDEV\\Clock+2\\datetimepicker\\build\\intermediates\\bundles\\debug\\res\\values-sk\\values-sk.xml",
+                    "position": {
+                        "startLine": 5,
+                        "startColumn": 4,
+                        "startOffset": 394,
+                        "endColumn": 103,
+                        "endOffset": 493
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 6,
+                    "startColumn": 4,
+                    "startOffset": 498,
+                    "endColumn": 125,
+                    "endOffset": 619
+                },
+                "from": {
+                    "file": "C:\\AndroidDEV\\Clock+2\\datetimepicker\\build\\intermediates\\bundles\\debug\\res\\values-sk\\values-sk.xml",
+                    "position": {
+                        "startLine": 6,
+                        "startColumn": 4,
+                        "startOffset": 498,
+                        "endColumn": 125,
+                        "endOffset": 619
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 7,
+                    "startColumn": 4,
+                    "startOffset": 624,
+                    "endColumn": 105,
+                    "endOffset": 725
+                },
+                "from": {
+                    "file": "C:\\AndroidDEV\\Clock+2\\datetimepicker\\build\\intermediates\\bundles\\debug\\res\\values-sk\\values-sk.xml",
+                    "position": {
+                        "startLine": 7,
+                        "startColumn": 4,
+                        "startOffset": 624,
+                        "endColumn": 105,
+                        "endOffset": 725
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 8,
+                    "startColumn": 4,
+                    "startOffset": 730,
+                    "endColumn": 89,
+                    "endOffset": 815
+                },
+                "from": {
+                    "file": "C:\\AndroidDEV\\Clock+2\\datetimepicker\\build\\intermediates\\bundles\\debug\\res\\values-sk\\values-sk.xml",
+                    "position": {
+                        "startLine": 8,
+                        "startColumn": 4,
+                        "startOffset": 730,
+                        "endColumn": 89,
+                        "endOffset": 815
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 9,
+                    "startColumn": 4,
+                    "startOffset": 820,
+                    "endColumn": 85,
+                    "endOffset": 901
+                },
+                "from": {
+                    "file": "C:\\AndroidDEV\\Clock+2\\datetimepicker\\build\\intermediates\\bundles\\debug\\res\\values-sk\\values-sk.xml",
+                    "position": {
+                        "startLine": 9,
+                        "startColumn": 4,
+                        "startOffset": 820,
+                        "endColumn": 85,
+                        "endOffset": 901
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 10,
+                    "startColumn": 4,
+                    "startOffset": 906,
+                    "endColumn": 87,
+                    "endOffset": 989
+                },
+                "from": {
+                    "file": "C:\\AndroidDEV\\Clock+2\\datetimepicker\\build\\intermediates\\bundles\\debug\\res\\values-sk\\values-sk.xml",
+                    "position": {
+                        "startLine": 10,
+                        "startColumn": 4,
+                        "startOffset": 906,
+                        "endColumn": 87,
+                        "endOffset": 989
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 11,
+                    "startColumn": 4,
+                    "startOffset": 994,
+                    "endColumn": 81,
+                    "endOffset": 1071
+                },
+                "from": {
+                    "file": "C:\\AndroidDEV\\Clock+2\\datetimepicker\\build\\intermediates\\bundles\\debug\\res\\values-sk\\values-sk.xml",
+                    "position": {
+                        "startLine": 11,
+                        "startColumn": 4,
+                        "startOffset": 994,
+                        "endColumn": 81,
+                        "endOffset": 1071
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 12,
+                    "startColumn": 4,
+                    "startOffset": 1076,
+                    "endColumn": 94,
+                    "endOffset": 1166
+                },
+                "from": {
+                    "file": "C:\\AndroidDEV\\Clock+2\\datetimepicker\\build\\intermediates\\bundles\\debug\\res\\values-sk\\values-sk.xml",
+                    "position": {
+                        "startLine": 12,
+                        "startColumn": 4,
+                        "startOffset": 1076,
+                        "endColumn": 94,
+                        "endOffset": 1166
+                    }
+                }
+            }
+        ]
+    }
+]

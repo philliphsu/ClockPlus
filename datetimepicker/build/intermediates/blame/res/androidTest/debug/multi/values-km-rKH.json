@@ -1,0 +1,216 @@
+[
+    {
+        "outputFile": "C:\\AndroidDEV\\Clock+2\\datetimepicker\\build\\intermediates\\res\\merged\\androidTest\\debug\\values-km-rKH\\values-km-rKH.xml",
+        "map": [
+            {
+                "to": {
+                    "startLine": 2,
+                    "startColumn": 4,
+                    "startOffset": 105,
+                    "endColumn": 104,
+                    "endOffset": 205
+                },
+                "from": {
+                    "file": "C:\\AndroidDEV\\Clock+2\\datetimepicker\\build\\intermediates\\bundles\\debug\\res\\values-km-rKH\\values-km-rKH.xml",
+                    "position": {
+                        "startLine": 2,
+                        "startColumn": 4,
+                        "startOffset": 105,
+                        "endColumn": 104,
+                        "endOffset": 205
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 3,
+                    "startColumn": 4,
+                    "startOffset": 210,
+                    "endColumn": 106,
+                    "endOffset": 312
+                },
+                "from": {
+                    "file": "C:\\AndroidDEV\\Clock+2\\datetimepicker\\build\\intermediates\\bundles\\debug\\res\\values-km-rKH\\values-km-rKH.xml",
+                    "position": {
+                        "startLine": 3,
+                        "startColumn": 4,
+                        "startOffset": 210,
+                        "endColumn": 106,
+                        "endOffset": 312
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 4,
+                    "startColumn": 4,
+                    "startOffset": 317,
+                    "endColumn": 77,
+                    "endOffset": 390
+                },
+                "from": {
+                    "file": "C:\\AndroidDEV\\Clock+2\\datetimepicker\\build\\intermediates\\bundles\\debug\\res\\values-km-rKH\\values-km-rKH.xml",
+                    "position": {
+                        "startLine": 4,
+                        "startColumn": 4,
+                        "startOffset": 317,
+                        "endColumn": 77,
+                        "endOffset": 390
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 5,
+                    "startColumn": 4,
+                    "startOffset": 395,
+                    "endColumn": 106,
+                    "endOffset": 497
+                },
+                "from": {
+                    "file": "C:\\AndroidDEV\\Clock+2\\datetimepicker\\build\\intermediates\\bundles\\debug\\res\\values-km-rKH\\values-km-rKH.xml",
+                    "position": {
+                        "startLine": 5,
+                        "startColumn": 4,
+                        "startOffset": 395,
+                        "endColumn": 106,
+                        "endOffset": 497
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 6,
+                    "startColumn": 4,
+                    "startOffset": 502,
+                    "endColumn": 114,
+                    "endOffset": 612
+                },
+                "from": {
+                    "file": "C:\\AndroidDEV\\Clock+2\\datetimepicker\\build\\intermediates\\bundles\\debug\\res\\values-km-rKH\\values-km-rKH.xml",
+                    "position": {
+                        "startLine": 6,
+                        "startColumn": 4,
+                        "startOffset": 502,
+                        "endColumn": 114,
+                        "endOffset": 612
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 7,
+                    "startColumn": 4,
+                    "startOffset": 617,
+                    "endColumn": 108,
+                    "endOffset": 721
+                },
+                "from": {
+                    "file": "C:\\AndroidDEV\\Clock+2\\datetimepicker\\build\\intermediates\\bundles\\debug\\res\\values-km-rKH\\values-km-rKH.xml",
+                    "position": {
+                        "startLine": 7,
+                        "startColumn": 4,
+                        "startOffset": 617,
+                        "endColumn": 108,
+                        "endOffset": 721
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 8,
+                    "startColumn": 4,
+                    "startOffset": 726,
+                    "endColumn": 86,
+                    "endOffset": 808
+                },
+                "from": {
+                    "file": "C:\\AndroidDEV\\Clock+2\\datetimepicker\\build\\intermediates\\bundles\\debug\\res\\values-km-rKH\\values-km-rKH.xml",
+                    "position": {
+                        "startLine": 8,
+                        "startColumn": 4,
+                        "startOffset": 726,
+                        "endColumn": 86,
+                        "endOffset": 808
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 9,
+                    "startColumn": 4,
+                    "startOffset": 813,
+                    "endColumn": 81,
+                    "endOffset": 890
+                },
+                "from": {
+                    "file": "C:\\AndroidDEV\\Clock+2\\datetimepicker\\build\\intermediates\\bundles\\debug\\res\\values-km-rKH\\values-km-rKH.xml",
+                    "position": {
+                        "startLine": 9,
+                        "startColumn": 4,
+                        "startOffset": 813,
+                        "endColumn": 81,
+                        "endOffset": 890
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 10,
+                    "startColumn": 4,
+                    "startOffset": 895,
+                    "endColumn": 83,
+                    "endOffset": 974
+                },
+                "from": {
+                    "file": "C:\\AndroidDEV\\Clock+2\\datetimepicker\\build\\intermediates\\bundles\\debug\\res\\values-km-rKH\\values-km-rKH.xml",
+                    "position": {
+                        "startLine": 10,
+                        "startColumn": 4,
+                        "startOffset": 895,
+                        "endColumn": 83,
+                        "endOffset": 974
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 11,
+                    "startColumn": 4,
+                    "startOffset": 979,
+                    "endColumn": 81,
+                    "endOffset": 1056
+                },
+                "from": {
+                    "file": "C:\\AndroidDEV\\Clock+2\\datetimepicker\\build\\intermediates\\bundles\\debug\\res\\values-km-rKH\\values-km-rKH.xml",
+                    "position": {
+                        "startLine": 11,
+                        "startColumn": 4,
+                        "startOffset": 979,
+                        "endColumn": 81,
+                        "endOffset": 1056
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 12,
+                    "startColumn": 4,
+                    "startOffset": 1061,
+                    "endColumn": 93,
+                    "endOffset": 1150
+                },
+                "from": {
+                    "file": "C:\\AndroidDEV\\Clock+2\\datetimepicker\\build\\intermediates\\bundles\\debug\\res\\values-km-rKH\\values-km-rKH.xml",
+                    "position": {
+                        "startLine": 12,
+                        "startColumn": 4,
+                        "startOffset": 1061,
+                        "endColumn": 93,
+                        "endOffset": 1150
+                    }
+                }
+            }
+        ]
+    }
+]

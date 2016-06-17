@@ -1,0 +1,216 @@
+[
+    {
+        "outputFile": "C:\\AndroidDEV\\Clock+2\\datetimepicker\\build\\intermediates\\res\\merged\\androidTest\\debug\\values-et-rEE\\values-et-rEE.xml",
+        "map": [
+            {
+                "to": {
+                    "startLine": 2,
+                    "startColumn": 4,
+                    "startOffset": 105,
+                    "endColumn": 103,
+                    "endOffset": 204
+                },
+                "from": {
+                    "file": "C:\\AndroidDEV\\Clock+2\\datetimepicker\\build\\intermediates\\bundles\\debug\\res\\values-et-rEE\\values-et-rEE.xml",
+                    "position": {
+                        "startLine": 2,
+                        "startColumn": 4,
+                        "startOffset": 105,
+                        "endColumn": 103,
+                        "endOffset": 204
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 3,
+                    "startColumn": 4,
+                    "startOffset": 209,
+                    "endColumn": 112,
+                    "endOffset": 317
+                },
+                "from": {
+                    "file": "C:\\AndroidDEV\\Clock+2\\datetimepicker\\build\\intermediates\\bundles\\debug\\res\\values-et-rEE\\values-et-rEE.xml",
+                    "position": {
+                        "startLine": 3,
+                        "startColumn": 4,
+                        "startOffset": 209,
+                        "endColumn": 112,
+                        "endOffset": 317
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 4,
+                    "startColumn": 4,
+                    "startOffset": 322,
+                    "endColumn": 75,
+                    "endOffset": 393
+                },
+                "from": {
+                    "file": "C:\\AndroidDEV\\Clock+2\\datetimepicker\\build\\intermediates\\bundles\\debug\\res\\values-et-rEE\\values-et-rEE.xml",
+                    "position": {
+                        "startLine": 4,
+                        "startColumn": 4,
+                        "startOffset": 322,
+                        "endColumn": 75,
+                        "endOffset": 393
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 5,
+                    "startColumn": 4,
+                    "startOffset": 398,
+                    "endColumn": 107,
+                    "endOffset": 501
+                },
+                "from": {
+                    "file": "C:\\AndroidDEV\\Clock+2\\datetimepicker\\build\\intermediates\\bundles\\debug\\res\\values-et-rEE\\values-et-rEE.xml",
+                    "position": {
+                        "startLine": 5,
+                        "startColumn": 4,
+                        "startOffset": 398,
+                        "endColumn": 107,
+                        "endOffset": 501
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 6,
+                    "startColumn": 4,
+                    "startOffset": 506,
+                    "endColumn": 115,
+                    "endOffset": 617
+                },
+                "from": {
+                    "file": "C:\\AndroidDEV\\Clock+2\\datetimepicker\\build\\intermediates\\bundles\\debug\\res\\values-et-rEE\\values-et-rEE.xml",
+                    "position": {
+                        "startLine": 6,
+                        "startColumn": 4,
+                        "startOffset": 506,
+                        "endColumn": 115,
+                        "endOffset": 617
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 7,
+                    "startColumn": 4,
+                    "startOffset": 622,
+                    "endColumn": 110,
+                    "endOffset": 728
+                },
+                "from": {
+                    "file": "C:\\AndroidDEV\\Clock+2\\datetimepicker\\build\\intermediates\\bundles\\debug\\res\\values-et-rEE\\values-et-rEE.xml",
+                    "position": {
+                        "startLine": 7,
+                        "startColumn": 4,
+                        "startOffset": 622,
+                        "endColumn": 110,
+                        "endOffset": 728
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 8,
+                    "startColumn": 4,
+                    "startOffset": 733,
+                    "endColumn": 87,
+                    "endOffset": 816
+                },
+                "from": {
+                    "file": "C:\\AndroidDEV\\Clock+2\\datetimepicker\\build\\intermediates\\bundles\\debug\\res\\values-et-rEE\\values-et-rEE.xml",
+                    "position": {
+                        "startLine": 8,
+                        "startColumn": 4,
+                        "startOffset": 733,
+                        "endColumn": 87,
+                        "endOffset": 816
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 9,
+                    "startColumn": 4,
+                    "startOffset": 821,
+                    "endColumn": 87,
+                    "endOffset": 904
+                },
+                "from": {
+                    "file": "C:\\AndroidDEV\\Clock+2\\datetimepicker\\build\\intermediates\\bundles\\debug\\res\\values-et-rEE\\values-et-rEE.xml",
+                    "position": {
+                        "startLine": 9,
+                        "startColumn": 4,
+                        "startOffset": 821,
+                        "endColumn": 87,
+                        "endOffset": 904
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 10,
+                    "startColumn": 4,
+                    "startOffset": 909,
+                    "endColumn": 90,
+                    "endOffset": 995
+                },
+                "from": {
+                    "file": "C:\\AndroidDEV\\Clock+2\\datetimepicker\\build\\intermediates\\bundles\\debug\\res\\values-et-rEE\\values-et-rEE.xml",
+                    "position": {
+                        "startLine": 10,
+                        "startColumn": 4,
+                        "startOffset": 909,
+                        "endColumn": 90,
+                        "endOffset": 995
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 11,
+                    "startColumn": 4,
+                    "startOffset": 1000,
+                    "endColumn": 82,
+                    "endOffset": 1078
+                },
+                "from": {
+                    "file": "C:\\AndroidDEV\\Clock+2\\datetimepicker\\build\\intermediates\\bundles\\debug\\res\\values-et-rEE\\values-et-rEE.xml",
+                    "position": {
+                        "startLine": 11,
+                        "startColumn": 4,
+                        "startOffset": 1000,
+                        "endColumn": 82,
+                        "endOffset": 1078
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 12,
+                    "startColumn": 4,
+                    "startOffset": 1083,
+                    "endColumn": 95,
+                    "endOffset": 1174
+                },
+                "from": {
+                    "file": "C:\\AndroidDEV\\Clock+2\\datetimepicker\\build\\intermediates\\bundles\\debug\\res\\values-et-rEE\\values-et-rEE.xml",
+                    "position": {
+                        "startLine": 12,
+                        "startColumn": 4,
+                        "startOffset": 1083,
+                        "endColumn": 95,
+                        "endOffset": 1174
+                    }
+                }
+            }
+        ]
+    }
+]

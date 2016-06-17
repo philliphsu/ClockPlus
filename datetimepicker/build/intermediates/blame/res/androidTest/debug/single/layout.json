@@ -1,0 +1,34 @@
+[
+    {
+        "merged": "C:\\AndroidDEV\\Clock+2\\datetimepicker\\build\\intermediates\\res\\merged\\androidTest\\debug\\layout\\year_label_text_view.xml",
+        "source": "C:\\AndroidDEV\\Clock+2\\datetimepicker\\build\\intermediates\\bundles\\debug\\res\\layout\\year_label_text_view.xml"
+    },
+    {
+        "merged": "C:\\AndroidDEV\\Clock+2\\datetimepicker\\build\\intermediates\\res\\merged\\androidTest\\debug\\layout\\time_header_label.xml",
+        "source": "C:\\AndroidDEV\\Clock+2\\datetimepicker\\build\\intermediates\\bundles\\debug\\res\\layout\\time_header_label.xml"
+    },
+    {
+        "merged": "C:\\AndroidDEV\\Clock+2\\datetimepicker\\build\\intermediates\\res\\merged\\androidTest\\debug\\layout\\date_picker_view_animator.xml",
+        "source": "C:\\AndroidDEV\\Clock+2\\datetimepicker\\build\\intermediates\\bundles\\debug\\res\\layout\\date_picker_view_animator.xml"
+    },
+    {
+        "merged": "C:\\AndroidDEV\\Clock+2\\datetimepicker\\build\\intermediates\\res\\merged\\androidTest\\debug\\layout\\time_picker_dialog.xml",
+        "source": "C:\\AndroidDEV\\Clock+2\\datetimepicker\\build\\intermediates\\bundles\\debug\\res\\layout\\time_picker_dialog.xml"
+    },
+    {
+        "merged": "C:\\AndroidDEV\\Clock+2\\datetimepicker\\build\\intermediates\\res\\merged\\androidTest\\debug\\layout\\date_picker_done_button.xml",
+        "source": "C:\\AndroidDEV\\Clock+2\\datetimepicker\\build\\intermediates\\bundles\\debug\\res\\layout\\date_picker_done_button.xml"
+    },
+    {
+        "merged": "C:\\AndroidDEV\\Clock+2\\datetimepicker\\build\\intermediates\\res\\merged\\androidTest\\debug\\layout\\date_picker_selected_date.xml",
+        "source": "C:\\AndroidDEV\\Clock+2\\datetimepicker\\build\\intermediates\\bundles\\debug\\res\\layout\\date_picker_selected_date.xml"
+    },
+    {
+        "merged": "C:\\AndroidDEV\\Clock+2\\datetimepicker\\build\\intermediates\\res\\merged\\androidTest\\debug\\layout\\date_picker_dialog.xml",
+        "source": "C:\\AndroidDEV\\Clock+2\\datetimepicker\\build\\intermediates\\bundles\\debug\\res\\layout\\date_picker_dialog.xml"
+    },
+    {
+        "merged": "C:\\AndroidDEV\\Clock+2\\datetimepicker\\build\\intermediates\\res\\merged\\androidTest\\debug\\layout\\date_picker_header_view.xml",
+        "source": "C:\\AndroidDEV\\Clock+2\\datetimepicker\\build\\intermediates\\bundles\\debug\\res\\layout\\date_picker_header_view.xml"
+    }
+]

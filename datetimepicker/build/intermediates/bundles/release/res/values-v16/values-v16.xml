@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="day_of_week_label_typeface">sans-serif-light</string>
+    <style name="day_of_week_label_condensed">
+        <item name="android:fontFamily">sans-serif-condensed</item>
+    </style>
+    <style name="done_button_light">
+        <item name="android:fontFamily">sans-serif-light</item>
+    </style>
+    <style name="time_label_thin">
+        <item name="android:fontFamily">sans-serif-light</item>
+    </style>
+</resources>

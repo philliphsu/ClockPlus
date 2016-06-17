@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="dialog_height">200dip</dimen>
+    <dimen name="left_side_width">250dip</dimen>
+    <dimen name="selected_date_day_size">100dp</dimen>
+    <dimen name="selected_date_month_size">30dp</dimen>
+    <dimen name="selected_date_year_size">30dp</dimen>
+</resources>
