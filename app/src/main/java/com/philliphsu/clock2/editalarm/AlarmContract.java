@@ -5,6 +5,7 @@ import java.util.Date;
 /**
  * Created by Phillip Hsu on 6/2/2016.
  */
+@Deprecated
 interface AlarmContract {
 
     interface View {

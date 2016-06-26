@@ -11,6 +11,7 @@ package com.philliphsu.clock2.editalarm;
  * That way, each concrete interface impl doesn't need to implement the
  * base interface methods again and again.
  */
+@Deprecated
 public interface EditAlarmContract {
 
     interface View extends AlarmContract.View {

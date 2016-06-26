@@ -11,6 +11,7 @@ import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.format.DateFormat;
 import android.text.style.RelativeSizeSpan;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -27,15 +28,11 @@ import com.philliphsu.clock2.BaseActivity;
 import com.philliphsu.clock2.DaysOfWeek;
 import com.philliphsu.clock2.R;
 import com.philliphsu.clock2.SharedPreferencesHelper;
-import com.philliphsu.clock2.model.AlarmsRepository;
-import com.philliphsu.clock2.model.DatabaseManager;
 import com.philliphsu.clock2.ringtone.RingtoneActivity;
 import com.philliphsu.clock2.util.AlarmUtils;
 import com.philliphsu.clock2.util.LocalBroadcastHelper;
 
-import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 
 import butterknife.Bind;
 import butterknife.OnCheckedChanged;
@@ -45,6 +42,8 @@ import butterknife.OnTouch;
 import static android.text.format.DateFormat.getTimeFormat;
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
+import static com.philliphsu.clock2.DaysOfWeek.SATURDAY;
+import static com.philliphsu.clock2.DaysOfWeek.SUNDAY;
 import static com.philliphsu.clock2.util.KeyboardUtils.hideKeyboard;
 import static com.philliphsu.clock2.util.Preconditions.checkNotNull;
 
@@ -58,9 +57,9 @@ public class EditAlarmActivity extends BaseActivity implements AlarmNumpad.KeyLi
 
     private static final int REQUEST_PICK_RINGTONE = 0;
     private static final int ID_MENU_ITEM = 0;
-
-    private EditAlarmContract.Presenter mPresenter;
+    
     private Uri mSelectedRingtoneUri;
+    private Alarm mAlarm;
 
     @Bind(R.id.save) Button mSave;
     @Bind(R.id.delete) Button mDelete;
@@ -78,15 +77,54 @@ public class EditAlarmActivity extends BaseActivity implements AlarmNumpad.KeyLi
         super.onCreate(savedInstanceState);
         setWeekDaysText();
         mNumpad.setKeyListener(this);
-        mPresenter = new EditAlarmPresenter(this, AlarmsRepository.getInstance(this), this, this);
-        mPresenter.loadAlarm(getIntent().getLongExtra(EXTRA_ALARM_ID, -1));
-        mPresenter.setTimeTextHint();
+        loadAlarm(getIntent().getLongExtra(EXTRA_ALARM_ID, -1));
+        setTimeTextHint(); // TODO: private access
+    }
+    
+    private void loadAlarm(long alarmId) {
+        mAlarm = alarmId > -1 ? 
+                null // TODO: Retrieve from SQLite 
+                : null;
+        showDetails();
+    }
+
+    // TODO: Privatize access of each method called here.
+    private void showDetails() {
+        if (mAlarm != null) {
+            showTime(mAlarm.hour(), mAlarm.minutes());
+            showEnabled(mAlarm.isEnabled());
+            for (int i = SUNDAY; i <= SATURDAY; i++) {
+                showRecurringDays(i, mAlarm.isRecurring(i));
+            }
+            showLabel(mAlarm.label());
+            showRingtone(mAlarm.ringtone());
+            showVibrates(mAlarm.vibrates());
+            // Editing so don't show
+            showNumpad(false);
+            showTimeTextFocused(false);
+        } else {
+            // TODO default values
+            showTimeTextFocused(true);
+            showRingtone(""); // gets default ringtone
+            showNumpad(true);
+        }
     }
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         // TODO: Snooze menu item when alarm is ringing.
-        mPresenter.onPrepareOptionsMenu();
+        if (mAlarm != null && mAlarm.isEnabled()) {
+            // TODO: Read from prefs directly?
+            int hoursBeforeUpcoming = getInt(R.string.key_notify_me_of_upcoming_alarms, 2);
+            // TODO: Schedule task with handler to show the menu item when it is time. Handler is fine because
+            // the task only needs to be done if the activity is being viewed. (I think) if the process of this
+            // app is killed, then the handler is also killed.
+            if ((mAlarm.ringsWithinHours(hoursBeforeUpcoming))) {
+                showCanDismissNow();
+            } else if (mAlarm.isSnoozed()) {
+                showSnoozed(new Date(mAlarm.snoozingUntil()));
+            }
+        }
         return super.onPrepareOptionsMenu(menu);
     }
 
@@ -94,13 +132,15 @@ public class EditAlarmActivity extends BaseActivity implements AlarmNumpad.KeyLi
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_dismiss_now:
-                mPresenter.dismissNow();
-                item.setVisible(false);
-                return true;
             case R.id.action_done_snoozing:
-                mPresenter.stopSnoozing();
+                // TODO: helper method?
+                cancelAlarm(checkNotNull(mAlarm), true);
+                // cancelAlarm() should have turned off this alarm if appropriate
+                showEnabled(mAlarm.isEnabled());
                 item.setVisible(false);
-                getSupportActionBar().setDisplayShowTitleEnabled(false); // TODO: Move to presenter?
+                // This only matters for case R.id.action_done_snoozing.
+                // It won't hurt to call this for case R.id.action_dismiss_now.
+                getSupportActionBar().setDisplayShowTitleEnabled(false);
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -111,7 +151,6 @@ public class EditAlarmActivity extends BaseActivity implements AlarmNumpad.KeyLi
         // Since this Activity doesn't host fragments, not necessary?
         //super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_PICK_RINGTONE && resultCode == RESULT_OK) {
-            // TODO: How can we make this MVP?
             mSelectedRingtoneUri = data.getParcelableExtra(RingtoneManager.EXTRA_RINGTONE_PICKED_URI);
             updateRingtoneButtonText();
         }
@@ -132,7 +171,7 @@ public class EditAlarmActivity extends BaseActivity implements AlarmNumpad.KeyLi
         // This if check must be here unless you want to write a presenter
         // method called isNumpadOpen()...
         if (mNumpad.getVisibility() == View.VISIBLE) {
-            mPresenter.hideNumpad();
+            showNumpad(false);
         } else {
             super.onBackPressed();
         }
@@ -140,39 +179,40 @@ public class EditAlarmActivity extends BaseActivity implements AlarmNumpad.KeyLi
 
     @Override
     public void onAcceptChanges() {
-        mPresenter.acceptNumpadChanges();
+        showNumpad(false);
+        showEnabled(true);
     }
 
     @Override
     public void onNumberInput(String formattedInput) {
-        mPresenter.onNumberInput(formattedInput);
+        showTimeText(formattedInput);
     }
 
     @Override
     public void onCollapse() {
-        mPresenter.hideNumpad();
+        showNumpad(false);
     }
 
     @Override
     public void onBackspace(String newStr) {
-        mPresenter.onBackspace(newStr);
+        showTimeTextPostBackspace(newStr);
     }
 
     @Override
     public void onLongBackspace() {
-        mPresenter.onBackspace("");
+        showTimeTextPostBackspace("");
     }
 
     @OnTouch(R.id.input_time)
     boolean touch(MotionEvent event) {
         if (event.getActionMasked() == MotionEvent.ACTION_UP) {
             hideKeyboard(this); // If not open, does nothing.
-            mPresenter.focusTimeText();
+            showTimeTextFocused(true);
             if (mNumpad.getVisibility() != View.VISIBLE) {
                 // TODO: If keyboard was open, consider adding delay to opening the numpad.
                 // Otherwise, it opens immediately behind the keyboard as it is still animating
                 // out of the window.
-                mPresenter.showNumpad();
+                showNumpad(true);
             }
         }
         return true;
@@ -180,22 +220,64 @@ public class EditAlarmActivity extends BaseActivity implements AlarmNumpad.KeyLi
 
     @OnClick(R.id.ringtone)
     void ringtone() {
-        mPresenter.openRingtonePickerDialog();
+        showRingtonePickerDialog();
     }
 
+    // TODO: Privatize accessor methods
     @OnClick(R.id.save)
     void save() {
-        //mPresenter.save();
-        Calendar calendar = new GregorianCalendar();
-        int hour = calendar.get(Calendar.HOUR_OF_DAY);
-        int minutes = calendar.get(Calendar.MINUTE);
-        Alarm alarm = Alarm.builder().hour(hour).minutes((minutes + 1) % 60).build();
-        DatabaseManager.getInstance(this).insertAlarm(alarm);
+        int hour;
+        int minutes;
+        try {
+            hour = getHour();
+            minutes = getMinutes();
+        } catch (IllegalStateException e) {
+            Log.e(TAG, e.getMessage());
+            return;
+        }
+
+        Alarm a = Alarm.builder()
+                .hour(hour)
+                .minutes(minutes)
+                .ringtone(getRingtone())
+                .label(getLabel())
+                .vibrates(vibrates())
+                .build();
+        a.setEnabled(isEnabled());
+        for (int i = SUNDAY; i <= SATURDAY; i++) {
+            a.setRecurring(i, isRecurringDay(i));
+        }
+
+        if (mAlarm != null) {
+            if (mAlarm.isEnabled()) {
+                Log.d(TAG, "Cancelling old alarm first");
+                cancelAlarm(mAlarm, false);
+            }
+            // TODO: Update sql
+            //mRepository.updateItem(mAlarm, a);
+        } else {
+            // TODO: Insert sql
+            //mRepository.addItem(a);
+        }
+
+        if (a.isEnabled()) {
+            scheduleAlarm(a);
+        }
+
+        showEditorClosed();
     }
 
+    // TODO: Private accessor
     @OnClick(R.id.delete)
     void delete() {
-        mPresenter.delete();
+        if (mAlarm != null) {
+            if (mAlarm.isEnabled()) {
+                cancelAlarm(mAlarm, false);
+            }
+            // TODO: Delete sql
+            //mRepository.deleteItem(mAlarm);
+        }
+        showEditorClosed();
     }
 
     // This isn't actually concerned with setting the alarm on/off.
@@ -220,7 +302,7 @@ public class EditAlarmActivity extends BaseActivity implements AlarmNumpad.KeyLi
     @OnTouch(R.id.label)
     boolean touchLabel(MotionEvent event) {
         if (event.getActionMasked() == MotionEvent.ACTION_UP && mNumpad.getVisibility() == VISIBLE) {
-            mPresenter.hideNumpad();
+            showNumpad(false);
         }
         return false; // don't capture
     }

@@ -18,6 +18,7 @@ import static com.philliphsu.clock2.util.Preconditions.checkNotNull;
 /**
  * Created by Phillip Hsu on 6/3/2016.
  */
+@Deprecated
 public class EditAlarmPresenter implements EditAlarmContract.Presenter {
     private static final String TAG = "EditAlarmPresenter";
 
@@ -27,6 +28,7 @@ public class EditAlarmPresenter implements EditAlarmContract.Presenter {
     @NonNull private final SharedPreferencesHelper mSharedPreferencesHelper;
     @Nullable private Alarm mAlarm;
 
+    @Deprecated
     public EditAlarmPresenter(@NonNull EditAlarmContract.View view,
                               @NonNull Repository<Alarm> repository,
                               @NonNull AlarmUtilsHelper helper,
@@ -37,6 +39,7 @@ public class EditAlarmPresenter implements EditAlarmContract.Presenter {
         mSharedPreferencesHelper = sharedPreferencesHelper;
     }
 
+    @Deprecated
     @Override
     public void loadAlarm(long alarmId) {
         // Can't load alarm in ctor because showDetails() calls
@@ -48,6 +51,7 @@ public class EditAlarmPresenter implements EditAlarmContract.Presenter {
         showDetails();
     }
 
+    @Deprecated
     @Override
     public void save() {
         int hour;
@@ -89,6 +93,7 @@ public class EditAlarmPresenter implements EditAlarmContract.Presenter {
         mView.showEditorClosed();
     }
 
+    @Deprecated
     @Override
     public void delete() {
         if (mAlarm != null) {
@@ -100,6 +105,7 @@ public class EditAlarmPresenter implements EditAlarmContract.Presenter {
         mView.showEditorClosed();
     }
 
+    @Deprecated
     @Override
     public void dismissNow() {
         mAlarmUtilsHelper.cancelAlarm(checkNotNull(mAlarm), true);
@@ -107,6 +113,7 @@ public class EditAlarmPresenter implements EditAlarmContract.Presenter {
         mView.showEnabled(mAlarm.isEnabled());
     }
 
+    @Deprecated
     @Override
     public void stopSnoozing() {
         dismissNow(); // MUST be first, see AlarmUtils.notifyUpcomingAlarmIntent()
@@ -117,27 +124,32 @@ public class EditAlarmPresenter implements EditAlarmContract.Presenter {
         */
     }
 
+    @Deprecated
     @Override
     public void showNumpad() {
         mView.showNumpad(true);
     }
 
+    @Deprecated
     @Override
     public void hideNumpad() {
         mView.showNumpad(false);
     }
 
+    @Deprecated
     @Override
     public void onBackspace(String newStr) {
         mView.showTimeTextPostBackspace(newStr);
     }
 
+    @Deprecated
     @Override
     public void acceptNumpadChanges() {
         mView.showNumpad(false);
         mView.showEnabled(true);
     }
 
+    @Deprecated
     @Override
     public void onPrepareOptionsMenu() {
         if (mAlarm != null && mAlarm.isEnabled()) {
@@ -153,26 +165,31 @@ public class EditAlarmPresenter implements EditAlarmContract.Presenter {
         }
     }
 
+    @Deprecated
     @Override
     public void openRingtonePickerDialog() {
         mView.showRingtonePickerDialog();
     }
 
+    @Deprecated
     @Override
     public void setTimeTextHint() {
         mView.setTimeTextHint();
     }
 
+    @Deprecated
     @Override
     public void onNumberInput(String formattedInput) {
         mView.showTimeText(formattedInput);
     }
 
+    @Deprecated
     @Override
     public void focusTimeText() {
         mView.showTimeTextFocused(true);
     }
 
+    @Deprecated
     private void showDetails() {
         if (mAlarm != null) {
             mView.showTime(mAlarm.hour(), mAlarm.minutes());
