@@ -19,6 +19,7 @@ import java.util.List;
 /**
  * Created by Phillip Hsu on 5/31/2016.
  */
+@Deprecated
 public abstract class JsonIoHelper<T extends JsonSerializable> {
     @NonNull private final Context mContext;
     @NonNull private final String mFilename;

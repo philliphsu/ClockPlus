@@ -9,6 +9,7 @@ import com.philliphsu.clock2.Alarm;
 /**
  * Created by Phillip Hsu on 5/31/2016.
  */
+@Deprecated
 public class AlarmsRepository extends BaseRepository<Alarm> {
     private static final String TAG = "AlarmsRepository";
     // Singleton, so this is the sole instance for the lifetime

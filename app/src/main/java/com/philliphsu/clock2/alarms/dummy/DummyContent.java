@@ -32,12 +32,6 @@ public class DummyContent {
     }
 
     private static Alarm createAlarm(int position) {
-        Alarm.Builder b = Alarm.builder();
-        if (position % 2 == 0) {
-            b.hour(21).minutes(0);
-        }
-        Alarm a = b.id(position).build();
-        a.setEnabled(true);
-        return a;
+        return null;
     }
 }

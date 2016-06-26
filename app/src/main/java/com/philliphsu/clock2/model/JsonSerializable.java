@@ -8,6 +8,7 @@ import org.json.JSONObject;
 /**
  * Created by Phillip Hsu on 5/31/2016.
  */
+@Deprecated
 public interface JsonSerializable {
     String KEY_ID = "id";
 

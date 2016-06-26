@@ -13,6 +13,7 @@ import java.util.List;
 /**
  * Created by Phillip Hsu on 5/31/2016.
  */
+@Deprecated
 public abstract class BaseRepository<T extends JsonSerializable> implements Repository<T> {
     private static final String TAG = "BaseRepository";
     // Cannot do this! Multiple classes will extend from this,

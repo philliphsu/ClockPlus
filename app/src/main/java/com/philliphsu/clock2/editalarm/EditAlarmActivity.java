@@ -28,11 +28,14 @@ import com.philliphsu.clock2.DaysOfWeek;
 import com.philliphsu.clock2.R;
 import com.philliphsu.clock2.SharedPreferencesHelper;
 import com.philliphsu.clock2.model.AlarmsRepository;
+import com.philliphsu.clock2.model.DatabaseManager;
 import com.philliphsu.clock2.ringtone.RingtoneActivity;
 import com.philliphsu.clock2.util.AlarmUtils;
 import com.philliphsu.clock2.util.LocalBroadcastHelper;
 
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 
 import butterknife.Bind;
 import butterknife.OnCheckedChanged;
@@ -182,7 +185,12 @@ public class EditAlarmActivity extends BaseActivity implements AlarmNumpad.KeyLi
 
     @OnClick(R.id.save)
     void save() {
-        mPresenter.save();
+        //mPresenter.save();
+        Calendar calendar = new GregorianCalendar();
+        int hour = calendar.get(Calendar.HOUR_OF_DAY);
+        int minutes = calendar.get(Calendar.MINUTE);
+        Alarm alarm = Alarm.builder().hour(hour).minutes((minutes + 1) % 60).build();
+        DatabaseManager.getInstance(this).insertAlarm(alarm);
     }
 
     @OnClick(R.id.delete)

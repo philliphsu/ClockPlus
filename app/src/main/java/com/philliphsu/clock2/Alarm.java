@@ -5,13 +5,10 @@ import android.support.annotation.NonNull;
 import com.google.auto.value.AutoValue;
 import com.philliphsu.clock2.model.JsonSerializable;
 
-import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
-import java.util.concurrent.atomic.AtomicLong;
 
 import static com.philliphsu.clock2.DaysOfWeek.NUM_DAYS;
 import static com.philliphsu.clock2.DaysOfWeek.SATURDAY;
@@ -24,24 +21,13 @@ import static com.philliphsu.clock2.DaysOfWeek.SUNDAY;
 public abstract class Alarm implements JsonSerializable {
     private static final int MAX_MINUTES_CAN_SNOOZE = 30;
 
-    // JSON property names
-    private static final String KEY_SNOOZING_UNTIL_MILLIS = "snoozing_until_millis";
-    private static final String KEY_ENABLED = "enabled";
-    private static final String KEY_RECURRING_DAYS = "recurring_days";
-    //private static final String KEY_ID = "id"; // Defined in JsonSerializable
-    private static final String KEY_HOUR = "hour";
-    private static final String KEY_MINUTES = "minutes";
-    private static final String KEY_LABEL = "label";
-    private static final String KEY_RINGTONE = "ringtone";
-    private static final String KEY_VIBRATES = "vibrates";
-
-    // ========= MUTABLE ==============
+    // =================== MUTABLE =======================
+    private long id;
     private long snoozingUntilMillis;
     private boolean enabled;
     private final boolean[] recurringDays = new boolean[NUM_DAYS];
-    // ================================
+    // ====================================================
 
-    //public abstract long id();
     public abstract int hour();
     public abstract int minutes();
     public abstract String label();
@@ -50,35 +36,15 @@ public abstract class Alarm implements JsonSerializable {
     /** Initializes a Builder to the same property values as this instance */
     public abstract Builder toBuilder();
 
+    @Deprecated
     public static Alarm create(JSONObject jsonObject) {
-        try {
-            Alarm alarm = new AutoValue_Alarm.Builder()
-                    .id(jsonObject.getLong(KEY_ID))
-                    .hour(jsonObject.getInt(KEY_HOUR))
-                    .minutes(jsonObject.getInt(KEY_MINUTES))
-                    .label(jsonObject.getString(KEY_LABEL))
-                    .ringtone(jsonObject.getString(KEY_RINGTONE))
-                    .vibrates(jsonObject.getBoolean(KEY_VIBRATES))
-                    .rebuild();
-            alarm.setEnabled(jsonObject.getBoolean(KEY_ENABLED));
-            alarm.snoozingUntilMillis = jsonObject.getLong(KEY_SNOOZING_UNTIL_MILLIS);
-
-            JSONArray a = (JSONArray) jsonObject.get(KEY_RECURRING_DAYS);
-            for (int i = 0; i < a.length(); i++) {
-                alarm.recurringDays[i] = a.getBoolean(i);
-            }
-
-            return alarm;
-        } catch (JSONException e) {
-            throw new RuntimeException(e);
-        }
+        return null;
     }
 
     public static Builder builder() {
         // Unfortunately, default values must be provided for generated Builders.
         // Fields that were not set when build() is called will throw an exception.
         return new AutoValue_Alarm.Builder()
-                .id(-1)
                 .hour(0)
                 .minutes(0)
                 .label("")
@@ -211,56 +177,43 @@ public abstract class Alarm implements JsonSerializable {
         return ringsIn() <= hours * 3600000;
     }
 
+    @Deprecated
     public int intId() {
-        return (int) id();
+        return -1;
     }
 
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    @Deprecated
+    @Override
+    public final long id() {
+        return -1;
+    }
+
+    @Deprecated
     @Override
     @NonNull
     public JSONObject toJsonObject() {
-        try {
-            return new JSONObject()
-                    .put(KEY_SNOOZING_UNTIL_MILLIS, snoozingUntilMillis)
-                    .put(KEY_ENABLED, enabled)
-                    .put(KEY_RECURRING_DAYS, new JSONArray(recurringDays))
-                    .put(KEY_ID, id())
-                    .put(KEY_HOUR, hour())
-                    .put(KEY_MINUTES, minutes())
-                    .put(KEY_LABEL, label())
-                    .put(KEY_RINGTONE, ringtone())
-                    .put(KEY_VIBRATES, vibrates());
-        } catch (JSONException e) {
-            throw new RuntimeException(e);
-        }
+        return null;
     }
 
     @AutoValue.Builder
     public abstract static class Builder {
-        private static final AtomicLong ID_COUNTER = new AtomicLong(0);
-        // By omitting the set- prefix, we reduce the number of changes required to define the Builder
-        // class after copying and pasting the accessor fields here.
-        public abstract Builder id(long id);
         public abstract Builder hour(int hour);
         public abstract Builder minutes(int minutes);
         public abstract Builder label(String label);
         public abstract Builder ringtone(String ringtone);
         public abstract Builder vibrates(boolean vibrates);
-        // To enforce preconditions, split the build method into two. autoBuild() is hidden from
-        // callers and is generated. You implement the public build(), which calls the generated
-        // autoBuild() and performs your desired validations.
-        /*not public*/abstract Alarm autoBuild();
+        /* package */ abstract Alarm autoBuild();
 
         public Alarm build() {
-            this.id(ID_COUNTER.incrementAndGet()); // TOneverDO: change to getAndIncrement() without also adding offset of 1 in rebuild()
             Alarm alarm = autoBuild();
-            doChecks(alarm);
-            return alarm;
-        }
-
-        /** <b>Should only be called when recreating an instance from JSON</b> */
-        private Alarm rebuild() {
-            Alarm alarm = autoBuild();
-            ID_COUNTER.set(alarm.id()); // prevent future instances from id collision
             doChecks(alarm);
             return alarm;
         }

@@ -10,6 +10,7 @@ import org.json.JSONObject;
 /**
  * Created by Phillip Hsu on 5/31/2016.
  */
+@Deprecated
 public class AlarmIoHelper extends JsonIoHelper<Alarm> {
     private static final String FILENAME = "alarms.json";
 
