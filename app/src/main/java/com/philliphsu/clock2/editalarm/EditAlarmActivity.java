@@ -28,6 +28,7 @@ import com.philliphsu.clock2.BaseActivity;
 import com.philliphsu.clock2.DaysOfWeek;
 import com.philliphsu.clock2.R;
 import com.philliphsu.clock2.SharedPreferencesHelper;
+import com.philliphsu.clock2.model.DatabaseManager;
 import com.philliphsu.clock2.ringtone.RingtoneActivity;
 import com.philliphsu.clock2.util.AlarmUtils;
 import com.philliphsu.clock2.util.LocalBroadcastHelper;
@@ -48,7 +49,7 @@ import static com.philliphsu.clock2.util.KeyboardUtils.hideKeyboard;
 import static com.philliphsu.clock2.util.Preconditions.checkNotNull;
 
 public class EditAlarmActivity extends BaseActivity implements AlarmNumpad.KeyListener,
-        EditAlarmContract.View,
+        EditAlarmContract.View, // TODO: Remove @Override from the methods
         AlarmUtilsHelper,
         SharedPreferencesHelper {
     private static final String TAG = "EditAlarmActivity";
@@ -59,7 +60,8 @@ public class EditAlarmActivity extends BaseActivity implements AlarmNumpad.KeyLi
     private static final int ID_MENU_ITEM = 0;
     
     private Uri mSelectedRingtoneUri;
-    private Alarm mAlarm;
+    private Alarm mOldAlarm;
+    private DatabaseManager mDatabaseManager;
 
     @Bind(R.id.save) Button mSave;
     @Bind(R.id.delete) Button mDelete;
@@ -79,50 +81,21 @@ public class EditAlarmActivity extends BaseActivity implements AlarmNumpad.KeyLi
         mNumpad.setKeyListener(this);
         loadAlarm(getIntent().getLongExtra(EXTRA_ALARM_ID, -1));
         setTimeTextHint(); // TODO: private access
-    }
-    
-    private void loadAlarm(long alarmId) {
-        mAlarm = alarmId > -1 ? 
-                null // TODO: Retrieve from SQLite 
-                : null;
-        showDetails();
-    }
-
-    // TODO: Privatize access of each method called here.
-    private void showDetails() {
-        if (mAlarm != null) {
-            showTime(mAlarm.hour(), mAlarm.minutes());
-            showEnabled(mAlarm.isEnabled());
-            for (int i = SUNDAY; i <= SATURDAY; i++) {
-                showRecurringDays(i, mAlarm.isRecurring(i));
-            }
-            showLabel(mAlarm.label());
-            showRingtone(mAlarm.ringtone());
-            showVibrates(mAlarm.vibrates());
-            // Editing so don't show
-            showNumpad(false);
-            showTimeTextFocused(false);
-        } else {
-            // TODO default values
-            showTimeTextFocused(true);
-            showRingtone(""); // gets default ringtone
-            showNumpad(true);
-        }
+        mDatabaseManager = DatabaseManager.getInstance(this);
     }
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         // TODO: Snooze menu item when alarm is ringing.
-        if (mAlarm != null && mAlarm.isEnabled()) {
-            // TODO: Read from prefs directly?
+        if (mOldAlarm != null && mOldAlarm.isEnabled()) {
             int hoursBeforeUpcoming = getInt(R.string.key_notify_me_of_upcoming_alarms, 2);
             // TODO: Schedule task with handler to show the menu item when it is time. Handler is fine because
             // the task only needs to be done if the activity is being viewed. (I think) if the process of this
             // app is killed, then the handler is also killed.
-            if ((mAlarm.ringsWithinHours(hoursBeforeUpcoming))) {
+            if ((mOldAlarm.ringsWithinHours(hoursBeforeUpcoming))) {
                 showCanDismissNow();
-            } else if (mAlarm.isSnoozed()) {
-                showSnoozed(new Date(mAlarm.snoozingUntil()));
+            } else if (mOldAlarm.isSnoozed()) {
+                showSnoozed(new Date(mOldAlarm.snoozingUntil()));
             }
         }
         return super.onPrepareOptionsMenu(menu);
@@ -133,10 +106,9 @@ public class EditAlarmActivity extends BaseActivity implements AlarmNumpad.KeyLi
         switch (item.getItemId()) {
             case R.id.action_dismiss_now:
             case R.id.action_done_snoozing:
-                // TODO: helper method?
-                cancelAlarm(checkNotNull(mAlarm), true);
+                cancelAlarm(checkNotNull(mOldAlarm), true);
                 // cancelAlarm() should have turned off this alarm if appropriate
-                showEnabled(mAlarm.isEnabled());
+                showEnabled(mOldAlarm.isEnabled());
                 item.setVisible(false);
                 // This only matters for case R.id.action_done_snoozing.
                 // It won't hurt to call this for case R.id.action_dismiss_now.
@@ -236,32 +208,30 @@ public class EditAlarmActivity extends BaseActivity implements AlarmNumpad.KeyLi
             return;
         }
 
-        Alarm a = Alarm.builder()
+        Alarm alarm = Alarm.builder()
                 .hour(hour)
                 .minutes(minutes)
                 .ringtone(getRingtone())
                 .label(getLabel())
                 .vibrates(vibrates())
                 .build();
-        a.setEnabled(isEnabled());
+        alarm.setEnabled(isEnabled());
         for (int i = SUNDAY; i <= SATURDAY; i++) {
-            a.setRecurring(i, isRecurringDay(i));
+            alarm.setRecurring(i, isRecurringDay(i));
         }
 
-        if (mAlarm != null) {
-            if (mAlarm.isEnabled()) {
+        if (mOldAlarm != null) {
+            if (mOldAlarm.isEnabled()) {
                 Log.d(TAG, "Cancelling old alarm first");
-                cancelAlarm(mAlarm, false);
+                cancelAlarm(mOldAlarm, false);
             }
-            // TODO: Update sql
-            //mRepository.updateItem(mAlarm, a);
+            mDatabaseManager.updateAlarm(mOldAlarm, alarm);
         } else {
-            // TODO: Insert sql
-            //mRepository.addItem(a);
+            mDatabaseManager.insertAlarm(alarm);
         }
 
-        if (a.isEnabled()) {
-            scheduleAlarm(a);
+        if (alarm.isEnabled()) {
+            scheduleAlarm(alarm);
         }
 
         showEditorClosed();
@@ -270,12 +240,11 @@ public class EditAlarmActivity extends BaseActivity implements AlarmNumpad.KeyLi
     // TODO: Private accessor
     @OnClick(R.id.delete)
     void delete() {
-        if (mAlarm != null) {
-            if (mAlarm.isEnabled()) {
-                cancelAlarm(mAlarm, false);
+        if (mOldAlarm != null) {
+            if (mOldAlarm.isEnabled()) {
+                cancelAlarm(mOldAlarm, false);
             }
-            // TODO: Delete sql
-            //mRepository.deleteItem(mAlarm);
+            mDatabaseManager.deleteAlarm(mOldAlarm);
         }
         showEditorClosed();
     }
@@ -291,7 +260,6 @@ public class EditAlarmActivity extends BaseActivity implements AlarmNumpad.KeyLi
             if (mTimeText.length() == 0 || mNumpad.checkTimeValid()) {
                 return false; // proceed to call through
             } else {
-                // TODO: is there anything to MVP?
                 Toast.makeText(this, "Enter a valid time first.", Toast.LENGTH_SHORT).show();
                 return true; // capture and end the touch event here
             }
@@ -310,7 +278,6 @@ public class EditAlarmActivity extends BaseActivity implements AlarmNumpad.KeyLi
     @OnCheckedChanged(R.id.on_off)
     void onChecked(boolean checked) {
         if (checked && mTimeText.length() == 0) {
-            // TODO: is there anything to MVP?
             mNumpad.setTime(0, 0);
         }
     }
@@ -328,7 +295,6 @@ public class EditAlarmActivity extends BaseActivity implements AlarmNumpad.KeyLi
     }
 
     private void setWeekDaysText() {
-        // TODO: is there anything to MVP?
         for (int i = 0; i < mDays.length; i++) {
             int weekDay = DaysOfWeek.getInstance(this).weekDayAt(i);
             String label = DaysOfWeek.getLabel(weekDay);
@@ -533,5 +499,32 @@ public class EditAlarmActivity extends BaseActivity implements AlarmNumpad.KeyLi
     @Override
     public int getInt(@StringRes int key, int defaultValue) {
         return AlarmUtils.readPreference(this, key, defaultValue);
+    }
+
+    private void loadAlarm(long alarmId) {
+        mOldAlarm = alarmId > -1 ? mDatabaseManager.getAlarm(alarmId) : null;
+        showDetails();
+    }
+
+    // TODO: Privatize access of each method called here.
+    private void showDetails() {
+        if (mOldAlarm != null) {
+            showTime(mOldAlarm.hour(), mOldAlarm.minutes());
+            showEnabled(mOldAlarm.isEnabled());
+            for (int i = SUNDAY; i <= SATURDAY; i++) {
+                showRecurringDays(i, mOldAlarm.isRecurring(i));
+            }
+            showLabel(mOldAlarm.label());
+            showRingtone(mOldAlarm.ringtone());
+            showVibrates(mOldAlarm.vibrates());
+            // Editing so don't show
+            showNumpad(false);
+            showTimeTextFocused(false);
+        } else {
+            // TODO default values
+            showTimeTextFocused(true);
+            showRingtone(""); // gets default ringtone
+            showNumpad(true);
+        }
     }
 }

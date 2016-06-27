@@ -5,6 +5,7 @@ import com.philliphsu.clock2.Alarm;
 /**
  * Created by Phillip Hsu on 6/3/2016.
  */
+@Deprecated
 public interface AlarmUtilsHelper {
     void scheduleAlarm(Alarm alarm);
     void cancelAlarm(Alarm alarm, boolean showToast);
