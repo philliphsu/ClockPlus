@@ -4,7 +4,7 @@ import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
 
-import com.philliphsu.clock2.model.AlarmsRepository;
+import com.philliphsu.clock2.model.DatabaseManager;
 import com.philliphsu.clock2.util.AlarmUtils;
 
 import java.util.List;
@@ -60,7 +60,7 @@ public class OnBootUpAlarmScheduler extends IntentService {
     @Override
     protected void onHandleIntent(Intent intent) {
         if (intent != null) {
-            List<Alarm> alarms = AlarmsRepository.getInstance(this).getItems();
+            List<Alarm> alarms = DatabaseManager.getInstance(this).getAlarms();
             for (Alarm a : alarms) {
                 if (a.isEnabled()) {
                     AlarmUtils.scheduleAlarm(this, a, false);

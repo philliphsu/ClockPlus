@@ -79,9 +79,9 @@ public class EditAlarmActivity extends BaseActivity implements AlarmNumpad.KeyLi
         super.onCreate(savedInstanceState);
         setWeekDaysText();
         mNumpad.setKeyListener(this);
+        mDatabaseManager = DatabaseManager.getInstance(this); // MUST be before loading alarm
         loadAlarm(getIntent().getLongExtra(EXTRA_ALARM_ID, -1));
         setTimeTextHint(); // TODO: private access
-        mDatabaseManager = DatabaseManager.getInstance(this);
     }
 
     @Override
@@ -225,7 +225,7 @@ public class EditAlarmActivity extends BaseActivity implements AlarmNumpad.KeyLi
                 Log.d(TAG, "Cancelling old alarm first");
                 cancelAlarm(mOldAlarm, false);
             }
-            mDatabaseManager.updateAlarm(mOldAlarm, alarm);
+            mDatabaseManager.updateAlarm(mOldAlarm.id(), alarm);
         } else {
             mDatabaseManager.insertAlarm(alarm);
         }

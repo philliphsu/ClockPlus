@@ -13,7 +13,7 @@ import com.philliphsu.clock2.Alarm;
 import com.philliphsu.clock2.PendingAlarmScheduler;
 import com.philliphsu.clock2.R;
 import com.philliphsu.clock2.UpcomingAlarmReceiver;
-import com.philliphsu.clock2.model.AlarmsRepository;
+import com.philliphsu.clock2.model.DatabaseManager;
 import com.philliphsu.clock2.ringtone.RingtoneActivity;
 import com.philliphsu.clock2.ringtone.RingtoneService;
 
@@ -112,19 +112,16 @@ public final class AlarmUtils {
             }
         }
 
-        save(c); // Save any changes
+        save(c, a);
 
         // If service is not running, nothing happens
-        // TODO: Since RingtoneService is a bound service, will this destroy the service after returning?
-        // Note that if a stopped service still has ServiceConnection objects bound to it with the
-        // BIND_AUTO_CREATE set, it will not be destroyed until all of these bindings are removed.
         c.stopService(new Intent(c, RingtoneService.class));
     }
 
     public static void snoozeAlarm(Context c, Alarm a) {
         a.snooze(snoozeDuration(c));
         scheduleAlarm(c, a, true);
-        save(c);
+        save(c, a);
     }
 
     public static void removeUpcomingAlarmNotification(Context c, Alarm a) {
@@ -185,7 +182,9 @@ public final class AlarmUtils {
         return pi;
     }
 
-    private static void save(Context c) {
-        AlarmsRepository.getInstance(c).saveItems();
+    private static void save(Context c, Alarm alarm) {
+//        AlarmsRepository.getInstance(c).saveItems();
+        // Update the same alarm
+        DatabaseManager.getInstance(c).updateAlarm(alarm.id(), alarm);
     }
 }

@@ -3,7 +3,6 @@ package com.philliphsu.clock2.alarms;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -13,8 +12,8 @@ import android.view.ViewGroup;
 import com.philliphsu.clock2.Alarm;
 import com.philliphsu.clock2.OnListItemInteractionListener;
 import com.philliphsu.clock2.R;
-import com.philliphsu.clock2.model.AlarmsRepository;
 import com.philliphsu.clock2.model.BaseRepository;
+import com.philliphsu.clock2.model.DatabaseManager;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -27,14 +26,9 @@ import butterknife.ButterKnife;
  */
 public class AlarmsFragment extends Fragment implements BaseRepository.DataObserver<Alarm> {
 
-    // TODO: Customize parameter argument names
-    private static final String ARG_COLUMN_COUNT = "column-count";
-    // TODO: Customize parameters
-    private int mColumnCount = 1;
     private OnAlarmInteractionListener mListener;
-    private AlarmsRepository mRepo;
-
     private AlarmsAdapter mAdapter;
+    private DatabaseManager mDatabaseManager;
 
     @Bind(R.id.list) RecyclerView mList;
 
@@ -49,7 +43,7 @@ public class AlarmsFragment extends Fragment implements BaseRepository.DataObser
     public static AlarmsFragment newInstance(int columnCount) {
         AlarmsFragment fragment = new AlarmsFragment();
         Bundle args = new Bundle();
-        args.putInt(ARG_COLUMN_COUNT, columnCount);
+        // TODO Put any arguments in bundle
         fragment.setArguments(args);
         return fragment;
     }
@@ -59,8 +53,10 @@ public class AlarmsFragment extends Fragment implements BaseRepository.DataObser
         super.onCreate(savedInstanceState);
 
         if (getArguments() != null) {
-            mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
+            // TODO Read arguments
         }
+
+        mDatabaseManager = DatabaseManager.getInstance(getActivity());
     }
 
     @Override
@@ -70,12 +66,8 @@ public class AlarmsFragment extends Fragment implements BaseRepository.DataObser
         ButterKnife.bind(this, view);
         // Set the adapter
         Context context = view.getContext();
-        if (mColumnCount <= 1) {
-            mList.setLayoutManager(new LinearLayoutManager(context));
-        } else {
-            mList.setLayoutManager(new GridLayoutManager(context, mColumnCount));
-        }
-        mAdapter = new AlarmsAdapter(mRepo.getItems(), mListener);
+        mList.setLayoutManager(new LinearLayoutManager(context));
+        mAdapter = new AlarmsAdapter(mDatabaseManager.getAlarms(), mListener);
         mList.setAdapter(mAdapter);
         return view;
     }
@@ -83,7 +75,15 @@ public class AlarmsFragment extends Fragment implements BaseRepository.DataObser
     @Override
     public void onPause() {
         super.onPause();
-        AlarmsRepository.getInstance(getActivity()).saveItems();
+        // TODO: Do we need to save anything?
+//        AlarmsRepository.getInstance(getActivity()).saveItems();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        // TODO: Need to refresh the list's adapter for any item changes. Consider doing this in
+        // onNewActivity().
     }
 
     @Override
@@ -101,16 +101,12 @@ public class AlarmsFragment extends Fragment implements BaseRepository.DataObser
             throw new RuntimeException(context.toString()
                     + " must implement OnAlarmInteractionListener");
         }
-        mRepo = AlarmsRepository.getInstance(context);
-        mRepo.registerDataObserver(this);
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
         mListener = null;
-        mRepo.unregisterDataObserver();
-        mRepo = null;
     }
 
     @Override

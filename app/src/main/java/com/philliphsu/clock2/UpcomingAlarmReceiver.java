@@ -8,7 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.v4.app.NotificationCompat;
 
-import com.philliphsu.clock2.model.AlarmsRepository;
+import com.philliphsu.clock2.model.DatabaseManager;
 import com.philliphsu.clock2.util.AlarmUtils;
 
 import static android.app.PendingIntent.FLAG_ONE_SHOT;
@@ -35,7 +35,7 @@ public class UpcomingAlarmReceiver extends BroadcastReceiver {
         if (ACTION_CANCEL_NOTIFICATION.equals(intent.getAction())) {
             nm.cancel(getClass().getName(), (int) id);
         } else {
-            Alarm alarm = checkNotNull(AlarmsRepository.getInstance(context).getItem(id));
+            Alarm alarm = checkNotNull(DatabaseManager.getInstance(context).getAlarm(id));
             if (ACTION_DISMISS_NOW.equals(intent.getAction())) {
                 AlarmUtils.cancelAlarm(context, alarm, true);
             } else {

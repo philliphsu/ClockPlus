@@ -38,7 +38,7 @@ public abstract class Alarm implements JsonSerializable {
 
     @Deprecated
     public static Alarm create(JSONObject jsonObject) {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     public static Builder builder() {
@@ -184,30 +184,26 @@ public abstract class Alarm implements JsonSerializable {
         return ringsIn() <= hours * 3600000;
     }
 
-    @Deprecated
     public int intId() {
-        return -1;
+        return (int) id;
     }
 
     public void setId(long id) {
         this.id = id;
     }
 
-    public long getId() {
-        return id;
-    }
-
-    @Deprecated
+    // TODO: Remove method signature from JsonSerializable interface.
+    // TODO: Remove final modifier.
     @Override
     public final long id() {
-        return -1;
+        return id;
     }
 
     @Deprecated
     @Override
     @NonNull
     public JSONObject toJsonObject() {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @AutoValue.Builder

@@ -23,7 +23,7 @@ import android.util.Log;
 
 import com.philliphsu.clock2.Alarm;
 import com.philliphsu.clock2.R;
-import com.philliphsu.clock2.model.AlarmsRepository;
+import com.philliphsu.clock2.model.DatabaseManager;
 import com.philliphsu.clock2.util.AlarmUtils;
 import com.philliphsu.clock2.util.LocalBroadcastHelper;
 
@@ -84,7 +84,7 @@ public class RingtoneService extends Service { // TODO: abstract this, make subc
         long id = intent.getLongExtra(EXTRA_ITEM_ID, -1);
         if (id < 0)
             throw new IllegalStateException("No item id set");
-        Alarm alarm = checkNotNull(AlarmsRepository.getInstance(this).getItem(id));
+        Alarm alarm = checkNotNull(DatabaseManager.getInstance(this).getAlarm(id));
 
         if (intent.getAction() == null) {
             playRingtone(alarm);

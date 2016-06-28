@@ -33,8 +33,16 @@ public class DatabaseManager {
         return alarm;
     }
 
+    /**
+     * @deprecated Use {@link #updateAlarm(long, Alarm)} instead
+     */
+    @Deprecated
     public int updateAlarm(Alarm oldAlarm, Alarm newAlarm) {
         return mHelper.updateAlarm(oldAlarm, newAlarm);
+    }
+
+    public int updateAlarm(long id, Alarm newAlarm) {
+        return mHelper.updateAlarm(id, newAlarm);
     }
 
     public int deleteAlarm(Alarm alarm) {

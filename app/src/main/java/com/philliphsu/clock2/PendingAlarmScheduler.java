@@ -4,7 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
-import com.philliphsu.clock2.model.AlarmsRepository;
+import com.philliphsu.clock2.model.DatabaseManager;
 import com.philliphsu.clock2.util.AlarmUtils;
 
 import static com.philliphsu.clock2.util.Preconditions.checkNotNull;
@@ -26,7 +26,7 @@ public class PendingAlarmScheduler extends BroadcastReceiver {
         if (id < 0) {
             throw new IllegalStateException("No alarm id received");
         }
-        Alarm alarm = checkNotNull(AlarmsRepository.getInstance(context).getItem(id));
+        Alarm alarm = checkNotNull(DatabaseManager.getInstance(context).getAlarm(id));
         AlarmUtils.scheduleAlarm(context, alarm, false);
     }
 }

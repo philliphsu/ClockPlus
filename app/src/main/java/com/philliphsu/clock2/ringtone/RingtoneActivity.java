@@ -14,7 +14,7 @@ import android.widget.Button;
 
 import com.philliphsu.clock2.Alarm;
 import com.philliphsu.clock2.R;
-import com.philliphsu.clock2.model.AlarmsRepository;
+import com.philliphsu.clock2.model.DatabaseManager;
 import com.philliphsu.clock2.util.AlarmUtils;
 import com.philliphsu.clock2.util.LocalBroadcastHelper;
 
@@ -52,7 +52,7 @@ public class RingtoneActivity extends AppCompatActivity {
         if (id < 0) {
             throw new IllegalStateException("Cannot start RingtoneActivity without item's id");
         }
-        mAlarm = checkNotNull(AlarmsRepository.getInstance(this).getItem(id));
+        mAlarm = checkNotNull(DatabaseManager.getInstance(this).getAlarm(id));
         Log.d(TAG, "Ringing alarm " + mAlarm);
 
         // TODO: If the upcoming alarm notification isn't present, verify other notifications aren't affected.

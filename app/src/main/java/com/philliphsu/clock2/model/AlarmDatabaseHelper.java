@@ -23,6 +23,7 @@ import static com.philliphsu.clock2.DaysOfWeek.WEDNESDAY;
  * TODO: We can generalize this class to all data models, not just Alarms.
  */
 public class AlarmDatabaseHelper extends SQLiteOpenHelper {
+    private static final String TAG = "AlarmDatabaseHelper";
     private static final String DB_NAME = "alarms.db";
     private static final int VERSION_1 = 1;
 
@@ -43,6 +44,7 @@ public class AlarmDatabaseHelper extends SQLiteOpenHelper {
     // TODO: Consider creating an inner class that implements BaseColumns
     // and defines all the columns.
     private static final String TABLE_ALARM_RECURRING_DAYS = "alarm_recurring_days";
+    // TODO: change value to _id if changing this to a primary auto-incrementing key
     private static final String COLUMN_ALARM_ID = "alarm_id";
     private static final String COLUMN_SUNDAY = "sunday";
     private static final String COLUMN_MONDAY = "monday";
@@ -77,6 +79,8 @@ public class AlarmDatabaseHelper extends SQLiteOpenHelper {
 
     private static void createRecurringDaysTable(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE " + TABLE_ALARM_RECURRING_DAYS + " ("
+                // TODO: The ID can instead be a primary auto-incrementing key, since a recurrence entry
+                // will always be made in conjunction with an alarm entry.
                 + COLUMN_ALARM_ID + " INTEGER REFERENCES " + TABLE_ALARMS + "(" + COLUMN_ID + "), "
                 + COLUMN_SUNDAY + " INTEGER NOT NULL DEFAULT 0, "
                 + COLUMN_MONDAY + " INTEGER NOT NULL DEFAULT 0, "
@@ -117,16 +121,38 @@ public class AlarmDatabaseHelper extends SQLiteOpenHelper {
         return id;
     }
 
+    /**
+     * @deprecated Use {@link #updateAlarm(long, Alarm)} instead
+     */
+    @Deprecated
     public int updateAlarm(Alarm oldAlarm, Alarm newAlarm) {
-        newAlarm.setId(oldAlarm.getId());
+        newAlarm.setId(oldAlarm.id());
         SQLiteDatabase db = getWritableDatabase();
         int rowsUpdatedInAlarmsTable = db.update(TABLE_ALARMS,
                 toContentValues(newAlarm),
-                COLUMN_ID + " = " + newAlarm.getId(),
+                COLUMN_ID + " = " + newAlarm.id(),
                 null);
         int rowsUpdatedInRecurrencesTable = db.update(TABLE_ALARM_RECURRING_DAYS,
-                toRecurrenceContentValues(newAlarm.getId(), newAlarm),
-                COLUMN_ALARM_ID + " = " + newAlarm.getId(),
+                toRecurrenceContentValues(newAlarm.id(), newAlarm),
+                COLUMN_ALARM_ID + " = " + newAlarm.id(),
+                null);
+        if (rowsUpdatedInAlarmsTable == rowsUpdatedInRecurrencesTable && rowsUpdatedInAlarmsTable == 1) {
+            return 1;
+        }
+        throw new IllegalStateException("rows updated in TABLE_ALARMS = " + rowsUpdatedInAlarmsTable +
+                ", rows updated in TABLE_ALARM_RECURRING_DAYS = " + rowsUpdatedInRecurrencesTable);
+    }
+
+    public int updateAlarm(long id, Alarm newAlarm) {
+        newAlarm.setId(id);
+        SQLiteDatabase db = getWritableDatabase();
+        int rowsUpdatedInAlarmsTable = db.update(TABLE_ALARMS,
+                toContentValues(newAlarm),
+                COLUMN_ID + " = " + id,
+                null);
+        int rowsUpdatedInRecurrencesTable = db.update(TABLE_ALARM_RECURRING_DAYS,
+                toRecurrenceContentValues(id, newAlarm),
+                COLUMN_ALARM_ID + " = " + id,
                 null);
         if (rowsUpdatedInAlarmsTable == rowsUpdatedInRecurrencesTable && rowsUpdatedInAlarmsTable == 1) {
             return 1;
@@ -138,10 +164,10 @@ public class AlarmDatabaseHelper extends SQLiteOpenHelper {
     public int deleteAlarm(Alarm alarm) {
         SQLiteDatabase db = getWritableDatabase();
         int rowsDeletedInAlarmsTable = db.delete(TABLE_ALARMS,
-                COLUMN_ID + " = " + alarm.getId(),
+                COLUMN_ID + " = " + alarm.id(),
                 null);
         int rowsDeletedInRecurrencesTable = db.delete(TABLE_ALARM_RECURRING_DAYS,
-                COLUMN_ALARM_ID + " = " + alarm.getId(),
+                COLUMN_ALARM_ID + " = " + alarm.id(),
                 null);
         if (rowsDeletedInAlarmsTable == rowsDeletedInRecurrencesTable && rowsDeletedInAlarmsTable == 1) {
             return 1;
@@ -161,7 +187,7 @@ public class AlarmDatabaseHelper extends SQLiteOpenHelper {
                 "1"); // limit 1 row
         Cursor recurrenceCursor = getReadableDatabase().query(TABLE_ALARM_RECURRING_DAYS,
                 null, // All columns
-                COLUMN_ID + " = " + id, // selection
+                COLUMN_ALARM_ID + " = " + id, // selection
                 null, // selection args
                 null, // group by
                 null, // order by
@@ -232,13 +258,19 @@ public class AlarmDatabaseHelper extends SQLiteOpenHelper {
             alarm.setId(getLong(getColumnIndex(COLUMN_ID)));
             alarm.setEnabled(getInt(getColumnIndex(COLUMN_ENABLED)) == 1);
             alarm.setSnoozing(getLong(getColumnIndex(COLUMN_SNOOZING_UNTIL_MILLIS)));
-            alarm.setRecurring(SUNDAY, isRecurring(INDEX_SUNDAY));
-            alarm.setRecurring(MONDAY, isRecurring(INDEX_MONDAY));
-            alarm.setRecurring(TUESDAY, isRecurring(INDEX_TUESDAY));
-            alarm.setRecurring(WEDNESDAY, isRecurring(INDEX_WEDNESDAY));
-            alarm.setRecurring(THURSDAY, isRecurring(INDEX_THURSDAY));
-            alarm.setRecurring(FRIDAY, isRecurring(INDEX_FRIDAY));
-            alarm.setRecurring(SATURDAY, isRecurring(INDEX_SATURDAY));
+            // DatabaseManager moves the primary cursor for you. However, you are responsible
+            // for moving the recurrence cursor yourself, because it is private to this class.
+            if (mRecurrenceCursor.moveToNext()) {
+                alarm.setRecurring(SUNDAY, isRecurring(INDEX_SUNDAY));
+                alarm.setRecurring(MONDAY, isRecurring(INDEX_MONDAY));
+                alarm.setRecurring(TUESDAY, isRecurring(INDEX_TUESDAY));
+                alarm.setRecurring(WEDNESDAY, isRecurring(INDEX_WEDNESDAY));
+                alarm.setRecurring(THURSDAY, isRecurring(INDEX_THURSDAY));
+                alarm.setRecurring(FRIDAY, isRecurring(INDEX_FRIDAY));
+                alarm.setRecurring(SATURDAY, isRecurring(INDEX_SATURDAY));
+            } else {
+                throw new IllegalStateException("No entry in recurrence table for alarm: " + alarm);
+            }
             return alarm;
         }
         
