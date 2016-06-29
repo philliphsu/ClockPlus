@@ -1,8 +1,10 @@
 package com.philliphsu.clock2.alarms;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -12,6 +14,7 @@ import android.view.ViewGroup;
 import com.philliphsu.clock2.Alarm;
 import com.philliphsu.clock2.OnListItemInteractionListener;
 import com.philliphsu.clock2.R;
+import com.philliphsu.clock2.model.AlarmsListCursorLoader;
 import com.philliphsu.clock2.model.BaseRepository;
 import com.philliphsu.clock2.model.DatabaseManager;
 
@@ -24,10 +27,15 @@ import butterknife.ButterKnife;
  * Activities containing this fragment MUST implement the {@link OnAlarmInteractionListener}
  * interface.
  */
-public class AlarmsFragment extends Fragment implements BaseRepository.DataObserver<Alarm> {
+// TODO: Use native fragments since we're targeting API >=19?
+// TODO: Use native LoaderCallbacks.
+public class AlarmsFragment extends Fragment implements
+        BaseRepository.DataObserver<Alarm>, LoaderCallbacks<Cursor> {
 
     private OnAlarmInteractionListener mListener;
+    @Deprecated
     private AlarmsAdapter mAdapter;
+    private AlarmsCursorAdapter mCursorAdapter;
     private DatabaseManager mDatabaseManager;
 
     @Bind(R.id.list) RecyclerView mList;
@@ -56,6 +64,8 @@ public class AlarmsFragment extends Fragment implements BaseRepository.DataObser
             // TODO Read arguments
         }
 
+        // Initialize the loader to load the list of runs
+        getLoaderManager().initLoader(0, null, this);
         mDatabaseManager = DatabaseManager.getInstance(getActivity());
     }
 
@@ -67,8 +77,12 @@ public class AlarmsFragment extends Fragment implements BaseRepository.DataObser
         // Set the adapter
         Context context = view.getContext();
         mList.setLayoutManager(new LinearLayoutManager(context));
+        // TODO: Create a new adapter subclass with constructor that
+        // has no dataset param. The Loader will set the Cursor after it
+        // has finished loading it.
         mAdapter = new AlarmsAdapter(mDatabaseManager.getAlarms(), mListener);
-        mList.setAdapter(mAdapter);
+        mCursorAdapter = new AlarmsCursorAdapter(mListener);
+        mList.setAdapter(mCursorAdapter);
         return view;
     }
 
@@ -84,6 +98,7 @@ public class AlarmsFragment extends Fragment implements BaseRepository.DataObser
         super.onResume();
         // TODO: Need to refresh the list's adapter for any item changes. Consider doing this in
         // onNewActivity().
+        getLoaderManager().restartLoader(0, null, this);
     }
 
     @Override
@@ -123,6 +138,23 @@ public class AlarmsFragment extends Fragment implements BaseRepository.DataObser
     @Override
     public void onItemUpdated(Alarm oldItem, Alarm newItem) {
         mAdapter.updateItem(oldItem, newItem);
+    }
+
+    @Override
+    public android.support.v4.content.Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        return new AlarmsListCursorLoader(getActivity());
+    }
+
+    @Override
+    public void onLoadFinished(android.support.v4.content.Loader<Cursor> loader, Cursor data) {
+        // Called on the main thread after loading is complete
+        mCursorAdapter.swapCursor(data);
+    }
+
+    @Override
+    public void onLoaderReset(android.support.v4.content.Loader<Cursor> loader) {
+        // The adapter's current cursor should not be used anymore
+        mCursorAdapter.swapCursor(null);
     }
 
     /**

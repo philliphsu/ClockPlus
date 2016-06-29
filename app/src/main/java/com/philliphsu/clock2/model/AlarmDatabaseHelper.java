@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.CursorWrapper;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import com.philliphsu.clock2.Alarm;
 
@@ -29,7 +30,7 @@ public class AlarmDatabaseHelper extends SQLiteOpenHelper {
 
     // TODO: Consider creating an inner class that implements BaseColumns
     // and defines all the columns.
-    // TODO: Consider statically defining index constants for each column,
+    // TODO: Consider defining index constants for each column,
     // and then removing all cursor getColumnIndex() calls.
     private static final String TABLE_ALARMS = "alarms";
     private static final String COLUMN_ID = "_id";
@@ -39,13 +40,8 @@ public class AlarmDatabaseHelper extends SQLiteOpenHelper {
     private static final String COLUMN_RINGTONE = "ringtone";
     private static final String COLUMN_VIBRATES = "vibrates";
     private static final String COLUMN_ENABLED = "enabled";
+    private static final String COLUMN_RING_TIME_MILLIS = "ring_time_millis";
     private static final String COLUMN_SNOOZING_UNTIL_MILLIS = "snoozing_until_millis";
-
-    // TODO: Consider creating an inner class that implements BaseColumns
-    // and defines all the columns.
-    private static final String TABLE_ALARM_RECURRING_DAYS = "alarm_recurring_days";
-    // TODO: change value to _id if changing this to a primary auto-incrementing key
-    private static final String COLUMN_ALARM_ID = "alarm_id";
     private static final String COLUMN_SUNDAY = "sunday";
     private static final String COLUMN_MONDAY = "monday";
     private static final String COLUMN_TUESDAY = "tuesday";
@@ -54,42 +50,18 @@ public class AlarmDatabaseHelper extends SQLiteOpenHelper {
     private static final String COLUMN_FRIDAY = "friday";
     private static final String COLUMN_SATURDAY = "saturday";
 
-    // Statically define column indices for the days so we don't have
-    // to call cursor.getColumnIndex(COLUMN_[DAY]). We offset the value
-    // by one because COLUMN_ALARM_ID is actually first.
-    private static final int INDEX_SUNDAY = SUNDAY + 1;
-    private static final int INDEX_MONDAY = MONDAY + 1;
-    private static final int INDEX_TUESDAY = TUESDAY + 1;
-    private static final int INDEX_WEDNESDAY = WEDNESDAY + 1;
-    private static final int INDEX_THURSDAY = THURSDAY + 1;
-    private static final int INDEX_FRIDAY = FRIDAY + 1;
-    private static final int INDEX_SATURDAY = SATURDAY + 1;
+    // https://www.sqlite.org/lang_select.html#orderby
+    // Rows are first sorted based on the results of evaluating the left-most expression in the
+    // ORDER BY list, then ties are broken by evaluating the second left-most expression and so on.
+    // The order in which two rows for which all ORDER BY expressions evaluate to equal values are
+    // returned is undefined. Each ORDER BY expression may be optionally followed by one of the keywords
+    // ASC (smaller values are returned first) or DESC (larger values are returned first). If neither
+    // ASC or DESC are specified, rows are sorted in ascending (smaller values first) order by default.
 
-    private static void createAlarmsTable(SQLiteDatabase db) {
-        db.execSQL("CREATE TABLE " + TABLE_ALARMS + " ("
-                + COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
-                + COLUMN_HOUR + " INTEGER NOT NULL, "
-                + COLUMN_MINUTES + " INTEGER NOT NULL, "
-                + COLUMN_LABEL + " TEXT, "
-                + COLUMN_RINGTONE + " TEXT NOT NULL, "
-                + COLUMN_VIBRATES + " INTEGER NOT NULL, "
-                + COLUMN_ENABLED + " INTEGER NOT NULL, "
-                + COLUMN_SNOOZING_UNTIL_MILLIS + " INTEGER);");
-    }
-
-    private static void createRecurringDaysTable(SQLiteDatabase db) {
-        db.execSQL("CREATE TABLE " + TABLE_ALARM_RECURRING_DAYS + " ("
-                // TODO: The ID can instead be a primary auto-incrementing key, since a recurrence entry
-                // will always be made in conjunction with an alarm entry.
-                + COLUMN_ALARM_ID + " INTEGER REFERENCES " + TABLE_ALARMS + "(" + COLUMN_ID + "), "
-                + COLUMN_SUNDAY + " INTEGER NOT NULL DEFAULT 0, "
-                + COLUMN_MONDAY + " INTEGER NOT NULL DEFAULT 0, "
-                + COLUMN_TUESDAY + " INTEGER NOT NULL DEFAULT 0, "
-                + COLUMN_WEDNESDAY + " INTEGER NOT NULL DEFAULT 0, "
-                + COLUMN_THURSDAY + " INTEGER NOT NULL DEFAULT 0, "
-                + COLUMN_FRIDAY + " INTEGER NOT NULL DEFAULT 0, "
-                + COLUMN_SATURDAY + " INTEGER NOT NULL DEFAULT 0);");
-    }
+    // First sort by ring time in ascending order (smaller values first),
+    // then break ties by sorting by id in ascending order.
+    private static final String SORT_ORDER =
+            COLUMN_RING_TIME_MILLIS + " ASC, " + COLUMN_ID + " ASC";
 
     public AlarmDatabaseHelper(Context context) {
         super(context, DB_NAME, null, VERSION_1);
@@ -102,8 +74,23 @@ public class AlarmDatabaseHelper extends SQLiteOpenHelper {
         // of the value. As soon as INTEGER values are read off of disk and into memory for processing,
         // they are converted to the most general datatype (8-byte signed integer).
         // 8 byte == 64 bits so this means they are read as longs...?
-        createAlarmsTable(db);
-        createRecurringDaysTable(db);
+        db.execSQL("CREATE TABLE " + TABLE_ALARMS + " ("
+                + COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+                + COLUMN_HOUR + " INTEGER NOT NULL, "
+                + COLUMN_MINUTES + " INTEGER NOT NULL, "
+                + COLUMN_LABEL + " TEXT, "
+                + COLUMN_RINGTONE + " TEXT NOT NULL, "
+                + COLUMN_VIBRATES + " INTEGER NOT NULL, "
+                + COLUMN_ENABLED + " INTEGER NOT NULL, "
+                + COLUMN_RING_TIME_MILLIS + " INTEGER NOT NULL, "
+                + COLUMN_SNOOZING_UNTIL_MILLIS + " INTEGER, "
+                + COLUMN_SUNDAY + " INTEGER NOT NULL DEFAULT 0, "
+                + COLUMN_MONDAY + " INTEGER NOT NULL DEFAULT 0, "
+                + COLUMN_TUESDAY + " INTEGER NOT NULL DEFAULT 0, "
+                + COLUMN_WEDNESDAY + " INTEGER NOT NULL DEFAULT 0, "
+                + COLUMN_THURSDAY + " INTEGER NOT NULL DEFAULT 0, "
+                + COLUMN_FRIDAY + " INTEGER NOT NULL DEFAULT 0, "
+                + COLUMN_SATURDAY + " INTEGER NOT NULL DEFAULT 0);");
     }
 
     @Override
@@ -112,12 +99,10 @@ public class AlarmDatabaseHelper extends SQLiteOpenHelper {
         // to the schema in the new version.
     }
 
-    // TODO: Consider changing param to Alarm.Builder so the Alarm that will be
-    // built can have its ID set.
     public long insertAlarm(Alarm alarm) {
-        long id = getWritableDatabase().insert(TABLE_ALARMS, null, toContentValues(alarm));
+        long id = getWritableDatabase().insert(TABLE_ALARMS,
+                null, toContentValues(alarm));
         alarm.setId(id);
-        getWritableDatabase().insert(TABLE_ALARM_RECURRING_DAYS, null, toRecurrenceContentValues(id, alarm));
         return id;
     }
 
@@ -128,56 +113,30 @@ public class AlarmDatabaseHelper extends SQLiteOpenHelper {
     public int updateAlarm(Alarm oldAlarm, Alarm newAlarm) {
         newAlarm.setId(oldAlarm.id());
         SQLiteDatabase db = getWritableDatabase();
-        int rowsUpdatedInAlarmsTable = db.update(TABLE_ALARMS,
+        return db.update(TABLE_ALARMS,
                 toContentValues(newAlarm),
                 COLUMN_ID + " = " + newAlarm.id(),
                 null);
-        int rowsUpdatedInRecurrencesTable = db.update(TABLE_ALARM_RECURRING_DAYS,
-                toRecurrenceContentValues(newAlarm.id(), newAlarm),
-                COLUMN_ALARM_ID + " = " + newAlarm.id(),
-                null);
-        if (rowsUpdatedInAlarmsTable == rowsUpdatedInRecurrencesTable && rowsUpdatedInAlarmsTable == 1) {
-            return 1;
-        }
-        throw new IllegalStateException("rows updated in TABLE_ALARMS = " + rowsUpdatedInAlarmsTable +
-                ", rows updated in TABLE_ALARM_RECURRING_DAYS = " + rowsUpdatedInRecurrencesTable);
     }
 
     public int updateAlarm(long id, Alarm newAlarm) {
         newAlarm.setId(id);
         SQLiteDatabase db = getWritableDatabase();
-        int rowsUpdatedInAlarmsTable = db.update(TABLE_ALARMS,
+        return db.update(TABLE_ALARMS,
                 toContentValues(newAlarm),
                 COLUMN_ID + " = " + id,
                 null);
-        int rowsUpdatedInRecurrencesTable = db.update(TABLE_ALARM_RECURRING_DAYS,
-                toRecurrenceContentValues(id, newAlarm),
-                COLUMN_ALARM_ID + " = " + id,
-                null);
-        if (rowsUpdatedInAlarmsTable == rowsUpdatedInRecurrencesTable && rowsUpdatedInAlarmsTable == 1) {
-            return 1;
-        }
-        throw new IllegalStateException("rows updated in TABLE_ALARMS = " + rowsUpdatedInAlarmsTable +
-                ", rows updated in TABLE_ALARM_RECURRING_DAYS = " + rowsUpdatedInRecurrencesTable);
     }
 
     public int deleteAlarm(Alarm alarm) {
         SQLiteDatabase db = getWritableDatabase();
-        int rowsDeletedInAlarmsTable = db.delete(TABLE_ALARMS,
+        return db.delete(TABLE_ALARMS,
                 COLUMN_ID + " = " + alarm.id(),
                 null);
-        int rowsDeletedInRecurrencesTable = db.delete(TABLE_ALARM_RECURRING_DAYS,
-                COLUMN_ALARM_ID + " = " + alarm.id(),
-                null);
-        if (rowsDeletedInAlarmsTable == rowsDeletedInRecurrencesTable && rowsDeletedInAlarmsTable == 1) {
-            return 1;
-        }
-        throw new IllegalStateException("rows deleted in TABLE_ALARMS = " + rowsDeletedInAlarmsTable +
-                ", rows deleted in TABLE_ALARM_RECURRING_DAYS = " + rowsDeletedInRecurrencesTable);
     }
 
     public AlarmCursor queryAlarm(long id) {
-        Cursor alarmCursor = getReadableDatabase().query(TABLE_ALARMS,
+        Cursor c = getReadableDatabase().query(TABLE_ALARMS,
                 null, // All columns
                 COLUMN_ID + " = " + id, // Selection for this alarm id
                 null, // selection args, none b/c id already specified in selection
@@ -185,24 +144,14 @@ public class AlarmDatabaseHelper extends SQLiteOpenHelper {
                 null, // order/sort by
                 null, // having
                 "1"); // limit 1 row
-        Cursor recurrenceCursor = getReadableDatabase().query(TABLE_ALARM_RECURRING_DAYS,
-                null, // All columns
-                COLUMN_ALARM_ID + " = " + id, // selection
-                null, // selection args
-                null, // group by
-                null, // order by
-                null, // having
-                "1");
-        return new AlarmCursor(alarmCursor, recurrenceCursor);
+        return new AlarmCursor(c);
     }
 
     public AlarmCursor queryAlarms() {
-        // Select all rows and columns from both tables
-        Cursor alarmCursor = getReadableDatabase().query(TABLE_ALARMS,
-                null, null, null, null, null, null);
-        Cursor recurrenceCursor = getReadableDatabase().query(TABLE_ALARM_RECURRING_DAYS,
-                null, null, null, null, null, null);
-        return new AlarmCursor(alarmCursor, recurrenceCursor);
+        // Select all rows and columns
+        Cursor c = getReadableDatabase().query(TABLE_ALARMS,
+                null, null, null, null, null, SORT_ORDER);
+        return new AlarmCursor(c);
     }
 
     private ContentValues toContentValues(Alarm alarm) {
@@ -213,15 +162,8 @@ public class AlarmDatabaseHelper extends SQLiteOpenHelper {
         values.put(COLUMN_RINGTONE, alarm.ringtone());
         values.put(COLUMN_VIBRATES, alarm.vibrates());
         values.put(COLUMN_ENABLED, alarm.isEnabled());
+        values.put(COLUMN_RING_TIME_MILLIS, alarm.ringsAt());
         values.put(COLUMN_SNOOZING_UNTIL_MILLIS, alarm.snoozingUntil());
-        return values;
-    }
-
-    // Even though the current impl of insertAlarm() sets the given id on the alarm, we require it
-    // as a param just as an extra measure, in case you happen to not set it.
-    private ContentValues toRecurrenceContentValues(long id, Alarm alarm) {
-        ContentValues values = new ContentValues();
-        values.put(COLUMN_ALARM_ID, id); // *could* have used alarm.id() instead
         values.put(COLUMN_SUNDAY, alarm.isRecurring(SUNDAY));
         values.put(COLUMN_MONDAY, alarm.isRecurring(MONDAY));
         values.put(COLUMN_TUESDAY, alarm.isRecurring(TUESDAY));
@@ -232,13 +174,17 @@ public class AlarmDatabaseHelper extends SQLiteOpenHelper {
         return values;
     }
 
+    // An alternative method to creating an Alarm from a cursor is to
+    // make an Alarm constructor that takes an Cursor param. However,
+    // this method has the advantage of keeping all the constants
+    // contained within this file. Another advantage is the contents of
+    // the Alarm class remain as pure Java, which can facilitate unit testing
+    // because it has no dependence on Cursor, which is part of the Android
+    // SDK.
     public static class AlarmCursor extends CursorWrapper {
-
-        private final Cursor mRecurrenceCursor;
-
-        public AlarmCursor(Cursor alarmCursor, Cursor recurrenceCursor) {
-            super(alarmCursor);
-            mRecurrenceCursor = recurrenceCursor;
+        
+        public AlarmCursor(Cursor c) {
+            super(c);
         }
 
         /**
@@ -248,34 +194,37 @@ public class AlarmDatabaseHelper extends SQLiteOpenHelper {
         public Alarm getAlarm() {
             if (isBeforeFirst() || isAfterLast())
                 return null;
+            // TODO: Use getColumnIndexOrThrow()
             Alarm alarm = Alarm.builder()
                     .hour(getInt(getColumnIndex(COLUMN_HOUR)))
                     .minutes(getInt(getColumnIndex(COLUMN_MINUTES)))
-                    .vibrates(getInt(getColumnIndex(COLUMN_VIBRATES)) == 1)
+                    .vibrates(isTrue(COLUMN_VIBRATES))
                     .ringtone(getString(getColumnIndex(COLUMN_RINGTONE)))
                     .label(getString(getColumnIndex(COLUMN_LABEL)))
                     .build();
             alarm.setId(getLong(getColumnIndex(COLUMN_ID)));
-            alarm.setEnabled(getInt(getColumnIndex(COLUMN_ENABLED)) == 1);
+            alarm.setEnabled(isTrue(COLUMN_ENABLED));
             alarm.setSnoozing(getLong(getColumnIndex(COLUMN_SNOOZING_UNTIL_MILLIS)));
-            // DatabaseManager moves the primary cursor for you. However, you are responsible
-            // for moving the recurrence cursor yourself, because it is private to this class.
-            if (mRecurrenceCursor.moveToNext()) {
-                alarm.setRecurring(SUNDAY, isRecurring(INDEX_SUNDAY));
-                alarm.setRecurring(MONDAY, isRecurring(INDEX_MONDAY));
-                alarm.setRecurring(TUESDAY, isRecurring(INDEX_TUESDAY));
-                alarm.setRecurring(WEDNESDAY, isRecurring(INDEX_WEDNESDAY));
-                alarm.setRecurring(THURSDAY, isRecurring(INDEX_THURSDAY));
-                alarm.setRecurring(FRIDAY, isRecurring(INDEX_FRIDAY));
-                alarm.setRecurring(SATURDAY, isRecurring(INDEX_SATURDAY));
-            } else {
-                throw new IllegalStateException("No entry in recurrence table for alarm: " + alarm);
-            }
+            alarm.setRecurring(SUNDAY, isTrue(COLUMN_SUNDAY));
+            alarm.setRecurring(MONDAY, isTrue(COLUMN_MONDAY));
+            alarm.setRecurring(TUESDAY, isTrue(COLUMN_TUESDAY));
+            alarm.setRecurring(WEDNESDAY, isTrue(COLUMN_WEDNESDAY));
+            alarm.setRecurring(THURSDAY, isTrue(COLUMN_THURSDAY));
+            alarm.setRecurring(FRIDAY, isTrue(COLUMN_FRIDAY));
+            alarm.setRecurring(SATURDAY, isTrue(COLUMN_SATURDAY));
             return alarm;
         }
+
+        public long getId() {
+            if (isBeforeFirst() || isAfterLast()) {
+                Log.e(TAG, "Failed to retrieve id, cursor out of range");
+                return -1;
+            }
+            return getLong(getColumnIndexOrThrow(COLUMN_ID));
+        }
         
-        private boolean isRecurring(int dayColumnIndex) {
-            return mRecurrenceCursor.getInt(dayColumnIndex) == 1;
+        private boolean isTrue(String columnName) {
+            return getInt(getColumnIndex(columnName)) == 1;
         }
     }
 }

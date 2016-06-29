@@ -3,6 +3,7 @@ package com.philliphsu.clock2.model;
 import android.content.Context;
 
 import com.philliphsu.clock2.Alarm;
+import com.philliphsu.clock2.model.AlarmDatabaseHelper.AlarmCursor;
 
 import java.util.ArrayList;
 
@@ -34,7 +35,8 @@ public class DatabaseManager {
     }
 
     /**
-     * @deprecated Use {@link #updateAlarm(long, Alarm)} instead
+     * @deprecated Use {@link #updateAlarm(long, Alarm)} instead, because all
+     *             that is needed from the oldAlarm is its id.
      */
     @Deprecated
     public int updateAlarm(Alarm oldAlarm, Alarm newAlarm) {
@@ -52,7 +54,7 @@ public class DatabaseManager {
     // Since the query returns at most one row, just return the Alarm the row represents.
     public Alarm getAlarm(long id) {
         Alarm alarm = null;
-        AlarmDatabaseHelper.AlarmCursor cursor = mHelper.queryAlarm(id);
+        AlarmCursor cursor = mHelper.queryAlarm(id);
         if (cursor != null && cursor.moveToFirst()) {
             alarm = cursor.getAlarm();
             cursor.close();
@@ -60,9 +62,11 @@ public class DatabaseManager {
         return alarm;
     }
 
+    /** @deprecated Use {@link #queryAlarms()} */
+    @Deprecated
     public ArrayList<Alarm> getAlarms() {
         ArrayList<Alarm> alarms = new ArrayList<>();
-        AlarmDatabaseHelper.AlarmCursor cursor = mHelper.queryAlarms();
+        AlarmCursor cursor = mHelper.queryAlarms();
         if (cursor != null) {
             while (cursor.moveToNext()) {
                 alarms.add(cursor.getAlarm());
@@ -70,5 +74,9 @@ public class DatabaseManager {
             cursor.close();
         }
         return alarms;
+    }
+
+    public AlarmCursor queryAlarms() {
+        return mHelper.queryAlarms();
     }
 }
