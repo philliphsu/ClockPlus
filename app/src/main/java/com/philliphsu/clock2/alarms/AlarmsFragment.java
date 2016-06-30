@@ -125,7 +125,13 @@ public class AlarmsFragment extends Fragment implements LoaderCallbacks<Cursor>,
 
         switch (requestCode) {
             case REQUEST_CREATE_ALARM:
+                getLoaderManager().restartLoader(0, null, this);
             case REQUEST_EDIT_ALARM:
+                if (data != null && data.getBooleanExtra(
+                        EditAlarmActivity.EXTRA_ALARM_DELETED, false)) {
+                    // TODO: Pass in the old alarm into the intent and access it here?
+                    onListItemDeleted(null);
+                }
                 getLoaderManager().restartLoader(0, null, this);
                 break;
             default:
@@ -141,6 +147,8 @@ public class AlarmsFragment extends Fragment implements LoaderCallbacks<Cursor>,
         startActivityForResult(intent, REQUEST_EDIT_ALARM);
     }
 
+    // TODO: This doesn't need to be defined in the interface.
+    // TODO: Rename to showDeletedSnackbar() or something
     @Override
     public void onListItemDeleted(final Alarm item) {
         Snackbar.make(getActivity().findViewById(R.id.main_content),
