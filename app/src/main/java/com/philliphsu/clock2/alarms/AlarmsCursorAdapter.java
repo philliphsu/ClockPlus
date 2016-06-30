@@ -61,8 +61,6 @@ public class AlarmsCursorAdapter extends RecyclerView.Adapter<AlarmViewHolder> {
             mCursor.close();
         }
         mCursor = (AlarmCursor) cursor;
-        // There is no way to notify the adapter of individual
-        // item changes when the dataset is a cursor.
         notifyDataSetChanged();
     }
 }

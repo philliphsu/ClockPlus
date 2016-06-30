@@ -3,13 +3,11 @@ package com.philliphsu.clock2;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -20,7 +18,9 @@ import com.philliphsu.clock2.alarms.AlarmsFragment;
 import com.philliphsu.clock2.editalarm.EditAlarmActivity;
 import com.philliphsu.clock2.settings.SettingsActivity;
 
-public class MainActivity extends BaseActivity implements AlarmsFragment.OnAlarmInteractionListener {
+import butterknife.Bind;
+
+public class MainActivity extends BaseActivity {
     private static final String TAG = "MainActivity";
 
     /**
@@ -33,10 +33,11 @@ public class MainActivity extends BaseActivity implements AlarmsFragment.OnAlarm
      */
     private SectionsPagerAdapter mSectionsPagerAdapter;
 
-    /**
-     * The {@link ViewPager} that will host the section contents.
-     */
-    private ViewPager mViewPager;
+    @Bind(R.id.container)
+    ViewPager mViewPager;
+
+    @Bind(R.id.fab)
+    FloatingActionButton mFab;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,19 +46,21 @@ public class MainActivity extends BaseActivity implements AlarmsFragment.OnAlarm
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
-
-        // Set up the ViewPager with the sections adapter.
-        mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
+        mFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startEditAlarmActivity(-1);
+                Intent intent = new Intent(MainActivity.this, EditAlarmActivity.class);
+                // Call Fragment#startActivityForResult() instead of Activity#startActivityForResult()
+                // because we want the result to be handled in the Fragment, not in this Activity.
+                // FragmentActivity does NOT deliver the result to the Fragment, i.e. your
+                // Fragment's onActivityResult() will NOT be called.
+                mSectionsPagerAdapter.getCurrentFragment()
+                        .startActivityForResult(intent, AlarmsFragment.REQUEST_CREATE_ALARM);
             }
         });
     }
@@ -132,7 +135,9 @@ public class MainActivity extends BaseActivity implements AlarmsFragment.OnAlarm
      * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
      * one of the sections/tabs/pages.
      */
-    public class SectionsPagerAdapter extends FragmentPagerAdapter {
+    private static class SectionsPagerAdapter extends FragmentPagerAdapter {
+
+        private Fragment mCurrentFragment;
 
         public SectionsPagerAdapter(FragmentManager fm) {
             super(fm);
@@ -143,6 +148,22 @@ public class MainActivity extends BaseActivity implements AlarmsFragment.OnAlarm
             // getItem is called to instantiate the fragment for the given page.
             return position == 0 ? AlarmsFragment.newInstance(1)
                     : PlaceholderFragment.newInstance(position + 1);
+        }
+
+        @Override
+        public void setPrimaryItem(ViewGroup container, int position, Object object) {
+            super.setPrimaryItem(container, position, object);
+            if (mCurrentFragment != object) {
+                mCurrentFragment = (Fragment) object;
+            }
+        }
+
+        @Override
+        public void destroyItem(ViewGroup container, int position, Object object) {
+            if (mCurrentFragment == object) {
+                mCurrentFragment = null;
+            }
+            super.destroyItem(container, position, object);
         }
 
         @Override
@@ -163,31 +184,9 @@ public class MainActivity extends BaseActivity implements AlarmsFragment.OnAlarm
             }
             return null;
         }
-    }
 
-    @Override
-    public void onListItemClick(Alarm item) {
-        startEditAlarmActivity(item.id());
-    }
-
-    @Override
-    public void onListItemDeleted(Alarm item) {
-        Log.d(TAG, "Deleted " + item.toString());
-        Snackbar.make(findViewById(R.id.main_content),
-                getString(R.string.snackbar_item_deleted, "Alarm"),
-                Snackbar.LENGTH_LONG) // TODO: not long enough?
-                .setAction(R.string.snackbar_undo_item_deleted, new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        // TODO get AlarmsFragment instance and restore the alarm
-                    }
-                })
-                .show();
-    }
-
-    private void startEditAlarmActivity(long alarmId) {
-        Intent intent = new Intent(this, EditAlarmActivity.class);
-        intent.putExtra(EditAlarmActivity.EXTRA_ALARM_ID, alarmId);
-        startActivity(intent);
+        public Fragment getCurrentFragment() {
+            return mCurrentFragment;
+        }
     }
 }

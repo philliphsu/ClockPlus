@@ -1,12 +1,16 @@
 package com.philliphsu.clock2.alarms;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,27 +18,22 @@ import android.view.ViewGroup;
 import com.philliphsu.clock2.Alarm;
 import com.philliphsu.clock2.OnListItemInteractionListener;
 import com.philliphsu.clock2.R;
+import com.philliphsu.clock2.editalarm.EditAlarmActivity;
 import com.philliphsu.clock2.model.AlarmsListCursorLoader;
-import com.philliphsu.clock2.model.BaseRepository;
 import com.philliphsu.clock2.model.DatabaseManager;
+import com.philliphsu.clock2.util.AlarmUtils;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
-/**
- * A fragment representing a list of Items.
- * <p/>
- * Activities containing this fragment MUST implement the {@link OnAlarmInteractionListener}
- * interface.
- */
 // TODO: Use native fragments since we're targeting API >=19?
 // TODO: Use native LoaderCallbacks.
-public class AlarmsFragment extends Fragment implements
-        BaseRepository.DataObserver<Alarm>, LoaderCallbacks<Cursor> {
+public class AlarmsFragment extends Fragment implements LoaderCallbacks<Cursor>,
+        OnListItemInteractionListener<Alarm> {
+    private static final int REQUEST_EDIT_ALARM = 0;
+    public static final int REQUEST_CREATE_ALARM = 1;
+    private static final String TAG = "AlarmsFragment";
 
-    private OnAlarmInteractionListener mListener;
-    @Deprecated
-    private AlarmsAdapter mAdapter;
     private AlarmsCursorAdapter mCursorAdapter;
     private DatabaseManager mDatabaseManager;
 
@@ -77,11 +76,7 @@ public class AlarmsFragment extends Fragment implements
         // Set the adapter
         Context context = view.getContext();
         mList.setLayoutManager(new LinearLayoutManager(context));
-        // TODO: Create a new adapter subclass with constructor that
-        // has no dataset param. The Loader will set the Cursor after it
-        // has finished loading it.
-        mAdapter = new AlarmsAdapter(mDatabaseManager.getAlarms(), mListener);
-        mCursorAdapter = new AlarmsCursorAdapter(mListener);
+        mCursorAdapter = new AlarmsCursorAdapter(this);
         mList.setAdapter(mCursorAdapter);
         return view;
     }
@@ -96,48 +91,12 @@ public class AlarmsFragment extends Fragment implements
     @Override
     public void onResume() {
         super.onResume();
-        // TODO: Need to refresh the list's adapter for any item changes. Consider doing this in
-        // onNewActivity().
-        getLoaderManager().restartLoader(0, null, this);
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
         ButterKnife.unbind(this); // Only for fragments!
-    }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof OnAlarmInteractionListener) {
-            mListener = (OnAlarmInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnAlarmInteractionListener");
-        }
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mListener = null;
-    }
-
-    @Override
-    public void onItemAdded(Alarm item) {
-        mList.smoothScrollToPosition(mAdapter.addItem(item));
-    }
-
-    @Override
-    public void onItemDeleted(Alarm item) {
-        mAdapter.removeItem(item);
-        mListener.onListItemDeleted(item);
-    }
-
-    @Override
-    public void onItemUpdated(Alarm oldItem, Alarm newItem) {
-        mAdapter.updateItem(oldItem, newItem);
     }
 
     @Override
@@ -157,15 +116,45 @@ public class AlarmsFragment extends Fragment implements
         mCursorAdapter.swapCursor(null);
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p/>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-    public interface OnAlarmInteractionListener extends OnListItemInteractionListener<Alarm> {}
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Log.d(TAG, "onActivityResult()");
+        if (resultCode != Activity.RESULT_OK) {
+            return;
+        }
+
+        switch (requestCode) {
+            case REQUEST_CREATE_ALARM:
+            case REQUEST_EDIT_ALARM:
+                getLoaderManager().restartLoader(0, null, this);
+                break;
+            default:
+                Log.i(TAG, "Could not handle request code " + requestCode);
+                break;
+        }
+    }
+
+    @Override
+    public void onListItemClick(Alarm item) {
+        Intent intent = new Intent(getActivity(), EditAlarmActivity.class);
+        intent.putExtra(EditAlarmActivity.EXTRA_ALARM_ID, item.id());
+        startActivityForResult(intent, REQUEST_EDIT_ALARM);
+    }
+
+    @Override
+    public void onListItemDeleted(final Alarm item) {
+        Snackbar.make(getActivity().findViewById(R.id.main_content),
+                getString(R.string.snackbar_item_deleted, "Alarm"),
+                Snackbar.LENGTH_LONG) // TODO: not long enough?
+                .setAction(R.string.snackbar_undo_item_deleted, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        DatabaseManager.getInstance(getActivity()).insertAlarm(item);
+                        if (item.isEnabled()) {
+                            AlarmUtils.scheduleAlarm(getActivity(), item, true);
+                        }
+                    }
+                })
+                .show();
+    }
 }

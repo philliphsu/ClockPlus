@@ -234,6 +234,7 @@ public class EditAlarmActivity extends BaseActivity implements AlarmNumpad.KeyLi
             scheduleAlarm(alarm);
         }
 
+        setResult(RESULT_OK);
         showEditorClosed();
     }
 
@@ -246,6 +247,7 @@ public class EditAlarmActivity extends BaseActivity implements AlarmNumpad.KeyLi
             }
             mDatabaseManager.deleteAlarm(mOldAlarm);
         }
+        setResult(RESULT_OK);
         showEditorClosed();
     }
 
