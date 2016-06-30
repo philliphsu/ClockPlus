@@ -4,10 +4,9 @@ import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
 
+import com.philliphsu.clock2.model.AlarmDatabaseHelper.AlarmCursor;
 import com.philliphsu.clock2.model.DatabaseManager;
 import com.philliphsu.clock2.util.AlarmUtils;
-
-import java.util.List;
 
 /**
  * An {@link IntentService} subclass for handling asynchronous task requests in
@@ -60,12 +59,15 @@ public class OnBootUpAlarmScheduler extends IntentService {
     @Override
     protected void onHandleIntent(Intent intent) {
         if (intent != null) {
-            List<Alarm> alarms = DatabaseManager.getInstance(this).getAlarms();
-            for (Alarm a : alarms) {
-                if (a.isEnabled()) {
-                    AlarmUtils.scheduleAlarm(this, a, false);
+            // IntentService already works in a background thread, so we don't need to use a loader.
+            AlarmCursor cursor = DatabaseManager.getInstance(this).queryAlarms();
+            while (cursor.moveToNext()) {
+                Alarm alarm = cursor.getAlarm();
+                if (alarm.isEnabled()) {
+                    AlarmUtils.scheduleAlarm(this, alarm, false);
                 }
             }
+            cursor.close();
 
 /*            final String action = intent.getAction();
             if (ACTION_FOO.equals(action)) {

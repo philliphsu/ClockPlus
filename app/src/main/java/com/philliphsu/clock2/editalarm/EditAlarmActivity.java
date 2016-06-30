@@ -5,6 +5,8 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.StringRes;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.SwitchCompat;
 import android.text.SpannableString;
@@ -28,6 +30,7 @@ import com.philliphsu.clock2.BaseActivity;
 import com.philliphsu.clock2.DaysOfWeek;
 import com.philliphsu.clock2.R;
 import com.philliphsu.clock2.SharedPreferencesHelper;
+import com.philliphsu.clock2.model.AlarmLoader;
 import com.philliphsu.clock2.model.DatabaseManager;
 import com.philliphsu.clock2.ringtone.RingtoneActivity;
 import com.philliphsu.clock2.util.AlarmUtils;
@@ -51,14 +54,16 @@ import static com.philliphsu.clock2.util.Preconditions.checkNotNull;
 public class EditAlarmActivity extends BaseActivity implements AlarmNumpad.KeyListener,
         EditAlarmContract.View, // TODO: Remove @Override from the methods
         AlarmUtilsHelper,
-        SharedPreferencesHelper {
+        SharedPreferencesHelper,
+        LoaderManager.LoaderCallbacks<Alarm> {
     private static final String TAG = "EditAlarmActivity";
     public static final String EXTRA_ALARM_ID = "com.philliphsu.clock2.editalarm.extra.ALARM_ID";
     private static final RelativeSizeSpan AMPM_SIZE_SPAN = new RelativeSizeSpan(0.5f);
 
     private static final int REQUEST_PICK_RINGTONE = 0;
     private static final int ID_MENU_ITEM = 0;
-    
+
+    private long mOldAlarmId;
     private Uri mSelectedRingtoneUri;
     private Alarm mOldAlarm;
     private DatabaseManager mDatabaseManager;
@@ -80,7 +85,17 @@ public class EditAlarmActivity extends BaseActivity implements AlarmNumpad.KeyLi
         setWeekDaysText();
         mNumpad.setKeyListener(this);
         mDatabaseManager = DatabaseManager.getInstance(this); // MUST be before loading alarm
-        loadAlarm(getIntent().getLongExtra(EXTRA_ALARM_ID, -1));
+        mOldAlarmId = getIntent().getLongExtra(EXTRA_ALARM_ID, -1);
+        if (mOldAlarmId != -1) {
+            // getLoaderManager() for support fragments by default returns the
+            // support version of LoaderManager. However, since this is an Activity,
+            // we have both the native getLoaderManager() and getSupportLoaderManager().
+            // Use the latter to remain consistent with the rest of our current code base.
+            getSupportLoaderManager().initLoader(0, null, this);
+        } else {
+            // Nothing to load, so show default values
+            showDetails();
+        }
         setTimeTextHint(); // TODO: private access
     }
 
@@ -503,9 +518,20 @@ public class EditAlarmActivity extends BaseActivity implements AlarmNumpad.KeyLi
         return AlarmUtils.readPreference(this, key, defaultValue);
     }
 
-    private void loadAlarm(long alarmId) {
-        mOldAlarm = alarmId > -1 ? mDatabaseManager.getAlarm(alarmId) : null;
+    @Override
+    public Loader<Alarm> onCreateLoader(int id, Bundle args) {
+        return new AlarmLoader(this, mOldAlarmId);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Alarm> loader, Alarm data) {
+        mOldAlarm = data;
         showDetails();
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Alarm> loader) {
+        // nothing to reset
     }
 
     // TODO: Privatize access of each method called here.

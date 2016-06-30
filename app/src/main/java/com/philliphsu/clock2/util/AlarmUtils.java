@@ -21,7 +21,6 @@ import static android.app.PendingIntent.FLAG_CANCEL_CURRENT;
 import static android.app.PendingIntent.FLAG_NO_CREATE;
 import static android.app.PendingIntent.getActivity;
 import static com.philliphsu.clock2.util.DateFormatUtils.formatTime;
-import static com.philliphsu.clock2.util.Preconditions.checkNotNull;
 import static java.util.concurrent.TimeUnit.HOURS;
 
 /**
@@ -75,12 +74,16 @@ public final class AlarmUtils {
         AlarmManager am = (AlarmManager) c.getSystemService(Context.ALARM_SERVICE);
 
         PendingIntent pi = alarmIntent(c, a, true);
-        am.cancel(pi);
-        pi.cancel();
+        if (pi != null) {
+            am.cancel(pi);
+            pi.cancel();
+        }
 
         pi = notifyUpcomingAlarmIntent(c, a, true);
-        am.cancel(pi);
-        pi.cancel();
+        if (pi != null) {
+            am.cancel(pi);
+            pi.cancel();
+        }
 
         removeUpcomingAlarmNotification(c, a);
 
@@ -159,9 +162,13 @@ public final class AlarmUtils {
                 .putExtra(RingtoneActivity.EXTRA_ITEM_ID, alarm.id());
         int flag = retrievePrevious ? FLAG_NO_CREATE : FLAG_CANCEL_CURRENT;
         PendingIntent pi = getActivity(context, alarm.intId(), intent, flag);
+        // Even when we try to retrieve a previous instance that actually did exist,
+        // null can be returned for some reason.
+/*
         if (retrievePrevious) {
             checkNotNull(pi);
         }
+*/
         return pi;
     }
 
@@ -176,9 +183,13 @@ public final class AlarmUtils {
         }
         int flag = retrievePrevious ? FLAG_NO_CREATE : FLAG_CANCEL_CURRENT;
         PendingIntent pi = PendingIntent.getBroadcast(context, alarm.intId(), intent, flag);
+        // Even when we try to retrieve a previous instance that actually did exist,
+        // null can be returned for some reason.
+/*
         if (retrievePrevious) {
             checkNotNull(pi);
         }
+*/
         return pi;
     }
 
