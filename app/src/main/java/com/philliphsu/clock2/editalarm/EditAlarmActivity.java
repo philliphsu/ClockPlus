@@ -58,7 +58,7 @@ public class EditAlarmActivity extends BaseActivity implements AlarmNumpad.KeyLi
         LoaderManager.LoaderCallbacks<Alarm> {
     private static final String TAG = "EditAlarmActivity";
     public static final String EXTRA_ALARM_ID = "com.philliphsu.clock2.editalarm.extra.ALARM_ID";
-    public static final String EXTRA_ALARM_DELETED = "com.philliphsu.clock2.editalarm.extra.ALARM_DELETED";
+    public static final String EXTRA_DELETED_ALARM = "com.philliphsu.clock2.editalarm.extra.DELETED_ALARM";
     private static final RelativeSizeSpan AMPM_SIZE_SPAN = new RelativeSizeSpan(0.5f);
 
     private static final int REQUEST_PICK_RINGTONE = 0;
@@ -260,13 +260,15 @@ public class EditAlarmActivity extends BaseActivity implements AlarmNumpad.KeyLi
         if (mOldAlarm != null) {
             if (mOldAlarm.isEnabled()) {
                 cancelAlarm(mOldAlarm, false);
+                // Re-enable in case this is restored so
+                // the alarm is scheduled again
+                mOldAlarm.setEnabled(true);
             }
             mDatabaseManager.deleteAlarm(mOldAlarm);
+            Intent intent = new Intent();
+            intent.putExtra(EXTRA_DELETED_ALARM, mOldAlarm);
+            setResult(RESULT_OK, intent);
         }
-        Intent intent = new Intent();
-        // TODO: Pass in the old alarm into the intent?
-        intent.putExtra(EXTRA_ALARM_DELETED, true);
-        setResult(RESULT_OK, intent);
         showEditorClosed();
     }
 

@@ -1,5 +1,7 @@
 package com.philliphsu.clock2;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
 import com.google.auto.value.AutoValue;
@@ -18,7 +20,7 @@ import static com.philliphsu.clock2.DaysOfWeek.SUNDAY;
  * Created by Phillip Hsu on 5/26/2016.
  */
 @AutoValue
-public abstract class Alarm implements JsonSerializable {
+public abstract class Alarm implements JsonSerializable, Parcelable {
     private static final int MAX_MINUTES_CAN_SNOOZE = 30;
 
     // =================== MUTABLE =======================
@@ -205,6 +207,63 @@ public abstract class Alarm implements JsonSerializable {
     public JSONObject toJsonObject() {
         throw new UnsupportedOperationException();
     }
+
+    // ============================ PARCELABLE ==============================
+    // Unfortunately, we can't use the Parcelable extension for AutoValue because
+    // our model isn't totally immutable. Our mutable properties will be left
+    // out of the generated class.
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(hour());
+        dest.writeInt(minutes());
+        dest.writeString(label());
+        dest.writeString(ringtone());
+        dest.writeInt(vibrates() ? 1 : 0);
+        // Mutable fields must be written after the immutable fields,
+        // because when we recreate the object, we can't initialize
+        // those mutable fields until after we call build(). Values
+        // in the parcel are read in the order they were written.
+        dest.writeLong(id);
+        dest.writeLong(snoozingUntilMillis);
+        dest.writeInt(enabled ? 1 : 0);
+        dest.writeBooleanArray(recurringDays);
+    }
+
+    private static Alarm create(Parcel in) {
+        Alarm alarm = Alarm.builder()
+                .hour(in.readInt())
+                .minutes(in.readInt())
+                .label(in.readString())
+                .ringtone(in.readString())
+                .vibrates(in.readInt() != 0)
+                .build();
+        alarm.id = in.readLong();
+        alarm.snoozingUntilMillis = in.readLong();
+        alarm.enabled = in.readInt() != 0;
+        in.readBooleanArray(alarm.recurringDays);
+        return alarm;
+    }
+
+    public static final Parcelable.Creator<Alarm> CREATOR
+            = new Parcelable.Creator<Alarm>() {
+        @Override
+        public Alarm createFromParcel(Parcel source) {
+            return Alarm.create(source);
+        }
+
+        @Override
+        public Alarm[] newArray(int size) {
+            return new Alarm[size];
+        }
+    };
+
+    // ======================================================================
 
     @AutoValue.Builder
     public abstract static class Builder {
