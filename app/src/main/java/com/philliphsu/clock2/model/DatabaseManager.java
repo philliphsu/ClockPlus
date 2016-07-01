@@ -79,4 +79,8 @@ public class DatabaseManager {
     public AlarmCursor queryAlarms() {
         return mHelper.queryAlarms();
     }
+
+    public AlarmCursor queryEnabledAlarms() {
+        return mHelper.queryEnabledAlarms();
+    }
 }

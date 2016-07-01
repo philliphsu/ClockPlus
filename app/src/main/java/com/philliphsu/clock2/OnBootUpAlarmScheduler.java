@@ -59,13 +59,15 @@ public class OnBootUpAlarmScheduler extends IntentService {
     @Override
     protected void onHandleIntent(Intent intent) {
         if (intent != null) {
-            // IntentService already works in a background thread, so we don't need to use a loader.
-            AlarmCursor cursor = DatabaseManager.getInstance(this).queryAlarms();
+            // IntentService works in a background thread, so this won't hold us up.
+            AlarmCursor cursor = DatabaseManager.getInstance(this).queryEnabledAlarms();
             while (cursor.moveToNext()) {
                 Alarm alarm = cursor.getAlarm();
-                if (alarm.isEnabled()) {
-                    AlarmUtils.scheduleAlarm(this, alarm, false);
+                if (!alarm.isEnabled()) {
+                    throw new IllegalStateException(
+                            "queryEnabledAlarms() returned alarm(s) that aren't enabled");
                 }
+                AlarmUtils.scheduleAlarm(this, alarm, false);
             }
             cursor.close();
 

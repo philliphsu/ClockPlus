@@ -32,6 +32,8 @@ public class AlarmDatabaseHelper extends SQLiteOpenHelper {
     // and defines all the columns.
     // TODO: Consider defining index constants for each column,
     // and then removing all cursor getColumnIndex() calls.
+    // TODO: Consider making these public, so callers can customize their
+    // WHERE queries.
     private static final String TABLE_ALARMS = "alarms";
     private static final String COLUMN_ID = "_id";
     private static final String COLUMN_HOUR = "hour";
@@ -149,8 +151,16 @@ public class AlarmDatabaseHelper extends SQLiteOpenHelper {
 
     public AlarmCursor queryAlarms() {
         // Select all rows and columns
+        return queryAlarms(null);
+    }
+
+    public AlarmCursor queryEnabledAlarms() {
+        return queryAlarms(COLUMN_ENABLED + " = " + 1);
+    }
+
+    private AlarmCursor queryAlarms(String where) {
         Cursor c = getReadableDatabase().query(TABLE_ALARMS,
-                null, null, null, null, null, SORT_ORDER);
+                null, where, null, null, null, SORT_ORDER);
         return new AlarmCursor(c);
     }
 

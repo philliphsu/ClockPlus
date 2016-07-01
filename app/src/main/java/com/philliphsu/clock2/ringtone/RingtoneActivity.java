@@ -5,20 +5,18 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.support.v4.content.Loader;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 
 import com.philliphsu.clock2.Alarm;
 import com.philliphsu.clock2.R;
-import com.philliphsu.clock2.model.DatabaseManager;
+import com.philliphsu.clock2.model.AlarmLoader;
 import com.philliphsu.clock2.util.AlarmUtils;
 import com.philliphsu.clock2.util.LocalBroadcastHelper;
-
-import static com.philliphsu.clock2.util.Preconditions.checkNotNull;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
@@ -26,7 +24,8 @@ import static com.philliphsu.clock2.util.Preconditions.checkNotNull;
  *
  * TODO: Make this abstract and make appropriate subclasses for Alarms and Timers.
  */
-public class RingtoneActivity extends AppCompatActivity {
+public class RingtoneActivity extends AppCompatActivity implements
+        android.support.v4.app.LoaderManager.LoaderCallbacks<Alarm> {
     private static final String TAG = "RingtoneActivity";
 
     // Shared with RingtoneService
@@ -35,6 +34,7 @@ public class RingtoneActivity extends AppCompatActivity {
 
     private static boolean sIsAlive = false;
 
+    private long mAlarmId;
     private Alarm mAlarm;
 
     @Override
@@ -48,19 +48,17 @@ public class RingtoneActivity extends AppCompatActivity {
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
 
-        long id = getIntent().getLongExtra(EXTRA_ITEM_ID, -1);
-        if (id < 0) {
+        mAlarmId = getIntent().getLongExtra(EXTRA_ITEM_ID, -1);
+        if (mAlarmId < 0) {
             throw new IllegalStateException("Cannot start RingtoneActivity without item's id");
         }
-        mAlarm = checkNotNull(DatabaseManager.getInstance(this).getAlarm(id));
-        Log.d(TAG, "Ringing alarm " + mAlarm);
-
-        // TODO: If the upcoming alarm notification isn't present, verify other notifications aren't affected.
-        // This could be the case if we're starting a new instance of this activity after leaving the first launch.
-        AlarmUtils.removeUpcomingAlarmNotification(this, mAlarm);
+        // The reason we don't use a thread to load the alarm is because this is an
+        // Activity, which has complex lifecycle. LoaderManager is designed to help
+        // us through the vagaries of the lifecycle that could affect loading data.
+        getSupportLoaderManager().initLoader(0, null, this);
 
         Intent intent = new Intent(this, RingtoneService.class)
-                .putExtra(EXTRA_ITEM_ID, id);
+                .putExtra(EXTRA_ITEM_ID, mAlarmId);
         startService(intent);
 
         // TODO: Butterknife binding
@@ -139,19 +137,44 @@ public class RingtoneActivity extends AppCompatActivity {
         sIsAlive = false;
     }
 
+    @Override
+    public Loader<Alarm> onCreateLoader(int id, Bundle args) {
+        return new AlarmLoader(this, mAlarmId);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Alarm> loader, Alarm data) {
+        mAlarm = data;
+        if (mAlarm != null) {
+            // TODO: If the upcoming alarm notification isn't present, verify other notifications aren't affected.
+            // This could be the case if we're starting a new instance of this activity after leaving the first launch.
+            AlarmUtils.removeUpcomingAlarmNotification(this, mAlarm);
+        }
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Alarm> loader) {
+        // Do nothing
+    }
+
     public static boolean isAlive() {
         return sIsAlive;
     }
 
     private void snooze() {
-        AlarmUtils.snoozeAlarm(this, mAlarm);
+        if (mAlarm != null) {
+            AlarmUtils.snoozeAlarm(this, mAlarm);
+        }
         // Can't call dismiss() because we don't want to also call cancelAlarm()! Why? For example,
         // we don't want the alarm, if it has no recurrence, to be turned off right now.
         stopAndFinish();
     }
 
     private void dismiss() {
-        AlarmUtils.cancelAlarm(this, mAlarm, false); // TODO do we really need to cancel the intent and alarm?
+        if (mAlarm != null) {
+            // TODO do we really need to cancel the intent and alarm?
+            AlarmUtils.cancelAlarm(this, mAlarm, false);
+        }
         stopAndFinish();
     }
 

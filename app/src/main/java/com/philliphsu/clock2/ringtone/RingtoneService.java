@@ -64,7 +64,8 @@ public class RingtoneService extends Service { // TODO: abstract this, make subc
         @Override
         public void run() {
             mAutoSilenced = true;
-            AlarmUtils.cancelAlarm(RingtoneService.this, mAlarm, false); // TODO do we really need to cancel the alarm and intent?
+            // TODO do we really need to cancel the alarm and intent?
+            AlarmUtils.cancelAlarm(RingtoneService.this, mAlarm, false);
             finishActivity();
             stopSelf();
         }
@@ -81,18 +82,29 @@ public class RingtoneService extends Service { // TODO: abstract this, make subc
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        long id = intent.getLongExtra(EXTRA_ITEM_ID, -1);
+        final long id = intent.getLongExtra(EXTRA_ITEM_ID, -1);
         if (id < 0)
             throw new IllegalStateException("No item id set");
-        Alarm alarm = checkNotNull(DatabaseManager.getInstance(this).getAlarm(id));
-
         if (intent.getAction() == null) {
-            playRingtone(alarm);
+            // http://stackoverflow.com/q/8696146/5055032
+            // Start our own thread to load the alarm instead of using a loader,
+            // because Services do not have a built-in LoaderManager (because they have no need for one since
+            // their lifecycle is not complex like in Activities/Fragments) and our
+            // work is simple enough that getting loaders to work here is not
+            // worth the effort.
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    mAlarm = checkNotNull(DatabaseManager
+                            .getInstance(RingtoneService.this).getAlarm(id));
+                    playRingtone();
+                }
+            }).start();
         } else {
             if (ACTION_SNOOZE.equals(intent.getAction())) {
-                AlarmUtils.snoozeAlarm(this, alarm);
+                AlarmUtils.snoozeAlarm(this, mAlarm);
             } else if (ACTION_DISMISS.equals(intent.getAction())) {
-                AlarmUtils.cancelAlarm(this, alarm, false); // TODO do we really need to cancel the intent and alarm?
+                AlarmUtils.cancelAlarm(this, mAlarm, false); // TODO do we really need to cancel the intent and alarm?
             } else {
                 throw new UnsupportedOperationException();
             }
@@ -143,9 +155,8 @@ public class RingtoneService extends Service { // TODO: abstract this, make subc
         return null;
     }
 
-    private void playRingtone(@NonNull Alarm alarm) {
+    private void playRingtone() {
         if (mAudioManager == null && mRingtone == null) {
-            mAlarm = checkNotNull(alarm);
             // TODO: The below call requires a notification, and there is no way to provide one suitable
             // for both Alarms and Timers. Consider making this class abstract, and have subclasses
             // implement an abstract method that calls startForeground(). You would then call that

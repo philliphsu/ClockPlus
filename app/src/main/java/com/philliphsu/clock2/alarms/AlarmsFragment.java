@@ -159,6 +159,7 @@ public class AlarmsFragment extends Fragment implements LoaderCallbacks<Cursor>,
                     @Override
                     public void onClick(View v) {
                         DatabaseManager.getInstance(getActivity()).insertAlarm(item);
+                        getLoaderManager().restartLoader(0, null, AlarmsFragment.this);
                         if (item.isEnabled()) {
                             AlarmUtils.scheduleAlarm(getActivity(), item, true);
                         }
