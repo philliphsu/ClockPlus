@@ -196,6 +196,7 @@ public final class AlarmUtils {
     private static void save(Context c, Alarm alarm) {
 //        AlarmsRepository.getInstance(c).saveItems();
         // Update the same alarm
+        // TODO: Do this in the background. AsyncTask?
         DatabaseManager.getInstance(c).updateAlarm(alarm.id(), alarm);
     }
 }

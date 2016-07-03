@@ -241,8 +241,10 @@ public class EditAlarmActivity extends BaseActivity implements AlarmNumpad.KeyLi
                 Log.d(TAG, "Cancelling old alarm first");
                 cancelAlarm(mOldAlarm, false);
             }
+            // TODO: Do this in the background. AsyncTask?
             mDatabaseManager.updateAlarm(mOldAlarm.id(), alarm);
         } else {
+            // TODO: Do this in the background. AsyncTask?
             mDatabaseManager.insertAlarm(alarm);
         }
 

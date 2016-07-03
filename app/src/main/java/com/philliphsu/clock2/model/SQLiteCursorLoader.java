@@ -10,6 +10,8 @@ import android.support.v4.content.AsyncTaskLoader;
  * Efficiently loads and holds a Cursor.
  */
 public abstract class SQLiteCursorLoader extends AsyncTaskLoader<Cursor> {
+    private static final String TAG = "SQLiteCursorLoader";
+
     private Cursor mCursor;
 
     public SQLiteCursorLoader(Context context) {
@@ -18,6 +20,7 @@ public abstract class SQLiteCursorLoader extends AsyncTaskLoader<Cursor> {
 
     protected abstract Cursor loadCursor();
 
+    /* Runs on a worker thread */
     @Override
     public Cursor loadInBackground() {
         Cursor cursor = loadCursor();
@@ -30,20 +33,28 @@ public abstract class SQLiteCursorLoader extends AsyncTaskLoader<Cursor> {
         return cursor;
     }
 
+    /* Runs on the UI thread */
     @Override
-    public void deliverResult(Cursor data) {
+    public void deliverResult(Cursor cursor) {
+        if (isReset()) {
+            // An async query came in while the loader is stopped
+            if (cursor != null) {
+                cursor.close();
+            }
+            return;
+        }
         Cursor oldCursor = mCursor;
-        mCursor = data;
+        mCursor = cursor;
 
         if (isStarted()) {
-            super.deliverResult(data);
+            super.deliverResult(cursor);
         }
 
         // Close the old cursor because it is no longer needed.
         // Because an existing cursor may be cached and redelivered, it is important
         // to make sure that the old cursor and the new cursor are not the
         // same before the old cursor is closed.
-        if (oldCursor != null && oldCursor != data && !oldCursor.isClosed()) {
+        if (oldCursor != null && oldCursor != cursor && !oldCursor.isClosed()) {
             oldCursor.close();
         }
     }

@@ -63,10 +63,20 @@ public class DatabaseManager {
     }
 
     /** @deprecated Use {@link #queryAlarms()} */
+    // TODO: Possible redundant. See AlarmListLoader.
     @Deprecated
     public ArrayList<Alarm> getAlarms() {
+        return getAlarms(mHelper.queryAlarms());
+    }
+
+    // TODO: Possible redundant. See AlarmListLoader.
+    public ArrayList<Alarm> getEnabledAlarms() {
+        return getAlarms(mHelper.queryEnabledAlarms());
+    }
+
+    // TODO: Possible redundant. See AlarmListLoader.
+    private ArrayList<Alarm> getAlarms(AlarmCursor cursor) {
         ArrayList<Alarm> alarms = new ArrayList<>();
-        AlarmCursor cursor = mHelper.queryAlarms();
         if (cursor != null) {
             while (cursor.moveToNext()) {
                 alarms.add(cursor.getAlarm());

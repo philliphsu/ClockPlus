@@ -26,6 +26,7 @@ public class PendingAlarmScheduler extends BroadcastReceiver {
         if (id < 0) {
             throw new IllegalStateException("No alarm id received");
         }
+        // TODO: Do this in the background. AsyncTask?
         Alarm alarm = checkNotNull(DatabaseManager.getInstance(context).getAlarm(id));
         AlarmUtils.scheduleAlarm(context, alarm, false);
     }
