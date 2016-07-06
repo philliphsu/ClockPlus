@@ -7,7 +7,6 @@ import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.media.AudioManager;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
@@ -18,7 +17,6 @@ import android.os.Vibrator;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
-import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.philliphsu.clock2.Alarm;
@@ -119,8 +117,7 @@ public class RingtoneService extends Service { // TODO: abstract this, make subc
     @Override
     public void onCreate() {
         super.onCreate();
-        LocalBroadcastManager.getInstance(this).registerReceiver(
-                mNotifyMissedReceiver, new IntentFilter(ACTION_NOTIFY_MISSED));
+        LocalBroadcastHelper.registerReceiver(this, mNotifyMissedReceiver, ACTION_NOTIFY_MISSED);
     }
 
     @Override
@@ -147,7 +144,7 @@ public class RingtoneService extends Service { // TODO: abstract this, make subc
             nm.notify(getClass().getName(), mAlarm.intId(), note);
         }
         stopForeground(true);
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(mNotifyMissedReceiver);
+        LocalBroadcastHelper.unregisterReceiver(this, mNotifyMissedReceiver);
     }
 
     @Override

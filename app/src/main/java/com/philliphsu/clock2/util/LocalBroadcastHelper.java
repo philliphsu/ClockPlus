@@ -16,13 +16,14 @@ public final class LocalBroadcastHelper {
         LocalBroadcastManager.getInstance(context).sendBroadcast(new Intent(action));
     }
 
-    /** Registers a BroadcastReceiver that filters intents by the action specified */
-    // TODO: Refactor any local registrations to use this utility method.
-    public static void registerReceiver(Context context, BroadcastReceiver receiver, String action) {
-        LocalBroadcastManager.getInstance(context).registerReceiver(receiver, new IntentFilter(action));
+    /** Registers a BroadcastReceiver that filters intents by the actions specified */
+    public static void registerReceiver(Context context, BroadcastReceiver receiver, String... actions) {
+        IntentFilter filter = new IntentFilter();
+        for (String action : actions)
+            filter.addAction(action);
+        LocalBroadcastManager.getInstance(context).registerReceiver(receiver, filter);
     }
 
-    // TODO: Refactor any local unregistrations to use this utility method.
     public static void unregisterReceiver(Context context, BroadcastReceiver receiver) {
         LocalBroadcastManager.getInstance(context).unregisterReceiver(receiver);
     }

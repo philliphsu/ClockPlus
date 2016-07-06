@@ -3,10 +3,8 @@ package com.philliphsu.clock2.ringtone;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.content.Loader;
-import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.WindowManager;
@@ -81,14 +79,13 @@ public class RingtoneActivity extends AppCompatActivity implements
     @Override
     protected void onResume() {
         super.onResume();
-        LocalBroadcastManager.getInstance(this).registerReceiver(
-                mFinishReceiver, new IntentFilter(ACTION_FINISH));
+        LocalBroadcastHelper.registerReceiver(this, mFinishReceiver, ACTION_FINISH);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(mFinishReceiver);
+        LocalBroadcastHelper.unregisterReceiver(this, mFinishReceiver);
     }
 
     @Override
