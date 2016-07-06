@@ -9,6 +9,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
 import com.philliphsu.clock2.Alarm;
+import com.philliphsu.clock2.util.LocalBroadcastHelper;
 
 import static com.philliphsu.clock2.DaysOfWeek.FRIDAY;
 import static com.philliphsu.clock2.DaysOfWeek.MONDAY;
@@ -65,8 +66,13 @@ public class AlarmDatabaseHelper extends SQLiteOpenHelper {
     private static final String SORT_ORDER =
             COLUMN_RING_TIME_MILLIS + " ASC, " + COLUMN_ID + " ASC";
 
+    private final Context mAppContext;
+
     public AlarmDatabaseHelper(Context context) {
         super(context, DB_NAME, null, VERSION_1);
+        // Since DatabaseManager calls this with the application
+        // context, we can safely hold onto this context.
+        mAppContext = context;
     }
 
     @Override
@@ -105,6 +111,7 @@ public class AlarmDatabaseHelper extends SQLiteOpenHelper {
         long id = getWritableDatabase().insert(TABLE_ALARMS,
                 null, toContentValues(alarm));
         alarm.setId(id);
+        notifyContentChanged();
         return id;
     }
 
@@ -115,26 +122,32 @@ public class AlarmDatabaseHelper extends SQLiteOpenHelper {
     public int updateAlarm(Alarm oldAlarm, Alarm newAlarm) {
         newAlarm.setId(oldAlarm.id());
         SQLiteDatabase db = getWritableDatabase();
-        return db.update(TABLE_ALARMS,
+        int rowsUpdated = db.update(TABLE_ALARMS,
                 toContentValues(newAlarm),
                 COLUMN_ID + " = " + newAlarm.id(),
                 null);
+        notifyContentChanged();
+        return rowsUpdated;
     }
 
     public int updateAlarm(long id, Alarm newAlarm) {
         newAlarm.setId(id);
         SQLiteDatabase db = getWritableDatabase();
-        return db.update(TABLE_ALARMS,
+        int rowsUpdated = db.update(TABLE_ALARMS,
                 toContentValues(newAlarm),
                 COLUMN_ID + " = " + id,
                 null);
+        notifyContentChanged();
+        return rowsUpdated;
     }
 
     public int deleteAlarm(Alarm alarm) {
         SQLiteDatabase db = getWritableDatabase();
-        return db.delete(TABLE_ALARMS,
+        int rowsDeleted = db.delete(TABLE_ALARMS,
                 COLUMN_ID + " = " + alarm.id(),
                 null);
+        notifyContentChanged();
+        return rowsDeleted;
     }
 
     public AlarmCursor queryAlarm(long id) {
@@ -182,6 +195,12 @@ public class AlarmDatabaseHelper extends SQLiteOpenHelper {
         values.put(COLUMN_FRIDAY, alarm.isRecurring(FRIDAY));
         values.put(COLUMN_SATURDAY, alarm.isRecurring(SATURDAY));
         return values;
+    }
+
+    private void notifyContentChanged() {
+        Log.d(TAG, "notifyContentChanged()");
+        LocalBroadcastHelper.sendBroadcast(mAppContext,
+                SQLiteCursorLoader.ACTION_CHANGE_CONTENT);
     }
 
     // An alternative method to creating an Alarm from a cursor is to

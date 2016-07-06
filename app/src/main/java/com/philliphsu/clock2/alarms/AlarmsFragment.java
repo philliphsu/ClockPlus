@@ -3,8 +3,8 @@ package com.philliphsu.clock2.alarms;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
@@ -17,30 +17,25 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.philliphsu.clock2.Alarm;
-import com.philliphsu.clock2.AsyncRecyclerViewItemChangeHandler;
 import com.philliphsu.clock2.OnListItemInteractionListener;
 import com.philliphsu.clock2.R;
 import com.philliphsu.clock2.editalarm.EditAlarmActivity;
-import com.philliphsu.clock2.model.AlarmListLoader;
+import com.philliphsu.clock2.model.AlarmsListCursorLoader;
 import com.philliphsu.clock2.model.DatabaseManager;
 import com.philliphsu.clock2.util.AlarmUtils;
-
-import java.util.Collections;
-import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
 // TODO: Use native fragments since we're targeting API >=19?
 // TODO: Use native LoaderCallbacks.
-public class AlarmsFragment extends Fragment implements LoaderCallbacks<List<Alarm>>,
+public class AlarmsFragment extends Fragment implements LoaderCallbacks<Cursor>,
         OnListItemInteractionListener<Alarm> {
     private static final int REQUEST_EDIT_ALARM = 0;
     public static final int REQUEST_CREATE_ALARM = 1;
     private static final String TAG = "AlarmsFragment";
 
-    private AsyncRecyclerViewItemChangeHandler mAsyncRecyclerViewItemChangeHandler;
-    private AlarmsAdapter mAdapter;
+    private AlarmsCursorAdapter mAdapter;
 
     @Bind(R.id.list) RecyclerView mList;
 
@@ -80,11 +75,8 @@ public class AlarmsFragment extends Fragment implements LoaderCallbacks<List<Ala
         // Set the adapter
         Context context = view.getContext();
         mList.setLayoutManager(new LinearLayoutManager(context));
-        mAdapter = new AlarmsAdapter(Collections.<Alarm>emptyList(), this);
+        mAdapter = new AlarmsCursorAdapter(this);
         mList.setAdapter(mAdapter);
-
-        mAsyncRecyclerViewItemChangeHandler = new AsyncRecyclerViewItemChangeHandler(
-                mAdapter, getActivity().findViewById(R.id.main_content));
         return view;
     }
 
@@ -107,20 +99,18 @@ public class AlarmsFragment extends Fragment implements LoaderCallbacks<List<Ala
     }
 
     @Override
-    public Loader<List<Alarm>> onCreateLoader(int id, Bundle args) {
-        return new AlarmListLoader(getActivity());
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        return new AlarmsListCursorLoader(getActivity());
     }
 
     @Override
-    public void onLoadFinished(Loader<List<Alarm>> loader, List<Alarm> data) {
-        mAdapter.replaceData(data);
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        mAdapter.swapCursor(data);
     }
 
     @Override
-    public void onLoaderReset(Loader<List<Alarm>> loader) {
-        // Can't pass in null, because replaceData() will try to add all the elements
-        // from the given collection, so we would run into an NPE.
-        mAdapter.replaceData(Collections.<Alarm>emptyList());
+    public void onLoaderReset(Loader<Cursor> loader) {
+        mAdapter.swapCursor(null);
     }
 
     @Override
@@ -132,14 +122,9 @@ public class AlarmsFragment extends Fragment implements LoaderCallbacks<List<Ala
 
         switch (requestCode) {
             case REQUEST_CREATE_ALARM:
-                Log.d(TAG, "Async add alarm");
-                final Alarm createdAlarm = data.getParcelableExtra(EditAlarmActivity.EXTRA_MODIFIED_ALARM);
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        mAsyncRecyclerViewItemChangeHandler.asyncAddAlarm(createdAlarm);
-                    }
-                }, 1000);
+                // TODO: Should we still do the async add here?
+                // We must if we want the async handler to post the toast/snackbar
+                // for us.
                 break;
             case REQUEST_EDIT_ALARM:
                 Alarm deletedAlarm;

@@ -5,7 +5,6 @@ import android.os.AsyncTask;
 import android.support.design.widget.Snackbar;
 import android.view.View;
 
-import com.philliphsu.clock2.alarms.AlarmsAdapter;
 import com.philliphsu.clock2.model.DatabaseManager;
 import com.philliphsu.clock2.util.AlarmUtils;
 
@@ -14,18 +13,16 @@ import com.philliphsu.clock2.util.AlarmUtils;
  *
  * TODO: Generify this class for any item.
  */
-public final class AsyncRecyclerViewItemChangeHandler {
+public final class AsyncItemChangeHandler {
 
     private final Context mContext;
-    private final AlarmsAdapter mAdapter;
     private final View mSnackbarAnchor;
 
     /**
      * @param snackbarAnchor an optional anchor for a Snackbar to anchor to
      */
-    public AsyncRecyclerViewItemChangeHandler(AlarmsAdapter adapter, View snackbarAnchor) {
-        mContext = snackbarAnchor.getContext();
-        mAdapter = adapter;
+    public AsyncItemChangeHandler(Context context, View snackbarAnchor) {
+        mContext = context.getApplicationContext(); // to prevent memory leaks
         mSnackbarAnchor = snackbarAnchor;
     }
 
@@ -39,7 +36,7 @@ public final class AsyncRecyclerViewItemChangeHandler {
             @Override
             protected void onPostExecute(Long aLong) {
                 // TODO: Snackbar/Toast here? If so, remove the code in AlarmUtils.scheduleAlarm() that does it.
-                mAdapter.addItem(alarm);
+                // Then, consider scheduling the alarm in the background.
                 AlarmUtils.scheduleAlarm(mContext, alarm, true);
             }
         }.execute();
@@ -49,8 +46,6 @@ public final class AsyncRecyclerViewItemChangeHandler {
         new AsyncTask<Void, Void, Integer>() {
             @Override
             protected Integer doInBackground(Void... params) {
-                mAdapter.updateItem(oldAlarm, newAlarm);
-                // Save the item to the db
                 return DatabaseManager.getInstance(mContext).updateAlarm(oldAlarm.id(), newAlarm);
             }
 
@@ -65,14 +60,11 @@ public final class AsyncRecyclerViewItemChangeHandler {
         new AsyncTask<Void, Void, Integer>() {
             @Override
             protected Integer doInBackground(Void... params) {
-                mAdapter.removeItem(alarm);
-                // Save the item to the db
                 return DatabaseManager.getInstance(mContext).deleteAlarm(alarm);
             }
 
             @Override
             protected void onPostExecute(Integer integer) {
-                // TODO: Snackbar
                 if (mSnackbarAnchor != null) {
                     String message = mContext.getString(R.string.snackbar_item_deleted,
                             mContext.getString(R.string.alarm));

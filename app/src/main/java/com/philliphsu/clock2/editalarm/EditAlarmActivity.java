@@ -26,6 +26,7 @@ import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.philliphsu.clock2.Alarm;
+import com.philliphsu.clock2.AsyncItemChangeHandler;
 import com.philliphsu.clock2.BaseActivity;
 import com.philliphsu.clock2.DaysOfWeek;
 import com.philliphsu.clock2.R;
@@ -68,6 +69,7 @@ public class EditAlarmActivity extends BaseActivity implements AlarmNumpad.KeyLi
     private Uri mSelectedRingtoneUri;
     private Alarm mOldAlarm;
     private DatabaseManager mDatabaseManager;
+    private AsyncItemChangeHandler mAsyncItemChangeHandler;
 
     @Bind(R.id.save) Button mSave;
     @Bind(R.id.delete) Button mDelete;
@@ -98,6 +100,8 @@ public class EditAlarmActivity extends BaseActivity implements AlarmNumpad.KeyLi
             showDetails();
         }
         setTimeTextHint(); // TODO: private access
+
+        mAsyncItemChangeHandler = new AsyncItemChangeHandler(this, null);
     }
 
     @Override
@@ -246,13 +250,15 @@ public class EditAlarmActivity extends BaseActivity implements AlarmNumpad.KeyLi
             mDatabaseManager.updateAlarm(mOldAlarm.id(), alarm);
         } else {
             //mDatabaseManager.insertAlarm(alarm);
-            intent.putExtra(EXTRA_MODIFIED_ALARM, alarm);
+            mAsyncItemChangeHandler.asyncAddAlarm(alarm);
+            //intent.putExtra(EXTRA_MODIFIED_ALARM, alarm);
         }
 
         if (alarm.isEnabled()) {
             //scheduleAlarm(alarm);
         }
 
+        // TODO: Remove intent
         setResult(RESULT_OK, intent);
         showEditorClosed();
     }

@@ -1,8 +1,13 @@
 package com.philliphsu.clock2.model;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.support.v4.content.AsyncTaskLoader;
+import android.util.Log;
+
+import com.philliphsu.clock2.util.LocalBroadcastHelper;
 
 /**
  * Created by Phillip Hsu on 6/28/2016.
@@ -12,7 +17,10 @@ import android.support.v4.content.AsyncTaskLoader;
 public abstract class SQLiteCursorLoader extends AsyncTaskLoader<Cursor> {
     private static final String TAG = "SQLiteCursorLoader";
 
+    public static final String ACTION_CHANGE_CONTENT = "com.philliphsu.clock2.model.action.CHANGE_CONTENT";
+
     private Cursor mCursor;
+    private OnContentChangeReceiver mOnContentChangeReceiver;
 
     public SQLiteCursorLoader(Context context) {
         super(context);
@@ -66,30 +74,54 @@ public abstract class SQLiteCursorLoader extends AsyncTaskLoader<Cursor> {
         if (mCursor != null) {
             deliverResult(mCursor);
         }
+
+        if (mOnContentChangeReceiver == null) {
+            mOnContentChangeReceiver = new OnContentChangeReceiver();
+            LocalBroadcastHelper.registerReceiver(getContext(),
+                    mOnContentChangeReceiver, ACTION_CHANGE_CONTENT);
+        }
+
         if (takeContentChanged() || mCursor == null) {
             forceLoad();
         }
     }
+
     @Override
     protected void onStopLoading() {
         // Attempt to cancel the current load task if possible.
         cancelLoad();
     }
+
     @Override
     public void onCanceled(Cursor cursor) {
         if (cursor != null && !cursor.isClosed()) {
             cursor.close();
         }
     }
+
     @Override
     protected void onReset() {
         super.onReset();
         // Ensure the loader is stopped
         onStopLoading();
+
         if (mCursor != null && !mCursor.isClosed()) {
             mCursor.close();
         }
         mCursor = null;
+
+        if (mOnContentChangeReceiver != null) {
+            LocalBroadcastHelper.unregisterReceiver(getContext(),
+                    mOnContentChangeReceiver);
+            mOnContentChangeReceiver = null;
+        }
     }
 
+    private final class OnContentChangeReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.d(TAG, "Received content change event");
+            onContentChanged();
+        }
+    }
 }
