@@ -22,7 +22,14 @@ public class AlarmsCursorAdapter extends RecyclerView.Adapter<AlarmViewHolder> {
 
     public AlarmsCursorAdapter(OnListItemInteractionListener<Alarm> listener) {
         mListener = listener;
-        setHasStableIds(true); // TODO: why do we need this?
+        // Excerpt from docs of notifyDataSetChanged():
+        // "RecyclerView will attempt to synthesize [artificially create?]
+        // visible structural change events [when items are inserted, removed or
+        // moved] for adapters that report that they have stable IDs when
+        // [notifyDataSetChanged()] is used. This can help for the purposes of
+        // animation and visual object persistence [?] but individual item views
+        // will still need to be rebound and relaid out."
+        setHasStableIds(true);
     }
 
     @Override

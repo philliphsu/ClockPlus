@@ -14,7 +14,7 @@ public class DatabaseManager {
 
     private static DatabaseManager sDatabaseManager;
     private final Context mContext;
-    private final AlarmDatabaseHelper mHelper;
+    private final AlarmDatabaseHelper mHelper; // TODO: Should we call close() when we're done?
 
     private DatabaseManager(Context context) {
         mContext = context.getApplicationContext();
@@ -28,10 +28,8 @@ public class DatabaseManager {
         return sDatabaseManager;
     }
 
-    // TODO: why return an Alarm?
-    public Alarm insertAlarm(Alarm alarm) {
-        mHelper.insertAlarm(alarm);
-        return alarm;
+    public long insertAlarm(Alarm alarm) {
+        return mHelper.insertAlarm(alarm);
     }
 
     /**

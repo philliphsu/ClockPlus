@@ -58,7 +58,7 @@ public class EditAlarmActivity extends BaseActivity implements AlarmNumpad.KeyLi
         LoaderManager.LoaderCallbacks<Alarm> {
     private static final String TAG = "EditAlarmActivity";
     public static final String EXTRA_ALARM_ID = "com.philliphsu.clock2.editalarm.extra.ALARM_ID";
-    public static final String EXTRA_DELETED_ALARM = "com.philliphsu.clock2.editalarm.extra.DELETED_ALARM";
+    public static final String EXTRA_MODIFIED_ALARM = "com.philliphsu.clock2.editalarm.extra.MODIFIED_ALARM";
     private static final RelativeSizeSpan AMPM_SIZE_SPAN = new RelativeSizeSpan(0.5f);
 
     private static final int REQUEST_PICK_RINGTONE = 0;
@@ -236,6 +236,7 @@ public class EditAlarmActivity extends BaseActivity implements AlarmNumpad.KeyLi
             alarm.setRecurring(i, isRecurringDay(i));
         }
 
+        Intent intent = new Intent();
         if (mOldAlarm != null) {
             if (mOldAlarm.isEnabled()) {
                 Log.d(TAG, "Cancelling old alarm first");
@@ -244,15 +245,15 @@ public class EditAlarmActivity extends BaseActivity implements AlarmNumpad.KeyLi
             // TODO: Do this in the background. AsyncTask?
             mDatabaseManager.updateAlarm(mOldAlarm.id(), alarm);
         } else {
-            // TODO: Do this in the background. AsyncTask?
-            mDatabaseManager.insertAlarm(alarm);
+            //mDatabaseManager.insertAlarm(alarm);
+            intent.putExtra(EXTRA_MODIFIED_ALARM, alarm);
         }
 
         if (alarm.isEnabled()) {
-            scheduleAlarm(alarm);
+            //scheduleAlarm(alarm);
         }
 
-        setResult(RESULT_OK);
+        setResult(RESULT_OK, intent);
         showEditorClosed();
     }
 
@@ -268,7 +269,7 @@ public class EditAlarmActivity extends BaseActivity implements AlarmNumpad.KeyLi
             }
             mDatabaseManager.deleteAlarm(mOldAlarm);
             Intent intent = new Intent();
-            intent.putExtra(EXTRA_DELETED_ALARM, mOldAlarm);
+            intent.putExtra(EXTRA_MODIFIED_ALARM, mOldAlarm);
             setResult(RESULT_OK, intent);
         }
         showEditorClosed();

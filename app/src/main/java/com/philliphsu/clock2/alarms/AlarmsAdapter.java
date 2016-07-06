@@ -13,6 +13,12 @@ public class AlarmsAdapter extends BaseAdapter<Alarm, AlarmViewHolder> {
 
     public AlarmsAdapter(List<Alarm> alarms, OnListItemInteractionListener<Alarm> listener) {
         super(Alarm.class, alarms, listener);
+        setHasStableIds(true);
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return getItem(position).id();
     }
 
     @Override

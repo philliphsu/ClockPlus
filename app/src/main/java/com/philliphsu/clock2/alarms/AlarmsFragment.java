@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
@@ -16,6 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.philliphsu.clock2.Alarm;
+import com.philliphsu.clock2.AsyncRecyclerViewItemChangeHandler;
 import com.philliphsu.clock2.OnListItemInteractionListener;
 import com.philliphsu.clock2.R;
 import com.philliphsu.clock2.editalarm.EditAlarmActivity;
@@ -37,6 +39,7 @@ public class AlarmsFragment extends Fragment implements LoaderCallbacks<List<Ala
     public static final int REQUEST_CREATE_ALARM = 1;
     private static final String TAG = "AlarmsFragment";
 
+    private AsyncRecyclerViewItemChangeHandler mAsyncRecyclerViewItemChangeHandler;
     private AlarmsAdapter mAdapter;
 
     @Bind(R.id.list) RecyclerView mList;
@@ -79,6 +82,9 @@ public class AlarmsFragment extends Fragment implements LoaderCallbacks<List<Ala
         mList.setLayoutManager(new LinearLayoutManager(context));
         mAdapter = new AlarmsAdapter(Collections.<Alarm>emptyList(), this);
         mList.setAdapter(mAdapter);
+
+        mAsyncRecyclerViewItemChangeHandler = new AsyncRecyclerViewItemChangeHandler(
+                mAdapter, getActivity().findViewById(R.id.main_content));
         return view;
     }
 
@@ -126,12 +132,19 @@ public class AlarmsFragment extends Fragment implements LoaderCallbacks<List<Ala
 
         switch (requestCode) {
             case REQUEST_CREATE_ALARM:
-                // TODO: notifyItemInserted?
-                getLoaderManager().restartLoader(0, null, this);
+                Log.d(TAG, "Async add alarm");
+                final Alarm createdAlarm = data.getParcelableExtra(EditAlarmActivity.EXTRA_MODIFIED_ALARM);
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        mAsyncRecyclerViewItemChangeHandler.asyncAddAlarm(createdAlarm);
+                    }
+                }, 1000);
+                break;
             case REQUEST_EDIT_ALARM:
                 Alarm deletedAlarm;
                 if (data != null && (deletedAlarm = data.getParcelableExtra(
-                        EditAlarmActivity.EXTRA_DELETED_ALARM)) != null) {
+                        EditAlarmActivity.EXTRA_MODIFIED_ALARM)) != null) {
                     onListItemDeleted(deletedAlarm);
                 }
                 // TODO: notifyItemRemoved?
@@ -153,6 +166,7 @@ public class AlarmsFragment extends Fragment implements LoaderCallbacks<List<Ala
     // TODO: This doesn't need to be defined in the interface.
     // TODO: Rename to showDeletedSnackbar() or something
     // TODO: This needs to prompt a reload of the list.
+    @Deprecated // TODO: Delete this method.
     @Override
     public void onListItemDeleted(final Alarm item) {
         Snackbar.make(getActivity().findViewById(R.id.main_content),
