@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
@@ -17,6 +18,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.philliphsu.clock2.Alarm;
+import com.philliphsu.clock2.AsyncItemChangeHandler;
 import com.philliphsu.clock2.OnListItemInteractionListener;
 import com.philliphsu.clock2.R;
 import com.philliphsu.clock2.editalarm.EditAlarmActivity;
@@ -30,12 +32,14 @@ import butterknife.ButterKnife;
 // TODO: Use native fragments since we're targeting API >=19?
 // TODO: Use native LoaderCallbacks.
 public class AlarmsFragment extends Fragment implements LoaderCallbacks<Cursor>,
-        OnListItemInteractionListener<Alarm> {
+        OnListItemInteractionListener<Alarm>, ScrollHandler {
     private static final int REQUEST_EDIT_ALARM = 0;
     public static final int REQUEST_CREATE_ALARM = 1;
     private static final String TAG = "AlarmsFragment";
 
     private AlarmsCursorAdapter mAdapter;
+    private AsyncItemChangeHandler mAsyncItemChangeHandler;
+    private long mScrollToStableId = RecyclerView.NO_ID;
 
     @Bind(R.id.list) RecyclerView mList;
 
@@ -77,6 +81,9 @@ public class AlarmsFragment extends Fragment implements LoaderCallbacks<Cursor>,
         mList.setLayoutManager(new LinearLayoutManager(context));
         mAdapter = new AlarmsCursorAdapter(this);
         mList.setAdapter(mAdapter);
+
+        mAsyncItemChangeHandler = new AsyncItemChangeHandler(getActivity(),
+                getActivity().findViewById(R.id.main_content), this);
         return view;
     }
 
@@ -106,6 +113,8 @@ public class AlarmsFragment extends Fragment implements LoaderCallbacks<Cursor>,
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         mAdapter.swapCursor(data);
+        // Scroll to the last modified alarm
+        performScrollToStableId();
     }
 
     @Override
@@ -122,9 +131,17 @@ public class AlarmsFragment extends Fragment implements LoaderCallbacks<Cursor>,
 
         switch (requestCode) {
             case REQUEST_CREATE_ALARM:
-                // TODO: Should we still do the async add here?
-                // We must if we want the async handler to post the toast/snackbar
-                // for us.
+                if (data != null) {
+                    final Alarm createdAlarm = data.getParcelableExtra(EditAlarmActivity.EXTRA_MODIFIED_ALARM);
+                    if (createdAlarm != null) {
+                        new Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                mAsyncItemChangeHandler.asyncAddAlarm(createdAlarm);
+                            }
+                        }, 300);
+                    }
+                }
                 break;
             case REQUEST_EDIT_ALARM:
                 Alarm deletedAlarm;
@@ -146,6 +163,33 @@ public class AlarmsFragment extends Fragment implements LoaderCallbacks<Cursor>,
         Intent intent = new Intent(getActivity(), EditAlarmActivity.class);
         intent.putExtra(EditAlarmActivity.EXTRA_ALARM_ID, item.id());
         startActivityForResult(intent, REQUEST_EDIT_ALARM);
+    }
+
+    @Override
+    public void setScrollToStableId(long id) {
+        mScrollToStableId = id;
+    }
+
+    @Override
+    public void scrollToPosition(int position) {
+        mList.smoothScrollToPosition(position);
+    }
+
+    private void performScrollToStableId() {
+        if (mScrollToStableId != RecyclerView.NO_ID) {
+            int position = -1;
+            for (int i = 0; i < mAdapter.getItemCount(); i++) {
+                if (mAdapter.getItemId(i) == mScrollToStableId) {
+                    position = i;
+                    break;
+                }
+            }
+            if (position >= 0) {
+                scrollToPosition(position);
+            }
+        }
+        // Reset
+        mScrollToStableId = RecyclerView.NO_ID;
     }
 
     // TODO: This doesn't need to be defined in the interface.

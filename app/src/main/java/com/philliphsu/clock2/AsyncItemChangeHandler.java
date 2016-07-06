@@ -5,6 +5,7 @@ import android.os.AsyncTask;
 import android.support.design.widget.Snackbar;
 import android.view.View;
 
+import com.philliphsu.clock2.alarms.ScrollHandler;
 import com.philliphsu.clock2.model.DatabaseManager;
 import com.philliphsu.clock2.util.AlarmUtils;
 
@@ -14,16 +15,20 @@ import com.philliphsu.clock2.util.AlarmUtils;
  * TODO: Generify this class for any item.
  */
 public final class AsyncItemChangeHandler {
+    private static final String TAG = "AsyncItemChangeHandler";
 
     private final Context mContext;
     private final View mSnackbarAnchor;
+    private final ScrollHandler mScrollHandler;
 
     /**
      * @param snackbarAnchor an optional anchor for a Snackbar to anchor to
+     * @param scrollHandler
      */
-    public AsyncItemChangeHandler(Context context, View snackbarAnchor) {
+    public AsyncItemChangeHandler(Context context, View snackbarAnchor, ScrollHandler scrollHandler) {
         mContext = context.getApplicationContext(); // to prevent memory leaks
         mSnackbarAnchor = snackbarAnchor;
+        mScrollHandler = scrollHandler;
     }
 
     public void asyncAddAlarm(final Alarm alarm) {
@@ -38,6 +43,8 @@ public final class AsyncItemChangeHandler {
                 // TODO: Snackbar/Toast here? If so, remove the code in AlarmUtils.scheduleAlarm() that does it.
                 // Then, consider scheduling the alarm in the background.
                 AlarmUtils.scheduleAlarm(mContext, alarm, true);
+                // Prepare to scroll to the newly added alarm
+                mScrollHandler.setScrollToStableId(aLong);
             }
         }.execute();
     }
