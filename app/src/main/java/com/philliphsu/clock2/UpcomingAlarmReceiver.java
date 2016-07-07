@@ -35,6 +35,7 @@ public class UpcomingAlarmReceiver extends BroadcastReceiver {
         if (ACTION_CANCEL_NOTIFICATION.equals(intent.getAction())) {
             nm.cancel(getClass().getName(), (int) id);
         } else {
+            // TODO: AsyncTask/Loader
             Alarm alarm = checkNotNull(DatabaseManager.getInstance(context).getAlarm(id));
             if (ACTION_DISMISS_NOW.equals(intent.getAction())) {
                 AlarmUtils.cancelAlarm(context, alarm, true);

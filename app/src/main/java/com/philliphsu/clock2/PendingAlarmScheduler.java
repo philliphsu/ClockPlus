@@ -28,6 +28,9 @@ public class PendingAlarmScheduler extends BroadcastReceiver {
         }
         // TODO: Do this in the background. AsyncTask?
         Alarm alarm = checkNotNull(DatabaseManager.getInstance(context).getAlarm(id));
+        if (!alarm.isEnabled()) {
+            throw new IllegalStateException("Alarm must be enabled!");
+        }
         AlarmUtils.scheduleAlarm(context, alarm, false);
     }
 }

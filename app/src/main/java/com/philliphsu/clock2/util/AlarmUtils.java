@@ -10,10 +10,10 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.philliphsu.clock2.Alarm;
+import com.philliphsu.clock2.AsyncItemChangeHandler;
 import com.philliphsu.clock2.PendingAlarmScheduler;
 import com.philliphsu.clock2.R;
 import com.philliphsu.clock2.UpcomingAlarmReceiver;
-import com.philliphsu.clock2.model.DatabaseManager;
 import com.philliphsu.clock2.ringtone.RingtoneActivity;
 import com.philliphsu.clock2.ringtone.RingtoneService;
 
@@ -36,7 +36,17 @@ public final class AlarmUtils {
 
     private AlarmUtils() {}
 
+    /**
+     * Schedules the alarm with the {@link AlarmManager}. If
+     * {@code alarm.}{@link Alarm#isEnabled() isEnabled()} returns false,
+     * this does nothing and returns immediately.
+     */
     public static void scheduleAlarm(Context context, Alarm alarm, boolean showToast) {
+        if (!alarm.isEnabled()) {
+            Log.i(TAG, "Skipped scheduling an alarm because it was not enabled");
+            return;
+        }
+
         Log.d(TAG, "Scheduling alarm " + alarm);
         AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         // If there is already an alarm for this Intent scheduled (with the equality of two
@@ -194,9 +204,6 @@ public final class AlarmUtils {
     }
 
     private static void save(Context c, Alarm alarm) {
-//        AlarmsRepository.getInstance(c).saveItems();
-        // Update the same alarm
-        // TODO: Do this in the background. AsyncTask?
-        DatabaseManager.getInstance(c).updateAlarm(alarm.id(), alarm);
+        new AsyncItemChangeHandler(c, null, null).asyncUpdateAlarm(alarm);
     }
 }

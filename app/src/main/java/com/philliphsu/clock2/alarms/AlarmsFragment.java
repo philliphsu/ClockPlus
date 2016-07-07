@@ -30,9 +30,10 @@ import butterknife.ButterKnife;
 // TODO: Use native LoaderCallbacks.
 public class AlarmsFragment extends Fragment implements LoaderCallbacks<Cursor>,
         OnListItemInteractionListener<Alarm>, ScrollHandler {
-    private static final int REQUEST_EDIT_ALARM = 0;
-    public static final int REQUEST_CREATE_ALARM = 1;
     private static final String TAG = "AlarmsFragment";
+    private static final int REQUEST_EDIT_ALARM = 0;
+    // Public because MainActivity needs to use it.
+    public static final int REQUEST_CREATE_ALARM = 1;
 
     private AlarmsCursorAdapter mAdapter;
     private AsyncItemChangeHandler mAsyncItemChangeHandler;
