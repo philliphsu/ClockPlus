@@ -15,22 +15,42 @@ import static com.philliphsu.clock2.util.Preconditions.checkNotNull;
  * your intent at the Alarm instance's normal ring time, so by the time you make a subsequent call
  * to {@link Alarm#ringsAt()}, the value returned refers to the next time the alarm will recur.
  */
+// TODO: Consider registering this locally instead of in the manifest.
 public class PendingAlarmScheduler extends BroadcastReceiver {
     // We include the class name in the string to distinguish this constant from the one defined
     // in UpcomingAlarmReceiver.
     public static final String EXTRA_ALARM_ID = "com.philliphsu.clock2.PendingAlarmScheduler.extra.ALARM_ID";
 
     @Override
-    public void onReceive(Context context, Intent intent) {
-        long id = intent.getLongExtra(EXTRA_ALARM_ID, -1);
+    public void onReceive(final Context context, Intent intent) {
+        final long id = intent.getLongExtra(EXTRA_ALARM_ID, -1);
         if (id < 0) {
             throw new IllegalStateException("No alarm id received");
         }
-        // TODO: Do this in the background. AsyncTask?
-        Alarm alarm = checkNotNull(DatabaseManager.getInstance(context).getAlarm(id));
-        if (!alarm.isEnabled()) {
-            throw new IllegalStateException("Alarm must be enabled!");
-        }
-        AlarmUtils.scheduleAlarm(context, alarm, false);
+        // Start our own thread to load the alarm instead of:
+        //  * using a Loader, because we have no complex lifecycle and thus
+        //  BroadcastReceiver has no built-in LoaderManager, AND getting a Loader
+        //  to work here might be a hassle, let alone it might not even be appropriate to
+        //  use Loaders outside of an Activity/Fragment, since it does depend on LoaderCallbacks.
+        //  * using an AsyncTask, because we don't need to do anything on the UI thread
+        //  after the background work is complete.
+        // TODO: Verify using a Runnable like this won't cause a memory leak.
+        // It *probably* won't because a BroadcastReceiver doesn't hold a Context,
+        // and it also doesn't have a lifecycle, so it likely won't stick around
+        // in memory.
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Alarm alarm = checkNotNull(DatabaseManager
+                        .getInstance(context).getAlarm(id));
+                if (!alarm.isEnabled()) {
+                    throw new IllegalStateException("Alarm must be enabled!");
+                }
+                // Because showToast = false, we don't do any UI work.
+                // TODO: Since we're in a worker thread, verify that the
+                // UI related code within will not cause us to crash.
+                AlarmUtils.scheduleAlarm(context, alarm, false);
+            }
+        }).start();
     }
 }

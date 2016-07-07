@@ -14,7 +14,7 @@ public class DatabaseManager {
 
     private static DatabaseManager sDatabaseManager;
     private final Context mContext;
-    private final AlarmDatabaseHelper mHelper; // TODO: Should we call close() when we're done?
+    private final AlarmDatabaseHelper mHelper; // TODO: Call close() when *the app* is exiting.
 
     private DatabaseManager(Context context) {
         mContext = context.getApplicationContext();

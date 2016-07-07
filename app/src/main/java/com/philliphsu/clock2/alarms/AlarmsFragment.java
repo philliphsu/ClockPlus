@@ -86,13 +86,6 @@ public class AlarmsFragment extends Fragment implements LoaderCallbacks<Cursor>,
     }
 
     @Override
-    public void onPause() {
-        super.onPause();
-        // TODO: Do we need to save anything?
-//        AlarmsRepository.getInstance(getActivity()).saveItems();
-    }
-
-    @Override
     public void onResume() {
         super.onResume();
     }

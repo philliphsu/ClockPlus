@@ -9,6 +9,7 @@ import java.util.List;
 /**
  * Created by Phillip Hsu on 7/2/2016.
  */
+@Deprecated
 // TODO: Consider C extends MyTypeBoundedCursorWrapper<D>
 public abstract class DataListLoader<D, C extends CursorWrapper> extends AsyncTaskLoader<List<D>> {
     

@@ -11,6 +11,7 @@ import java.util.List;
 /**
  * Created by Phillip Hsu on 7/2/2016.
  */
+@Deprecated
 public class AlarmListLoader extends DataListLoader<Alarm, AlarmCursor> {
 
     public AlarmListLoader(Context context) {

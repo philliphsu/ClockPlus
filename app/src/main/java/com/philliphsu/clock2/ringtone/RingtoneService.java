@@ -90,6 +90,7 @@ public class RingtoneService extends Service { // TODO: abstract this, make subc
             // their lifecycle is not complex like in Activities/Fragments) and our
             // work is simple enough that getting loaders to work here is not
             // worth the effort.
+            // TODO: Will using the Runnable like this cause a memory leak?
             new Thread(new Runnable() {
                 @Override
                 public void run() {

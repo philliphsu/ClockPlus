@@ -99,7 +99,7 @@ public class AlarmViewHolder extends BaseViewHolder<Alarm> implements AlarmCount
             bindCountdown(false, -1);
             bindDismissButton(false, "");
         }
-        save(); // TODO: Problem! If cancelAlarm() saves the repo, this is a redundant call!
+        save();
     }
     */
 
@@ -164,7 +164,6 @@ public class AlarmViewHolder extends BaseViewHolder<Alarm> implements AlarmCount
         String buttonText = alarm.isSnoozed()
                 ? getContext().getString(R.string.title_snoozing_until, formatTime(getContext(), alarm.snoozingUntil()))
                 : getContext().getString(R.string.dismiss_now);
-        // TODO: Register dynamic broadcast receiver in this class to listen for
         // when this alarm crosses the upcoming threshold, so we can show this button.
         bindDismissButton(visible, buttonText);
     }

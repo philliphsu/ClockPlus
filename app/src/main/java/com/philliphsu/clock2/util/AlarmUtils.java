@@ -65,6 +65,8 @@ public final class AlarmUtils {
                 notifyUpcomingAlarmIntent(context, alarm, false));
         am.setExact(AlarmManager.RTC_WAKEUP, ringAt, alarmIntent(context, alarm, false));
 
+        // TODO: Consider removing this and letting callers handle Toasts, because
+        // it could be beneficial for callers to schedule the alarm in a worker thread.
         if (showToast) {
             String message;
             if (alarm.isSnoozed()) {
@@ -97,6 +99,10 @@ public final class AlarmUtils {
 
         removeUpcomingAlarmNotification(c, a);
 
+        // We can't remove this and instead let callers handle Toasts
+        // without complication, because callers would then have to
+        // handle cases when the alarm is snoozed and/or has
+        // recurrence themselves.
         // TOneverDO: Place block after making value changes to the alarm.
         if (showToast && (a.ringsWithinHours(hoursBeforeUpcoming(c)) || a.isSnoozed())) {
             String time = formatTime(c, a.isSnoozed() ? a.snoozingUntil() : a.ringsAt());
