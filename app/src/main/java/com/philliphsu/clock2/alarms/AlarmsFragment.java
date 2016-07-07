@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
@@ -23,8 +22,6 @@ import com.philliphsu.clock2.OnListItemInteractionListener;
 import com.philliphsu.clock2.R;
 import com.philliphsu.clock2.editalarm.EditAlarmActivity;
 import com.philliphsu.clock2.model.AlarmsListCursorLoader;
-import com.philliphsu.clock2.model.DatabaseManager;
-import com.philliphsu.clock2.util.AlarmUtils;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -39,6 +36,7 @@ public class AlarmsFragment extends Fragment implements LoaderCallbacks<Cursor>,
 
     private AlarmsCursorAdapter mAdapter;
     private AsyncItemChangeHandler mAsyncItemChangeHandler;
+    private Handler mHandler = new Handler();
     private long mScrollToStableId = RecyclerView.NO_ID;
 
     @Bind(R.id.list) RecyclerView mList;
@@ -67,7 +65,6 @@ public class AlarmsFragment extends Fragment implements LoaderCallbacks<Cursor>,
             // TODO Read arguments
         }
 
-        // Initialize the loader to load the list of runs
         getLoaderManager().initLoader(0, null, this);
     }
 
@@ -125,32 +122,36 @@ public class AlarmsFragment extends Fragment implements LoaderCallbacks<Cursor>,
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         Log.d(TAG, "onActivityResult()");
-        if (resultCode != Activity.RESULT_OK) {
+        if (resultCode != Activity.RESULT_OK || data == null)
             return;
-        }
+        final Alarm alarm = data.getParcelableExtra(EditAlarmActivity.EXTRA_MODIFIED_ALARM);
+        if (alarm == null)
+            return;
 
+        // http://stackoverflow.com/a/27055512/5055032
+        // "RecyclerView does not run animations in the first layout
+        // pass after being attached." A workaround is to postpone
+        // the CRUD operation to the next frame. A delay of 300ms is
+        // short enough to not be noticeable, and long enough to
+        // give us the animation *most of the time*.
         switch (requestCode) {
             case REQUEST_CREATE_ALARM:
-                if (data != null) {
-                    final Alarm createdAlarm = data.getParcelableExtra(EditAlarmActivity.EXTRA_MODIFIED_ALARM);
-                    if (createdAlarm != null) {
-                        new Handler().postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                mAsyncItemChangeHandler.asyncAddAlarm(createdAlarm);
-                            }
-                        }, 300);
-                    }
-                }
+                mHandler.postDelayed(
+                        new AsyncAddItemRunnable(mAsyncItemChangeHandler, alarm),
+                        300);
                 break;
             case REQUEST_EDIT_ALARM:
-                Alarm deletedAlarm;
-                if (data != null && (deletedAlarm = data.getParcelableExtra(
-                        EditAlarmActivity.EXTRA_MODIFIED_ALARM)) != null) {
-                    onListItemDeleted(deletedAlarm);
+                if (data.getBooleanExtra(EditAlarmActivity.EXTRA_IS_DELETING, false)) {
+                    // TODO: Should we delay this too? It seems animations run
+                    // some of the time.
+                    mAsyncItemChangeHandler.asyncRemoveAlarm(alarm);
+                } else {
+                    // TODO: Increase the delay, because update animation is
+                    // more elusive than insert.
+                    mHandler.postDelayed(
+                            new AsyncUpdateItemRunnable(mAsyncItemChangeHandler, alarm),
+                            300);
                 }
-                // TODO: notifyItemRemoved?
-                getLoaderManager().restartLoader(0, null, this);
                 break;
             default:
                 Log.i(TAG, "Could not handle request code " + requestCode);
@@ -192,25 +193,67 @@ public class AlarmsFragment extends Fragment implements LoaderCallbacks<Cursor>,
         mScrollToStableId = RecyclerView.NO_ID;
     }
 
-    // TODO: This doesn't need to be defined in the interface.
-    // TODO: Rename to showDeletedSnackbar() or something
-    // TODO: This needs to prompt a reload of the list.
-    @Deprecated // TODO: Delete this method.
+
+    @Deprecated
     @Override
     public void onListItemDeleted(final Alarm item) {
-        Snackbar.make(getActivity().findViewById(R.id.main_content),
-                getString(R.string.snackbar_item_deleted, "Alarm"),
-                Snackbar.LENGTH_LONG) // TODO: not long enough?
-                .setAction(R.string.snackbar_undo_item_deleted, new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        DatabaseManager.getInstance(getActivity()).insertAlarm(item);
-                        getLoaderManager().restartLoader(0, null, AlarmsFragment.this);
-                        if (item.isEnabled()) {
-                            AlarmUtils.scheduleAlarm(getActivity(), item, true);
-                        }
-                    }
-                })
-                .show();
+        // TODO: This doesn't need to be defined in the interface.
+        // TODO: Delete this method.
+    }
+
+    private static abstract class BaseAsyncItemChangeRunnable {
+        // TODO: Will holding onto this cause a memory leak?
+        private final AsyncItemChangeHandler mAsyncItemChangeHandler;
+        private final Alarm mAlarm;
+
+        BaseAsyncItemChangeRunnable(AsyncItemChangeHandler asyncItemChangeHandler, Alarm alarm) {
+            mAsyncItemChangeHandler = asyncItemChangeHandler;
+            mAlarm = alarm;
+        }
+
+        void asyncAddAlarm() {
+            mAsyncItemChangeHandler.asyncAddAlarm(mAlarm);
+        }
+
+        void asyncUpdateAlarm() {
+            mAsyncItemChangeHandler.asyncUpdateAlarm(mAlarm);
+        }
+
+        void asyncRemoveAlarm() {
+            mAsyncItemChangeHandler.asyncRemoveAlarm(mAlarm);
+        }
+    }
+
+    private static class AsyncAddItemRunnable extends BaseAsyncItemChangeRunnable implements Runnable {
+        AsyncAddItemRunnable(AsyncItemChangeHandler asyncItemChangeHandler, Alarm alarm) {
+            super(asyncItemChangeHandler, alarm);
+        }
+
+        @Override
+        public void run() {
+            asyncAddAlarm();
+        }
+    }
+
+    private static class AsyncUpdateItemRunnable extends BaseAsyncItemChangeRunnable implements Runnable {
+        AsyncUpdateItemRunnable(AsyncItemChangeHandler asyncItemChangeHandler, Alarm alarm) {
+            super(asyncItemChangeHandler, alarm);
+        }
+
+        @Override
+        public void run() {
+            asyncUpdateAlarm();
+        }
+    }
+
+    private static class AsyncRemoveItemRunnable extends BaseAsyncItemChangeRunnable implements Runnable {
+        AsyncRemoveItemRunnable(AsyncItemChangeHandler asyncItemChangeHandler, Alarm alarm) {
+            super(asyncItemChangeHandler, alarm);
+        }
+
+        @Override
+        public void run() {
+            asyncRemoveAlarm();
+        }
     }
 }

@@ -59,6 +59,7 @@ public class EditAlarmActivity extends BaseActivity implements AlarmNumpad.KeyLi
     private static final String TAG = "EditAlarmActivity";
     public static final String EXTRA_ALARM_ID = "com.philliphsu.clock2.editalarm.extra.ALARM_ID";
     public static final String EXTRA_MODIFIED_ALARM = "com.philliphsu.clock2.editalarm.extra.MODIFIED_ALARM";
+    public static final String EXTRA_IS_DELETING = "com.philliphsu.clock2.editalarm.extra.IS_DELETING";
     private static final RelativeSizeSpan AMPM_SIZE_SPAN = new RelativeSizeSpan(0.5f);
 
     private static final int REQUEST_PICK_RINGTONE = 0;
@@ -211,12 +212,12 @@ public class EditAlarmActivity extends BaseActivity implements AlarmNumpad.KeyLi
         showRingtonePickerDialog();
     }
 
-    // TODO: Privatize accessor methods
     @OnClick(R.id.save)
     void save() {
         int hour;
         int minutes;
         try {
+            // TODO: Privatize accessor methods
             hour = getHour();
             minutes = getMinutes();
         } catch (IllegalStateException e) {
@@ -242,16 +243,15 @@ public class EditAlarmActivity extends BaseActivity implements AlarmNumpad.KeyLi
                 Log.d(TAG, "Cancelling old alarm first");
                 cancelAlarm(mOldAlarm, false);
             }
-            // TODO: Do this in the background. AsyncTask?
-            mDatabaseManager.updateAlarm(mOldAlarm.id(), alarm);
-        } else {
-            //mDatabaseManager.insertAlarm(alarm);
-            intent.putExtra(EXTRA_MODIFIED_ALARM, alarm);
+            alarm.setId(mOldAlarm.id());
+            intent.putExtra(EXTRA_IS_DELETING, false);
         }
+        intent.putExtra(EXTRA_MODIFIED_ALARM, alarm);
 
-        if (alarm.isEnabled()) {
-            //scheduleAlarm(alarm);
-        }
+        // The reason we don't schedule the alarm here is AlarmUtils
+        // will attempt to retrieve the specified alarm
+        // from the database; however, the alarm hasn't yet
+        // been added to the database at this point.
 
         setResult(RESULT_OK, intent);
         showEditorClosed();
@@ -269,6 +269,7 @@ public class EditAlarmActivity extends BaseActivity implements AlarmNumpad.KeyLi
             }
             mDatabaseManager.deleteAlarm(mOldAlarm);
             Intent intent = new Intent();
+            intent.putExtra(EXTRA_IS_DELETING, true);
             intent.putExtra(EXTRA_MODIFIED_ALARM, mOldAlarm);
             setResult(RESULT_OK, intent);
         }

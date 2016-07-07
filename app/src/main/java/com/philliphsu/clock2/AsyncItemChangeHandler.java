@@ -49,16 +49,28 @@ public final class AsyncItemChangeHandler {
         }.execute();
     }
 
-    public void asyncUpdateAlarm(final Alarm oldAlarm, final Alarm newAlarm) {
+    /**
+     * We only need one Alarm param because we called newAlarm.setId(oldAlarm.id())
+     * when we were in the edit activity.
+     * TODO: Consider changing the signature of updateAlarm() in DatabaseManager and
+     * AlarmDatabaseHelper to only require one Alarm param.
+     */
+    public void asyncUpdateAlarm(final Alarm newAlarm) {
         new AsyncTask<Void, Void, Integer>() {
             @Override
             protected Integer doInBackground(Void... params) {
-                return DatabaseManager.getInstance(mContext).updateAlarm(oldAlarm.id(), newAlarm);
+                return DatabaseManager.getInstance(mContext).updateAlarm(newAlarm.id(), newAlarm);
             }
 
             @Override
             protected void onPostExecute(Integer integer) {
                 // TODO: Snackbar/Toast here? If so, remove the code in AlarmUtils.scheduleAlarm() that does it.
+                AlarmUtils.scheduleAlarm(mContext, newAlarm, true);
+                // The new alarm could have a different sort order from the old alarm.
+                // TODO: Sometimes this won't scrolls to the new alarm if the old alarm is
+                // towards the bottom and the new alarm is ordered towards the top. This
+                // may have something to do with us breaking the stable id guarantee?
+                mScrollHandler.setScrollToStableId(newAlarm.id());
             }
         }.execute();
     }
