@@ -105,8 +105,7 @@ public final class AsyncItemChangeHandler {
                             .setAction(R.string.snackbar_undo_item_deleted, new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
-                                    DatabaseManager.getInstance(mContext).insertAlarm(alarm);
-                                    AlarmUtils.scheduleAlarm(mContext, alarm, true);
+                                    asyncAddAlarm(alarm);
                                 }
                             }).show();
                 }

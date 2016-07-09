@@ -68,7 +68,7 @@ public class EditAlarmActivity extends BaseActivity implements AlarmNumpad.KeyLi
     private long mOldAlarmId;
     private Uri mSelectedRingtoneUri;
     private Alarm mOldAlarm;
-    private DatabaseManager mDatabaseManager;
+    private DatabaseManager mDatabaseManager; // TODO: Delete this
 
     @Bind(R.id.save) Button mSave;
     @Bind(R.id.delete) Button mDelete;
@@ -264,10 +264,11 @@ public class EditAlarmActivity extends BaseActivity implements AlarmNumpad.KeyLi
             if (mOldAlarm.isEnabled()) {
                 cancelAlarm(mOldAlarm, false);
                 // Re-enable in case this is restored so
-                // the alarm is scheduled again
+                // the alarm can be scheduled again. This
+                // change is saved to the db if the alarm
+                // is restored (re-inserting into to the db).
                 mOldAlarm.setEnabled(true);
             }
-            mDatabaseManager.deleteAlarm(mOldAlarm);
             Intent intent = new Intent();
             intent.putExtra(EXTRA_IS_DELETING, true);
             intent.putExtra(EXTRA_MODIFIED_ALARM, mOldAlarm);
