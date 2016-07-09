@@ -1,71 +1,83 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingTop="@dimen/item_padding_top"
-    android:paddingStart="@dimen/item_padding_start"
-    android:paddingEnd="@dimen/item_padding_end"
-    android:paddingBottom="@dimen/item_padding_bottom"
+    android:orientation="vertical"
     android:background="?selectableItemBackground">
 
     <RelativeLayout
-        android:id="@+id/time_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/item_margin_between_elements">
+        android:paddingTop="@dimen/item_padding_top"
+        android:paddingStart="@dimen/item_padding_start"
+        android:paddingEnd="@dimen/item_padding_end">
+
+        <RelativeLayout
+            android:id="@+id/time_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/item_margin_between_elements">
+
+            <TextView
+                android:id="@+id/time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="1:20"
+                android:textAppearance="@style/TextAppearance.AppCompat"
+                android:textSize="@dimen/alarm_time_text_size"/>
+
+            <android.support.v7.widget.SwitchCompat
+                android:id="@+id/on_off_switch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"/>
+
+        </RelativeLayout>
 
         <TextView
-            android:id="@+id/time"
+            android:id="@+id/label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="1:20"
-            android:textAppearance="@style/TextAppearance.AppCompat"
-            android:textSize="@dimen/alarm_time_text_size"/>
+            android:textAppearance="?textAppearanceListItem"
+            android:textStyle="bold"
+            android:text="Label"
+            android:layout_below="@id/time_layout"
+            android:layout_marginBottom="@dimen/item_margin_between_elements"/>
 
-        <android.support.v7.widget.SwitchCompat
-            android:id="@+id/on_off_switch"
+        <com.philliphsu.clock2.alarms.AlarmCountdown
+            android:id="@+id/countdown"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"/>
+            android:textAppearance="?textAppearanceListItem"
+            android:text="in %dh %dm"
+            android:layout_marginStart="4dp"
+            android:layout_below="@id/time_layout"
+            android:layout_toEndOf="@id/label"/>
+
+        <TextView
+            android:id="@+id/recurring_days"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Mon, Tue, Wed, Thu, Fri, Sat, Sun"
+            android:layout_below="@id/label"
+            android:layout_marginBottom="@dimen/item_margin_between_elements"/>
+
+        <Button
+            android:id="@+id/dismiss"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/recurring_days"
+            android:text="@string/dismiss_now"
+            style="@style/Widget.AppCompat.Button.Colored"/>
 
     </RelativeLayout>
 
-    <TextView
-        android:id="@+id/label"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?textAppearanceListItem"
-        android:textStyle="bold"
-        android:text="Label"
-        android:layout_below="@id/time_layout"
-        android:layout_marginBottom="@dimen/item_margin_between_elements"/>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="?android:listDivider"
+        android:layout_marginTop="@dimen/item_margin_between_elements"/>
 
-    <com.philliphsu.clock2.alarms.AlarmCountdown
-        android:id="@+id/countdown"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?textAppearanceListItem"
-        android:text="in %dh %dm"
-        android:layout_marginStart="4dp"
-        android:layout_below="@id/time_layout"
-        android:layout_toEndOf="@id/label"/>
-
-    <TextView
-        android:id="@+id/recurring_days"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Mon, Tue, Wed, Thu, Fri, Sat, Sun"
-        android:layout_below="@id/label"
-        android:layout_marginBottom="@dimen/item_margin_between_elements"/>
-
-    <Button
-        android:id="@+id/dismiss"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/recurring_days"
-        android:text="@string/dismiss_now"
-        style="@style/Widget.AppCompat.Button.Colored"/>
-
-</RelativeLayout>
+</LinearLayout>
