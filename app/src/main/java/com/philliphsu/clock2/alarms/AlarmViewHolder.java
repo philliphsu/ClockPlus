@@ -68,10 +68,16 @@ public class AlarmViewHolder extends BaseViewHolder<Alarm> implements AlarmCount
 
     @OnClick(R.id.dismiss)
     void dismiss() {
-        // TODO: This is NOT correct for all alarms! This may be correct for single
-        // use alarms, but not so for recurring alarms!
-        mSwitch.setPressed(true); // needed so the OnCheckedChange event calls through
-        bindSwitch(false); // fires OnCheckedChange to do the binding for you
+        Alarm alarm = getAlarm();
+        if (!alarm.hasRecurrence()) {
+            // This is a single-use alarm, so turn it off completely.
+            mSwitch.setPressed(true); // needed so the OnCheckedChange event calls through
+            bindSwitch(false); // fires OnCheckedChange to turn off the alarm for us
+        } else {
+            // Dismisses the current upcoming alarm and handles scheduling the next alarm for us.
+            // Since changes are saved to the database, this prompts a UI refresh.
+            AlarmUtils.cancelAlarm(getContext(), alarm, true);
+        }
         // TOneverDO: AlarmUtils.cancelAlarm() otherwise it will be called twice
         /*
         AlarmUtils.cancelAlarm(getContext(), getAlarm());
@@ -122,17 +128,10 @@ public class AlarmViewHolder extends BaseViewHolder<Alarm> implements AlarmCount
             if (alarm.isEnabled()) {
                 // TODO: On Moto X, upcoming notification doesn't post immediately
                 AlarmUtils.scheduleAlarm(getContext(), alarm, true);
-                // TODO: We don't have to manually bind these if we update the alarm via the db,
-                // because that would trigger the loader to reload the dataset and hence the
-                // corresponding VH is rebound.
-                bindCountdown(true, alarm.ringsIn());
-                bindDismissButton(alarm);
+                AlarmUtils.save(getContext(), alarm);
             } else {
-                AlarmUtils.cancelAlarm(getContext(), alarm, true); // saves repo
-                // TODO: Remove these, cancelAlarm will prompt update call to the db, so all VHs will
-                // be rebound.
-                bindCountdown(false, -1);
-                bindDismissButton(false, "");
+                AlarmUtils.cancelAlarm(getContext(), alarm, true);
+                // cancelAlarm() already calls save() for you.
             }
             mSwitch.setPressed(false); // clear the pressed focus, esp. if setPressed(true) was called manually
         }
