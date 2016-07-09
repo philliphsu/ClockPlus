@@ -72,7 +72,7 @@ public class UpcomingAlarmReceiver extends BroadcastReceiver {
                             }
                         }
 
-                        Intent in = new Intent(context, getClass())
+                        Intent in = new Intent(context, UpcomingAlarmReceiver.class)
                                 .putExtra(EXTRA_ALARM_ID, id) // TOneverDO: cast to int
                                 .setAction(ACTION_DISMISS_NOW);
                         PendingIntent pi = PendingIntent.getBroadcast(context, (int) id, in, FLAG_ONE_SHOT);

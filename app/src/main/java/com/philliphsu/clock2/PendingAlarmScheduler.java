@@ -46,10 +46,13 @@ public class PendingAlarmScheduler extends BroadcastReceiver {
                 if (!alarm.isEnabled()) {
                     throw new IllegalStateException("Alarm must be enabled!");
                 }
+                alarm.ignoreUpcomingRingTime(false); // allow #ringsWithinHours() to behave normally
                 // Because showToast = false, we don't do any UI work.
                 // TODO: Since we're in a worker thread, verify that the
                 // UI related code within will not cause us to crash.
                 AlarmUtils.scheduleAlarm(context, alarm, false);
+                // Update the db
+                AlarmUtils.save(context, alarm);
             }
         }).start();
     }

@@ -9,4 +9,5 @@
     android:layout_height="match_parent"
     app:layoutManager="LinearLayoutManager"
     tools:context="com.philliphsu.clock2.alarms.AlarmsFragment"
-    tools:listitem="@layout/item_alarm"/>
+    tools:listitem="@layout/item_alarm"
+    android:scrollbars="vertical"/>

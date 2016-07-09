@@ -52,6 +52,7 @@ public class AlarmDatabaseHelper extends SQLiteOpenHelper {
     private static final String COLUMN_THURSDAY = "thursday";
     private static final String COLUMN_FRIDAY = "friday";
     private static final String COLUMN_SATURDAY = "saturday";
+    private static final String COLUMN_IGNORE_UPCOMING_RING_TIME = "ignore_upcoming_ring_time";
 
     // https://www.sqlite.org/lang_select.html#orderby
     // Rows are first sorted based on the results of evaluating the left-most expression in the
@@ -98,7 +99,8 @@ public class AlarmDatabaseHelper extends SQLiteOpenHelper {
                 + COLUMN_WEDNESDAY + " INTEGER NOT NULL DEFAULT 0, "
                 + COLUMN_THURSDAY + " INTEGER NOT NULL DEFAULT 0, "
                 + COLUMN_FRIDAY + " INTEGER NOT NULL DEFAULT 0, "
-                + COLUMN_SATURDAY + " INTEGER NOT NULL DEFAULT 0);");
+                + COLUMN_SATURDAY + " INTEGER NOT NULL DEFAULT 0, "
+                + COLUMN_IGNORE_UPCOMING_RING_TIME + " INTEGER NOT NULL);");
     }
 
     @Override
@@ -168,7 +170,7 @@ public class AlarmDatabaseHelper extends SQLiteOpenHelper {
     }
 
     public AlarmCursor queryEnabledAlarms() {
-        return queryAlarms(COLUMN_ENABLED + " = " + 1);
+        return queryAlarms(COLUMN_ENABLED + " = 1");
     }
 
     private AlarmCursor queryAlarms(String where) {
@@ -194,6 +196,7 @@ public class AlarmDatabaseHelper extends SQLiteOpenHelper {
         values.put(COLUMN_THURSDAY, alarm.isRecurring(THURSDAY));
         values.put(COLUMN_FRIDAY, alarm.isRecurring(FRIDAY));
         values.put(COLUMN_SATURDAY, alarm.isRecurring(SATURDAY));
+        values.put(COLUMN_IGNORE_UPCOMING_RING_TIME, alarm.isIgnoringUpcomingRingTime());
         return values;
     }
 
@@ -241,6 +244,7 @@ public class AlarmDatabaseHelper extends SQLiteOpenHelper {
             alarm.setRecurring(THURSDAY, isTrue(COLUMN_THURSDAY));
             alarm.setRecurring(FRIDAY, isTrue(COLUMN_FRIDAY));
             alarm.setRecurring(SATURDAY, isTrue(COLUMN_SATURDAY));
+            alarm.ignoreUpcomingRingTime(isTrue(COLUMN_IGNORE_UPCOMING_RING_TIME));
             return alarm;
         }
 

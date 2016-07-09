@@ -10,10 +10,10 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.philliphsu.clock2.Alarm;
-import com.philliphsu.clock2.AsyncItemChangeHandler;
 import com.philliphsu.clock2.PendingAlarmScheduler;
 import com.philliphsu.clock2.R;
 import com.philliphsu.clock2.UpcomingAlarmReceiver;
+import com.philliphsu.clock2.model.DatabaseManager;
 import com.philliphsu.clock2.ringtone.RingtoneActivity;
 import com.philliphsu.clock2.ringtone.RingtoneService;
 
@@ -119,8 +119,9 @@ public final class AlarmUtils {
         } else {
             if (a.isEnabled()) {
                 if (a.ringsWithinHours(hoursBeforeUpcoming(c))) {
-                    // Still upcoming today, so wait until the normal ring time passes before
-                    // rescheduling the alarm.
+                    // Still upcoming today, so wait until the normal ring time
+                    // passes before rescheduling the alarm.
+                    a.ignoreUpcomingRingTime(true); // Useful only for VH binding
                     Intent intent = new Intent(c, PendingAlarmScheduler.class)
                             .putExtra(PendingAlarmScheduler.EXTRA_ALARM_ID, a.id());
                     pi = PendingIntent.getBroadcast(c, a.intId(), intent, PendingIntent.FLAG_ONE_SHOT);
@@ -209,7 +210,13 @@ public final class AlarmUtils {
         return pi;
     }
 
-    private static void save(Context c, Alarm alarm) {
-        new AsyncItemChangeHandler(c, null, null).asyncUpdateAlarm(alarm);
+    public static void save(final Context c, final Alarm alarm) {
+        // TODO: Will using the Runnable like this cause a memory leak?
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                DatabaseManager.getInstance(c).updateAlarm(alarm.id(), alarm);
+            }
+        }).start();
     }
 }

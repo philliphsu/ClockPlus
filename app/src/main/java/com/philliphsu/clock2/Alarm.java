@@ -11,6 +11,7 @@ import org.json.JSONObject;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.concurrent.TimeUnit;
 
 import static com.philliphsu.clock2.DaysOfWeek.NUM_DAYS;
 import static com.philliphsu.clock2.DaysOfWeek.SATURDAY;
@@ -28,6 +29,7 @@ public abstract class Alarm implements JsonSerializable, Parcelable {
     private long snoozingUntilMillis;
     private boolean enabled;
     private final boolean[] recurringDays = new boolean[NUM_DAYS];
+    private boolean ignoreUpcomingRingTime;
     // ====================================================
 
     public abstract int hour();
@@ -116,6 +118,14 @@ public abstract class Alarm implements JsonSerializable, Parcelable {
         return count;
     }
 
+    public void ignoreUpcomingRingTime(boolean ignore) {
+        ignoreUpcomingRingTime = ignore;
+    }
+
+    public boolean isIgnoringUpcomingRingTime() {
+        return ignoreUpcomingRingTime;
+    }
+
     public long ringsAt() {
         // Always with respect to the current date and time
         Calendar calendar = new GregorianCalendar();
@@ -124,22 +134,26 @@ public abstract class Alarm implements JsonSerializable, Parcelable {
         calendar.set(Calendar.SECOND, 0);
         calendar.set(Calendar.MILLISECOND, 0);
 
+        long baseRingTime = calendar.getTimeInMillis();
+
         if (!hasRecurrence()) {
-            if (calendar.getTimeInMillis() <= System.currentTimeMillis()) {
+            if (baseRingTime <= System.currentTimeMillis()) {
                 // The specified time has passed for today
-                calendar.add(Calendar.HOUR_OF_DAY, 24);
+                baseRingTime += TimeUnit.DAYS.toMillis(1);
             }
+            return baseRingTime;
         } else {
             // Compute the ring time just for the next closest recurring day.
-            // Remember that day constants defined in the Calendar class are not zero-based like ours, so we have to
-            // compensate with an offset of magnitude one, with the appropriate sign based on the situation.
+            // Remember that day constants defined in the Calendar class are
+            // not zero-based like ours, so we have to compensate with an offset
+            // of magnitude one, with the appropriate sign based on the situation.
             int weekdayToday = calendar.get(Calendar.DAY_OF_WEEK);
             int numDaysFromToday = -1;
 
             for (int i = weekdayToday; i <= Calendar.SATURDAY; i++) {
                 if (isRecurring(i - 1 /*match up with our day constant*/)) {
                     if (i == weekdayToday) {
-                        if (calendar.getTimeInMillis() > System.currentTimeMillis()) {
+                        if (baseRingTime > System.currentTimeMillis()) {
                             // The normal ring time has not passed yet
                             numDaysFromToday = 0;
                             break;
@@ -164,26 +178,29 @@ public abstract class Alarm implements JsonSerializable, Parcelable {
             // Still not computed yet. The only recurring day is weekdayToday,
             // and its normal ring time has already passed.
             if (numDaysFromToday < 0 && isRecurring(weekdayToday - 1)
-                    && calendar.getTimeInMillis() <= System.currentTimeMillis()) {
+                    && baseRingTime <= System.currentTimeMillis()) {
                 numDaysFromToday = 7;
             }
 
             if (numDaysFromToday < 0)
                 throw new IllegalStateException("How did we get here?");
 
-            calendar.add(Calendar.HOUR_OF_DAY, 24 * numDaysFromToday);
+            return baseRingTime + TimeUnit.DAYS.toMillis(numDaysFromToday);
         }
-
-        return calendar.getTimeInMillis();
     }
 
     public long ringsIn() {
         return ringsAt() - System.currentTimeMillis();
     }
 
-    /** @return true if this Alarm will ring in the next {@code hours} hours */
+    /**
+     * Returns whether this Alarm is upcoming in the next {@code hours} hours.
+     * To return true, this Alarm must not have its {@link #ignoreUpcomingRingTime}
+     * member field set to true.
+     * @see #ignoreUpcomingRingTime(boolean)
+     */
     public boolean ringsWithinHours(int hours) {
-        return ringsIn() <= hours * 3600000;
+        return !ignoreUpcomingRingTime && ringsIn() <= TimeUnit.HOURS.toMillis(hours);
     }
 
     public int intId() {
@@ -233,6 +250,7 @@ public abstract class Alarm implements JsonSerializable, Parcelable {
         dest.writeLong(snoozingUntilMillis);
         dest.writeInt(enabled ? 1 : 0);
         dest.writeBooleanArray(recurringDays);
+        dest.writeInt(ignoreUpcomingRingTime ? 1 : 0);
     }
 
     private static Alarm create(Parcel in) {
@@ -247,6 +265,7 @@ public abstract class Alarm implements JsonSerializable, Parcelable {
         alarm.snoozingUntilMillis = in.readLong();
         alarm.enabled = in.readInt() != 0;
         in.readBooleanArray(alarm.recurringDays);
+        alarm.ignoreUpcomingRingTime = in.readInt() != 0;
         return alarm;
     }
 

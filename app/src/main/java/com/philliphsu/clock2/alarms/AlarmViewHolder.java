@@ -68,6 +68,8 @@ public class AlarmViewHolder extends BaseViewHolder<Alarm> implements AlarmCount
 
     @OnClick(R.id.dismiss)
     void dismiss() {
+        // TODO: This is NOT correct for all alarms! This may be correct for single
+        // use alarms, but not so for recurring alarms!
         mSwitch.setPressed(true); // needed so the OnCheckedChange event calls through
         bindSwitch(false); // fires OnCheckedChange to do the binding for you
         // TOneverDO: AlarmUtils.cancelAlarm() otherwise it will be called twice
@@ -120,10 +122,15 @@ public class AlarmViewHolder extends BaseViewHolder<Alarm> implements AlarmCount
             if (alarm.isEnabled()) {
                 // TODO: On Moto X, upcoming notification doesn't post immediately
                 AlarmUtils.scheduleAlarm(getContext(), alarm, true);
+                // TODO: We don't have to manually bind these if we update the alarm via the db,
+                // because that would trigger the loader to reload the dataset and hence the
+                // corresponding VH is rebound.
                 bindCountdown(true, alarm.ringsIn());
                 bindDismissButton(alarm);
             } else {
                 AlarmUtils.cancelAlarm(getContext(), alarm, true); // saves repo
+                // TODO: Remove these, cancelAlarm will prompt update call to the db, so all VHs will
+                // be rebound.
                 bindCountdown(false, -1);
                 bindDismissButton(false, "");
             }
@@ -164,7 +171,6 @@ public class AlarmViewHolder extends BaseViewHolder<Alarm> implements AlarmCount
         String buttonText = alarm.isSnoozed()
                 ? getContext().getString(R.string.title_snoozing_until, formatTime(getContext(), alarm.snoozingUntil()))
                 : getContext().getString(R.string.dismiss_now);
-        // when this alarm crosses the upcoming threshold, so we can show this button.
         bindDismissButton(visible, buttonText);
     }
 
