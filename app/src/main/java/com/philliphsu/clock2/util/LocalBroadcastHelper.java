@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 
 /**
@@ -13,7 +14,16 @@ public final class LocalBroadcastHelper {
 
     /** Sends a local broadcast using an intent with the action specified */
     public static void sendBroadcast(Context context, String action) {
-        LocalBroadcastManager.getInstance(context).sendBroadcast(new Intent(action));
+        sendBroadcast(context, action, null);
+    }
+
+    /** Sends a local broadcast using an intent with the action and the extras specified */
+    public static void sendBroadcast(Context context, String action, Bundle extras) {
+        Intent intent = new Intent(action);
+        if (extras != null) {
+            intent.putExtras(extras);
+        }
+        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
     }
 
     /** Registers a BroadcastReceiver that filters intents by the actions specified */

@@ -32,23 +32,7 @@ public final class AsyncItemChangeHandler {
     }
 
     public void asyncAddAlarm(final Alarm alarm) {
-        new AsyncTask<Void, Void, Long>() {
-            @Override
-            protected Long doInBackground(Void... params) {
-                return DatabaseManager.getInstance(mContext).insertAlarm(alarm);
-            }
-
-            @Override
-            protected void onPostExecute(Long aLong) {
-                // TODO: Snackbar/Toast here? If so, remove the code in AlarmUtils.scheduleAlarm() that does it.
-                // Then, consider scheduling the alarm in the background.
-                AlarmUtils.scheduleAlarm(mContext, alarm, true);
-                if (mScrollHandler != null) {
-                    // Prepare to scroll to the newly added alarm
-                    mScrollHandler.setScrollToStableId(aLong);
-                }
-            }
-        }.execute();
+        new InsertAlarmAsyncTask(alarm).execute();
     }
 
     /**
@@ -56,37 +40,9 @@ public final class AsyncItemChangeHandler {
      * when we were in the edit activity.
      * TODO: Consider changing the signature of updateAlarm() in DatabaseManager and
      * AlarmDatabaseHelper to only require one Alarm param.
-     * TODO: The AsyncTask employed here is very similar to the one employed in
-     * asyncAddAlarm(). Figure out a way to refactor the code in common. Possible
-     * starts are to:
-     *  * Change the Result type to Long, and then the onPostExecute() can be
-     *   expressed the same between the two methods.
-     *  * Similar to what you did in AlarmsFragment with the static
-     *   inner Runnables, write a static inner abstract class that extends
-     *   AsyncTask that takes in an Alarm; leave doInBackground() unimplemented
-     *   in this base class. Then, define methods in this base class that subclasses
-     *   can call to do their desired CRUD task in their doInBackground().
      */
     public void asyncUpdateAlarm(final Alarm newAlarm) {
-        new AsyncTask<Void, Void, Integer>() {
-            @Override
-            protected Integer doInBackground(Void... params) {
-                return DatabaseManager.getInstance(mContext).updateAlarm(newAlarm.id(), newAlarm);
-            }
-
-            @Override
-            protected void onPostExecute(Integer integer) {
-                // TODO: Snackbar/Toast here? If so, remove the code in AlarmUtils.scheduleAlarm() that does it.
-                AlarmUtils.scheduleAlarm(mContext, newAlarm, true);
-                if (mScrollHandler != null) {
-                    // The new alarm could have a different sort order from the old alarm.
-                    // TODO: Sometimes this won't scrolls to the new alarm if the old alarm is
-                    // towards the bottom and the new alarm is ordered towards the top. This
-                    // may have something to do with us breaking the stable id guarantee?
-                    mScrollHandler.setScrollToStableId(newAlarm.id());
-                }
-            }
-        }.execute();
+        new UpdateAlarmAsyncTask(newAlarm).execute();
     }
 
     public void asyncRemoveAlarm(final Alarm alarm) {
@@ -99,6 +55,8 @@ public final class AsyncItemChangeHandler {
             @Override
             protected void onPostExecute(Integer integer) {
                 if (mSnackbarAnchor != null) {
+                    // TODO: Consider adding delay to allow the alarm item animation
+                    // to finish first before we show the snackbar. Inbox app does this.
                     String message = mContext.getString(R.string.snackbar_item_deleted,
                             mContext.getString(R.string.alarm));
                     Snackbar.make(mSnackbarAnchor, message, Snackbar.LENGTH_LONG)
@@ -111,5 +69,67 @@ public final class AsyncItemChangeHandler {
                 }
             }
         }.execute();
+    }
+
+    ////////////////////////////////////////////////////////////
+    // Insert and update AsyncTasks
+    ////////////////////////////////////////////////////////////
+
+    /**
+     * Created because the code in insert and update AsyncTasks are exactly the same.
+     */
+    private abstract class BaseAsyncTask extends AsyncTask<Void, Void, Long> {
+        private final Alarm mAlarm;
+
+        BaseAsyncTask(Alarm alarm) {
+            mAlarm = alarm;
+        }
+
+        @Override
+        protected void onPostExecute(Long result) {
+            AlarmUtils.scheduleAlarm(mContext, mAlarm, true);
+            if (mScrollHandler != null) {
+                // Prepare to scroll to this alarm
+                mScrollHandler.setScrollToStableId(result);
+            }
+            if (mSnackbarAnchor != null) {
+                // TODO: Consider adding delay to allow the alarm item animation
+                // to finish first before we show the snackbar. Inbox app does this.
+                String message = AlarmUtils.getRingsInText(mContext, mAlarm.ringsIn());
+                AlarmUtils.showSnackbar(mSnackbarAnchor, message);
+            }
+        }
+
+        final Long insertAlarm() {
+            return DatabaseManager.getInstance(mContext).insertAlarm(mAlarm);
+        }
+
+        final Long updateAlarm() {
+            long id = mAlarm.id();
+            DatabaseManager.getInstance(mContext).updateAlarm(id, mAlarm);
+            return id;
+        }
+    }
+
+    private class InsertAlarmAsyncTask extends BaseAsyncTask {
+        InsertAlarmAsyncTask(Alarm alarm) {
+            super(alarm);
+        }
+
+        @Override
+        protected Long doInBackground(Void... params) {
+            return insertAlarm();
+        }
+    }
+
+    private class UpdateAlarmAsyncTask extends BaseAsyncTask {
+        UpdateAlarmAsyncTask(Alarm alarm) {
+            super(alarm);
+        }
+
+        @Override
+        protected Long doInBackground(Void... params) {
+            return updateAlarm();
+        }
     }
 }

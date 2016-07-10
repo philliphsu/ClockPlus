@@ -64,6 +64,11 @@ public class AlarmDatabaseHelper extends SQLiteOpenHelper {
 
     // First sort by ring time in ascending order (smaller values first),
     // then break ties by sorting by id in ascending order.
+    // TODO: Consider changing the sort order to hour ASC, minutes ASC, enabled DESC. Then, we can
+    // delete the COLUMN_RING_TIME_MILLIS.
+    // As defined now, the ordering can be confusing; some examples are:
+    // * If there are multiple single-use alarms in the list, and one of them is snoozed, then on the
+    // next cursor load, this alarm will be reordered to the very bottom
     private static final String SORT_ORDER =
             COLUMN_RING_TIME_MILLIS + " ASC, " + COLUMN_ID + " ASC";
 

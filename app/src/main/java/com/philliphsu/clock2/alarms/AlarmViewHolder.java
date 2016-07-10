@@ -128,6 +128,7 @@ public class AlarmViewHolder extends BaseViewHolder<Alarm> implements AlarmCount
             if (alarm.isEnabled()) {
                 // TODO: On Moto X, upcoming notification doesn't post immediately
                 AlarmUtils.scheduleAlarm(getContext(), alarm, true);
+                AlarmUtils.sendShowSnackbarBroadcast(getContext(), AlarmUtils.getRingsInText(getContext(), alarm.ringsIn()));
                 AlarmUtils.save(getContext(), alarm);
             } else {
                 AlarmUtils.cancelAlarm(getContext(), alarm, true);

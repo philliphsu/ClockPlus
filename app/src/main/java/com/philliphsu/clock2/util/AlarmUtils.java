@@ -4,15 +4,19 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.StringRes;
+import android.support.design.widget.Snackbar;
 import android.util.Log;
+import android.view.View;
 import android.widget.Toast;
 
 import com.philliphsu.clock2.Alarm;
 import com.philliphsu.clock2.PendingAlarmScheduler;
 import com.philliphsu.clock2.R;
 import com.philliphsu.clock2.UpcomingAlarmReceiver;
+import com.philliphsu.clock2.alarms.AlarmsFragment;
 import com.philliphsu.clock2.model.DatabaseManager;
 import com.philliphsu.clock2.ringtone.RingtoneActivity;
 import com.philliphsu.clock2.ringtone.RingtoneService;
@@ -40,7 +44,11 @@ public final class AlarmUtils {
      * Schedules the alarm with the {@link AlarmManager}. If
      * {@code alarm.}{@link Alarm#isEnabled() isEnabled()} returns false,
      * this does nothing and returns immediately.
+     *
+     * @deprecated {@code showToast} is no longer working. Callers must
+     * handle popup confirmations on their own.
      */
+    // TODO: Delete showToast param
     public static void scheduleAlarm(Context context, Alarm alarm, boolean showToast) {
         if (!alarm.isEnabled()) {
             Log.i(TAG, "Skipped scheduling an alarm because it was not enabled");
@@ -65,9 +73,9 @@ public final class AlarmUtils {
                 notifyUpcomingAlarmIntent(context, alarm, false));
         am.setExact(AlarmManager.RTC_WAKEUP, ringAt, alarmIntent(context, alarm, false));
 
-        // TODO: Consider removing this and letting callers handle Toasts, because
+        // TODO: Consider removing this and letting callers handle this, because
         // it could be beneficial for callers to schedule the alarm in a worker thread.
-        if (showToast) {
+        if (false && showToast) {
             String message;
             if (alarm.isSnoozed()) {
                 message = context.getString(R.string.title_snoozing_until,
@@ -141,6 +149,14 @@ public final class AlarmUtils {
     public static void snoozeAlarm(Context c, Alarm a) {
         a.snooze(snoozeDuration(c));
         scheduleAlarm(c, a, true);
+        // TODO: Based on the current lifecycle methods pair where we register/unregister the
+        // receiver in AlarmsFragment, the snackbar won't be shown.
+        // We have no reference to the snackbar anchor, so let AlarmsFragment
+        // handle showing the snackbar for us. AlarmsFragment has no knowledge
+        // of which alarm is snoozed (and actually doesn't need to know); we can build
+        // the message for it. This is why we don't have a showAlarmSnoozedSnackbar(Alarm)
+        // utility method.
+        sendShowSnackbarBroadcast(c, getSnoozingUntilText(c, a.snoozingUntil()));
         save(c, a);
     }
 
@@ -218,5 +234,31 @@ public final class AlarmUtils {
                 DatabaseManager.getInstance(c).updateAlarm(alarm.id(), alarm);
             }
         }).start();
+    }
+
+    public static String getRingsInText(Context context, long ringsIn) {
+        return context.getString(R.string.alarm_set_for,
+                DurationUtils.toString(context, ringsIn, false /*abbreviate?*/));
+    }
+
+    public static String getSnoozingUntilText(Context context, long snoozingUntil) {
+        return context.getString(R.string.title_snoozing_until,
+                formatTime(context, snoozingUntil));
+    }
+
+    public static void sendShowSnackbarBroadcast(Context c, String message) {
+        Bundle extra = new Bundle(1);
+        extra.putString(AlarmsFragment.EXTRA_MSG, message);
+        LocalBroadcastHelper.sendBroadcast(c, AlarmsFragment.ACTION_SHOW_SNACKBAR_MSG, extra);
+    }
+
+    /**
+     * Show a snackbar confirmation about an event related to an alarm.
+     * Used for showing an alarm has been snoozed.
+     */
+    public static void showSnackbar(View snackbarAnchor, String message) {
+        if (snackbarAnchor != null) {
+            Snackbar.make(snackbarAnchor, message, Snackbar.LENGTH_LONG).show();
+        }
     }
 }

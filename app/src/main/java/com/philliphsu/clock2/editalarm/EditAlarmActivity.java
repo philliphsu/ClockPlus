@@ -511,9 +511,11 @@ public class EditAlarmActivity extends BaseActivity implements AlarmNumpad.KeyLi
         }
     }
 
+    // TODO: Delete this
+    @Deprecated
     @Override
     public void scheduleAlarm(Alarm alarm) {
-        AlarmUtils.scheduleAlarm(this, alarm, true);
+        //AlarmUtils.scheduleAlarm(this, alarm, true);
     }
 
     @Override

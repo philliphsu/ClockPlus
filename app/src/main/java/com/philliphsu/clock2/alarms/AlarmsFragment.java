@@ -1,6 +1,7 @@
 package com.philliphsu.clock2.alarms;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -22,6 +23,8 @@ import com.philliphsu.clock2.OnListItemInteractionListener;
 import com.philliphsu.clock2.R;
 import com.philliphsu.clock2.editalarm.EditAlarmActivity;
 import com.philliphsu.clock2.model.AlarmsListCursorLoader;
+import com.philliphsu.clock2.util.AlarmUtils;
+import com.philliphsu.clock2.util.LocalBroadcastHelper;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -34,10 +37,16 @@ public class AlarmsFragment extends Fragment implements LoaderCallbacks<Cursor>,
     private static final int REQUEST_EDIT_ALARM = 0;
     // Public because MainActivity needs to use it.
     public static final int REQUEST_CREATE_ALARM = 1;
+    /**
+     * Local broadcast senders can tell us to show a snackbar with a message on their behalf.
+     */
+    public static final String ACTION_SHOW_SNACKBAR_MSG = "com.philliphsu.clock2.alarms.action.SHOW_SNACKBAR_MSG";
+    public static final String EXTRA_MSG = "com.philliphsu.clock2.alarms.extra.MSG";
 
     private AlarmsCursorAdapter mAdapter;
     private AsyncItemChangeHandler mAsyncItemChangeHandler;
     private Handler mHandler = new Handler();
+    private View mSnackbarAnchor;
     private long mScrollToStableId = RecyclerView.NO_ID;
 
     @Bind(R.id.list) RecyclerView mList;
@@ -66,6 +75,10 @@ public class AlarmsFragment extends Fragment implements LoaderCallbacks<Cursor>,
             // TODO Read arguments
         }
 
+        // Will succeed because the activity is created at this point.
+        // See the Fragment lifecycle.
+        mSnackbarAnchor = getActivity().findViewById(R.id.main_content);
+
         getLoaderManager().initLoader(0, null, this);
     }
 
@@ -80,14 +93,27 @@ public class AlarmsFragment extends Fragment implements LoaderCallbacks<Cursor>,
         mAdapter = new AlarmsCursorAdapter(this);
         mList.setAdapter(mAdapter);
 
-        mAsyncItemChangeHandler = new AsyncItemChangeHandler(getActivity(),
-                getActivity().findViewById(R.id.main_content), this);
+        mAsyncItemChangeHandler = new AsyncItemChangeHandler(
+                getActivity(), mSnackbarAnchor, this);
         return view;
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
+    public void onStart() {
+        super.onStart();
+        LocalBroadcastHelper.registerReceiver(getActivity(),
+                mShowSnackbarReceiver, ACTION_SHOW_SNACKBAR_MSG);
+    }
+
+    @Override
+    public void onStop() {
+        // This will always be called when we leave this screen, either by exiting the app or
+        // by navigating elsewhere. Since we unregister the receiver here, we will never receive
+        // a "show alarm snoozed" broadcast, because the snooze action is always made elsewhere
+        // in the app.
+        super.onStop();
+        Log.e(TAG, "onStop()");
+        LocalBroadcastHelper.unregisterReceiver(getActivity(), mShowSnackbarReceiver);
     }
 
     @Override
@@ -194,6 +220,19 @@ public class AlarmsFragment extends Fragment implements LoaderCallbacks<Cursor>,
         // TODO: This doesn't need to be defined in the interface.
         // TODO: Delete this method.
     }
+
+    private final BroadcastReceiver mShowSnackbarReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            // See Intent#putExtras(Bundle):
+            // Putting a Bundle of extras into an intent will have its
+            // contents added to the intent's collection of extras,
+            // so we can individually retrieve the Bundle's extras
+            // directly from the intent.
+            String message = intent.getStringExtra(EXTRA_MSG);
+            AlarmUtils.showSnackbar(mSnackbarAnchor, message);
+        }
+    };
 
     private static abstract class BaseAsyncItemChangeRunnable {
         // TODO: Will holding onto this cause a memory leak?
