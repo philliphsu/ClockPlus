@@ -7,7 +7,7 @@ import android.view.View;
 
 import com.philliphsu.clock2.alarms.ScrollHandler;
 import com.philliphsu.clock2.model.DatabaseManager;
-import com.philliphsu.clock2.util.AlarmUtils;
+import com.philliphsu.clock2.util.AlarmController;
 
 /**
  * Created by Phillip Hsu on 7/1/2016.
@@ -20,15 +20,19 @@ public final class AsyncItemChangeHandler {
     private final Context mContext;
     private final View mSnackbarAnchor;
     private final ScrollHandler mScrollHandler;
+    private final AlarmController mAlarmController;
 
     /**
-     * @param snackbarAnchor an optional anchor for a Snackbar to anchor to
-     * @param scrollHandler
+     * @param context the Context from which we get the application context
+     * @param snackbarAnchor
      */
-    public AsyncItemChangeHandler(Context context, View snackbarAnchor, ScrollHandler scrollHandler) {
+    public AsyncItemChangeHandler(Context context, View snackbarAnchor,
+                                  ScrollHandler scrollHandler,
+                                  AlarmController alarmController) {
         mContext = context.getApplicationContext(); // to prevent memory leaks
         mSnackbarAnchor = snackbarAnchor;
         mScrollHandler = scrollHandler;
+        mAlarmController = alarmController;
     }
 
     public void asyncAddAlarm(final Alarm alarm) {
@@ -54,6 +58,7 @@ public final class AsyncItemChangeHandler {
 
             @Override
             protected void onPostExecute(Integer integer) {
+                mAlarmController.cancelAlarm(alarm, false);
                 if (mSnackbarAnchor != null) {
                     // TODO: Consider adding delay to allow the alarm item animation
                     // to finish first before we show the snackbar. Inbox app does this.
@@ -87,16 +92,12 @@ public final class AsyncItemChangeHandler {
 
         @Override
         protected void onPostExecute(Long result) {
-            AlarmUtils.scheduleAlarm(mContext, mAlarm, true);
+            // TODO: Consider adding delay to allow the alarm item animation
+            // to finish first before we show the snackbar. Inbox app does this.
+            mAlarmController.scheduleAlarm(mAlarm, true);
             if (mScrollHandler != null) {
                 // Prepare to scroll to this alarm
                 mScrollHandler.setScrollToStableId(result);
-            }
-            if (mSnackbarAnchor != null) {
-                // TODO: Consider adding delay to allow the alarm item animation
-                // to finish first before we show the snackbar. Inbox app does this.
-                String message = AlarmUtils.getRingsInText(mContext, mAlarm.ringsIn());
-                AlarmUtils.showSnackbar(mSnackbarAnchor, message);
             }
         }
 

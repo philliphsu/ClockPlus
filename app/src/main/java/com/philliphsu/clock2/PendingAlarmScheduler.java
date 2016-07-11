@@ -5,7 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 
 import com.philliphsu.clock2.model.DatabaseManager;
-import com.philliphsu.clock2.util.AlarmUtils;
+import com.philliphsu.clock2.util.AlarmController;
 
 import static com.philliphsu.clock2.util.Preconditions.checkNotNull;
 
@@ -47,12 +47,10 @@ public class PendingAlarmScheduler extends BroadcastReceiver {
                     throw new IllegalStateException("Alarm must be enabled!");
                 }
                 alarm.ignoreUpcomingRingTime(false); // allow #ringsWithinHours() to behave normally
-                // Because showToast = false, we don't do any UI work.
-                // TODO: Since we're in a worker thread, verify that the
-                // UI related code within will not cause us to crash.
-                AlarmUtils.scheduleAlarm(context, alarm, false);
-                // Update the db
-                AlarmUtils.save(context, alarm);
+                // No UI work is done
+                AlarmController controller = new AlarmController(context, null);
+                controller.scheduleAlarm(alarm, false);
+                controller.save(alarm);
             }
         }).start();
     }

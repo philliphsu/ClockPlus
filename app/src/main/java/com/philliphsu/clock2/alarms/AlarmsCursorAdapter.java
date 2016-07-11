@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import com.philliphsu.clock2.Alarm;
 import com.philliphsu.clock2.OnListItemInteractionListener;
 import com.philliphsu.clock2.model.AlarmDatabaseHelper.AlarmCursor;
+import com.philliphsu.clock2.util.AlarmController;
 
 /**
  * Created by Phillip Hsu on 6/29/2016.
@@ -18,10 +19,13 @@ public class AlarmsCursorAdapter extends RecyclerView.Adapter<AlarmViewHolder> {
     private static final String TAG = "AlarmsCursorAdapter";
 
     private final OnListItemInteractionListener<Alarm> mListener;
+    private final AlarmController mAlarmController;
     private AlarmCursor mCursor;
 
-    public AlarmsCursorAdapter(OnListItemInteractionListener<Alarm> listener) {
+    public AlarmsCursorAdapter(OnListItemInteractionListener<Alarm> listener,
+                               AlarmController alarmController) {
         mListener = listener;
+        mAlarmController = alarmController;
         // Excerpt from docs of notifyDataSetChanged():
         // "RecyclerView will attempt to synthesize [artificially create?]
         // visible structural change events [when items are inserted, removed or
@@ -34,7 +38,7 @@ public class AlarmsCursorAdapter extends RecyclerView.Adapter<AlarmViewHolder> {
 
     @Override
     public AlarmViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return new AlarmViewHolder(parent, mListener);
+        return new AlarmViewHolder(parent, mListener, mAlarmController);
     }
 
     @Override

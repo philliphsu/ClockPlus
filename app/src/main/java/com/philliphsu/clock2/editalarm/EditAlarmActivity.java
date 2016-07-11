@@ -33,6 +33,7 @@ import com.philliphsu.clock2.SharedPreferencesHelper;
 import com.philliphsu.clock2.model.AlarmLoader;
 import com.philliphsu.clock2.model.DatabaseManager;
 import com.philliphsu.clock2.ringtone.RingtoneActivity;
+import com.philliphsu.clock2.util.AlarmController;
 import com.philliphsu.clock2.util.AlarmUtils;
 import com.philliphsu.clock2.util.LocalBroadcastHelper;
 
@@ -520,7 +521,9 @@ public class EditAlarmActivity extends BaseActivity implements AlarmNumpad.KeyLi
 
     @Override
     public void cancelAlarm(Alarm alarm, boolean showToast) {
-        AlarmUtils.cancelAlarm(this, alarm, showToast);
+        // TODO: Rewrite XML layout to use CoordinatorLayout and
+        // pass in the snackbar anchor.
+        new AlarmController(this, null).cancelAlarm(alarm, true);
         if (RingtoneActivity.isAlive()) {
             LocalBroadcastHelper.sendBroadcast(this, RingtoneActivity.ACTION_FINISH);
         }

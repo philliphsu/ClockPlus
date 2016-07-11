@@ -13,7 +13,7 @@ import android.widget.Button;
 import com.philliphsu.clock2.Alarm;
 import com.philliphsu.clock2.R;
 import com.philliphsu.clock2.model.AlarmLoader;
-import com.philliphsu.clock2.util.AlarmUtils;
+import com.philliphsu.clock2.util.AlarmController;
 import com.philliphsu.clock2.util.LocalBroadcastHelper;
 
 /**
@@ -34,6 +34,7 @@ public class RingtoneActivity extends AppCompatActivity implements
 
     private long mAlarmId;
     private Alarm mAlarm;
+    private AlarmController mAlarmController;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +59,8 @@ public class RingtoneActivity extends AppCompatActivity implements
         Intent intent = new Intent(this, RingtoneService.class)
                 .putExtra(EXTRA_ITEM_ID, mAlarmId);
         startService(intent);
+
+        mAlarmController = new AlarmController(this, null);
 
         // TODO: Butterknife binding
         Button snooze = (Button) findViewById(R.id.btn_snooze);
@@ -145,7 +148,7 @@ public class RingtoneActivity extends AppCompatActivity implements
         if (mAlarm != null) {
             // TODO: If the upcoming alarm notification isn't present, verify other notifications aren't affected.
             // This could be the case if we're starting a new instance of this activity after leaving the first launch.
-            AlarmUtils.removeUpcomingAlarmNotification(this, mAlarm);
+            mAlarmController.removeUpcomingAlarmNotification(mAlarm);
         }
     }
 
@@ -160,7 +163,7 @@ public class RingtoneActivity extends AppCompatActivity implements
 
     private void snooze() {
         if (mAlarm != null) {
-            AlarmUtils.snoozeAlarm(this, mAlarm);
+            mAlarmController.snoozeAlarm(mAlarm);
         }
         // Can't call dismiss() because we don't want to also call cancelAlarm()! Why? For example,
         // we don't want the alarm, if it has no recurrence, to be turned off right now.
@@ -170,7 +173,7 @@ public class RingtoneActivity extends AppCompatActivity implements
     private void dismiss() {
         if (mAlarm != null) {
             // TODO do we really need to cancel the intent and alarm?
-            AlarmUtils.cancelAlarm(this, mAlarm, false);
+            mAlarmController.cancelAlarm(mAlarm, false);
         }
         stopAndFinish();
     }

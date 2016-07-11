@@ -10,7 +10,7 @@ import android.os.AsyncTask;
 import android.support.v4.app.NotificationCompat;
 
 import com.philliphsu.clock2.model.DatabaseManager;
-import com.philliphsu.clock2.util.AlarmUtils;
+import com.philliphsu.clock2.util.AlarmController;
 
 import static android.app.PendingIntent.FLAG_ONE_SHOT;
 import static com.philliphsu.clock2.util.DateFormatUtils.formatTime;
@@ -47,8 +47,7 @@ public class UpcomingAlarmReceiver extends BroadcastReceiver {
                 @Override
                 protected void onPostExecute(Alarm alarm) {
                     if (ACTION_DISMISS_NOW.equals(intent.getAction())) {
-                        // This MUST be done on the UI thread.
-                        AlarmUtils.cancelAlarm(context, alarm, true);
+                        new AlarmController(context, null).cancelAlarm(alarm, false);
                     } else {
                         // Prepare notification
                         // http://stackoverflow.com/a/15803726/5055032

@@ -6,7 +6,7 @@ import android.content.Intent;
 
 import com.philliphsu.clock2.model.AlarmDatabaseHelper.AlarmCursor;
 import com.philliphsu.clock2.model.DatabaseManager;
-import com.philliphsu.clock2.util.AlarmUtils;
+import com.philliphsu.clock2.util.AlarmController;
 
 /**
  * An {@link IntentService} subclass for handling asynchronous task requests in
@@ -59,6 +59,7 @@ public class OnBootUpAlarmScheduler extends IntentService {
     @Override
     protected void onHandleIntent(Intent intent) {
         if (intent != null) {
+            AlarmController controller = new AlarmController(this, null);
             // IntentService works in a background thread, so this won't hold us up.
             AlarmCursor cursor = DatabaseManager.getInstance(this).queryEnabledAlarms();
             while (cursor.moveToNext()) {
@@ -67,7 +68,7 @@ public class OnBootUpAlarmScheduler extends IntentService {
                     throw new IllegalStateException(
                             "queryEnabledAlarms() returned alarm(s) that aren't enabled");
                 }
-                AlarmUtils.scheduleAlarm(this, alarm, false);
+                controller.scheduleAlarm(alarm, false);
             }
             cursor.close();
 

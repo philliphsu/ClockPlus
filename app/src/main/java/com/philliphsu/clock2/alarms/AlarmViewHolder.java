@@ -18,6 +18,7 @@ import com.philliphsu.clock2.DaysOfWeek;
 import com.philliphsu.clock2.OnListItemInteractionListener;
 import com.philliphsu.clock2.R;
 import com.philliphsu.clock2.model.AlarmsRepository;
+import com.philliphsu.clock2.util.AlarmController;
 import com.philliphsu.clock2.util.AlarmUtils;
 
 import java.util.Date;
@@ -38,6 +39,8 @@ import static com.philliphsu.clock2.util.DateFormatUtils.formatTime;
 public class AlarmViewHolder extends BaseViewHolder<Alarm> implements AlarmCountdown.OnTickListener {
     private static final RelativeSizeSpan AMPM_SIZE_SPAN = new RelativeSizeSpan(0.5f);
 
+    private final AlarmController mAlarmController;
+
     @Bind(R.id.time) TextView mTime;
     @Bind(R.id.on_off_switch) SwitchCompat mSwitch;
     @Bind(R.id.label) TextView mLabel;
@@ -45,8 +48,17 @@ public class AlarmViewHolder extends BaseViewHolder<Alarm> implements AlarmCount
     @Bind(R.id.recurring_days) TextView mDays;
     @Bind(R.id.dismiss) Button mDismissButton;
 
+    @Deprecated // TODO: Delete this, the only usage is from AlarmsAdapter (SortedList), which is not used anymore.
     public AlarmViewHolder(ViewGroup parent, OnListItemInteractionListener<Alarm> listener) {
         super(parent, R.layout.item_alarm, listener);
+        mAlarmController = null;
+        mCountdown.setOnTickListener(this);
+    }
+
+    public AlarmViewHolder(ViewGroup parent, OnListItemInteractionListener<Alarm> listener,
+                           AlarmController alarmController) {
+        super(parent, R.layout.item_alarm, listener);
+        mAlarmController = alarmController;
         mCountdown.setOnTickListener(this);
     }
 
@@ -76,7 +88,7 @@ public class AlarmViewHolder extends BaseViewHolder<Alarm> implements AlarmCount
         } else {
             // Dismisses the current upcoming alarm and handles scheduling the next alarm for us.
             // Since changes are saved to the database, this prompts a UI refresh.
-            AlarmUtils.cancelAlarm(getContext(), alarm, true);
+            mAlarmController.cancelAlarm(alarm, true);
         }
         // TOneverDO: AlarmUtils.cancelAlarm() otherwise it will be called twice
         /*
@@ -127,11 +139,10 @@ public class AlarmViewHolder extends BaseViewHolder<Alarm> implements AlarmCount
             alarm.setEnabled(checked);
             if (alarm.isEnabled()) {
                 // TODO: On Moto X, upcoming notification doesn't post immediately
-                AlarmUtils.scheduleAlarm(getContext(), alarm, true);
-                AlarmUtils.sendShowSnackbarBroadcast(getContext(), AlarmUtils.getRingsInText(getContext(), alarm.ringsIn()));
-                AlarmUtils.save(getContext(), alarm);
+                mAlarmController.scheduleAlarm(alarm, true);
+                mAlarmController.save(alarm);
             } else {
-                AlarmUtils.cancelAlarm(getContext(), alarm, true);
+                mAlarmController.cancelAlarm(alarm, true);
                 // cancelAlarm() already calls save() for you.
             }
             mSwitch.setPressed(false); // clear the pressed focus, esp. if setPressed(true) was called manually

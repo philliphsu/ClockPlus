@@ -22,6 +22,7 @@ import android.util.Log;
 import com.philliphsu.clock2.Alarm;
 import com.philliphsu.clock2.R;
 import com.philliphsu.clock2.model.DatabaseManager;
+import com.philliphsu.clock2.util.AlarmController;
 import com.philliphsu.clock2.util.AlarmUtils;
 import com.philliphsu.clock2.util.LocalBroadcastHelper;
 
@@ -54,6 +55,7 @@ public class RingtoneService extends Service { // TODO: abstract this, make subc
     private Ringtone mRingtone;
     private Alarm mAlarm;
     private String mNormalRingTime;
+    private AlarmController mAlarmController;
     private boolean mAutoSilenced = false;
     // TODO: Using Handler for this is ill-suited? Alarm ringing could outlast the
     // application's life. Use AlarmManager API instead.
@@ -63,7 +65,7 @@ public class RingtoneService extends Service { // TODO: abstract this, make subc
         public void run() {
             mAutoSilenced = true;
             // TODO do we really need to cancel the alarm and intent?
-            AlarmUtils.cancelAlarm(RingtoneService.this, mAlarm, false);
+            mAlarmController.cancelAlarm(mAlarm, false);
             finishActivity();
             stopSelf();
         }
@@ -72,7 +74,7 @@ public class RingtoneService extends Service { // TODO: abstract this, make subc
         @Override
         public void onReceive(Context context, Intent intent) {
             mAutoSilenced = true;
-            // TODO: Do we need to call AlarmUtils.cancelAlarm()?
+            // TODO: Do we need to call mAlarmController.cancelAlarm()?
             stopSelf();
             // Activity finishes itself
         }
@@ -101,9 +103,9 @@ public class RingtoneService extends Service { // TODO: abstract this, make subc
             }).start();
         } else {
             if (ACTION_SNOOZE.equals(intent.getAction())) {
-                AlarmUtils.snoozeAlarm(this, mAlarm);
+                mAlarmController.snoozeAlarm(mAlarm);
             } else if (ACTION_DISMISS.equals(intent.getAction())) {
-                AlarmUtils.cancelAlarm(this, mAlarm, false); // TODO do we really need to cancel the intent and alarm?
+                mAlarmController.cancelAlarm(mAlarm, false); // TODO do we really need to cancel the intent and alarm?
             } else {
                 throw new UnsupportedOperationException();
             }
@@ -119,6 +121,7 @@ public class RingtoneService extends Service { // TODO: abstract this, make subc
     public void onCreate() {
         super.onCreate();
         LocalBroadcastHelper.registerReceiver(this, mNotifyMissedReceiver, ACTION_NOTIFY_MISSED);
+        mAlarmController = new AlarmController(this, null);
     }
 
     @Override
