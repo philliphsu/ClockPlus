@@ -43,7 +43,11 @@ public class AlarmDatabaseHelper extends SQLiteOpenHelper {
     private static final String COLUMN_RINGTONE = "ringtone";
     private static final String COLUMN_VIBRATES = "vibrates";
     private static final String COLUMN_ENABLED = "enabled";
+
+    // TODO: Delete this column, becuase new sort order does not consider it
+    @Deprecated
     private static final String COLUMN_RING_TIME_MILLIS = "ring_time_millis";
+
     private static final String COLUMN_SNOOZING_UNTIL_MILLIS = "snoozing_until_millis";
     private static final String COLUMN_SUNDAY = "sunday";
     private static final String COLUMN_MONDAY = "monday";
@@ -64,21 +68,61 @@ public class AlarmDatabaseHelper extends SQLiteOpenHelper {
 
     // First sort by ring time in ascending order (smaller values first),
     // then break ties by sorting by id in ascending order.
-    // TODO: Consider changing the sort order to hour ASC, minutes ASC, enabled DESC. Then, we can
-    // delete the COLUMN_RING_TIME_MILLIS.
-    // As defined now, the ordering can be confusing; some examples are:
-    // * If there are multiple single-use alarms in the list, and one of them is snoozed, then on the
-    // next cursor load, this alarm will be reordered to the very bottom
+    @Deprecated
     private static final String SORT_ORDER =
             COLUMN_RING_TIME_MILLIS + " ASC, " + COLUMN_ID + " ASC";
+
+    private static final String NEW_SORT_ORDER = COLUMN_HOUR + " ASC, "
+            + COLUMN_MINUTES + " ASC, "
+            // TOneverDO: Sort COLUMN_ENABLED or else alarms could be reordered
+            // if you toggle them on/off, which looks confusing.
+            // TODO: Figure out how to get the order to be:
+            // No recurring days ->
+            // Recurring earlier in user's weekday order ->
+            // Recurring everyday
+            // As written now, this is incorrect! For one, it assumes
+            // the standard week order (starting on Sunday).
+            // DESC gives us (Sunday -> Saturday -> No recurring days),
+            // ASC gives us the reverse (No recurring days -> Saturday -> Sunday).
+            // TODO: If assuming standard week order, try ASC for all days but
+            // write COLUMN_SATURDAY first, then COLUMN_FRIDAY, ... , COLUMN_SUNDAY.
+            // Check if that gives us (No recurring days -> Sunday -> Saturday).
+//            + COLUMN_SUNDAY + " DESC, "
+//            + COLUMN_MONDAY + " DESC, "
+//            + COLUMN_TUESDAY + " DESC, "
+//            + COLUMN_WEDNESDAY + " DESC, "
+//            + COLUMN_THURSDAY + " DESC, "
+//            + COLUMN_FRIDAY + " DESC, "
+//            + COLUMN_SATURDAY + " DESC, "
+            // All else equal, newer alarms first
+            + COLUMN_ID + " DESC"; // TODO: If duplicate alarm times disallowed, delete this
 
     private final Context mAppContext;
 
     public AlarmDatabaseHelper(Context context) {
-        super(context, DB_NAME, null, VERSION_1);
-        // Since DatabaseManager calls this with the application
-        // context, we can safely hold onto this context.
-        mAppContext = context;
+        super(context.getApplicationContext(), DB_NAME, null, VERSION_1);
+        mAppContext = context.getApplicationContext();
+        // TODO: Here is where you could compute the sort expression
+        // for the recurring days order, based on the user's defined
+        // weekday order. For example, if we read the first day of
+        // the week as Sunday, then we build a String called RECURRENCE_ORDER:
+        //   RECURRENCE_ORDER =
+        //     COLUMN_SATURDAY + " ASC, "
+        //     + ...
+        //     + COLUMN_SUNDAY + " ASC";
+        // Note how the weekday order is reversed when
+        // we refer to the columns. We should also include
+        // ordering by id as the last piece of this string:
+        //    + COLUMN_ID + " DESC";
+        // and remove that piece from the NEW_SORT_ORDER
+        // constant. This is so we can later concatenate
+        // NEW_SORT_ORDER and RECURRENCE_ORDER but maintain
+        // the original order of the sort expressions.
+        // We should also rename that constant
+        // to BASE_SORT_ORDER. Last, in the query() methods,
+        // we can pass in
+        //   BASE_SORT_ORDER + RECURRENCE_ORDER
+        // to its orderBy parameter.
     }
 
     @Override
@@ -180,7 +224,7 @@ public class AlarmDatabaseHelper extends SQLiteOpenHelper {
 
     private AlarmCursor queryAlarms(String where) {
         Cursor c = getReadableDatabase().query(TABLE_ALARMS,
-                null, where, null, null, null, SORT_ORDER);
+                null, where, null, null, null, NEW_SORT_ORDER);
         return new AlarmCursor(c);
     }
 

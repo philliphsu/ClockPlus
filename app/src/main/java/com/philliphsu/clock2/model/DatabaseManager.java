@@ -17,8 +17,10 @@ public class DatabaseManager {
     private final AlarmDatabaseHelper mHelper; // TODO: Call close() when *the app* is exiting.
 
     private DatabaseManager(Context context) {
+        // TODO: Do we need to hold onto this?
         mContext = context.getApplicationContext();
-        mHelper = new AlarmDatabaseHelper(mContext);
+        // This will internally get the application context
+        mHelper = new AlarmDatabaseHelper(context);
     }
 
     public static DatabaseManager getInstance(Context context) {
