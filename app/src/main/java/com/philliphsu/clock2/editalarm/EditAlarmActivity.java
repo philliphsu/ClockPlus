@@ -5,6 +5,7 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.StringRes;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v7.app.ActionBar;
@@ -31,7 +32,6 @@ import com.philliphsu.clock2.DaysOfWeek;
 import com.philliphsu.clock2.R;
 import com.philliphsu.clock2.SharedPreferencesHelper;
 import com.philliphsu.clock2.model.AlarmLoader;
-import com.philliphsu.clock2.model.DatabaseManager;
 import com.philliphsu.clock2.ringtone.RingtoneActivity;
 import com.philliphsu.clock2.util.AlarmController;
 import com.philliphsu.clock2.util.AlarmUtils;
@@ -52,6 +52,12 @@ import static com.philliphsu.clock2.DaysOfWeek.SUNDAY;
 import static com.philliphsu.clock2.util.KeyboardUtils.hideKeyboard;
 import static com.philliphsu.clock2.util.Preconditions.checkNotNull;
 
+/**
+ * TODO: Consider writing an EditAlarmController that would have an
+ * AlarmController member variable to manage the states of the alarm.
+ * The class would have the API for editing the alarm, so move all
+ * the relevant helper methods from here to there.
+ */
 public class EditAlarmActivity extends BaseActivity implements AlarmNumpad.KeyListener,
         EditAlarmContract.View, // TODO: Remove @Override from the methods
         AlarmUtilsHelper,
@@ -69,8 +75,8 @@ public class EditAlarmActivity extends BaseActivity implements AlarmNumpad.KeyLi
     private long mOldAlarmId;
     private Uri mSelectedRingtoneUri;
     private Alarm mOldAlarm;
-    private DatabaseManager mDatabaseManager; // TODO: Delete this
 
+    @Bind(R.id.main_content) CoordinatorLayout mMainContent;
     @Bind(R.id.save) Button mSave;
     @Bind(R.id.delete) Button mDelete;
     @Bind(R.id.on_off) SwitchCompat mSwitch;
@@ -87,7 +93,6 @@ public class EditAlarmActivity extends BaseActivity implements AlarmNumpad.KeyLi
         super.onCreate(savedInstanceState);
         setWeekDaysText();
         mNumpad.setKeyListener(this);
-        mDatabaseManager = DatabaseManager.getInstance(this); // MUST be before loading alarm
         mOldAlarmId = getIntent().getLongExtra(EXTRA_ALARM_ID, -1);
         if (mOldAlarmId != -1) {
             // getLoaderManager() for support fragments by default returns the
@@ -107,8 +112,9 @@ public class EditAlarmActivity extends BaseActivity implements AlarmNumpad.KeyLi
         // TODO: Snooze menu item when alarm is ringing.
         if (mOldAlarm != null && mOldAlarm.isEnabled()) {
             int hoursBeforeUpcoming = getInt(R.string.key_notify_me_of_upcoming_alarms, 2);
-            // TODO: Schedule task with handler to show the menu item when it is time. Handler is fine because
-            // the task only needs to be done if the activity is being viewed. (I think) if the process of this
+            // TODO: Schedule task with handler to show the menu item when it is time.
+            // Handler is fine because the task only needs to be done if the activity
+            // is being viewed. (I think) if the process of this
             // app is killed, then the handler is also killed.
             if ((mOldAlarm.ringsWithinHours(hoursBeforeUpcoming))) {
                 showCanDismissNow();
@@ -523,7 +529,7 @@ public class EditAlarmActivity extends BaseActivity implements AlarmNumpad.KeyLi
     public void cancelAlarm(Alarm alarm, boolean showToast) {
         // TODO: Rewrite XML layout to use CoordinatorLayout and
         // pass in the snackbar anchor.
-        new AlarmController(this, findViewById(R.id.main_content)).cancelAlarm(alarm, true);
+        new AlarmController(this, mMainContent).cancelAlarm(alarm, true);
         if (RingtoneActivity.isAlive()) {
             LocalBroadcastHelper.sendBroadcast(this, RingtoneActivity.ACTION_FINISH);
         }
