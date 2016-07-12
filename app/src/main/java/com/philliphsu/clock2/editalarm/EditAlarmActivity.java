@@ -148,7 +148,7 @@ public class EditAlarmActivity extends BaseActivity implements AlarmNumpad.KeyLi
 
     @Override
     protected int layoutResId() {
-        return R.layout.activity_edit_alarm;
+        return R.layout.activity_edit_alarm_v2;
     }
 
     @Override
@@ -523,7 +523,7 @@ public class EditAlarmActivity extends BaseActivity implements AlarmNumpad.KeyLi
     public void cancelAlarm(Alarm alarm, boolean showToast) {
         // TODO: Rewrite XML layout to use CoordinatorLayout and
         // pass in the snackbar anchor.
-        new AlarmController(this, null).cancelAlarm(alarm, true);
+        new AlarmController(this, findViewById(R.id.main_content)).cancelAlarm(alarm, true);
         if (RingtoneActivity.isAlive()) {
             LocalBroadcastHelper.sendBroadcast(this, RingtoneActivity.ACTION_FINISH);
         }
