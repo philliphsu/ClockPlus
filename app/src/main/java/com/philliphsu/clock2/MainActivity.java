@@ -8,6 +8,8 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.text.format.DateFormat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -15,7 +17,8 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.philliphsu.clock2.alarms.AlarmsFragment;
-import com.philliphsu.clock2.editalarm.EditAlarmActivity;
+import com.philliphsu.clock2.editalarm.NumpadTimePickerDialog;
+import com.philliphsu.clock2.editalarm.OnTimeSetListener;
 import com.philliphsu.clock2.settings.SettingsActivity;
 
 import butterknife.Bind;
@@ -51,9 +54,18 @@ public class MainActivity extends BaseActivity {
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
 
+        // TODO: @OnCLick instead.
         mFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                NumpadTimePickerDialog tpd = NumpadTimePickerDialog.newInstance(new OnTimeSetListener() {
+                    @Override
+                    public void onTimeSet(ViewGroup viewGroup, int hourOfDay, int minute) {
+                        Log.i(TAG, "Time set: " + String.format("%02d:%02d", hourOfDay, minute));
+                    }
+                }, 0, 0, DateFormat.is24HourFormat(MainActivity.this));
+                tpd.show(getFragmentManager(), "tag");
+                /*
                 Intent intent = new Intent(MainActivity.this, EditAlarmActivity.class);
                 // Call Fragment#startActivityForResult() instead of Activity#startActivityForResult()
                 // because we want the result to be handled in the Fragment, not in this Activity.
@@ -61,6 +73,7 @@ public class MainActivity extends BaseActivity {
                 // Fragment's onActivityResult() will NOT be called.
                 mSectionsPagerAdapter.getCurrentFragment()
                         .startActivityForResult(intent, AlarmsFragment.REQUEST_CREATE_ALARM);
+                        */
             }
         });
     }

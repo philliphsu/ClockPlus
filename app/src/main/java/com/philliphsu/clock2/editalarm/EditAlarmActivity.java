@@ -19,6 +19,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -62,7 +63,8 @@ public class EditAlarmActivity extends BaseActivity implements AlarmNumpad.KeyLi
         EditAlarmContract.View, // TODO: Remove @Override from the methods
         AlarmUtilsHelper,
         SharedPreferencesHelper,
-        LoaderManager.LoaderCallbacks<Alarm> {
+        LoaderManager.LoaderCallbacks<Alarm>,
+        OnTimeSetListener {
     private static final String TAG = "EditAlarmActivity";
     public static final String EXTRA_ALARM_ID = "com.philliphsu.clock2.editalarm.extra.ALARM_ID";
     public static final String EXTRA_MODIFIED_ALARM = "com.philliphsu.clock2.editalarm.extra.MODIFIED_ALARM";
@@ -87,6 +89,11 @@ public class EditAlarmActivity extends BaseActivity implements AlarmNumpad.KeyLi
     @Bind(R.id.ringtone) Button mRingtone;
     @Bind(R.id.vibrate) CheckBox mVibrate;
     @Bind(R.id.numpad) AlarmNumpad mNumpad;
+
+    @Override
+    public void onTimeSet(ViewGroup viewGroup, int hourOfDay, int minute) {
+        Log.i(TAG, "Time set: " + String.format("%02d:%02d", hourOfDay, minute));
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
