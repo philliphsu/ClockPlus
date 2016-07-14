@@ -91,6 +91,15 @@ public abstract class GridLayoutNumpad extends GridLayout implements View.OnClic
     }
 
     /**
+     * @return a defensive copy of the internal array of inputted digits
+     */
+    protected final int[] getDigits() {
+        int[] digits = new int[mInput.length];
+        System.arraycopy(mInput, 0, digits, 0, mInput.length);
+        return digits;
+    }
+
+    /**
      * @return the number of digits inputted
      */
     protected final int count() {
@@ -184,10 +193,14 @@ public abstract class GridLayoutNumpad extends GridLayout implements View.OnClic
      * with the String value of those digits.
      */
     protected final void insertDigits(int... digits) {
+        if (digits == null)
+            return;
         String newDigits = "";
         for (int d : digits) {
             if (mCount == mInput.length)
                 break;
+            if (d == UNMODIFIED)
+                continue;
             mInput[mCount++] = d;
             newDigits += d;
         }

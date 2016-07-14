@@ -28,12 +28,17 @@ public class NumpadTimePickerDialog extends DialogFragment
     private static final String KEY_HOUR_OF_DAY = "hour_of_day";
     private static final String KEY_MINUTE = "minute";
     private static final String KEY_IS_24_HOUR_VIEW = "is_24_hour_view";
+    private static final String KEY_DIGITS_INPUTTED = "digits_inputted";
 
-    private OnTimeSetListener mCallback;
+    private TimePicker.OnTimeSetListener mCallback;
 
     private int mInitialHourOfDay;
     private int mInitialMinute;
     private boolean mIs24HourMode;
+    /**
+     * The digits stored in the numpad from the last time onSaveInstanceState() was called
+     */
+    private int[] mInputtedDigits;
 
     @Bind(R.id.backspace) ImageButton mBackspace;
     @Bind(R.id.input) EditText mInputField;
@@ -46,14 +51,23 @@ public class NumpadTimePickerDialog extends DialogFragment
     }
 
     // TODO: We don't need to pass in an initial hour and minute for a new instance.
-    public static NumpadTimePickerDialog newInstance(OnTimeSetListener callback,
+    // TODO: Delete is24HourMode?
+    @Deprecated
+    public static NumpadTimePickerDialog newInstance(TimePicker.OnTimeSetListener callback,
                                                      int hourOfDay, int minute, boolean is24HourMode) {
         NumpadTimePickerDialog ret = new NumpadTimePickerDialog();
         ret.initialize(callback, hourOfDay, minute, is24HourMode);
         return ret;
     }
 
-    public void initialize(OnTimeSetListener callback,
+    public static NumpadTimePickerDialog newInstance(TimePicker.OnTimeSetListener callback) {
+        NumpadTimePickerDialog ret = new NumpadTimePickerDialog();
+        ret.setOnTimeSetListener(callback);
+        return ret;
+    }
+
+    @Deprecated
+    public void initialize(TimePicker.OnTimeSetListener callback,
                            int hourOfDay, int minute, boolean is24HourMode) {
         mCallback = callback;
         mInitialHourOfDay = hourOfDay;
@@ -61,18 +75,15 @@ public class NumpadTimePickerDialog extends DialogFragment
         mIs24HourMode = is24HourMode;
     }
 
-    public void setOnTimeSetListener(OnTimeSetListener callback) {
+    public void setOnTimeSetListener(TimePicker.OnTimeSetListener callback) {
         mCallback = callback;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (savedInstanceState != null && savedInstanceState.containsKey(KEY_HOUR_OF_DAY)
-                && savedInstanceState.containsKey(KEY_MINUTE)
-                && savedInstanceState.containsKey(KEY_IS_24_HOUR_VIEW)) {
-            mInitialHourOfDay = savedInstanceState.getInt(KEY_HOUR_OF_DAY);
-            mInitialMinute = savedInstanceState.getInt(KEY_MINUTE);
+        if (savedInstanceState != null) {
+            mInputtedDigits = savedInstanceState.getIntArray(KEY_DIGITS_INPUTTED);
             mIs24HourMode = savedInstanceState.getBoolean(KEY_IS_24_HOUR_VIEW);
         }
     }
@@ -81,12 +92,14 @@ public class NumpadTimePickerDialog extends DialogFragment
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         getDialog().getWindow().requestFeature(Window.FEATURE_NO_TITLE);
+
         View view = inflater.inflate(R.layout.dialog_time_picker_numpad, container, false);
         ButterKnife.bind(this, view);
-        mNumpad.setOnInputChangeListener(this);
 
-        //mNumpad.setTime(mInitialHourOfDay, mInitialMinute);
-        // TODO: Write numpad method set24HourMode() and use mIs24HourMode
+        mNumpad.setOnInputChangeListener(this);
+        mNumpad.insertDigits(mInputtedDigits); // TOneverDO: before mNumpad.setOnInputChangeListener(this);
+        // TODO: Disabled color
+        updateInputText(""); // Primarily to disable 'OK'
 
         return view;
     }
@@ -94,8 +107,7 @@ public class NumpadTimePickerDialog extends DialogFragment
     @Override
     public void onSaveInstanceState(Bundle outState) {
         if (mNumpad != null) {
-            outState.putInt(KEY_HOUR_OF_DAY, mNumpad.getHours());
-            outState.putInt(KEY_MINUTE, mNumpad.getMinutes());
+            outState.putIntArray(KEY_DIGITS_INPUTTED, mNumpad.getDigits());
             outState.putBoolean(KEY_IS_24_HOUR_VIEW, mIs24HourMode);
             //outState.putBoolean(KEY_DARK_THEME, mThemeDark);
         }
@@ -125,7 +137,7 @@ public class NumpadTimePickerDialog extends DialogFragment
     void ok() {
         if (!mNumpad.checkTimeValid())
             return;
-        mCallback.onTimeSet(mNumpad, mNumpad.getHours(), mNumpad.getMinutes());
+        mCallback.onTimeSet(mNumpad, mNumpad.hourOfDay(), mNumpad.minute());
         dismiss();
     }
 
@@ -142,5 +154,6 @@ public class NumpadTimePickerDialog extends DialogFragment
 
     private void updateInputText(String inputText) {
         mInputField.setText(inputText);
+        mOkButton.setEnabled(mNumpad.checkTimeValid());
     }
 }

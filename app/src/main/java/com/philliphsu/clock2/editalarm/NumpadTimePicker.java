@@ -19,7 +19,7 @@ import butterknife.OnClick;
 /**
  * Created by Phillip Hsu on 7/12/2016.
  */
-public class NumpadTimePicker extends GridLayoutNumpad {
+public class NumpadTimePicker extends GridLayoutNumpad implements TimePicker {
     // Time can be represented with maximum of 4 digits
     private static final int MAX_DIGITS = 4;
 
@@ -101,8 +101,7 @@ public class NumpadTimePicker extends GridLayoutNumpad {
             mFormattedInput.delete(mFormattedInput.indexOf(" "), len);
             // No digit was actually deleted, but we have to notify the
             // listener to update its output.
-            /*TOneverDO: remove super*/super.onDigitDeleted(
-                    mFormattedInput.toString());
+/*TOneverDO: remove super*/super.onDigitDeleted(mFormattedInput.toString());
             updateNumpadStates();
         } else {
             super.delete();
@@ -110,9 +109,10 @@ public class NumpadTimePicker extends GridLayoutNumpad {
     }
 
     /** Returns the hour of day (0-23) regardless of clock system */
-    public int getHours() {
+    @Override
+    public int hourOfDay() {
         if (!checkTimeValid())
-            throw new IllegalStateException("Cannot call getHours() until legal time inputted");
+            throw new IllegalStateException("Cannot call hourOfDay() until legal time inputted");
         int hours = count() < 4 ? valueAt(0) : valueAt(0) * 10 + valueAt(1);
         if (hours == 12) {
             switch (mAmPmState) {
@@ -130,9 +130,10 @@ public class NumpadTimePicker extends GridLayoutNumpad {
         return hours + (mAmPmState == PM ? 12 : 0);
     }
 
-    public int getMinutes() {
+    @Override
+    public int minute() {
         if (!checkTimeValid())
-            throw new IllegalStateException("Cannot call getMinutes() until legal time inputted");
+            throw new IllegalStateException("Cannot call minute() until legal time inputted");
         return count() < 4 ? valueAt(1) * 10 + valueAt(2) : valueAt(2) * 10 + valueAt(3);
     }
 
@@ -179,6 +180,7 @@ public class NumpadTimePicker extends GridLayoutNumpad {
             amPmState = HRS_24;
         }
 
+        /*
         // Convert the hour and minutes into text form, so that
         // we can read each digit individually.
         // Only if on 24-hour clock, zero-pad single digit hours.
@@ -192,8 +194,14 @@ public class NumpadTimePicker extends GridLayoutNumpad {
         for (int i = 0; i < textDigits.length(); i++) {
             digits[i] = Character.digit(textDigits.charAt(i), BASE_10);
         }
-
         insertDigits(digits);
+        */
+
+        if (is24HourFormat() || hours > 9) {
+            insertDigits(hours / 10, hours % 10, minutes / 10, minutes % 10);
+        } else {
+            insertDigits(hours, minutes / 10, minutes % 10);
+        }
 
         mAmPmState = amPmState;
         if (mAmPmState != HRS_24) {
@@ -236,15 +244,17 @@ public class NumpadTimePicker extends GridLayoutNumpad {
             mFormattedInput.append(' ').append(altBtn.getText());
             mAmPmState = mAltButtons[0] == altBtn ? AM : PM;
             // Digits will be shown for you on insert, but not AM/PM
-            /*TOneverDO: remove super*/super.onDigitInserted(
-                    mFormattedInput.toString());
+/*TOneverDO: remove super*/super.onDigitInserted(mFormattedInput.toString());
         } else {
             CharSequence text = altBtn.getText();
             int[] digits = new int[text.length() - 1];
             // charAt(0) is the colon, so skip i = 0.
             // We are only interested in storing the digits.
             for (int i = 1; i < text.length(); i++) {
-                digits[i] = Character.digit(text.charAt(i), BASE_10);
+                // The array and the text do not have the same lengths,
+                // so the iterator value does not correspond to the
+                // array index directly
+                digits[i - 1] = Character.digit(text.charAt(i), BASE_10);
             }
             // Colon is added for you
             insertDigits(digits);

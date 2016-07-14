@@ -36,6 +36,7 @@ import com.philliphsu.clock2.model.AlarmLoader;
 import com.philliphsu.clock2.ringtone.RingtoneActivity;
 import com.philliphsu.clock2.util.AlarmController;
 import com.philliphsu.clock2.util.AlarmUtils;
+import com.philliphsu.clock2.util.DateFormatUtils;
 import com.philliphsu.clock2.util.LocalBroadcastHelper;
 
 import java.util.Date;
@@ -50,7 +51,6 @@ import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
 import static com.philliphsu.clock2.DaysOfWeek.SATURDAY;
 import static com.philliphsu.clock2.DaysOfWeek.SUNDAY;
-import static com.philliphsu.clock2.util.KeyboardUtils.hideKeyboard;
 import static com.philliphsu.clock2.util.Preconditions.checkNotNull;
 
 /**
@@ -59,17 +59,19 @@ import static com.philliphsu.clock2.util.Preconditions.checkNotNull;
  * The class would have the API for editing the alarm, so move all
  * the relevant helper methods from here to there.
  */
-public class EditAlarmActivity extends BaseActivity implements AlarmNumpad.KeyListener,
+public class EditAlarmActivity extends BaseActivity implements
+        AlarmNumpad.KeyListener, // TODO: Deprecated, remove
         EditAlarmContract.View, // TODO: Remove @Override from the methods
         AlarmUtilsHelper,
         SharedPreferencesHelper,
         LoaderManager.LoaderCallbacks<Alarm>,
-        OnTimeSetListener {
+        NumpadTimePicker.OnTimeSetListener {
     private static final String TAG = "EditAlarmActivity";
     public static final String EXTRA_ALARM_ID = "com.philliphsu.clock2.editalarm.extra.ALARM_ID";
     public static final String EXTRA_MODIFIED_ALARM = "com.philliphsu.clock2.editalarm.extra.MODIFIED_ALARM";
     public static final String EXTRA_IS_DELETING = "com.philliphsu.clock2.editalarm.extra.IS_DELETING";
     private static final RelativeSizeSpan AMPM_SIZE_SPAN = new RelativeSizeSpan(0.5f);
+    private static final String TAG_TIME_PICKER = "time_picker";
 
     private static final int REQUEST_PICK_RINGTONE = 0;
     private static final int ID_MENU_ITEM = 0;
@@ -77,12 +79,14 @@ public class EditAlarmActivity extends BaseActivity implements AlarmNumpad.KeyLi
     private long mOldAlarmId;
     private Uri mSelectedRingtoneUri;
     private Alarm mOldAlarm;
+    private int mSelectedHourOfDay = -1;
+    private int mSelctedMinute = -1;
 
     @Bind(R.id.main_content) CoordinatorLayout mMainContent;
     @Bind(R.id.save) Button mSave;
     @Bind(R.id.delete) Button mDelete;
     @Bind(R.id.on_off) SwitchCompat mSwitch;
-    @Bind(R.id.input_time) EditText mTimeText;
+    @Bind(R.id.input_time) TextView mTimeText;
     @Bind({R.id.day0, R.id.day1, R.id.day2, R.id.day3, R.id.day4, R.id.day5, R.id.day6})
     ToggleButton[] mDays;
     @Bind(R.id.label) EditText mLabel;
@@ -92,7 +96,9 @@ public class EditAlarmActivity extends BaseActivity implements AlarmNumpad.KeyLi
 
     @Override
     public void onTimeSet(ViewGroup viewGroup, int hourOfDay, int minute) {
-        Log.i(TAG, "Time set: " + String.format("%02d:%02d", hourOfDay, minute));
+        mSelectedHourOfDay = hourOfDay;
+        mSelctedMinute = minute;
+        showTimeText(DateFormatUtils.formatTime(this, hourOfDay, minute));
     }
 
     @Override
@@ -112,6 +118,19 @@ public class EditAlarmActivity extends BaseActivity implements AlarmNumpad.KeyLi
             showDetails();
         }
         setTimeTextHint(); // TODO: private access
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Was the time picker in our backstack? It could have been if it was showing
+        // and the device had rotated.
+        NumpadTimePickerDialog picker = (NumpadTimePickerDialog)
+                getFragmentManager().findFragmentByTag(TAG_TIME_PICKER);
+        if (picker != null) {
+            // Restore the callback
+            picker.setOnTimeSetListener(this);
+        }
     }
 
     @Override
@@ -206,6 +225,7 @@ public class EditAlarmActivity extends BaseActivity implements AlarmNumpad.KeyLi
         showTimeTextPostBackspace("");
     }
 
+    /* // TODO: remove
     @OnTouch(R.id.input_time)
     boolean touch(MotionEvent event) {
         if (event.getActionMasked() == MotionEvent.ACTION_UP) {
@@ -220,6 +240,7 @@ public class EditAlarmActivity extends BaseActivity implements AlarmNumpad.KeyLi
         }
         return true;
     }
+    */
 
     @OnClick(R.id.ringtone)
     void ringtone() {
@@ -334,6 +355,12 @@ public class EditAlarmActivity extends BaseActivity implements AlarmNumpad.KeyLi
          * is in view.
          * =============================================================================
          */
+    }
+
+    @OnClick(R.id.input_time)
+    void openTimePicker() {
+        NumpadTimePickerDialog picker = NumpadTimePickerDialog.newInstance(EditAlarmActivity.this);
+        picker.show(getFragmentManager(), TAG_TIME_PICKER);
     }
 
     private void setWeekDaysText() {
@@ -488,13 +515,14 @@ public class EditAlarmActivity extends BaseActivity implements AlarmNumpad.KeyLi
         } else {
             mTimeText.setText(formattedInput);
         }
-        mTimeText.setSelection(mTimeText.length());
+//TODO:delete        mTimeText.setSelection(mTimeText.length());
     }
 
+    @Deprecated // TODO: Remove
     @Override
     public void showTimeTextPostBackspace(String newStr) {
         mTimeText.setText(newStr);
-        mTimeText.setSelection(mTimeText.length());
+//TODO:delete        mTimeText.setSelection(mTimeText.length());
         if (!mNumpad.checkTimeValid() && mSwitch.isChecked()) {
             mSwitch.setChecked(false);
         }
@@ -519,7 +547,7 @@ public class EditAlarmActivity extends BaseActivity implements AlarmNumpad.KeyLi
         if (focused) {
             mTimeText.requestFocus();
             // Move cursor to end
-            mTimeText.setSelection(mTimeText.length());
+//TODO:delete            mTimeText.setSelection(mTimeText.length());
         } else {
             mTimeText.clearFocus(); // TODO: not cleared! focus needs to go to a neighboring view.
         }
@@ -581,7 +609,8 @@ public class EditAlarmActivity extends BaseActivity implements AlarmNumpad.KeyLi
             // TODO default values
             showTimeTextFocused(true);
             showRingtone(""); // gets default ringtone
-            showNumpad(true);
+            // TODO: Show the dialog instead
+            //showNumpad(true);
         }
     }
 }

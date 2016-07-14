@@ -85,17 +85,14 @@
                         android:layout_alignParentEnd="true"
                         android:layout_centerVertical="true"/>
 
-                    <!-- TODO: Find out how to get a touch ripple; foreground attr didn't work -->
-                    <EditText
+                    <TextView
                         android:id="@+id/input_time"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:foreground="?selectableItemBackground"
-                        android:background="@android:color/transparent"
+                        android:background="?selectableItemBackground"
                         android:hint="@string/default_alarm_time_12h"
                         android:textSize="56sp"
-                        android:layout_toStartOf="@id/on_off"
-                        android:inputType="time"/>
+                        android:layout_toStartOf="@id/on_off"/>
 
                 </RelativeLayout>
 
