@@ -126,7 +126,7 @@ public class EditAlarmActivity extends BaseActivity implements
         // Was the time picker in our backstack? It could have been if it was showing
         // and the device had rotated.
         NumpadTimePickerDialog picker = (NumpadTimePickerDialog)
-                getFragmentManager().findFragmentByTag(TAG_TIME_PICKER);
+                getSupportFragmentManager().findFragmentByTag(TAG_TIME_PICKER);
         if (picker != null) {
             // Restore the callback
             picker.setOnTimeSetListener(this);
@@ -360,7 +360,7 @@ public class EditAlarmActivity extends BaseActivity implements
     @OnClick(R.id.input_time)
     void openTimePicker() {
         NumpadTimePickerDialog picker = NumpadTimePickerDialog.newInstance(EditAlarmActivity.this);
-        picker.show(getFragmentManager(), TAG_TIME_PICKER);
+        picker.show(getSupportFragmentManager(), TAG_TIME_PICKER);
     }
 
     private void setWeekDaysText() {

@@ -1,7 +1,7 @@
 package com.philliphsu.clock2.editalarm;
 
-import android.app.DialogFragment;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,7 +20,6 @@ import butterknife.OnLongClick;
 /**
  * Created by Phillip Hsu on 7/12/2016.
  *
- * Note this extends the framework's DialogFragment, NOT the support version's!
  */
 public class NumpadTimePickerDialog extends DialogFragment
         implements NumpadTimePicker.OnInputChangeListener {
