@@ -54,6 +54,17 @@ public class NumpadTimePicker extends GridLayoutNumpad implements TimePicker {
     @Bind(R.id.fab) FloatingActionButton mFab;
     @Bind(R.id.backspace) ImageButton mBackspace;
 
+    /**
+     * Provides additional APIs to configure clients' display output.
+     */
+    public interface OnInputChangeListener extends GridLayoutNumpad.OnInputChangeListener {
+        /**
+         * Called when this numpad's buttons are all disabled, indicating no further
+         * digits can be inserted.
+         */
+        void onInputDisabled();
+    }
+
     public NumpadTimePicker(Context context) {
         super(context);
         init();
@@ -72,6 +83,14 @@ public class NumpadTimePicker extends GridLayoutNumpad implements TimePicker {
     @Override
     protected int contentLayout() {
         return R.layout.content_numpad_time_picker;
+    }
+
+    @Override
+    protected void enable(int lowerLimitInclusive, int upperLimitExclusive) {
+        super.enable(lowerLimitInclusive, upperLimitExclusive);
+        if (lowerLimitInclusive == 0 && upperLimitExclusive == 0) {
+            ((OnInputChangeListener) getOnInputChangeListener()).onInputDisabled();
+        }
     }
 
     @Override

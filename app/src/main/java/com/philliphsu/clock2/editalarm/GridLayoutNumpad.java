@@ -78,7 +78,16 @@ public abstract class GridLayoutNumpad extends GridLayout implements View.OnClic
         mOnInputChangeListener = onInputChangeListener;
     }
 
-    protected final void enable(int lowerLimitInclusive, int upperLimitExclusive) {
+    /**
+     * Provided only for subclasses so they can retrieve the registered listener
+     * and fire any custom OnInputChange events they may have defined.
+     */
+    protected final OnInputChangeListener getOnInputChangeListener() {
+        return mOnInputChangeListener;
+    }
+
+    @CallSuper
+    protected void enable(int lowerLimitInclusive, int upperLimitExclusive) {
         if (lowerLimitInclusive < 0 || upperLimitExclusive > mButtons.length)
             throw new IndexOutOfBoundsException("Upper limit out of range");
 

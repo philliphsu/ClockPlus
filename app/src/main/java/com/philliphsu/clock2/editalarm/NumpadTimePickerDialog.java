@@ -142,6 +142,12 @@ public class NumpadTimePickerDialog extends DialogFragment implements NumpadTime
         updateInputText("");
     }
 
+    @Override
+    public void onInputDisabled() {
+        // Steals the focus from the EditText
+        mFocusGrabber.requestFocus();
+    }
+
     @OnTouch(R.id.input_time)
     boolean captureTouchOnEditText() {
         // Capture touch events on the EditText field, because we want it to do nothing.
@@ -157,8 +163,9 @@ public class NumpadTimePickerDialog extends DialogFragment implements NumpadTime
         mInputField.setText(inputText);
         // Move the cursor
         mInputField.setSelection(mInputField.length());
-        if (mNumpad.count() == mNumpad.capacity()) {
-            mFocusGrabber.requestFocus();
+        if (mFocusGrabber.isFocused()) {
+            // Return focus to the EditText
+            mInputField.requestFocus();
         }
     }
 }
