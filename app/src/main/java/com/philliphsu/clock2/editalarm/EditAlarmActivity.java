@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.StringRes;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.LoaderManager;
@@ -73,6 +74,13 @@ public class EditAlarmActivity extends BaseActivity implements
     private static final RelativeSizeSpan AMPM_SIZE_SPAN = new RelativeSizeSpan(0.5f);
     private static final String TAG_TIME_PICKER = "time_picker";
 
+    private static final String KEY_INPUT_TIME = "input_time";
+    private static final String KEY_ENABLED = "enabled";
+    private static final String KEY_CHECKED_DAYS = "checked_days";
+    private static final String KEY_LABEL = "label";
+    private static final String KEY_RINGTONE_URI = "ringtone";
+    private static final String KEY_VIBRATE = "vibrate";
+
     private static final int REQUEST_PICK_RINGTONE = 0;
     private static final int ID_MENU_ITEM = 0;
 
@@ -81,6 +89,12 @@ public class EditAlarmActivity extends BaseActivity implements
     private Alarm mOldAlarm;
     private int mSelectedHourOfDay = -1;
     private int mSelctedMinute = -1;
+
+    // If we keep a reference to the dialog, we keep its previous state as well.
+    // So the next time we call show() on this, the input field will show the
+    // last inputted time. The easiest workaround is to always create a new
+    // instance each time we want to show the dialog.
+//    private NumpadTimePickerDialog mPicker;
 
     @Bind(R.id.main_content) CoordinatorLayout mMainContent;
     @Bind(R.id.save) Button mSave;
@@ -105,7 +119,20 @@ public class EditAlarmActivity extends BaseActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setWeekDaysText();
+
+        // Are we recreating this Activity because of a rotation? If so, try finding
+        // the time picker in our backstack.
+        NumpadTimePickerDialog picker = (NumpadTimePickerDialog)
+                getSupportFragmentManager().findFragmentByTag(TAG_TIME_PICKER);
+        if (picker != null) {
+            // Restore the callback
+            picker.setOnTimeSetListener(this);
+//            mPicker = picker;
+        }
+
+        // TODO: Delete this
         mNumpad.setKeyListener(this);
+
         mOldAlarmId = getIntent().getLongExtra(EXTRA_ALARM_ID, -1);
         if (mOldAlarmId != -1) {
             // getLoaderManager() for support fragments by default returns the
@@ -116,21 +143,74 @@ public class EditAlarmActivity extends BaseActivity implements
         } else {
             // Nothing to load, so show default values
             showDetails();
+            // Show the time picker dialog, if it is not already showing
+            // AND this is the very first time the activity is being created
+            if (picker == null && savedInstanceState == null) {
+                // Wait a bit so the activity and dialog don't show at the same time
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        openTimePicker();
+                    }
+                }, 300);
+            }
         }
         setTimeTextHint(); // TODO: private access
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        // Was the time picker in our backstack? It could have been if it was showing
-        // and the device had rotated.
-        NumpadTimePickerDialog picker = (NumpadTimePickerDialog)
-                getSupportFragmentManager().findFragmentByTag(TAG_TIME_PICKER);
-        if (picker != null) {
-            // Restore the callback
-            picker.setOnTimeSetListener(this);
+    protected void onSaveInstanceState(Bundle outState) {
+        // Write out any state we wish to save for re-initialization.
+        // You can either restore this state in onCreate() or by
+        // overriding onRestoreInstanceState() and restoring it there.
+        super.onSaveInstanceState(outState);
+        outState.putString(KEY_INPUT_TIME, mTimeText.getText().toString());
+        // This is restored automatically post-rotation
+        outState.putBoolean(KEY_ENABLED, mSwitch.isChecked());
+        // These are restored automatically post-rotation
+        outState.putBooleanArray(KEY_CHECKED_DAYS, new boolean[] {
+                mDays[0].isChecked(),
+                mDays[1].isChecked(),
+                mDays[2].isChecked(),
+                mDays[3].isChecked(),
+                mDays[4].isChecked(),
+                mDays[5].isChecked(),
+                mDays[6].isChecked()
+        });
+        // This is restored automatically post-rotation
+        outState.putString(KEY_LABEL, mLabel.getText().toString());
+        outState.putParcelable(KEY_RINGTONE_URI, mSelectedRingtoneUri);
+        // This is restored automatically post-rotation
+        outState.putBoolean(KEY_VIBRATE, mVibrate.isChecked());
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        // For now, restore the previous state here instead of in onCreate()
+        // because it's easier than refactoring the code over there.
+        super.onRestoreInstanceState(savedInstanceState);
+        // No null-check on the given Bundle is necessary,
+        // because onSaveInstanceState() works with a non-null
+        // Bundle, even in the default implementation.
+        if (savedInstanceState.containsKey(KEY_INPUT_TIME)
+                //&& savedInstanceState.containsKey(KEY_LABEL)
+                && savedInstanceState.containsKey(KEY_RINGTONE_URI)) {
+            // Make sure we actually saved something, or else we'd get
+            // a null and we'll end up clearing the hints...
+            mTimeText.setText(savedInstanceState.getString(KEY_INPUT_TIME));
+//            mLabel.setText(savedInstanceState.getString(KEY_LABEL));
+            mSelectedRingtoneUri = savedInstanceState.getParcelable(KEY_RINGTONE_URI);
+            // ...this, however, would throw an NPE because
+            // we'd be accessing a null Ringtone.
+            updateRingtoneButtonText();
         }
+        // TODO: Manually restore the states of the "auto-restoring" widgets.
+        // In onCreate(), we will call showDetails().
+        // You only witnessed the auto-restoring for a blank Alarm, where
+        // the impl of showDetails() is pretty bare. If we have an actual
+        // Alarm, showDetails() could very well change the values displayed
+        // by those widgets based on that Alarm's values, but not based on
+        // any unsaved changes that may have occurred to the widgets previously.
     }
 
     @Override
@@ -359,8 +439,8 @@ public class EditAlarmActivity extends BaseActivity implements
 
     @OnClick(R.id.input_time)
     void openTimePicker() {
-        NumpadTimePickerDialog picker = NumpadTimePickerDialog.newInstance(EditAlarmActivity.this);
-        picker.show(getSupportFragmentManager(), TAG_TIME_PICKER);
+        NumpadTimePickerDialog.newInstance(EditAlarmActivity.this)
+                .show(getSupportFragmentManager(), TAG_TIME_PICKER);
     }
 
     private void setWeekDaysText() {
@@ -609,7 +689,6 @@ public class EditAlarmActivity extends BaseActivity implements
             // TODO default values
             showTimeTextFocused(true);
             showRingtone(""); // gets default ringtone
-            // TODO: Show the dialog instead
             //showNumpad(true);
         }
     }

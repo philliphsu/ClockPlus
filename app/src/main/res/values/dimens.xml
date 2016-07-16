@@ -11,4 +11,9 @@
     <dimen name="alarm_time_text_size">48sp</dimen>
     <dimen name="app_bar_height">180dp</dimen>
     <dimen name="text_margin">16dp</dimen>
+    
+    <!-- NumpadTimePickerDialog -->
+    <dimen name="header_height">72dp</dimen>
+    <dimen name="numpad_height">270dp</dimen>
+    <dimen name="time_input_text_size">40sp</dimen>
 </resources>

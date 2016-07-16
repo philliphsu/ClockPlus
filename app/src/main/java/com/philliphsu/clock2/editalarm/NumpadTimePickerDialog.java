@@ -16,6 +16,7 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.OnLongClick;
+import butterknife.OnTouch;
 
 /**
  * Created by Phillip Hsu on 7/12/2016.
@@ -35,7 +36,12 @@ public class NumpadTimePickerDialog extends DialogFragment
     private int mInitialMinute;
     private boolean mIs24HourMode;
     /**
-     * The digits stored in the numpad from the last time onSaveInstanceState() was called
+     * The digits stored in the numpad from the last time onSaveInstanceState() was called.
+     *
+     * Why not have the NumpadTimePicker class save state itself? Because it's a lot more
+     * code to do so, as you have to create your own SavedState subclass. Also, we modeled
+     * this dialog class on the RadialTimePickerDialog, where the RadialPickerLayout also
+     * depends on the dialog to save its state.
      */
     private int[] mInputtedDigits;
 
@@ -97,6 +103,8 @@ public class NumpadTimePickerDialog extends DialogFragment
 
         mNumpad.setOnInputChangeListener(this);
         mNumpad.insertDigits(mInputtedDigits); // TOneverDO: before mNumpad.setOnInputChangeListener(this);
+        // Show the cursor immediately
+        mInputField.requestFocus(); // TODO: If changed to TextView, then don't need this.
         // TODO: Disabled color
         updateInputText(""); // Primarily to disable 'OK'
 
@@ -127,6 +135,13 @@ public class NumpadTimePickerDialog extends DialogFragment
         updateInputText("");
     }
 
+    // TODO: If you change the input field to a TextView, then you don't need this.
+    @OnTouch(R.id.input)
+    boolean captureTouchOnEditText() {
+        // Capture touch events on the EditText field, because we want it to do nothing.
+        return true;
+    }
+
     @OnClick(R.id.cancel)
     void myCancel() {
         dismiss();
@@ -153,6 +168,8 @@ public class NumpadTimePickerDialog extends DialogFragment
 
     private void updateInputText(String inputText) {
         mInputField.setText(inputText);
+        // Move the cursor
+        //mInputField.setSelection(mInputField.length()); // TODO: If changed to TextView, don't need this
         mOkButton.setEnabled(mNumpad.checkTimeValid());
     }
 }
