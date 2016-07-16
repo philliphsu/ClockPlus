@@ -160,7 +160,7 @@ public class NumpadTimePickerDialog extends DialogFragment implements NumpadTime
     }
 
     private void updateInputText(String inputText) {
-        mInputField.setText(inputText);
+        TimeTextUtils.setText(inputText, mInputField);
         // Move the cursor
         mInputField.setSelection(mInputField.length());
         if (mFocusGrabber.isFocused()) {
