@@ -65,7 +65,7 @@ public class NumpadTimePicker extends GridLayoutNumpad implements TimePicker {
     }
     
     @Override
-    protected int capacity() {
+    public int capacity() {
         return MAX_DIGITS;
     }
 

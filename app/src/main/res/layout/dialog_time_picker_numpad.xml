@@ -38,6 +38,14 @@
             android:background="@android:color/transparent"
             style="@style/TextAppearance.AppCompat.Inverse"/>
 
+        <!-- We need both focusable attrs for requestFocus() to succeed -->
+        <View
+            android:id="@+id/focus_grabber"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:focusable="true"
+            android:focusableInTouchMode="true"/>
+
         <!-- TOneverDO: Before the EditText, because we need this on top -->
         <ImageButton
             android:id="@+id/cancel"

@@ -66,7 +66,7 @@ public abstract class GridLayoutNumpad extends GridLayout implements View.OnClic
     /**
      * @return the number of digits we can input
      */
-    protected abstract int capacity();
+    public abstract int capacity();
 
     /**
      * @return the layout resource that defines the children for this numpad
@@ -102,7 +102,7 @@ public abstract class GridLayoutNumpad extends GridLayout implements View.OnClic
     /**
      * @return the number of digits inputted
      */
-    protected final int count() {
+    public final int count() {
         return mCount;
     }
 

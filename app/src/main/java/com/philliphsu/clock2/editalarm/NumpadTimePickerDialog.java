@@ -44,6 +44,7 @@ public class NumpadTimePickerDialog extends DialogFragment implements NumpadTime
     // Don't need to keep a reference to the dismiss ImageButton
     @Bind(R.id.input_time) EditText mInputField;
     @Bind(R.id.number_grid) NumpadTimePicker mNumpad;
+    @Bind(R.id.focus_grabber) View mFocusGrabber;
 
     public NumpadTimePickerDialog() {
         // Empty constructor required for dialog fragment.
@@ -156,5 +157,8 @@ public class NumpadTimePickerDialog extends DialogFragment implements NumpadTime
         mInputField.setText(inputText);
         // Move the cursor
         mInputField.setSelection(mInputField.length());
+        if (mNumpad.count() == mNumpad.capacity()) {
+            mFocusGrabber.requestFocus();
+        }
     }
 }
