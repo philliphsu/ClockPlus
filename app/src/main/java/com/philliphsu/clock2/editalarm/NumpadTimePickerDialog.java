@@ -2,6 +2,7 @@ package com.philliphsu.clock2.editalarm;
 
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,7 +13,6 @@ import com.philliphsu.clock2.R;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 import butterknife.OnTouch;
 
 /**
@@ -94,6 +94,16 @@ public class NumpadTimePickerDialog extends DialogFragment implements NumpadTime
         View view = inflater.inflate(R.layout.dialog_time_picker_numpad, container, false);
         ButterKnife.bind(this, view);
 
+        Toolbar toolbar = ButterKnife.findById(view, R.id.toolbar);
+        toolbar.setNavigationIcon(android.R.drawable.ic_menu_close_clear_cancel);
+        // Can't do a method bind on the navigation icon because we don't own it
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dismiss();
+            }
+        });
+
         // Can't do a method bind because the FAB is not part of this dialog's layout
         // Also can't do the bind in the Numpad's class, because it doesn't have access to
         // the OnTimeSetListener callback contained here or the dialog's dismiss()
@@ -144,11 +154,6 @@ public class NumpadTimePickerDialog extends DialogFragment implements NumpadTime
     boolean captureTouchOnEditText() {
         // Capture touch events on the EditText field, because we want it to do nothing.
         return true;
-    }
-
-    @OnClick(R.id.cancel_icon)
-    void myCancel() {
-        dismiss();
     }
 
     private void updateInputText(String inputText) {

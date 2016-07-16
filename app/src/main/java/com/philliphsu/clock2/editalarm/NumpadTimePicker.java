@@ -92,8 +92,8 @@ public class NumpadTimePicker extends GridLayoutNumpad implements TimePicker {
     @Override
     protected void onDigitsCleared() {
         mFormattedInput.delete(0, mFormattedInput.length());
-        updateNumpadStates();
         mAmPmState = UNSPECIFIED;
+        updateNumpadStates(); // TOneverDO: before resetting mAmPmState to UNSPECIFIED
         super.onDigitsCleared();
     }
 
@@ -155,8 +155,14 @@ public class NumpadTimePicker extends GridLayoutNumpad implements TimePicker {
      * state must be set.
      */
     public boolean checkTimeValid() {
-        if (mAmPmState == UNSPECIFIED || mAmPmState == HRS_24 && count() < 3)
+        // While the test looks bare, it is actually comprehensive.
+        // mAmPmState will remain UNSPECIFIED until a legal
+        // sequence of digits is inputted, no matter the clock system in use.
+        // TODO: So if that's the case, do we actually need 'count() < 3' here? Or better yet,
+        // can we simplify the code to just 'return mAmPmState != UNSPECIFIED'?
+        if (mAmPmState == UNSPECIFIED || mAmPmState == HRS_24 && count() < 3) {
             return false;
+        }
         // AM or PM can only be set if the time was already valid previously, so we don't need
         // to check for them.
         return true;
@@ -306,7 +312,7 @@ public class NumpadTimePicker extends GridLayoutNumpad implements TimePicker {
             }
         } else if (count() == MAX_DIGITS) {
             int colonAt = mFormattedInput.indexOf(":");
-            // Since we now batch updating the formatted input whenever
+            // Since we now batch update the formatted input whenever
             // digits are inserted, the colon may legitimately not be
             // present in the formatted input when this is initialized.
             if (colonAt != -1) {
