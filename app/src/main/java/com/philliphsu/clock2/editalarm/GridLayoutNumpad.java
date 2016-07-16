@@ -132,6 +132,7 @@ public abstract class GridLayoutNumpad extends GridLayout implements View.OnClic
     }
 
     // TODO: Why do we need this?
+    @Deprecated
     public void delete(int at) {
         if (at - 1 >= 0) {
             mInput[at - 1] = UNMODIFIED;
@@ -140,10 +141,11 @@ public abstract class GridLayoutNumpad extends GridLayout implements View.OnClic
         }
     }
 
-    public final void clear() {
+    public final boolean clear() {
         Arrays.fill(mInput, UNMODIFIED);
         mCount = 0;
         onDigitsCleared();
+        return true;
     }
 
     /**

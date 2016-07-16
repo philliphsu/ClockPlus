@@ -226,11 +226,7 @@ public class NumpadTimePicker extends GridLayoutNumpad implements TimePicker {
     }
 
     @OnClick({ R.id.leftAlt, R.id.rightAlt })
-    void onClick(Button altBtn) {
-        onAltButtonClick(altBtn);
-    }
-
-    private void onAltButtonClick(Button altBtn) {
+    void onAltButtonClick(Button altBtn) {
         if (mAltButtons[0] != altBtn && mAltButtons[1] != altBtn)
             throw new IllegalArgumentException("Not called with one of the alt buttons");
 
