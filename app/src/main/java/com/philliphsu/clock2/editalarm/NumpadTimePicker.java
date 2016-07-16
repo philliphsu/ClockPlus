@@ -89,6 +89,10 @@ public class NumpadTimePicker extends GridLayoutNumpad implements TimePicker {
     protected void enable(int lowerLimitInclusive, int upperLimitExclusive) {
         super.enable(lowerLimitInclusive, upperLimitExclusive);
         if (lowerLimitInclusive == 0 && upperLimitExclusive == 0) {
+            // For 12-hour clock, alt buttons need to be disabled as well before firing onInputDisabled()
+            if (!is24HourFormat() && (mAltButtons[0].isEnabled() || mAltButtons[1].isEnabled())) {
+                return;
+            }
             ((OnInputChangeListener) getOnInputChangeListener()).onInputDisabled();
         }
     }
@@ -127,6 +131,7 @@ public class NumpadTimePicker extends GridLayoutNumpad implements TimePicker {
             // No digit was actually deleted, but we have to notify the
             // listener to update its output.
 /*TOneverDO: remove super*/super.onDigitDeleted(mFormattedInput.toString());
+            // We also have to manually update the numpad.
             updateNumpadStates();
         } else {
             super.delete();
@@ -372,7 +377,11 @@ public class NumpadTimePicker extends GridLayoutNumpad implements TimePicker {
     }
 
     private void updateNumpadStates() {
+        // TOneverDO: after updateNumberKeysStates(), esp. if clock is 12-hour,
+        // because it calls enable(0, 0), which checks if the alt buttons have been
+        // disabled as well before firing the onInputDisabled().
         updateAltButtonStates();
+
         updateBackspaceState();
         updateNumberKeysStates();
         updateFabState();
