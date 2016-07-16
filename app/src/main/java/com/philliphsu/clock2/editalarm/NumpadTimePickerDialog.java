@@ -6,24 +6,20 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
-import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageButton;
 
 import com.philliphsu.clock2.R;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import butterknife.OnLongClick;
 import butterknife.OnTouch;
 
 /**
  * Created by Phillip Hsu on 7/12/2016.
  *
  */
-public class NumpadTimePickerDialog extends DialogFragment
-        implements NumpadTimePicker.OnInputChangeListener {
+public class NumpadTimePickerDialog extends DialogFragment implements NumpadTimePicker.OnInputChangeListener {
 
     private static final String KEY_HOUR_OF_DAY = "hour_of_day";
     private static final String KEY_MINUTE = "minute";
@@ -45,10 +41,7 @@ public class NumpadTimePickerDialog extends DialogFragment
      */
     private int[] mInputtedDigits;
 
-    @Bind(R.id.backspace) ImageButton mBackspace;
-    @Bind(R.id.input) EditText mInputField;
-    @Bind(R.id.cancel) Button mCancelButton;
-    @Bind(R.id.ok) Button mOkButton;
+    @Bind(R.id.input_time) EditText mInputField;
     @Bind(R.id.number_grid) NumpadTimePicker mNumpad;
 
     public NumpadTimePickerDialog() {
@@ -101,12 +94,24 @@ public class NumpadTimePickerDialog extends DialogFragment
         View view = inflater.inflate(R.layout.dialog_time_picker_numpad, container, false);
         ButterKnife.bind(this, view);
 
+        // Can't do a method bind because the FAB is not part of this dialog's layout
+        // Also can't do the bind in the Numpad's class, because it doesn't have access to
+        // the OnTimeSetListener callback contained here or the dialog's dismiss()
+        mNumpad.setFabClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!mNumpad.checkTimeValid())
+                    return;
+                mCallback.onTimeSet(mNumpad, mNumpad.hourOfDay(), mNumpad.minute());
+                dismiss();
+            }
+        });
         mNumpad.setOnInputChangeListener(this);
         mNumpad.insertDigits(mInputtedDigits); // TOneverDO: before mNumpad.setOnInputChangeListener(this);
         // Show the cursor immediately
-        mInputField.requestFocus(); // TODO: If changed to TextView, then don't need this.
+        mInputField.requestFocus();
         // TODO: Disabled color
-        updateInputText(""); // Primarily to disable 'OK'
+        //updateInputText(""); // Primarily to disable 'OK'
 
         return view;
     }
@@ -135,41 +140,20 @@ public class NumpadTimePickerDialog extends DialogFragment
         updateInputText("");
     }
 
-    // TODO: If you change the input field to a TextView, then you don't need this.
-    @OnTouch(R.id.input)
+    @OnTouch(R.id.input_time)
     boolean captureTouchOnEditText() {
         // Capture touch events on the EditText field, because we want it to do nothing.
         return true;
     }
 
-    @OnClick(R.id.cancel)
+    @OnClick(R.id.cancel_icon)
     void myCancel() {
         dismiss();
-    }
-
-    @OnClick(R.id.ok)
-    void ok() {
-        if (!mNumpad.checkTimeValid())
-            return;
-        mCallback.onTimeSet(mNumpad, mNumpad.hourOfDay(), mNumpad.minute());
-        dismiss();
-    }
-
-    @OnClick(R.id.backspace)
-    void backspace() {
-        mNumpad.delete();
-    }
-
-    @OnLongClick(R.id.backspace)
-    boolean longBackspace() {
-        mNumpad.clear();
-        return true;
     }
 
     private void updateInputText(String inputText) {
         mInputField.setText(inputText);
         // Move the cursor
-        //mInputField.setSelection(mInputField.length()); // TODO: If changed to TextView, don't need this
-        mOkButton.setEnabled(mNumpad.checkTimeValid());
+        mInputField.setSelection(mInputField.length());
     }
 }

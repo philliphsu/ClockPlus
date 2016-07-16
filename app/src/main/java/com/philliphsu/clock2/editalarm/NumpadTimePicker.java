@@ -2,9 +2,11 @@ package com.philliphsu.clock2.editalarm;
 
 import android.content.Context;
 import android.support.annotation.IntDef;
+import android.support.design.widget.FloatingActionButton;
 import android.text.format.DateFormat;
 import android.util.AttributeSet;
 import android.widget.Button;
+import android.widget.ImageButton;
 
 import com.philliphsu.clock2.R;
 
@@ -15,6 +17,7 @@ import java.util.Calendar;
 
 import butterknife.Bind;
 import butterknife.OnClick;
+import butterknife.OnLongClick;
 
 /**
  * Created by Phillip Hsu on 7/12/2016.
@@ -48,6 +51,8 @@ public class NumpadTimePicker extends GridLayoutNumpad implements TimePicker {
 
     @Bind({ R.id.leftAlt, R.id.rightAlt })
     Button[] mAltButtons;
+    @Bind(R.id.fab) FloatingActionButton mFab;
+    @Bind(R.id.backspace) ImageButton mBackspace;
 
     public NumpadTimePicker(Context context) {
         super(context);
@@ -93,6 +98,7 @@ public class NumpadTimePicker extends GridLayoutNumpad implements TimePicker {
     }
 
     @Override
+    @OnClick(R.id.backspace)
     public void delete() {
         int len = mFormattedInput.length();
         if (!is24HourFormat() && mAmPmState != UNSPECIFIED) {
@@ -106,6 +112,12 @@ public class NumpadTimePicker extends GridLayoutNumpad implements TimePicker {
         } else {
             super.delete();
         }
+    }
+
+    @Override
+    @OnLongClick(R.id.backspace)
+    public boolean clear() {
+        return super.clear();
     }
 
     /** Returns the hour of day (0-23) regardless of clock system */
@@ -211,6 +223,10 @@ public class NumpadTimePicker extends GridLayoutNumpad implements TimePicker {
 
     public String getTime() {
         return mFormattedInput.toString();
+    }
+
+    public void setFabClickListener(OnClickListener fabClickListener) {
+        mFab.setOnClickListener(fabClickListener);
     }
 
     private void init() {
@@ -332,8 +348,17 @@ public class NumpadTimePicker extends GridLayoutNumpad implements TimePicker {
 
     private void updateNumpadStates() {
         updateAltButtonStates();
-        //updateBackspaceState(); // Backspace is not part of the numpad
+        updateBackspaceState();
         updateNumberKeysStates();
+        updateFabState();
+    }
+
+    private void updateFabState() {
+        mFab.setEnabled(checkTimeValid());
+    }
+
+    private void updateBackspaceState() {
+        mBackspace.setEnabled(count() > 0);
     }
 
     private void updateAltButtonStates() {

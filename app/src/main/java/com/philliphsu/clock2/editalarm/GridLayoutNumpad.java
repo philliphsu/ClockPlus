@@ -141,7 +141,7 @@ public abstract class GridLayoutNumpad extends GridLayout implements View.OnClic
         }
     }
 
-    public final boolean clear() {
+    public boolean clear() {
         Arrays.fill(mInput, UNMODIFIED);
         mCount = 0;
         onDigitsCleared();

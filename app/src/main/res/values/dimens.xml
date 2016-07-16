@@ -15,5 +15,6 @@
     <!-- NumpadTimePickerDialog -->
     <dimen name="header_height">72dp</dimen>
     <dimen name="numpad_height">270dp</dimen>
-    <dimen name="time_input_text_size">40sp</dimen>
+    <dimen name="time_input_text_size">45sp</dimen>
+    <dimen name="cancel_icon_size">56dp</dimen>
 </resources>
