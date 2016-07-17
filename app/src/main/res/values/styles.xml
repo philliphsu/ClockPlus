@@ -25,7 +25,7 @@
         <item name="android:layout_width">0dp</item>
         <item name="android:layout_height">0dp</item>
         <item name="android:background">?android:attr/selectableItemBackground</item>
-        <item name="android:textSize">28sp</item>
+        <item name="android:textSize">@dimen/grid_element_text_size</item>
     </style>
 
 </resources>

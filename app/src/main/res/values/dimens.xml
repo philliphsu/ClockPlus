@@ -11,11 +11,18 @@
     <dimen name="alarm_time_text_size">48sp</dimen>
     <dimen name="app_bar_height">180dp</dimen>
     <dimen name="text_margin">16dp</dimen>
-    
+
+    <dimen name="grid_element_text_size">28sp</dimen>
+
     <!-- NumpadTimePickerDialog -->
     <dimen name="header_height">72dp</dimen>
     <dimen name="numpad_height">300dp</dimen>
     <dimen name="time_input_text_size">45sp</dimen>
     <dimen name="cancel_icon_size">56dp</dimen>
     <dimen name="fab_cell_height">88dp</dimen> <!-- 56dp fab size + 16dp top margin + 16dp bottom margin -->
+
+    <!-- ScrollingGridTimePickerDialog -->
+    <dimen name="scrolling_grid_height">270dp</dimen>
+    <dimen name="scrollbar_width">10dp</dimen>
+    <dimen name="ampm_text_size">24sp</dimen>
 </resources>

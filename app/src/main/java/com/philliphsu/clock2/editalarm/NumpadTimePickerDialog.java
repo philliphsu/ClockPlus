@@ -4,13 +4,11 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.widget.EditText;
 
 import com.philliphsu.clock2.R;
 
 import butterknife.Bind;
-import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.OnTouch;
 
@@ -81,11 +79,7 @@ public class NumpadTimePickerDialog extends BaseTimePickerDialog
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        getDialog().getWindow().requestFeature(Window.FEATURE_NO_TITLE);
-
-        View view = inflater.inflate(R.layout.dialog_time_picker_numpad, container, false);
-        ButterKnife.bind(this, view);
-
+        View view = super.onCreateView(inflater, container, savedInstanceState);
         // Can't do a method bind because the FAB is not part of this dialog's layout
         // Also can't do the bind in the Numpad's class, because it doesn't have access to
         // the OnTimeSetListener callback contained here or the dialog's dismiss()
@@ -106,6 +100,11 @@ public class NumpadTimePickerDialog extends BaseTimePickerDialog
         //updateInputText(""); // Primarily to disable 'OK'
 
         return view;
+    }
+
+    @Override
+    protected int contentLayout() {
+        return R.layout.dialog_time_picker_numpad;
     }
 
     @Override
