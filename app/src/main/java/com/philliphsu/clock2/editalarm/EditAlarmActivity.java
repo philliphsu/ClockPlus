@@ -11,10 +11,7 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.SwitchCompat;
-import android.text.SpannableString;
-import android.text.Spanned;
 import android.text.format.DateFormat;
-import android.text.style.RelativeSizeSpan;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -68,11 +65,11 @@ public class EditAlarmActivity extends BaseActivity implements
         LoaderManager.LoaderCallbacks<Alarm>,
         NumpadTimePicker.OnTimeSetListener {
     private static final String TAG = "EditAlarmActivity";
+    private static final String TAG_TIME_PICKER = "time_picker";
+
     public static final String EXTRA_ALARM_ID = "com.philliphsu.clock2.editalarm.extra.ALARM_ID";
     public static final String EXTRA_MODIFIED_ALARM = "com.philliphsu.clock2.editalarm.extra.MODIFIED_ALARM";
     public static final String EXTRA_IS_DELETING = "com.philliphsu.clock2.editalarm.extra.IS_DELETING";
-    private static final RelativeSizeSpan AMPM_SIZE_SPAN = new RelativeSizeSpan(0.5f);
-    private static final String TAG_TIME_PICKER = "time_picker";
 
     private static final String KEY_INPUT_TIME = "input_time";
     private static final String KEY_ENABLED = "enabled";
@@ -87,8 +84,8 @@ public class EditAlarmActivity extends BaseActivity implements
     private long mOldAlarmId;
     private Uri mSelectedRingtoneUri;
     private Alarm mOldAlarm;
-    private int mSelectedHourOfDay = -1;
-    private int mSelctedMinute = -1;
+    private int mSelectedHourOfDay;
+    private int mSelectedMinute;
 
     // If we keep a reference to the dialog, we keep its previous state as well.
     // So the next time we call show() on this, the input field will show the
@@ -106,12 +103,12 @@ public class EditAlarmActivity extends BaseActivity implements
     @Bind(R.id.label) EditText mLabel;
     @Bind(R.id.ringtone) Button mRingtone;
     @Bind(R.id.vibrate) CheckBox mVibrate;
-    @Bind(R.id.numpad) AlarmNumpad mNumpad;
+    @Deprecated @Bind(R.id.numpad) AlarmNumpad mNumpad;
 
     @Override
     public void onTimeSet(ViewGroup viewGroup, int hourOfDay, int minute) {
         mSelectedHourOfDay = hourOfDay;
-        mSelctedMinute = minute;
+        mSelectedMinute = minute;
         showTimeText(DateFormatUtils.formatTime(this, hourOfDay, minute));
     }
 
@@ -120,8 +117,8 @@ public class EditAlarmActivity extends BaseActivity implements
         super.onCreate(savedInstanceState);
         setWeekDaysText();
 
-        // Are we recreating this Activity because of a rotation? If so, try finding
-        // the time picker in our backstack.
+        // Are we recreating this Activity because of a rotation?
+        // If so, try finding the time picker in our backstack.
         NumpadTimePickerDialog picker = (NumpadTimePickerDialog)
                 getSupportFragmentManager().findFragmentByTag(TAG_TIME_PICKER);
         if (picker != null) {
@@ -329,20 +326,9 @@ public class EditAlarmActivity extends BaseActivity implements
 
     @OnClick(R.id.save)
     void save() {
-        int hour;
-        int minutes;
-        try {
-            // TODO: Privatize accessor methods
-            hour = getHour();
-            minutes = getMinutes();
-        } catch (IllegalStateException e) {
-            Log.e(TAG, e.getMessage());
-            return;
-        }
-
         Alarm alarm = Alarm.builder()
-                .hour(hour)
-                .minutes(minutes)
+                .hour(mSelectedHourOfDay)
+                .minutes(mSelectedMinute)
                 .ringtone(getRingtone())
                 .label(getLabel())
                 .vibrates(vibrates())
@@ -577,32 +563,21 @@ public class EditAlarmActivity extends BaseActivity implements
     @Override
     public void setTimeTextHint() {
         if (DateFormat.is24HourFormat(this)) {
-            mTimeText.setHint(R.string.default_alarm_time_24h);
+            mTimeText.setText(R.string.default_alarm_time_24h);
         } else {
-            SpannableString s = new SpannableString(getString(R.string.default_alarm_time_12h));
-            // Since we know the string's contents, we can pass in a hardcoded range
-            s.setSpan(AMPM_SIZE_SPAN, 5, 8, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-            mTimeText.setHint(s);
+            showTimeText(getString(R.string.default_alarm_time_12h));
         }
     }
 
     @Override
     public void showTimeText(String formattedInput) {
-        if (formattedInput.contains("AM") || formattedInput.contains("PM")) {
-            SpannableString s = new SpannableString(formattedInput);
-            s.setSpan(AMPM_SIZE_SPAN, formattedInput.indexOf(" "), formattedInput.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-            mTimeText.setText(s, TextView.BufferType.SPANNABLE);
-        } else {
-            mTimeText.setText(formattedInput);
-        }
-//TODO:delete        mTimeText.setSelection(mTimeText.length());
+        TimeTextUtils.setText(formattedInput, mTimeText);
     }
 
     @Deprecated // TODO: Remove
     @Override
     public void showTimeTextPostBackspace(String newStr) {
         mTimeText.setText(newStr);
-//TODO:delete        mTimeText.setSelection(mTimeText.length());
         if (!mNumpad.checkTimeValid() && mSwitch.isChecked()) {
             mSwitch.setChecked(false);
         }
@@ -689,6 +664,7 @@ public class EditAlarmActivity extends BaseActivity implements
             // TODO default values
             showTimeTextFocused(true);
             showRingtone(""); // gets default ringtone
+            showEnabled(true);
             //showNumpad(true);
         }
     }

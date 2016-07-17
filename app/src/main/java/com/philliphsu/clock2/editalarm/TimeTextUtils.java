@@ -7,17 +7,12 @@ import android.widget.TextView;
 
 /**
  * Created by Phillip Hsu on 7/16/2016.
- *
- * Utility for accessing the RelativeSizeSpan suitable for changing the
- * size of the AM/PM label in a TextView.
- *
- * TODO: Rename to something like TwelveHourTimeTextUtils
  */
 public class TimeTextUtils {
 
     private TimeTextUtils() {}
 
-    public static final RelativeSizeSpan AMPM_SIZE_SPAN = new RelativeSizeSpan(0.5f);
+    private static final RelativeSizeSpan AMPM_SIZE_SPAN = new RelativeSizeSpan(0.5f);
 
     /**
      * Sets the given String on the TextView.

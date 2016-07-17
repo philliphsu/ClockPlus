@@ -2,10 +2,7 @@ package com.philliphsu.clock2.alarms;
 
 import android.support.annotation.NonNull;
 import android.support.v7.widget.SwitchCompat;
-import android.text.SpannableString;
-import android.text.Spanned;
 import android.text.format.DateFormat;
-import android.text.style.RelativeSizeSpan;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +14,7 @@ import com.philliphsu.clock2.BaseViewHolder;
 import com.philliphsu.clock2.DaysOfWeek;
 import com.philliphsu.clock2.OnListItemInteractionListener;
 import com.philliphsu.clock2.R;
+import com.philliphsu.clock2.editalarm.TimeTextUtils;
 import com.philliphsu.clock2.model.AlarmsRepository;
 import com.philliphsu.clock2.util.AlarmController;
 import com.philliphsu.clock2.util.AlarmUtils;
@@ -37,8 +35,6 @@ import static com.philliphsu.clock2.util.DateFormatUtils.formatTime;
  * Created by Phillip Hsu on 5/31/2016.
  */
 public class AlarmViewHolder extends BaseViewHolder<Alarm> implements AlarmCountdown.OnTickListener {
-    private static final RelativeSizeSpan AMPM_SIZE_SPAN = new RelativeSizeSpan(0.5f);
-
     private final AlarmController mAlarmController;
 
     @Bind(R.id.time) TextView mTime;
@@ -154,10 +150,7 @@ public class AlarmViewHolder extends BaseViewHolder<Alarm> implements AlarmCount
         if (DateFormat.is24HourFormat(getContext())) {
             mTime.setText(time);
         } else {
-            // No way around having to construct this on binding
-            SpannableString s = new SpannableString(time);
-            s.setSpan(AMPM_SIZE_SPAN, time.indexOf(" "), time.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-            mTime.setText(s, TextView.BufferType.SPANNABLE);
+            TimeTextUtils.setText(time, mTime);
         }
     }
 
