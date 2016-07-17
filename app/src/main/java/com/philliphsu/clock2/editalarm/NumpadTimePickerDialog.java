@@ -1,7 +1,6 @@
 package com.philliphsu.clock2.editalarm;
 
 import android.os.Bundle;
-import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,14 +18,13 @@ import butterknife.OnTouch;
  * Created by Phillip Hsu on 7/12/2016.
  *
  */
-public class NumpadTimePickerDialog extends DialogFragment implements NumpadTimePicker.OnInputChangeListener {
+public class NumpadTimePickerDialog extends BaseTimePickerDialog
+        implements NumpadTimePicker.OnInputChangeListener {
 
     private static final String KEY_HOUR_OF_DAY = "hour_of_day";
     private static final String KEY_MINUTE = "minute";
     private static final String KEY_IS_24_HOUR_VIEW = "is_24_hour_view";
     private static final String KEY_DIGITS_INPUTTED = "digits_inputted";
-
-    private TimePicker.OnTimeSetListener mCallback;
 
     private int mInitialHourOfDay;
     private int mInitialMinute;
@@ -45,10 +43,6 @@ public class NumpadTimePickerDialog extends DialogFragment implements NumpadTime
     @Bind(R.id.input_time) EditText mInputField;
     @Bind(R.id.number_grid) NumpadTimePicker mNumpad;
     @Bind(R.id.focus_grabber) View mFocusGrabber;
-
-    public NumpadTimePickerDialog() {
-        // Empty constructor required for dialog fragment.
-    }
 
     // TODO: We don't need to pass in an initial hour and minute for a new instance.
     // TODO: Delete is24HourMode?
@@ -73,10 +67,6 @@ public class NumpadTimePickerDialog extends DialogFragment implements NumpadTime
         mInitialHourOfDay = hourOfDay;
         mInitialMinute = minute;
         mIs24HourMode = is24HourMode;
-    }
-
-    public void setOnTimeSetListener(TimePicker.OnTimeSetListener callback) {
-        mCallback = callback;
     }
 
     @Override

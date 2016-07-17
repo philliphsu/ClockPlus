@@ -22,6 +22,7 @@ public interface TimePicker {
          * @param hourOfDay The hour that was set.
          * @param minute The minute that was set.
          */
+        // TODO: Consider changing VG param to TimePicker
         void onTimeSet(ViewGroup viewGroup, int hourOfDay, int minute);
     }
 }
