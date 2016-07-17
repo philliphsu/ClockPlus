@@ -1,17 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- TOneverDO: Use LinearLayout because it doesn't obey LWM -->
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent">
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <android.support.v7.widget.RecyclerView
+    <ScrollView
         android:id="@+id/grid"
         android:layout_width="match_parent"
         android:layout_height="@dimen/scrolling_grid_height"
-        android:scrollbars="vertical"
-        android:scrollbarSize="@dimen/scrollbar_width"
-        android:fadeScrollbars="false"
-        android:layout_alignParentTop="true"/>
+        android:layout_alignParentTop="true">
+
+        <android.support.v7.widget.GridLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:alignmentMode="alignBounds"
+            app:columnCount="3">
+
+            <include layout="@layout/content_grid_layout_numpad"/>
+            <include layout="@layout/content_grid_layout_numpad"/>
+
+        </android.support.v7.widget.GridLayout>
+
+    </ScrollView>
 
     <View
         android:id="@+id/divider"

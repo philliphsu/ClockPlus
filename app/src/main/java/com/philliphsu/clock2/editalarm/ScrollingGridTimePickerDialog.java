@@ -22,7 +22,8 @@ public class ScrollingGridTimePickerDialog extends BaseTimePickerDialog {
     private String[] mValues;
     private boolean mIs24HourMode;
 
-    @Bind(R.id.grid) RecyclerView mGrid;
+    @Nullable
+    @Bind(R.id.main_content) RecyclerView mGrid;
 
     public static ScrollingGridTimePickerDialog newInstance(TimePicker.OnTimeSetListener callback, boolean is24HourMode) {
         ScrollingGridTimePickerDialog ret = new ScrollingGridTimePickerDialog();
@@ -50,15 +51,17 @@ public class ScrollingGridTimePickerDialog extends BaseTimePickerDialog {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = super.onCreateView(inflater, container, savedInstanceState);
 
-        mGrid.setLayoutManager(new GridLayoutManager(view.getContext(), COLUMNS));
-        mAdapter = new ScrollingGridAdapter(mValues, new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // TODO: If on hours, switch dataset to minutes values. Else, do nothing.
-                mAdapter.notifyDataSetChanged();
-            }
-        });
-        mGrid.setAdapter(mAdapter);
+        if (mGrid != null) {
+            mGrid.setLayoutManager(new GridLayoutManager(view.getContext(), COLUMNS));
+            mAdapter = new ScrollingGridAdapter(mValues, new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    // TODO: If on hours, switch dataset to minutes values. Else, do nothing.
+                    mAdapter.notifyDataSetChanged();
+                }
+            });
+            mGrid.setAdapter(mAdapter);
+        }
         return view;
     }
 
