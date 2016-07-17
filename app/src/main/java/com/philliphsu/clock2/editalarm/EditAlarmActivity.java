@@ -15,14 +15,11 @@ import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
-import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.philliphsu.clock2.Alarm;
@@ -40,13 +37,9 @@ import com.philliphsu.clock2.util.LocalBroadcastHelper;
 import java.util.Date;
 
 import butterknife.Bind;
-import butterknife.OnCheckedChanged;
 import butterknife.OnClick;
-import butterknife.OnTouch;
 
 import static android.text.format.DateFormat.getTimeFormat;
-import static android.view.View.GONE;
-import static android.view.View.VISIBLE;
 import static com.philliphsu.clock2.DaysOfWeek.SATURDAY;
 import static com.philliphsu.clock2.DaysOfWeek.SUNDAY;
 import static com.philliphsu.clock2.util.Preconditions.checkNotNull;
@@ -58,7 +51,6 @@ import static com.philliphsu.clock2.util.Preconditions.checkNotNull;
  * the relevant helper methods from here to there.
  */
 public class EditAlarmActivity extends BaseActivity implements
-        AlarmNumpad.KeyListener, // TODO: Deprecated, remove
         EditAlarmContract.View, // TODO: Remove @Override from the methods
         AlarmUtilsHelper,
         SharedPreferencesHelper,
@@ -77,6 +69,8 @@ public class EditAlarmActivity extends BaseActivity implements
     private static final String KEY_LABEL = "label";
     private static final String KEY_RINGTONE_URI = "ringtone";
     private static final String KEY_VIBRATE = "vibrate";
+    private static final String KEY_SELECTED_HOUR = "selected_hour";
+    private static final String KEY_SELECTED_MINUTE = "selected_minute";
 
     private static final int REQUEST_PICK_RINGTONE = 0;
     private static final int ID_MENU_ITEM = 0;
@@ -86,12 +80,7 @@ public class EditAlarmActivity extends BaseActivity implements
     private Alarm mOldAlarm;
     private int mSelectedHourOfDay;
     private int mSelectedMinute;
-
-    // If we keep a reference to the dialog, we keep its previous state as well.
-    // So the next time we call show() on this, the input field will show the
-    // last inputted time. The easiest workaround is to always create a new
-    // instance each time we want to show the dialog.
-//    private NumpadTimePickerDialog mPicker;
+    private final Intent mResultIntent = new Intent();
 
     @Bind(R.id.main_content) CoordinatorLayout mMainContent;
     @Bind(R.id.save) Button mSave;
@@ -103,7 +92,6 @@ public class EditAlarmActivity extends BaseActivity implements
     @Bind(R.id.label) EditText mLabel;
     @Bind(R.id.ringtone) Button mRingtone;
     @Bind(R.id.vibrate) CheckBox mVibrate;
-    @Deprecated @Bind(R.id.numpad) AlarmNumpad mNumpad;
 
     @Override
     public void onTimeSet(ViewGroup viewGroup, int hourOfDay, int minute) {
@@ -127,9 +115,6 @@ public class EditAlarmActivity extends BaseActivity implements
 //            mPicker = picker;
         }
 
-        // TODO: Delete this
-        mNumpad.setKeyListener(this);
-
         mOldAlarmId = getIntent().getLongExtra(EXTRA_ALARM_ID, -1);
         if (mOldAlarmId != -1) {
             // getLoaderManager() for support fragments by default returns the
@@ -152,7 +137,6 @@ public class EditAlarmActivity extends BaseActivity implements
                 }, 300);
             }
         }
-        setTimeTextHint(); // TODO: private access
     }
 
     @Override
@@ -179,6 +163,8 @@ public class EditAlarmActivity extends BaseActivity implements
         outState.putParcelable(KEY_RINGTONE_URI, mSelectedRingtoneUri);
         // This is restored automatically post-rotation
         outState.putBoolean(KEY_VIBRATE, mVibrate.isChecked());
+        outState.putInt(KEY_SELECTED_HOUR, mSelectedHourOfDay);
+        outState.putInt(KEY_SELECTED_MINUTE, mSelectedMinute);
     }
 
     @Override
@@ -201,6 +187,8 @@ public class EditAlarmActivity extends BaseActivity implements
             // we'd be accessing a null Ringtone.
             updateRingtoneButtonText();
         }
+        mSelectedHourOfDay = savedInstanceState.getInt(KEY_SELECTED_HOUR);
+        mSelectedMinute = savedInstanceState.getInt(KEY_SELECTED_MINUTE);
         // TODO: Manually restore the states of the "auto-restoring" widgets.
         // In onCreate(), we will call showDetails().
         // You only witnessed the auto-restoring for a blank Alarm, where
@@ -265,65 +253,6 @@ public class EditAlarmActivity extends BaseActivity implements
         return R.menu.menu_edit_alarm;
     }
 
-    @Override
-    public void onBackPressed() {
-        // This if check must be here unless you want to write a presenter
-        // method called isNumpadOpen()...
-        if (mNumpad.getVisibility() == View.VISIBLE) {
-            showNumpad(false);
-        } else {
-            super.onBackPressed();
-        }
-    }
-
-    @Override
-    public void onAcceptChanges() {
-        showNumpad(false);
-        showEnabled(true);
-    }
-
-    @Override
-    public void onNumberInput(String formattedInput) {
-        showTimeText(formattedInput);
-    }
-
-    @Override
-    public void onCollapse() {
-        showNumpad(false);
-    }
-
-    @Override
-    public void onBackspace(String newStr) {
-        showTimeTextPostBackspace(newStr);
-    }
-
-    @Override
-    public void onLongBackspace() {
-        showTimeTextPostBackspace("");
-    }
-
-    /* // TODO: remove
-    @OnTouch(R.id.input_time)
-    boolean touch(MotionEvent event) {
-        if (event.getActionMasked() == MotionEvent.ACTION_UP) {
-            hideKeyboard(this); // If not open, does nothing.
-            showTimeTextFocused(true);
-            if (mNumpad.getVisibility() != View.VISIBLE) {
-                // TODO: If keyboard was open, consider adding delay to opening the numpad.
-                // Otherwise, it opens immediately behind the keyboard as it is still animating
-                // out of the window.
-                showNumpad(true);
-            }
-        }
-        return true;
-    }
-    */
-
-    @OnClick(R.id.ringtone)
-    void ringtone() {
-        showRingtonePickerDialog();
-    }
-
     @OnClick(R.id.save)
     void save() {
         Alarm alarm = Alarm.builder()
@@ -338,24 +267,22 @@ public class EditAlarmActivity extends BaseActivity implements
             alarm.setRecurring(i, isRecurringDay(i));
         }
 
-        Intent intent = new Intent();
         if (mOldAlarm != null) {
             if (mOldAlarm.isEnabled()) {
                 Log.d(TAG, "Cancelling old alarm first");
                 cancelAlarm(mOldAlarm, false);
             }
             alarm.setId(mOldAlarm.id());
-            intent.putExtra(EXTRA_IS_DELETING, false);
+            mResultIntent.putExtra(EXTRA_IS_DELETING, false);
         }
-        intent.putExtra(EXTRA_MODIFIED_ALARM, alarm);
+        mResultIntent.putExtra(EXTRA_MODIFIED_ALARM, alarm);
 
         // The reason we don't schedule the alarm here is AlarmUtils
         // will attempt to retrieve the specified alarm
         // from the database; however, the alarm hasn't yet
         // been added to the database at this point.
 
-        setResult(RESULT_OK, intent);
-        showEditorClosed();
+        finish();
     }
 
     // TODO: Private accessor
@@ -370,61 +297,26 @@ public class EditAlarmActivity extends BaseActivity implements
                 // is restored (re-inserting into to the db).
                 mOldAlarm.setEnabled(true);
             }
-            Intent intent = new Intent();
-            intent.putExtra(EXTRA_IS_DELETING, true);
-            intent.putExtra(EXTRA_MODIFIED_ALARM, mOldAlarm);
-            setResult(RESULT_OK, intent);
+            mResultIntent.putExtra(EXTRA_IS_DELETING, true);
+            mResultIntent.putExtra(EXTRA_MODIFIED_ALARM, mOldAlarm);
         }
-        showEditorClosed();
+        finish();
     }
 
-    // This isn't actually concerned with setting the alarm on/off.
-    // It only checks if the touch event is valid to be processed.
-    // The actual toggling of on/off is handled when the OnCheckedChange
-    // event is fired. See #onChecked(boolean) below.
-    @OnTouch(R.id.on_off)
-    boolean toggleSwitch(MotionEvent event) {
-        // Event captured on start of pressed gesture
-        if (event.getActionMasked() == MotionEvent.ACTION_DOWN) {
-            if (mTimeText.length() == 0 || mNumpad.checkTimeValid()) {
-                return false; // proceed to call through
-            } else {
-                Toast.makeText(this, "Enter a valid time first.", Toast.LENGTH_SHORT).show();
-                return true; // capture and end the touch event here
-            }
+    @Override
+    public void finish() {
+        if (mResultIntent.getExtras() != null) {
+            setResult(RESULT_OK, mResultIntent);
         }
-        return false;
-    }
-
-    @OnTouch(R.id.label)
-    boolean touchLabel(MotionEvent event) {
-        if (event.getActionMasked() == MotionEvent.ACTION_UP && mNumpad.getVisibility() == VISIBLE) {
-            showNumpad(false);
-        }
-        return false; // don't capture
-    }
-
-    @OnCheckedChanged(R.id.on_off)
-    void onChecked(boolean checked) {
-        if (checked && mTimeText.length() == 0) {
-            mNumpad.setTime(0, 0);
-        }
-    }
-
-    @OnClick(R.id.numpad)
-    void captureClickEvent() {
-        /*
-         * ====================== DO NOT IMPLEMENT =====================================
-         * A stray click in the vicinity of the persistent footer buttons, even while
-         * they are covered by the numpad, will still have the click event call through
-         * to those buttons. This captures the buttons' click events as long as the numpad
-         * is in view.
-         * =============================================================================
-         */
+        super.finish();
     }
 
     @OnClick(R.id.input_time)
     void openTimePicker() {
+        // Create a new instance each time we want to show the dialog.
+        // If we keep a reference to the dialog, we keep its previous state as well.
+        // So the next time we call show() on it, the input field will show the
+        // last inputted time.
         NumpadTimePickerDialog.newInstance(EditAlarmActivity.this)
                 .show(getSupportFragmentManager(), TAG_TIME_PICKER);
     }
@@ -472,6 +364,7 @@ public class EditAlarmActivity extends BaseActivity implements
         mVibrate.setChecked(vibrates);
     }
 
+    @Deprecated
     @Override
     public void showEditorClosed() {
         finish();
@@ -479,12 +372,12 @@ public class EditAlarmActivity extends BaseActivity implements
 
     @Override
     public int getHour() {
-        return mNumpad.getHours();
+        return mSelectedHourOfDay;
     }
 
     @Override
     public int getMinutes() {
-        return mNumpad.getMinutes();
+        return mSelectedMinute;
     }
 
     @Override
@@ -517,7 +410,8 @@ public class EditAlarmActivity extends BaseActivity implements
 
     @Override
     public void showTime(int hour, int minutes) {
-        mNumpad.setTime(hour, minutes);
+        // TODO: Delete
+        showTimeText(DateFormatUtils.formatTime(this, hour, minutes));
     }
 
     @Override
@@ -532,7 +426,7 @@ public class EditAlarmActivity extends BaseActivity implements
 
     @Override
     public void showNumpad(boolean show) {
-        mNumpad.setVisibility(show ? VISIBLE : GONE);
+        // TODO: Delete
     }
 
     @Override
@@ -560,8 +454,21 @@ public class EditAlarmActivity extends BaseActivity implements
         ab.setTitle(title);
     }
 
+    @Deprecated // TODO: Delete in favor of setDefaultTime()
     @Override
     public void setTimeTextHint() {
+        if (DateFormat.is24HourFormat(this)) {
+            mTimeText.setText(R.string.default_alarm_time_24h);
+        } else {
+            showTimeText(getString(R.string.default_alarm_time_12h));
+        }
+    }
+
+    private void setDefaultTime() {
+        mSelectedHourOfDay = 0;
+        mSelectedMinute = 0;
+        // TODO: We could simplify this to just showTimeText() with the only difference being
+        // the string that is passed in.
         if (DateFormat.is24HourFormat(this)) {
             mTimeText.setText(R.string.default_alarm_time_24h);
         } else {
@@ -574,16 +481,14 @@ public class EditAlarmActivity extends BaseActivity implements
         TimeTextUtils.setText(formattedInput, mTimeText);
     }
 
-    @Deprecated // TODO: Remove
+    @Deprecated
     @Override
     public void showTimeTextPostBackspace(String newStr) {
-        mTimeText.setText(newStr);
-        if (!mNumpad.checkTimeValid() && mSwitch.isChecked()) {
-            mSwitch.setChecked(false);
-        }
+        // TODO: Remove
     }
 
     @Override
+    @OnClick(R.id.ringtone)
     public void showRingtonePickerDialog() {
         Intent intent = new Intent(RingtoneManager.ACTION_RINGTONE_PICKER);
         intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE, RingtoneManager.TYPE_ALARM)
@@ -602,9 +507,8 @@ public class EditAlarmActivity extends BaseActivity implements
         if (focused) {
             mTimeText.requestFocus();
             // Move cursor to end
-//TODO:delete            mTimeText.setSelection(mTimeText.length());
         } else {
-            mTimeText.clearFocus(); // TODO: not cleared! focus needs to go to a neighboring view.
+            mTimeText.clearFocus();
         }
     }
 
@@ -617,8 +521,6 @@ public class EditAlarmActivity extends BaseActivity implements
 
     @Override
     public void cancelAlarm(Alarm alarm, boolean showToast) {
-        // TODO: Rewrite XML layout to use CoordinatorLayout and
-        // pass in the snackbar anchor.
         new AlarmController(this, mMainContent).cancelAlarm(alarm, true);
         if (RingtoneActivity.isAlive()) {
             LocalBroadcastHelper.sendBroadcast(this, RingtoneActivity.ACTION_FINISH);
@@ -657,15 +559,13 @@ public class EditAlarmActivity extends BaseActivity implements
             showLabel(mOldAlarm.label());
             showRingtone(mOldAlarm.ringtone());
             showVibrates(mOldAlarm.vibrates());
-            // Editing so don't show
-            showNumpad(false);
             showTimeTextFocused(false);
         } else {
             // TODO default values
+            setDefaultTime();
             showTimeTextFocused(true);
             showRingtone(""); // gets default ringtone
             showEnabled(true);
-            //showNumpad(true);
         }
     }
 }

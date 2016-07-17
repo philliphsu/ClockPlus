@@ -223,14 +223,4 @@
 
     </android.support.design.widget.CoordinatorLayout>
 
-    <com.philliphsu.clock2.editalarm.AlarmNumpad
-        android:id="@+id/numpad"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/colorPrimary"
-        android:theme="@style/ThemeOverlay.AppCompat.Dark"
-        android:elevation="4dp"
-        android:layout_alignParentBottom="true"
-        android:visibility="gone"/>
-
 </RelativeLayout>
