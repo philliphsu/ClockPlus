@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:grid="http://schemas.android.com/apk/res-auto"
+       xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- We have to wrap this in a merge tag or else the GridLayout
+    attributes won't be picked up by the GridLayout that will be
+    the parent of this element. -->
+    <TextView
+        style="@style/hybrid_time_picker_grid_element"
+        android:text="01"/>
+
+</merge>

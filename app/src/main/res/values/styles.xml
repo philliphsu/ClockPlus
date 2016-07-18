@@ -26,4 +26,17 @@
         <item name="android:textSize">@dimen/grid_element_text_size</item>
     </style>
 
+    <style name="hybrid_time_picker_grid_element">
+        <item name="android:layout_width">@dimen/grid_element_touch_target</item>
+        <item name="android:layout_height">@dimen/grid_element_touch_target</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textSize">20sp</item>
+        <!-- http://stackoverflow.com/a/6868308/5055032
+         Leave off the namespace to reference a custom attribute.
+         Here, we are referencing the "grid:" namespace -->
+        <item name="layout_columnWeight">1</item>
+        <item name="layout_rowWeight">1</item>
+        <item name="layout_gravity">center</item>
+    </style>
+
 </resources>

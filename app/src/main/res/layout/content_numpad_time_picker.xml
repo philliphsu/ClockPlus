@@ -7,8 +7,6 @@
     <Button
         android:id="@+id/leftAlt"
         style="@style/grid_element_single"
-        app:layout_rowSpan="1"
-        app:layout_columnSpan="1"
         app:layout_rowWeight="1"
         app:layout_columnWeight="1"
         app:layout_column="0"/>
@@ -16,8 +14,6 @@
     <Button
         android:id="@+id/rightAlt"
         style="@style/grid_element_single"
-        app:layout_rowSpan="1"
-        app:layout_columnSpan="1"
         app:layout_rowWeight="1"
         app:layout_columnWeight="1"
         app:layout_column="2"/>
@@ -43,8 +39,6 @@
         android:id="@+id/backspace"
         android:src="@drawable/ic_backspace_24dp"
         android:background="?selectableItemBackground"
-        app:layout_rowSpan="1"
-        app:layout_columnSpan="1"
         app:layout_rowWeight="1"
         app:layout_columnWeight="1"
         app:layout_column="2"/>

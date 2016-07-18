@@ -4,8 +4,6 @@
     <Button
         android:id="@+id/one"
         style="@style/grid_element_single"
-        grid:layout_rowSpan="1"
-        grid:layout_columnSpan="1"
         grid:layout_rowWeight="1"
         grid:layout_columnWeight="1"
         android:text="1"/>
@@ -13,8 +11,6 @@
     <Button
         android:id="@+id/two"
         style="@style/grid_element_single"
-        grid:layout_rowSpan="1"
-        grid:layout_columnSpan="1"
         grid:layout_rowWeight="1"
         grid:layout_columnWeight="1"
         android:text="2"/>
@@ -29,8 +25,6 @@
     <Button
         android:id="@+id/four"
         style="@style/grid_element_single"
-        grid:layout_rowSpan="1"
-        grid:layout_columnSpan="1"
         grid:layout_rowWeight="1"
         grid:layout_columnWeight="1"
         android:text="4"/>
@@ -38,8 +32,6 @@
     <Button
         android:id="@+id/five"
         style="@style/grid_element_single"
-        grid:layout_rowSpan="1"
-        grid:layout_columnSpan="1"
         grid:layout_rowWeight="1"
         grid:layout_columnWeight="1"
         android:text="5"/>
@@ -47,8 +39,6 @@
     <Button
         android:id="@+id/six"
         style="@style/grid_element_single"
-        grid:layout_rowSpan="1"
-        grid:layout_columnSpan="1"
         grid:layout_rowWeight="1"
         grid:layout_columnWeight="1"
         android:text="6"/>
@@ -56,8 +46,6 @@
     <Button
         android:id="@+id/seven"
         style="@style/grid_element_single"
-        grid:layout_rowSpan="1"
-        grid:layout_columnSpan="1"
         grid:layout_rowWeight="1"
         grid:layout_columnWeight="1"
         android:text="7"/>
@@ -65,8 +53,6 @@
     <Button
         android:id="@+id/eight"
         style="@style/grid_element_single"
-        grid:layout_rowSpan="1"
-        grid:layout_columnSpan="1"
         grid:layout_rowWeight="1"
         grid:layout_columnWeight="1"
         android:text="8"/>
@@ -74,8 +60,6 @@
     <Button
         android:id="@+id/nine"
         style="@style/grid_element_single"
-        grid:layout_rowSpan="1"
-        grid:layout_columnSpan="1"
         grid:layout_rowWeight="1"
         grid:layout_columnWeight="1"
         android:text="9"/>
@@ -83,8 +67,6 @@
     <Button
         android:id="@+id/zero"
         style="@style/grid_element_single"
-        grid:layout_rowSpan="1"
-        grid:layout_columnSpan="1"
         grid:layout_rowWeight="1"
         grid:layout_columnWeight="1"
         grid:layout_column="1"

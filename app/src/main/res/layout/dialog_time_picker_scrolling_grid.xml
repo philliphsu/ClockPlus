@@ -1,75 +1,88 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- TOneverDO: Use LinearLayout because it doesn't obey LWM -->
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                xmlns:app="http://schemas.android.com/apk/res-auto">
-
-    <ScrollView
-        android:id="@+id/grid"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/scrolling_grid_height"
-        android:layout_alignParentTop="true">
-
-        <android.support.v7.widget.GridLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:alignmentMode="alignBounds"
-            app:columnCount="3">
-
-            <include layout="@layout/content_grid_layout_numpad"/>
-            <include layout="@layout/content_grid_layout_numpad"/>
-
-        </android.support.v7.widget.GridLayout>
-
-    </ScrollView>
-
-    <View
-        android:id="@+id/divider"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="?android:listDividerAlertDialog"
-        android:layout_below="@id/grid"/>
+<android.support.design.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="@dimen/fab_cell_height"
-        android:orientation="horizontal"
-        android:layout_below="@id/divider">
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-        <TextView
-            android:layout_width="0dp"
+        <!-- The advantage in defining a single layout for an element
+         of this grid and including it N times, instead of defining each
+         element N times, is code deduplication and reduction. Now, whenever
+         we want to make changes to how grid elements appear, all we have
+         to do is go to the single element's layout and make the changes,
+         and all the following grid elements will be changed. -->
+        <android.support.v7.widget.GridLayout
+            android:id="@+id/grid"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:minHeight="40dp"
-            android:layout_weight="1"
-            android:layout_gravity="center"
-            android:gravity="center"
-            android:text="AM"
-            android:textSize="@dimen/ampm_text_size"/>
+            android:paddingBottom="20dp"
+            app:columnCount="4">
 
-        <FrameLayout
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1">
+            <include layout="@layout/content_hybrid_time_picker"/>
+            <include layout="@layout/content_hybrid_time_picker"/>
+            <include layout="@layout/content_hybrid_time_picker"/>
+            <include layout="@layout/content_hybrid_time_picker"/>
+            <include layout="@layout/content_hybrid_time_picker"/>
+            <include layout="@layout/content_hybrid_time_picker"/>
+            <include layout="@layout/content_hybrid_time_picker"/>
+            <include layout="@layout/content_hybrid_time_picker"/>
+            <include layout="@layout/content_hybrid_time_picker"/>
+            <include layout="@layout/content_hybrid_time_picker"/>
+            <include layout="@layout/content_hybrid_time_picker"/>
+            <include layout="@layout/content_hybrid_time_picker"/>
+            <include layout="@layout/content_hybrid_time_picker"/>
+            <include layout="@layout/content_hybrid_time_picker"/>
+            <include layout="@layout/content_hybrid_time_picker"/>
+            <include layout="@layout/content_hybrid_time_picker"/>
+            <include layout="@layout/content_hybrid_time_picker"/>
+            <include layout="@layout/content_hybrid_time_picker"/>
+            <include layout="@layout/content_hybrid_time_picker"/>
+            <include layout="@layout/content_hybrid_time_picker"/>
+            <include layout="@layout/content_hybrid_time_picker"/>
+            <include layout="@layout/content_hybrid_time_picker"/>
+            <include layout="@layout/content_hybrid_time_picker"/>
+            <include layout="@layout/content_hybrid_time_picker"/>
 
-            <android.support.design.widget.FloatingActionButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:src="@drawable/ic_done_24dp"/>
+        </android.support.v7.widget.GridLayout>
 
-        </FrameLayout>
+        <View
+            android:id="@+id/divider"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="?android:listDividerAlertDialog"/>
 
-        <TextView
-            android:layout_width="0dp"
+        <!-- We need to distribute excess space around the child views
+         without scaling them because they should have a fixed width.
+         LinearLayout and layout_weight cannot achieve this. A passable
+         workaround is to use LinearLayout with Spaces of layout_weight=1
+         to the left and right of each view, but the view will not be
+         exactly centered; besides, that leads to ugly duplicate code. -->
+        <android.support.v7.widget.GridLayout
+            android:id="@+id/ampm"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:minHeight="40dp"
-            android:layout_weight="1"
-            android:layout_gravity="center"
-            android:gravity="center"
-            android:text="PM"
-            android:textSize="@dimen/ampm_text_size"/>
+            app:columnCount="2"
+            app:rowCount="1">
+
+            <include layout="@layout/content_hybrid_time_picker"/>
+            <include layout="@layout/content_hybrid_time_picker"/>
+
+        </android.support.v7.widget.GridLayout>
 
     </LinearLayout>
 
-</RelativeLayout>
+    <android.support.design.widget.FloatingActionButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_anchor="@id/divider"
+        app:layout_anchorGravity="center"
+        app:fabSize="mini"
+        android:src="@drawable/ic_done_24dp"/>
+
+</android.support.design.widget.CoordinatorLayout>

@@ -13,6 +13,7 @@
     <dimen name="text_margin">16dp</dimen>
 
     <dimen name="grid_element_text_size">28sp</dimen>
+    <dimen name="grid_element_touch_target">40dp</dimen>
 
     <!-- NumpadTimePickerDialog -->
     <dimen name="header_height">72dp</dimen>
