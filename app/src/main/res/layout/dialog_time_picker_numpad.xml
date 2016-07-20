@@ -1,82 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.design.widget.CoordinatorLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_marginTop="@dimen/bottom_sheet_vertical_space"
-    android:layout_marginStart="@dimen/bottom_sheet_edge_margin"
-    android:layout_marginEnd="@dimen/bottom_sheet_edge_margin"
-    android:layout_marginBottom="@dimen/bottom_sheet_vertical_space">
+<!-- TOneverDO: Use LinearLayout, because it doesn't obey LWM -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+    android:orientation="vertical">
 
-    <LinearLayout
+    <EditText
+        android:id="@+id/input_time"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
-
-        <!-- TODO: Consider TextView, because we might not want the cursor? -->
-        <EditText
-            android:id="@+id/input_time"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:textSize="@dimen/time_input_text_size"
-            android:background="@android:color/transparent"/>
-
-        <View style="@style/FocusGrabber"
-              android:id="@+id/focus_grabber"/>
-
-        <View style="@style/Divider"/>
-
-        <com.philliphsu.clock2.editalarm.NumpadTimePicker
-            android:id="@+id/number_grid"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/numpad_height"/>
-
-        <LinearLayout
-            android:id="@+id/alt_buttons"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <Space
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_weight="1"/>
-
-            <Button
-                android:id="@+id/leftAlt"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                style="@style/GridLayoutNumpadButton"/>
-
-            <Space
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_weight="1"/>
-
-            <Button
-                android:id="@+id/rightAlt"
-                style="@style/GridLayoutNumpadButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-
-            <Space
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_weight="1"/>
-
-        </LinearLayout>
-
-    </LinearLayout>
-
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab"
-        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/ic_done_24dp"
-        android:layout_gravity="center"
-        app:layout_anchor="@id/alt_buttons"
-        app:layout_anchorGravity="center"/>
+        android:gravity="center"
+        android:textSize="@dimen/time_input_text_size"
+        android:background="@android:color/transparent"/>
 
-</android.support.design.widget.CoordinatorLayout>
+    <View style="@style/FocusGrabber"
+        android:id="@+id/focus_grabber"/>
+
+    <View style="@style/Divider"/>
+
+    <com.philliphsu.clock2.editalarm.NumpadTimePicker
+        android:id="@+id/number_grid"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/numpad_height"
+        android:layout_marginTop="@dimen/bottom_sheet_vertical_space"
+        android:layout_marginStart="@dimen/bottom_sheet_edge_margin"
+        android:layout_marginEnd="@dimen/bottom_sheet_edge_margin"
+        android:layout_marginBottom="@dimen/bottom_sheet_vertical_space"/>
+
+</LinearLayout>

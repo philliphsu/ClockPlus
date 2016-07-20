@@ -2,6 +2,7 @@ package com.philliphsu.clock2.editalarm;
 
 import android.content.Context;
 import android.support.annotation.CallSuper;
+import android.support.annotation.LayoutRes;
 import android.support.v7.widget.GridLayout;
 import android.util.AttributeSet;
 import android.view.View;
@@ -70,6 +71,12 @@ public abstract class GridLayoutNumpad extends GridLayout implements View.OnClic
      * @return the number of digits we can input
      */
     public abstract int capacity();
+
+    /**
+     * @return the layout resource that defines the children for this numpad
+     */
+    @LayoutRes
+    protected abstract int contentLayout();
 
     public final void setOnInputChangeListener(OnInputChangeListener onInputChangeListener) {
         mOnInputChangeListener = onInputChangeListener;
@@ -238,7 +245,7 @@ public abstract class GridLayoutNumpad extends GridLayout implements View.OnClic
     private void init() {
         setAlignmentMode(ALIGN_BOUNDS);
         setColumnCount(COLUMNS);
-        View.inflate(getContext(), R.layout.content_grid_layout_numpad, this);
+        View.inflate(getContext(), contentLayout(), this);
         ButterKnife.bind(this);
         for (Button b : mButtons)
             b.setOnClickListener(this);
