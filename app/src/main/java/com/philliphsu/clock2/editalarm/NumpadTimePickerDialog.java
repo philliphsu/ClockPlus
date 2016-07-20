@@ -142,13 +142,6 @@ public class NumpadTimePickerDialog extends BaseTimePickerDialog
         return true;
     }
 
-    /*
-    @OnClick(R.id.cancel)
-    void cancel() {
-        dismiss();
-    }
-    */
-
     private void updateInputText(String inputText) {
         TimeTextUtils.setText(inputText, mInputField);
         // Move the cursor

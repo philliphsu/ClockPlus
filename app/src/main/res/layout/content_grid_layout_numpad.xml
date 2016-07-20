@@ -51,4 +51,11 @@
         style="@style/GridLayoutNumpadButton"
         grid:layout_column="1"
         android:text="0"/>
+
+
+    <ImageButton
+        android:id="@+id/backspace"
+        android:src="@drawable/ic_backspace_24dp"
+        style="@style/GridLayoutNumpadElement"
+        grid:layout_column="2"/>
 </merge>
