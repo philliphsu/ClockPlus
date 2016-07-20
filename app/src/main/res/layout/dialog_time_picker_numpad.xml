@@ -1,70 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- TOneverDO: Use LinearLayout, because it doesn't obey LWM -->
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:layout_width="match_parent"
-              android:layout_height="match_parent">
+              android:layout_height="match_parent"
+    android:orientation="vertical">
 
-    <!-- We want this to be a FrameLayout so we can make the EditText
-    field LWM, because that solves all of our cursor issues, and so we
-    can put the ImageButton on top (z-level) -->
-    <FrameLayout
-        android:id="@+id/header"
+    <!-- TODO: Consider TextView, because we might not want the cursor? -->
+    <EditText
+        android:id="@+id/input_time"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/header_height"
-        android:background="@color/colorPrimary"
-        android:layout_alignParentTop="true">
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:textSize="@dimen/time_input_text_size"
+        android:background="@android:color/transparent"/>
 
-        <!-- We want this to be an EditText because the cursor indicates
-        where the user's input will go. Otherwise, when the dialog first
-        opens, the user sees the header view as just an appbar that has
-        a single navigation icon, with no indication that the dialog
-        actually displays input. -->
-        <!-- If we were to use LWW, we would have issues with the cursor.
-        (1) It won't show initially, because the view is not big enough to
-        accommodate the cursor drawable. A hacky solution is to set the hint
-        to a single whitespace character.
-        (2) Additionally, when text is inputted, the cursor gets cut off
-        as it advances in position, probably because the text rendered at
-        the set text size is bigger than the view bounds. A satisfactory
-        solution has not been found. We tried adding padding to the end,
-        but that ended up decentralizing the view.
-         -->
-        <EditText
-            android:id="@+id/input_time"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center"
-            android:textSize="@dimen/time_input_text_size"
-            android:background="@android:color/transparent"
-            style="@style/TextAppearance.AppCompat.Inverse"/>
+    <View style="@style/FocusGrabber"
+        android:id="@+id/focus_grabber"/>
 
-        <!-- We need both focusable attrs for requestFocus() to succeed -->
-        <View
-            android:id="@+id/focus_grabber"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:focusable="true"
-            android:focusableInTouchMode="true"/>
-
-        <!-- TOneverDO: Before the EditText, because we need this on top -->
-        <ImageButton
-            android:id="@+id/cancel"
-            android:layout_width="@dimen/cancel_icon_size"
-            android:layout_height="@dimen/cancel_icon_size"
-            android:layout_gravity="center_vertical"
-            android:background="?selectableItemBackground"
-            android:src="@android:drawable/ic_menu_close_clear_cancel"/>
-
-    </FrameLayout>
+    <View style="@style/Divider"/>
 
     <com.philliphsu.clock2.editalarm.NumpadTimePicker
         android:id="@+id/number_grid"
         android:layout_width="match_parent"
         android:layout_height="@dimen/numpad_height"
-        android:layout_below="@id/header"
         android:layout_marginTop="@dimen/bottom_sheet_vertical_space"
         android:layout_marginStart="@dimen/bottom_sheet_edge_margin"
         android:layout_marginEnd="@dimen/bottom_sheet_edge_margin"
         android:layout_marginBottom="@dimen/bottom_sheet_vertical_space"/>
 
-</RelativeLayout>
+</LinearLayout>

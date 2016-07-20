@@ -56,6 +56,8 @@ public abstract class BaseTimePickerDialog extends BottomSheetDialogFragment {
         // While it is true by default, BottomSheetDialogs override this default height.
         // See http://stackoverflow.com/a/35634293/5055032 for an alternative solution involving
         // defining a style that overrides the attribute.
+        // TODO: If the sheet is dragged out of view, then the screen remains darkened until
+        // a subsequent touch on the screen. Consider doing the alt. soln.?
         behavior.setPeekHeight(0);
         dialog.setOnShowListener(new DialogInterface.OnShowListener() {
             @Override

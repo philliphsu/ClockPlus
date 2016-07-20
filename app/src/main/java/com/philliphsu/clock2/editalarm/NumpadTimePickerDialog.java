@@ -9,7 +9,6 @@ import android.widget.EditText;
 import com.philliphsu.clock2.R;
 
 import butterknife.Bind;
-import butterknife.OnClick;
 import butterknife.OnTouch;
 
 /**
@@ -143,10 +142,12 @@ public class NumpadTimePickerDialog extends BaseTimePickerDialog
         return true;
     }
 
+    /*
     @OnClick(R.id.cancel)
     void cancel() {
         dismiss();
     }
+    */
 
     private void updateInputText(String inputText) {
         TimeTextUtils.setText(inputText, mInputField);
