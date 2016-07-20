@@ -61,6 +61,10 @@
         android:id="@+id/number_grid"
         android:layout_width="match_parent"
         android:layout_height="@dimen/numpad_height"
-        android:layout_below="@id/header"/>
+        android:layout_below="@id/header"
+        android:layout_marginTop="@dimen/bottom_sheet_vertical_space"
+        android:layout_marginStart="@dimen/bottom_sheet_edge_margin"
+        android:layout_marginEnd="@dimen/bottom_sheet_edge_margin"
+        android:layout_marginBottom="@dimen/bottom_sheet_vertical_space"/>
 
 </RelativeLayout>

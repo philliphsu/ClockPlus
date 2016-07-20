@@ -26,4 +26,8 @@
     <dimen name="scrolling_grid_height">270dp</dimen>
     <dimen name="scrollbar_width">10dp</dimen>
     <dimen name="ampm_text_size">24sp</dimen>
+
+    <!-- Bottom sheet specs -->
+    <dimen name="bottom_sheet_edge_margin">24dp</dimen>
+    <dimen name="bottom_sheet_vertical_space">16dp</dimen>
 </resources>

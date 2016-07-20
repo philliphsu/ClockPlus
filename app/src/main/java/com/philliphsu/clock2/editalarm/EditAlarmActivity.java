@@ -42,6 +42,7 @@ import butterknife.OnClick;
 import static android.text.format.DateFormat.getTimeFormat;
 import static com.philliphsu.clock2.DaysOfWeek.SATURDAY;
 import static com.philliphsu.clock2.DaysOfWeek.SUNDAY;
+import static com.philliphsu.clock2.util.KeyboardUtils.hideKeyboard;
 import static com.philliphsu.clock2.util.Preconditions.checkNotNull;
 
 /**
@@ -313,12 +314,15 @@ public class EditAlarmActivity extends BaseActivity implements
 
     @OnClick(R.id.input_time)
     void openTimePicker() {
+        // Close the keyboard first, or else our dialog will be screwed up.
+        // If not open, this does nothing.
+        hideKeyboard(this);
         // Create a new instance each time we want to show the dialog.
         // If we keep a reference to the dialog, we keep its previous state as well.
         // So the next time we call show() on it, the input field will show the
         // last inputted time.
-        //NumpadTimePickerDialog.newInstance(this).show(getSupportFragmentManager(), TAG_TIME_PICKER);
-        ScrollingGridTimePickerDialog.newInstance(this, true).show(getSupportFragmentManager(), "tag");
+        NumpadTimePickerDialog.newInstance(this).show(getSupportFragmentManager(), TAG_TIME_PICKER);
+        //ScrollingGridTimePickerDialog.newInstance(this, true).show(getSupportFragmentManager(), "tag");
     }
 
     private void setWeekDaysText() {

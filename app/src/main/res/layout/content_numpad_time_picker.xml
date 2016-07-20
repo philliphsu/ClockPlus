@@ -6,23 +6,17 @@
 
     <Button
         android:id="@+id/leftAlt"
-        style="@style/grid_element_single"
-        app:layout_rowWeight="1"
-        app:layout_columnWeight="1"
+        style="@style/GridLayoutNumpadButton"
         app:layout_column="0"/>
 
     <Button
         android:id="@+id/rightAlt"
-        style="@style/grid_element_single"
-        app:layout_rowWeight="1"
-        app:layout_columnWeight="1"
+        style="@style/GridLayoutNumpadButton"
         app:layout_column="2"/>
 
     <!-- Used to properly position the FAB -->
     <FrameLayout
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:minHeight="@dimen/fab_cell_height"
+        android:layout_height="56dp"
         app:layout_columnWeight="1"
         app:layout_column="1">
 
@@ -38,8 +32,6 @@
     <ImageButton
         android:id="@+id/backspace"
         android:src="@drawable/ic_backspace_24dp"
-        android:background="?selectableItemBackground"
-        app:layout_rowWeight="1"
-        app:layout_columnWeight="1"
+        style="@style/GridLayoutNumpadElement"
         app:layout_column="2"/>
 </merge>
