@@ -322,7 +322,6 @@ public class EditAlarmActivity extends BaseActivity implements
         // So the next time we call show() on it, the input field will show the
         // last inputted time.
         NumpadTimePickerDialog.newInstance(this).show(getSupportFragmentManager(), TAG_TIME_PICKER);
-        //ScrollingGridTimePickerDialog.newInstance(this, true).show(getSupportFragmentManager(), "tag");
     }
 
     private void setWeekDaysText() {
