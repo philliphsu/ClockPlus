@@ -2,12 +2,11 @@ package com.philliphsu.clock2.editalarm;
 
 import android.content.Context;
 import android.support.annotation.CallSuper;
-import android.support.annotation.LayoutRes;
 import android.support.v7.widget.GridLayout;
 import android.util.AttributeSet;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.TextView;
 
 import com.philliphsu.clock2.R;
 
@@ -26,7 +25,7 @@ import butterknife.OnLongClick;
  * and not the backspace button. However, we do provide an API for removing
  * digits from the input.
  */
-public abstract class GridLayoutNumpad extends GridLayout implements View.OnClickListener {
+public abstract class GridLayoutNumpad extends GridLayout {
     // TODO: change to private?
     protected static final int UNMODIFIED = -1;
     private static final int COLUMNS = 3;
@@ -37,7 +36,7 @@ public abstract class GridLayoutNumpad extends GridLayout implements View.OnClic
 
     @Bind({ R.id.zero, R.id.one, R.id.two, R.id.three, R.id.four,
             R.id.five, R.id.six, R.id.seven, R.id.eight, R.id.nine })
-    Button[] mButtons;
+    TextView[] mButtons;
     @Bind(R.id.backspace) ImageButton mBackspace;
 
     /**
@@ -71,12 +70,6 @@ public abstract class GridLayoutNumpad extends GridLayout implements View.OnClic
      * @return the number of digits we can input
      */
     public abstract int capacity();
-
-    /**
-     * @return the layout resource that defines the children for this numpad
-     */
-    @LayoutRes
-    protected abstract int contentLayout();
 
     public final void setOnInputChangeListener(OnInputChangeListener onInputChangeListener) {
         mOnInputChangeListener = onInputChangeListener;
@@ -172,7 +165,7 @@ public abstract class GridLayoutNumpad extends GridLayout implements View.OnClic
      * {@link OnInputChangeListener OnInputChangeListener}
      * after a digit insertion. By default, the String
      * forwarded is just the String value of the inserted digit.
-     * @see #onClick(View)
+     * @see #onClick(TextView)
      * @param newDigit the formatted String that should be displayed
      */
     @CallSuper
@@ -233,11 +226,11 @@ public abstract class GridLayoutNumpad extends GridLayout implements View.OnClic
         }
     }
 
-    // TODO: Why not @OnClick instead?
-    @Override
-    public final void onClick(View v) {
+    @OnClick({ R.id.zero, R.id.one, R.id.two, R.id.three, R.id.four,
+            R.id.five, R.id.six, R.id.seven, R.id.eight, R.id.nine })
+    final void onClick(TextView view) {
         if (mCount < mInput.length) {
-            String textNum = ((Button) v).getText().toString();
+            String textNum = view.getText().toString();
             insertDigits(Integer.parseInt(textNum));
         }
     }
@@ -245,10 +238,8 @@ public abstract class GridLayoutNumpad extends GridLayout implements View.OnClic
     private void init() {
         setAlignmentMode(ALIGN_BOUNDS);
         setColumnCount(COLUMNS);
-        View.inflate(getContext(), contentLayout(), this);
+        View.inflate(getContext(), R.layout.content_grid_layout_numpad, this);
         ButterKnife.bind(this);
-        for (Button b : mButtons)
-            b.setOnClickListener(this);
         // If capacity() < 0, we let the system throw the exception.
         mInput = new int[capacity()];
         Arrays.fill(mInput, UNMODIFIED);
