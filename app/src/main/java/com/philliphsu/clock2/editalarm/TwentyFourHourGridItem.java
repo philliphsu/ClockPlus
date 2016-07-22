@@ -55,7 +55,7 @@ public class TwentyFourHourGridItem extends LinearLayout {
     private void init() {
         setOrientation(VERTICAL);
         setGravity(Gravity.CENTER);
-        inflate(getContext(), R.layout.element_24h_number_grid, this);
+        inflate(getContext(), R.layout.content_24h_grid_item, this);
         ButterKnife.bind(this);
     }
 }

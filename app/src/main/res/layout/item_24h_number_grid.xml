@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+       xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <!-- TODO: Define a grid item style with the first 3 attrs-->
+    <com.philliphsu.clock2.editalarm.TwentyFourHourGridItem
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_gravity="center"
+        style="@style/GridLayoutNumpadElement"/>
+
+</merge>

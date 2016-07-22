@@ -1,32 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <merge xmlns:android="http://schemas.android.com/apk/res/android"
        xmlns:app="http://schemas.android.com/apk/res-auto">
-
-    <include layout="@layout/element_number_grid"/>
-    <include layout="@layout/element_number_grid"/>
-    <include layout="@layout/element_number_grid"/>
-    <include layout="@layout/element_number_grid"/>
-    <include layout="@layout/element_number_grid"/>
-    <include layout="@layout/element_number_grid"/>
-    <include layout="@layout/element_number_grid"/>
-    <include layout="@layout/element_number_grid"/>
-    <include layout="@layout/element_number_grid"/>
-    <include layout="@layout/element_number_grid"/>
-    <include layout="@layout/element_number_grid"/>
-    <include layout="@layout/element_number_grid"/>
-
     <!-- TODO: Use fixed width and height -->
+    <!-- TODO: Add these views to the number grid-->
     <ImageButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         style="@style/GridLayoutNumpadElement"
         android:src="@drawable/ic_minus_circle_24dp"
+        app:layout_gravity="center"
         app:layout_column="1"/>
-
     <ImageButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         style="@style/GridLayoutNumpadElement"
         android:src="@drawable/ic_add_circle_24dp"
+        app:layout_gravity="center"
         app:layout_column="2"/>
 </merge>

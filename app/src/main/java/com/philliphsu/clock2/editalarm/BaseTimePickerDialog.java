@@ -33,7 +33,31 @@ public abstract class BaseTimePickerDialog extends DialogFragment {
         mCallback = callback;
     }
 
-//    Code for BottomSheetDialogs only. To uncomment, highlight and CTRL + /
+    // Code for AlertDialog style only.
+//    @NonNull
+//    @Override
+//    public Dialog onCreateDialog(Bundle savedInstanceState) {
+//        // Use an AlertDialog to display footer buttons, rather than
+//        // re-invent them in our layout.
+//        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+//        builder.setView(contentLayout())
+//                // The action strings are already defined and localized by the system!
+//                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialog, int which) {
+//
+//                    }
+//                })
+//                .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialog, int which) {
+//
+//                    }
+//                });
+//        return builder.create();
+//    }
+
+      // Code for BottomSheetDialogs only. To uncomment, highlight and CTRL + /
 //    @Override
 //    public Dialog onCreateDialog(Bundle savedInstanceState) {
 //        Dialog dialog = super.onCreateDialog(savedInstanceState);

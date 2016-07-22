@@ -4,12 +4,15 @@ import android.content.Context;
 import android.support.v7.widget.GridLayout;
 import android.text.format.DateFormat;
 import android.util.AttributeSet;
+import android.view.View;
+import android.widget.TextView;
 
 import com.philliphsu.clock2.R;
 
 /**
  * Created by Phillip Hsu on 7/21/2016.
  */
+@Deprecated
 public class NumberGrid extends GridLayout {
     private static final String TAG = "NumberGrid";
     private static final int COLUMNS = 3;
@@ -81,6 +84,42 @@ public class NumberGrid extends GridLayout {
     }
 
     /**
+     * Set the numbers to be displayed in this grid.
+     */
+    public void setNumbers(int[] numbers) {
+        // TODO: This method isn't applicable to the 24 Hour grid.. consider creating a subclass
+        // just for 24 hour values? Or just use a regular GridLayout in the dialog's layout
+        // as the container for whatever arbitrary children you want?
+        // TODO: Depending on the user's clock system, there will be different logic to toggle
+        // between "pages". If the user uses 12-hour time, then the same NumberGrid can be reused
+        // for both pages, and you can use this method to replace the texts. Otherwise, you have to
+        // remove all of the 24-hour value items from this grid and inflate the minutes layout
+        // into this grid. Find an elegant solution to implement this logic.
+        setNumbers(numbers, false);
+    }
+
+    public void setNumbers(int[] numbers, boolean zeroPadSingleDigits) {
+        if (numbers != null) {
+            int i = 0;
+            View child;
+            while ((child = getChildAt(i)) instanceof TextView/*TODO: TextViewWithCircularIndicator*/) {
+                String s = zeroPadSingleDigits
+                        ? String.format("%02d", numbers[i])
+                        : String.valueOf(numbers[i]);
+                ((TextView) child).setText(s);
+                child.setOnClickListener(new OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        setNumbers(new int[] {0,5,10,15,20,25,30,35,40,45,50,55}, true);
+                        inflate(getContext(), R.layout.content_number_grid_minute_tuners, NumberGrid.this);
+                    }
+                });
+                i++;
+            }
+        }
+    }
+
+    /**
      * Final because this is implemented for the grid of numbers. If subclasses need their own
      * click listeners for non-numeric buttons, they should set new OnClickListeners on those buttons.
      */
@@ -103,10 +142,14 @@ public class NumberGrid extends GridLayout {
 //        setAlignmentMode(ALIGN_BOUNDS);
         setColumnCount(COLUMNS);
         // When we initialize, display the hour values "page".
-        int layout = DateFormat.is24HourFormat(getContext())
+        boolean is24HourMode = DateFormat.is24HourFormat(getContext());
+        int layout = is24HourMode
                 ? R.layout.content_24h_number_grid
-                : R.layout.content_12h_number_grid;
+                : R.layout.content_number_grid;
         inflate(getContext(), layout, this);
+        if (!is24HourMode) {
+            setNumbers(new int[] {1,2,3,4,5,6,7,8,9,10,11,12});
+        }
 //        ButterKnife.bind(this);
     }
 }
