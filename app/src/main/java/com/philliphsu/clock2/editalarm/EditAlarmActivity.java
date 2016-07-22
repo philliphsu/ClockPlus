@@ -321,7 +321,8 @@ public class EditAlarmActivity extends BaseActivity implements
         // If we keep a reference to the dialog, we keep its previous state as well.
         // So the next time we call show() on it, the input field will show the
         // last inputted time.
-        NumpadTimePickerDialog.newInstance(this).show(getSupportFragmentManager(), TAG_TIME_PICKER);
+//        NumpadTimePickerDialog.newInstance(this).show(getSupportFragmentManager(), TAG_TIME_PICKER);
+        NumberGridTimePickerDialog.newInstance().show(getSupportFragmentManager(), TAG_TIME_PICKER);
     }
 
     private void setWeekDaysText() {

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <TextView
+        android:id="@+id/primary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/colorPrimary"
+        android:textSize="@dimen/grid_element_text_size"/>
+
+    <TextView
+        android:id="@+id/secondary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+</merge>

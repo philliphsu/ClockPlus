@@ -26,6 +26,7 @@
         <item name="android:textSize">@dimen/grid_element_text_size</item>
     </style>
 
+    <!-- TODO: Rename to GridLayoutElement -->
     <style name="GridLayoutNumpadElement">
         <!-- http://stackoverflow.com/a/6868308/5055032
          Leave off the namespace to reference a custom attribute.
@@ -35,6 +36,7 @@
         <item name="android:background">?android:attr/selectableItemBackground</item>
     </style>
 
+    <!-- TODO: Rename to GridLayout[Text/Button/TextView]? -->
     <style name="GridLayoutNumpadButton" parent="GridLayoutNumpadElement">
         <item name="android:textSize">@dimen/grid_element_text_size</item>
     </style>

@@ -9,4 +9,9 @@
         <attr name="metaButtonBarButtonStyle" format="reference"/>
     </declare-styleable>
 
+    <declare-styleable name="TwentyFourHourGridItem">
+        <attr name="primaryText" format="string"/>
+        <attr name="secondaryText" format="string"/>
+    </declare-styleable>
+
 </resources>
