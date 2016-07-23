@@ -322,7 +322,7 @@ public class EditAlarmActivity extends BaseActivity implements
         // So the next time we call show() on it, the input field will show the
         // last inputted time.
 //        NumpadTimePickerDialog.newInstance(this).show(getSupportFragmentManager(), TAG_TIME_PICKER);
-        NumberGridTimePickerDialogV2.newInstance(NumberGridTimePickerDialogV2.HOUR_INDEX, NumberGridTimePickerDialogV2.HALF_DAY_1)
+        NumberGridTimePickerDialog.newInstance(NumberGridTimePickerDialog.HOUR_INDEX, NumberGridTimePickerDialog.HALF_DAY_1)
                 .show(getSupportFragmentManager(), TAG_TIME_PICKER);
     }
 
