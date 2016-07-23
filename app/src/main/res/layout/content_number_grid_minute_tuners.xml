@@ -2,7 +2,6 @@
 <merge xmlns:android="http://schemas.android.com/apk/res/android"
        xmlns:app="http://schemas.android.com/apk/res-auto">
     <!-- TODO: Use fixed width and height -->
-    <!-- TODO: Add these views to the number grid-->
     <ImageButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

@@ -38,8 +38,16 @@ public class TwentyFourHourGridItem extends LinearLayout {
         }
     }
 
+    public CharSequence getPrimaryText() {
+        return mPrimaryText.getText();
+    }
+
     public void setPrimaryText(CharSequence text) {
         mPrimaryText.setText(text);
+    }
+
+    public CharSequence getSecondaryText() {
+        return mSecondaryText.getText();
     }
 
     public void setSecondaryText(CharSequence text) {
