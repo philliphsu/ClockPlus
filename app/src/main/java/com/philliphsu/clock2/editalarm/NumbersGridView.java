@@ -13,7 +13,7 @@ import com.philliphsu.clock2.R;
  * Created by Phillip Hsu on 7/21/2016.
  */
 @Deprecated
-public class NumberGrid extends GridLayout {
+public class NumbersGridView extends GridLayout {
     private static final String TAG = "NumberGrid";
     private static final int COLUMNS = 3;
 
@@ -32,12 +32,12 @@ public class NumberGrid extends GridLayout {
         void onNumberSelected(int number);
     }
 
-    public NumberGrid(Context context, AttributeSet attrs) {
+    public NumbersGridView(Context context, AttributeSet attrs) {
         super(context, attrs);
         init();
     }
 
-    public NumberGrid(Context context) {
+    public NumbersGridView(Context context) {
         super(context);
         init();
     }
@@ -111,7 +111,7 @@ public class NumberGrid extends GridLayout {
                     @Override
                     public void onClick(View v) {
                         setNumbers(new int[] {0,5,10,15,20,25,30,35,40,45,50,55}, true);
-                        inflate(getContext(), R.layout.content_number_grid_minute_tuners, NumberGrid.this);
+                        inflate(getContext(), R.layout.content_number_grid_minute_tuners, NumbersGridView.this);
                     }
                 });
                 i++;
