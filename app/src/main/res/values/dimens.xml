@@ -14,6 +14,7 @@
 
     <dimen name="grid_element_text_size">28sp</dimen>
     <dimen name="grid_element_touch_target">40dp</dimen>
+    <dimen name="half_day_text_size">17sp</dimen>
 
     <!-- NumpadTimePickerDialog -->
     <dimen name="numpad_height">300dp</dimen>

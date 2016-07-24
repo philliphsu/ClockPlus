@@ -77,7 +77,7 @@
 
     </RelativeLayout>
 
-    <View style="@style/Divider"
+    <View style="@style/Divider.Horizontal"
           android:layout_marginTop="@dimen/item_margin_between_elements"/>
 
 </LinearLayout>

@@ -23,7 +23,7 @@
         <View style="@style/FocusGrabber"
               android:id="@+id/focus_grabber"/>
 
-        <View style="@style/Divider"
+        <View style="@style/Divider.Horizontal"
               android:id="@+id/header_divider"
             android:layout_below="@id/input_time"/>
 
@@ -38,7 +38,7 @@
             android:layout_marginEnd="20dp"
             android:layout_marginBottom="28dp"/>
 
-        <View style="@style/Divider"
+        <View style="@style/Divider.Horizontal"
               android:id="@+id/footer_divider"
             android:layout_below="@id/number_grid"/>
 

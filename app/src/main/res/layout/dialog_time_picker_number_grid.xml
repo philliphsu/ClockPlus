@@ -1,46 +1,93 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              xmlns:app="http://schemas.android.com/apk/res-auto"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent">
+<android.support.design.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
-    <FrameLayout
-        android:id="@+id/time_display_background"
+    <!-- TOneverDO: Use vertical LinearLayout as long as
+    GridLayout has no fixed width -->
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@android:color/white" >
-        <include
-            layout="@layout/time_header_label"
+        android:layout_height="match_parent">
+
+        <FrameLayout
+            android:id="@+id/time_display_background"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/header_height"
-            android:layout_gravity="center" />
-    </FrameLayout>
+            android:layout_height="wrap_content"
+            android:background="@android:color/white" >
+            <include
+                layout="@layout/time_header_label"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/header_height"
+                android:layout_gravity="center" />
+        </FrameLayout>
 
-    <android.support.v7.widget.GridLayout
-        android:id="@+id/grid_layout"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/numpad_height"
-        android:layout_below="@id/time_display_background"
-        app:columnCount="3"/>
+        <android.support.v7.widget.GridLayout
+            android:id="@+id/grid_layout"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/numpad_height"
+            android:layout_below="@id/time_display_background"
+            app:columnCount="3"
+            android:layout_marginBottom="28dp"/>
 
-    <LinearLayout
-        android:layout_width="match_parent"
+        <View
+            android:id="@+id/divider"
+            style="@style/Divider.Horizontal"
+            android:layout_below="@id/grid_layout"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_below="@id/divider"
+            android:orientation="horizontal">
+
+            <FrameLayout 
+                android:id="@+id/half_day_toggle_1"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="?android:attr/selectableItemBackground">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:drawablePadding="8dp"
+                    android:gravity="center"
+                    android:layout_gravity="center"
+                    style="@style/TextAppearance.AppCompat.Button"
+                    android:textSize="@dimen/half_day_text_size"/>
+
+            </FrameLayout>
+
+            <FrameLayout
+                android:id="@+id/half_day_toggle_2"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="?android:attr/selectableItemBackground">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:drawablePadding="8dp"
+                    android:gravity="center"
+                    android:layout_gravity="center"
+                    style="@style/TextAppearance.AppCompat.Button"
+                    android:textSize="@dimen/half_day_text_size"/>
+
+            </FrameLayout>
+
+        </LinearLayout>
+
+    </RelativeLayout>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_below="@id/grid_layout">
+        android:src="@drawable/ic_done_24dp"
+        app:layout_anchor="@id/divider"
+        app:layout_anchorGravity="center_horizontal"/>
 
-        <Button
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:text="AM"/>
-
-        <Button
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:text="PM"/>
-
-    </LinearLayout>
-
-</RelativeLayout>
+</android.support.design.widget.CoordinatorLayout>
