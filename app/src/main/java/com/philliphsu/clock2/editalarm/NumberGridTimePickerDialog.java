@@ -45,6 +45,8 @@ import java.util.Locale;
 import butterknife.Bind;
 import butterknife.OnClick;
 
+import static com.philliphsu.clock2.util.ConversionUtils.dpToPx;
+
 //import com.android.datetimepicker.HapticFeedbackController;
 //import com.android.datetimepicker.R;
 //import com.android.datetimepicker.Utils;
@@ -129,8 +131,10 @@ public class NumberGridTimePickerDialog extends BaseTimePickerDialog /*DialogFra
     private static final int[] HOURS_24_HALF_DAY_1 = {0,1,2,3,4,5,6,7,8,9,10,11};
     private static final int[] HOURS_24_HALF_DAY_2 = {12,13,14,15,16,17,18,19,20,21,22,23};
     private static final int[] MINUTES = {0,5,10,15,20,25,30,35,40,45,50,55};
-    // The delay before a OnLongClick on a TwentyFourHourGridItem defers to OnClick
+    // The delay in ms before a OnLongClick on a TwentyFourHourGridItem defers to OnClick
     private static final int LONG_CLICK_RESULT_LEEWAY = 150;
+    // The padding in dp for the half day icon compound drawable
+    public static final int HALF_DAY_ICON_PADDING = 8;
 
     // TODO: Private?
     // Describes both AM/PM in the 12-hour clock and the half-days of the 24-hour clock.
@@ -267,14 +271,15 @@ public class NumberGridTimePickerDialog extends BaseTimePickerDialog /*DialogFra
                     ((TwentyFourHourGridItem) v).swapTexts();
                 }
             }
-            // TODO: Verify the corresponding TwentyFourHourGridItem retains its indicator
-            if (amOrPm == HALF_DAY_1) {
-                mSelectedHourOfDay -= 12;
-            } else if (amOrPm == HALF_DAY_2) {
-                mSelectedHourOfDay += 12;
-            }
-            onValueSelected(HOUR_INDEX, mSelectedHourOfDay, false);
         }
+
+        // TODO: Verify the corresponding TwentyFourHourGridItem retains its indicator
+        if (amOrPm == HALF_DAY_1) {
+            mSelectedHourOfDay %= 12;
+        } else if (amOrPm == HALF_DAY_2) {
+            mSelectedHourOfDay = (mSelectedHourOfDay % 12) + 12;
+        }
+        onValueSelected(HOUR_INDEX, mSelectedHourOfDay, false);
     }
 
     // TODO: Break this into two OnClickListeners instead--one for normal TextViews and
@@ -454,13 +459,15 @@ public class NumberGridTimePickerDialog extends BaseTimePickerDialog /*DialogFra
         TextView tv1 = (TextView) mLeftHalfDayToggle.getChildAt(0);
         TextView tv2 = (TextView) mRightHalfDayToggle.getChildAt(0);
         if (mIs24HourMode) {
-            tv1.setText("00-11");
+            tv1.setText("00 - 11");
             // Intrinsic bounds meaning the drawable's own bounds? So 24dp box.
             tv1.setCompoundDrawablesWithIntrinsicBounds(
                     R.drawable.ic_half_day_1_black_24dp, 0, 0, 0);
-            tv2.setText("12-23");
+            tv1.setCompoundDrawablePadding((int) dpToPx(getActivity(), HALF_DAY_ICON_PADDING));
+            tv2.setText("12 - 23");
             tv2.setCompoundDrawablesWithIntrinsicBounds(
                     R.drawable.ic_half_day_2_black_24dp, 0, 0, 0);
+            tv2.setCompoundDrawablePadding((int) dpToPx(getActivity(), HALF_DAY_ICON_PADDING));
         } else {
             tv1.setText(mAmText);
             tv2.setText(mPmText);

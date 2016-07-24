@@ -3,17 +3,11 @@
        xmlns:app="http://schemas.android.com/apk/res-auto">
     <!-- TODO: Use fixed width and height -->
     <ImageButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
         style="@style/GridLayoutNumpadElement"
         android:src="@drawable/ic_minus_circle_24dp"
-        app:layout_gravity="center"
         app:layout_column="1"/>
     <ImageButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
         style="@style/GridLayoutNumpadElement"
         android:src="@drawable/ic_add_circle_24dp"
-        app:layout_gravity="center"
         app:layout_column="2"/>
 </merge>
