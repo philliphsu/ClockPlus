@@ -226,8 +226,7 @@ public class NumberGridTimePickerDialog extends BaseTimePickerDialog /*DialogFra
             }
 
             if (index == MINUTE_INDEX) {
-                // Also inflate the minute tuner buttons
-                View.inflate(getActivity(), R.layout.content_number_grid_minute_tuners, mGridLayout);
+                createMinutesGrid();
             }
         }
     }
@@ -282,6 +281,18 @@ public class NumberGridTimePickerDialog extends BaseTimePickerDialog /*DialogFra
         onValueSelected(HOUR_INDEX, mSelectedHourOfDay, false);
     }
 
+    private void createMinutesGrid() {
+        // https://android-developers.blogspot.com/2009/03/android-layout-tricks-3-optimize-by.html
+        // "When inflating a layout starting with a <merge />, you *must* specify a parent ViewGroup
+        // and you must set attachToRoot to true (see the documentation of the LayoutInflater#inflate() method)"
+        // Note that by passing in a non-null parent, this will pass in true for attachToRoot.
+        View.inflate(getActivity(), R.layout.content_number_grid_minute_tuners, mGridLayout);
+        int childCount = mGridLayout.getChildCount();
+        // The tuner buttons are always the last two children in the grid
+        mGridLayout.getChildAt(childCount - 2).setOnClickListener(mOnDecrementMinuteListener);
+        mGridLayout.getChildAt(childCount - 1).setOnClickListener(mOnIncrementMinuteListener);
+    }
+
     // TODO: Break this into two OnClickListeners instead--one for normal TextViews and
     // the other for TwentyFourHourGridItem.
     // TODO: Set the indicator
@@ -310,6 +321,25 @@ public class NumberGridTimePickerDialog extends BaseTimePickerDialog /*DialogFra
             toggleHalfDay();
             mOnNumberClickListener.onClick(v);
             return true;
+        }
+    };
+
+    private final OnClickListener mOnIncrementMinuteListener = new OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            // Don't need to check for minute overflow, because setMinute()
+            // sets minute to 0 if we pass in 60
+            onValueSelected(MINUTE_INDEX, mSelectedMinute + 1, false);
+        }
+    };
+
+    private final OnClickListener mOnDecrementMinuteListener = new OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            int value = mSelectedMinute - 1;
+            if (value < 0)
+                value = 59;
+            onValueSelected(MINUTE_INDEX, value, false);
         }
     };
 
@@ -431,8 +461,7 @@ public class NumberGridTimePickerDialog extends BaseTimePickerDialog /*DialogFra
         setNumberTexts();
         setClickListenersOnButtons();
         if (mCurrentIndex == MINUTE_INDEX) {
-            // Add the minute tuner buttons as well
-            View.inflate(getActivity(), R.layout.content_number_grid_minute_tuners, mGridLayout);
+            createMinutesGrid();
         }
 
         Resources res = getResources();
