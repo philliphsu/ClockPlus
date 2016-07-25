@@ -16,7 +16,7 @@ import java.text.DateFormatSymbols;
 /**
  * Created by Phillip Hsu on 7/12/2016.
  */
-public class NumpadTimePicker extends GridLayoutNumpad implements TimePicker {
+public class NumpadTimePicker extends GridLayoutNumpad {
     // Time can be represented with maximum of 4 digits
     private static final int MAX_DIGITS = 4;
 
@@ -130,7 +130,6 @@ public class NumpadTimePicker extends GridLayoutNumpad implements TimePicker {
     }
 
     /** Returns the hour of day (0-23) regardless of clock system */
-    @Override
     public int hourOfDay() {
         if (!checkTimeValid())
             throw new IllegalStateException("Cannot call hourOfDay() until legal time inputted");
@@ -151,7 +150,6 @@ public class NumpadTimePicker extends GridLayoutNumpad implements TimePicker {
         return hours + (mAmPmState == PM ? 12 : 0);
     }
 
-    @Override
     public int minute() {
         if (!checkTimeValid())
             throw new IllegalStateException("Cannot call minute() until legal time inputted");

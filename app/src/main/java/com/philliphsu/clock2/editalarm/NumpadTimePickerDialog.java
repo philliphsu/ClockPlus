@@ -54,21 +54,21 @@ public class NumpadTimePickerDialog extends BaseTimePickerDialog
     // TODO: We don't need to pass in an initial hour and minute for a new instance.
     // TODO: Delete is24HourMode?
     @Deprecated
-    public static NumpadTimePickerDialog newInstance(TimePicker.OnTimeSetListener callback,
+    public static NumpadTimePickerDialog newInstance(OnTimeSetListener callback,
                                                      int hourOfDay, int minute, boolean is24HourMode) {
         NumpadTimePickerDialog ret = new NumpadTimePickerDialog();
         ret.initialize(callback, hourOfDay, minute, is24HourMode);
         return ret;
     }
 
-    public static NumpadTimePickerDialog newInstance(TimePicker.OnTimeSetListener callback) {
+    public static NumpadTimePickerDialog newInstance(OnTimeSetListener callback) {
         NumpadTimePickerDialog ret = new NumpadTimePickerDialog();
         ret.setOnTimeSetListener(callback);
         return ret;
     }
 
     @Deprecated
-    public void initialize(TimePicker.OnTimeSetListener callback,
+    public void initialize(OnTimeSetListener callback,
                            int hourOfDay, int minute, boolean is24HourMode) {
         mCallback = callback;
         mInitialHourOfDay = hourOfDay;

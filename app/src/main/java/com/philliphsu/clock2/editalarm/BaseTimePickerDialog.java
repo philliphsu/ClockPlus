@@ -18,7 +18,21 @@ public abstract class BaseTimePickerDialog extends DialogFragment {
 
     // TODO: Consider private access, and then writing package/protected API that subclasses
     // can use to interface with this field.
-    /*package*/ TimePicker.OnTimeSetListener mCallback;
+    /*package*/ OnTimeSetListener mCallback;
+
+    /**
+     * The callback interface used to indicate the user is done filling in
+     * the time (they clicked on the 'Set' button).
+     */
+    interface OnTimeSetListener {
+        /**
+         * @param viewGroup The view associated with this listener.
+         * @param hourOfDay The hour that was set.
+         * @param minute The minute that was set.
+         */
+        // TODO: Consider removing VG param, since listeners probably won't need to use it....
+        void onTimeSet(ViewGroup viewGroup, int hourOfDay, int minute);
+    }
 
     /**
      * Empty constructor required for dialog fragment.
@@ -29,8 +43,23 @@ public abstract class BaseTimePickerDialog extends DialogFragment {
     @LayoutRes
     protected abstract int contentLayout();
 
-    public final void setOnTimeSetListener(TimePicker.OnTimeSetListener callback) {
+    public final void setOnTimeSetListener(OnTimeSetListener callback) {
         mCallback = callback;
+    }
+
+    @Nullable
+    @Override
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        getDialog().getWindow().requestFeature(Window.FEATURE_NO_TITLE);
+        View view = inflater.inflate(contentLayout(), container, false);
+        ButterKnife.bind(this, view);
+        return view;
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        ButterKnife.unbind(this);
     }
 
     // Code for AlertDialog style only.
@@ -92,19 +121,4 @@ public abstract class BaseTimePickerDialog extends DialogFragment {
 //
 //        return dialog;
 //    }
-
-    @Nullable
-    @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        getDialog().getWindow().requestFeature(Window.FEATURE_NO_TITLE);
-        View view = inflater.inflate(contentLayout(), container, false);
-        ButterKnife.bind(this, view);
-        return view;
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        ButterKnife.unbind(this);
-    }
 }

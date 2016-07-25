@@ -23,7 +23,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.GridLayout;
-import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.KeyCharacterMap;
 import android.view.KeyEvent;
@@ -83,10 +82,7 @@ public class NumberGridTimePickerDialog extends BaseTimePickerDialog /*DialogFra
 
     // Delay before starting the pulse animation, in ms.
     private static final int PULSE_ANIMATOR_DELAY = 300;
-    /**
-     * TODO: (Me) Use my OnTimeSetListener type.
-     */
-    private OnTimeSetListener mCallback;
+//    private OnTimeSetListener mCallback;
 
 //    private HapticFeedbackController mHapticFeedbackController;
 
@@ -308,7 +304,11 @@ public class NumberGridTimePickerDialog extends BaseTimePickerDialog /*DialogFra
                 Log.e(TAG, "TimePicker does not support button type " + v.getClass().getName());
                 return;
             }
-            onValueSelected(mCurrentIndex, Integer.parseInt(number), true);
+            int value = Integer.parseInt(number);
+            if (mCurrentIndex == HOUR_INDEX && !mIs24HourMode && mSelectedHalfDay == HALF_DAY_2) {
+                value = (value % 12) + 12;
+            }
+            onValueSelected(mCurrentIndex, value, true);
         }
     };
 
@@ -345,24 +345,19 @@ public class NumberGridTimePickerDialog extends BaseTimePickerDialog /*DialogFra
 
     // =============================================================================================
 
-    /**
-     * The callback interface used to indicate the user is done filling in
-     * the time (they clicked on the 'Set' button).
-     */
-    /**
-     * TODO: (Me) Once we extend from my BaseTimePickerDialog,
-     * delete this because I defined my own.
-     */
-    public interface OnTimeSetListener {
-
-        /**
-         * @param view The view associated with this listener.
-         * @param hourOfDay The hour that was set.
-         * @param minute The minute that was set.
-         */
+//    /**
+//     * The callback interface used to indicate the user is done filling in
+//     * the time (they clicked on the 'Set' button).
+//     */
+//    public interface OnTimeSetListener {
+//
+//        /**
+//         * @param view The view associated with this listener.
+//         * @param hourOfDay The hour that was set.
+//         * @param minute The minute that was set.
+//         */
 //        void onTimeSet(RadialPickerLayout view, int hourOfDay, int minute);
-        void onTimeSet(View view, int hourOfDay, int minute);
-    }
+//    }
 
     public NumberGridTimePickerDialog() {
         // Empty constructor required for dialog fragment.
@@ -384,10 +379,12 @@ public class NumberGridTimePickerDialog extends BaseTimePickerDialog /*DialogFra
      * @param timeFieldIndex The index representing the time field whose values, ranging from its natural
      *                       lower and upper limits, will be presented as choices in the GridLayout
      *                       contained in this dialog's layout. Must be one of {@link #HOUR_INDEX}
-     *                       or {@link #MINUTE_INDEX}.
+     *                       or {@link #MINUTE_INDEX}. TODO: Why do we need this?
      * @param initialHalfDay The half-day, a.k.a. AM/PM for 12-hour time, that this picker should be
      *                       initialized to. Must be one of {@link #HALF_DAY_1} or {@link #HALF_DAY_2}.
+     *                       TODO: Why do we need this?
      */
+    @Deprecated
     public static NumberGridTimePickerDialog newInstance(int timeFieldIndex, int initialHalfDay) {
         NumberGridTimePickerDialog dialog = new NumberGridTimePickerDialog();
         dialog.mCurrentIndex = timeFieldIndex;
@@ -397,13 +394,15 @@ public class NumberGridTimePickerDialog extends BaseTimePickerDialog /*DialogFra
 
     public void initialize(OnTimeSetListener callback,
             int hourOfDay, int minute, boolean is24HourMode) {
-        mCallback = callback;
+        mCallback = callback; // TODO: Use setOnTimeSetListener() instead?
 
         mInitialHourOfDay = hourOfDay;
         mInitialMinute = minute;
         mIs24HourMode = is24HourMode;
         mInKbMode = false;
         mThemeDark = false;
+
+        mSelectedHalfDay = hourOfDay < 12 ? HALF_DAY_1 : HALF_DAY_2;
     }
 
     /**
@@ -417,9 +416,9 @@ public class NumberGridTimePickerDialog extends BaseTimePickerDialog /*DialogFra
         return mThemeDark;
     }
 
-    public void setOnTimeSetListener(OnTimeSetListener callback) {
-        mCallback = callback;
-    }
+//    public void setOnTimeSetListener(OnTimeSetListener callback) {
+//        mCallback = callback;
+//    }
 
     public void setStartTime(int hourOfDay, int minute) {
         mInitialHourOfDay = hourOfDay;
@@ -431,7 +430,7 @@ public class NumberGridTimePickerDialog extends BaseTimePickerDialog /*DialogFra
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // The Activity is created at this point
-        mIs24HourMode = DateFormat.is24HourFormat(getActivity());
+//        mIs24HourMode = DateFormat.is24HourFormat(getActivity());
         mHandler = new Handler();
         if (savedInstanceState != null && savedInstanceState.containsKey(KEY_HOUR_OF_DAY)
                     && savedInstanceState.containsKey(KEY_MINUTE)
@@ -543,7 +542,6 @@ public class NumberGridTimePickerDialog extends BaseTimePickerDialog /*DialogFra
                     tryVibrate();
                 }
                 Log.i(TAG, String.format("Selected time is %02d:%02d", mSelectedHourOfDay, mSelectedMinute));
-                // TODO: Use your OnTimeSetListener
                 if (mCallback != null) {
 //                    mCallback.onTimeSet(mTimePicker, mTimePicker.getHours(), mTimePicker.getMinutes());
                     // I don't think the listener actually uses the first param passed back,

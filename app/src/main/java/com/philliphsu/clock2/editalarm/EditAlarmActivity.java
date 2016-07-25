@@ -56,7 +56,7 @@ public class EditAlarmActivity extends BaseActivity implements
         AlarmUtilsHelper,
         SharedPreferencesHelper,
         LoaderManager.LoaderCallbacks<Alarm>,
-        NumpadTimePicker.OnTimeSetListener {
+        BaseTimePickerDialog.OnTimeSetListener {
     private static final String TAG = "EditAlarmActivity";
     private static final String TAG_TIME_PICKER = "time_picker";
 
@@ -108,7 +108,7 @@ public class EditAlarmActivity extends BaseActivity implements
 
         // Are we recreating this Activity because of a rotation?
         // If so, try finding the time picker in our backstack.
-        NumpadTimePickerDialog picker = (NumpadTimePickerDialog)
+        BaseTimePickerDialog picker = (BaseTimePickerDialog)
                 getSupportFragmentManager().findFragmentByTag(TAG_TIME_PICKER);
         if (picker != null) {
             // Restore the callback
@@ -316,14 +316,20 @@ public class EditAlarmActivity extends BaseActivity implements
     void openTimePicker() {
         // Close the keyboard first, or else our dialog will be screwed up.
         // If not open, this does nothing.
-        hideKeyboard(this);
+        hideKeyboard(this); // This is only important for BottomSheetDialogs!
         // Create a new instance each time we want to show the dialog.
         // If we keep a reference to the dialog, we keep its previous state as well.
         // So the next time we call show() on it, the input field will show the
         // last inputted time.
 //        NumpadTimePickerDialog.newInstance(this).show(getSupportFragmentManager(), TAG_TIME_PICKER);
-        NumberGridTimePickerDialog.newInstance(NumberGridTimePickerDialog.HOUR_INDEX, NumberGridTimePickerDialog.HALF_DAY_1)
-                .show(getSupportFragmentManager(), TAG_TIME_PICKER);
+        // TODO: Read preferences to see what time picker style to show.
+        BaseTimePickerDialog dialog;
+        dialog = NumberGridTimePickerDialog.newInstance(
+                this, // OnTimeSetListener
+                0, // Initial hour of day
+                0, // Initial minute
+                DateFormat.is24HourFormat(this));
+        dialog.show(getSupportFragmentManager(), TAG_TIME_PICKER);
     }
 
     private void setWeekDaysText() {
