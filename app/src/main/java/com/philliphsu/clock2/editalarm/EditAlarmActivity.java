@@ -5,6 +5,7 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.support.annotation.StringRes;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.LoaderManager;
@@ -321,14 +322,23 @@ public class EditAlarmActivity extends BaseActivity implements
         // If we keep a reference to the dialog, we keep its previous state as well.
         // So the next time we call show() on it, the input field will show the
         // last inputted time.
-        // TODO: Read preferences to see what time picker style to show.
-        BaseTimePickerDialog dialog;
-        dialog = NumberGridTimePickerDialog.newInstance(
-                this, // OnTimeSetListener
-                0, // Initial hour of day
-                0, // Initial minute
-                DateFormat.is24HourFormat(this));
-//        dialog = NumpadTimePickerDialog.newInstance(this);
+        BaseTimePickerDialog dialog = null;
+        String numpadStyle = getString(R.string.number_pad);
+        String gridStyle = getString(R.string.grid_selector);
+        String prefTimePickerStyle = PreferenceManager.getDefaultSharedPreferences(this).getString(
+                // key for the preference value to retrieve
+                getString(R.string.key_time_picker_style),
+                // default value
+                numpadStyle);
+        if (prefTimePickerStyle.equals(numpadStyle)) {
+            dialog = NumpadTimePickerDialog.newInstance(this);
+        } else if (prefTimePickerStyle.equals(gridStyle)) {
+            dialog = NumberGridTimePickerDialog.newInstance(
+                    this, // OnTimeSetListener
+                    0, // Initial hour of day
+                    0, // Initial minute
+                    DateFormat.is24HourFormat(this));
+        }
         dialog.show(getSupportFragmentManager(), TAG_TIME_PICKER);
     }
 

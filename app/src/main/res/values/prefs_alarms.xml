@@ -5,11 +5,15 @@
     <!-- Time picker style -->
     <string name="key_time_picker_style">key_time_picker_style</string>
     <string name="title_time_picker_style">Time picker style</string>
-    <string name="number_pad">Number pad</string>
-    <string name="radial_clock">Radial clock</string>
+    <!-- Internally, we refer to this picker as a numpad because it's concise.
+    However, "numeric keypad" is more descriptive when describing the style to users. -->
+    <string name="number_pad">Numeric keypad</string>
+    <!--<string name="radial_clock">Radial clock</string>-->
+    <string name="grid_selector">Grid selector</string>
     <string-array name="array_time_picker_styles">
         <item>@string/number_pad</item>
-        <item>@string/radial_clock</item>
+        <!--<item>@string/radial_clock</item>-->
+        <item>@string/grid_selector</item>
     </string-array>
 
     <!-- Silence after -->
