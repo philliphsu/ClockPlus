@@ -2,10 +2,10 @@ package com.philliphsu.clock2.editalarm;
 
 import android.content.Context;
 import android.support.annotation.CallSuper;
+import android.support.annotation.LayoutRes;
 import android.support.v7.widget.GridLayout;
 import android.util.AttributeSet;
 import android.view.View;
-import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.philliphsu.clock2.R;
@@ -15,7 +15,6 @@ import java.util.Arrays;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import butterknife.OnLongClick;
 
 /**
  * Created by Phillip Hsu on 7/12/2016.
@@ -37,7 +36,6 @@ public abstract class GridLayoutNumpad extends GridLayout {
     @Bind({ R.id.zero, R.id.one, R.id.two, R.id.three, R.id.four,
             R.id.five, R.id.six, R.id.seven, R.id.eight, R.id.nine })
     TextView[] mButtons;
-    @Bind(R.id.backspace) ImageButton mBackspace;
 
     /**
      * Informs clients how to output the digits inputted into this numpad.
@@ -71,6 +69,9 @@ public abstract class GridLayoutNumpad extends GridLayout {
      */
     public abstract int capacity();
 
+    @LayoutRes
+    protected abstract int contentLayout();
+
     public final void setOnInputChangeListener(OnInputChangeListener onInputChangeListener) {
         mOnInputChangeListener = onInputChangeListener;
     }
@@ -90,10 +91,6 @@ public abstract class GridLayoutNumpad extends GridLayout {
 
         for (int i = 0; i < mButtons.length; i++)
             mButtons[i].setEnabled(i >= lowerLimitInclusive && i < upperLimitExclusive);
-    }
-
-    protected final void setBackspaceEnabled(boolean enabled) {
-        mBackspace.setEnabled(enabled);
     }
 
     protected final int valueAt(int index) {
@@ -131,7 +128,6 @@ public abstract class GridLayoutNumpad extends GridLayout {
         return currentInput;
     }
 
-    @OnClick(R.id.backspace)
     public void delete() {
         /*
         if (mCount - 1 >= 0) {
@@ -152,7 +148,6 @@ public abstract class GridLayoutNumpad extends GridLayout {
         }
     }
 
-    @OnLongClick(R.id.backspace)
     public boolean clear() {
         Arrays.fill(mInput, UNMODIFIED);
         mCount = 0;
@@ -238,7 +233,7 @@ public abstract class GridLayoutNumpad extends GridLayout {
     private void init() {
         setAlignmentMode(ALIGN_BOUNDS);
         setColumnCount(COLUMNS);
-        View.inflate(getContext(), R.layout.content_grid_layout_numpad, this);
+        View.inflate(getContext(), contentLayout(), this);
         ButterKnife.bind(this);
         // If capacity() < 0, we let the system throw the exception.
         mInput = new int[capacity()];

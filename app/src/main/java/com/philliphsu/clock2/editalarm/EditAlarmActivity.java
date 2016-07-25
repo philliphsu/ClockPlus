@@ -321,14 +321,14 @@ public class EditAlarmActivity extends BaseActivity implements
         // If we keep a reference to the dialog, we keep its previous state as well.
         // So the next time we call show() on it, the input field will show the
         // last inputted time.
-//        NumpadTimePickerDialog.newInstance(this).show(getSupportFragmentManager(), TAG_TIME_PICKER);
         // TODO: Read preferences to see what time picker style to show.
         BaseTimePickerDialog dialog;
-        dialog = NumberGridTimePickerDialog.newInstance(
-                this, // OnTimeSetListener
-                0, // Initial hour of day
-                0, // Initial minute
-                DateFormat.is24HourFormat(this));
+//        dialog = NumberGridTimePickerDialog.newInstance(
+//                this, // OnTimeSetListener
+//                0, // Initial hour of day
+//                0, // Initial minute
+//                DateFormat.is24HourFormat(this));
+        dialog = NumpadTimePickerDialog.newInstance(this);
         dialog.show(getSupportFragmentManager(), TAG_TIME_PICKER);
     }
 
