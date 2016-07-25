@@ -29,7 +29,9 @@
             android:layout_height="@dimen/numpad_height"
             android:layout_below="@id/time_display_background"
             app:columnCount="3"
-            android:layout_marginBottom="28dp"/>
+            android:layout_marginStart="@dimen/bottom_sheet_edge_margin"
+            android:layout_marginEnd="@dimen/bottom_sheet_edge_margin"
+            android:paddingBottom="28dp"/>
 
         <View
             android:id="@+id/divider"

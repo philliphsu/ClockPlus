@@ -5,7 +5,7 @@
     <ImageButton
         style="@style/GridLayoutNumpadElement"
         android:src="@drawable/ic_minus_circle_24dp"
-        app:layout_column="1"/>
+        app:layout_column="0"/>
     <ImageButton
         style="@style/GridLayoutNumpadElement"
         android:src="@drawable/ic_add_circle_24dp"
