@@ -305,8 +305,12 @@ public class NumberGridTimePickerDialog extends BaseTimePickerDialog /*DialogFra
                 return;
             }
             int value = Integer.parseInt(number);
-            if (mCurrentIndex == HOUR_INDEX && !mIs24HourMode && mSelectedHalfDay == HALF_DAY_2) {
-                value = (value % 12) + 12;
+            if (mCurrentIndex == HOUR_INDEX && !mIs24HourMode) {
+                if (value == 12 && mSelectedHalfDay == HALF_DAY_1) {
+                    value = 0;
+                } else if (value != 12 && mSelectedHalfDay == HALF_DAY_2) {
+                    value += 12;
+                }
             }
             onValueSelected(mCurrentIndex, value, true);
         }

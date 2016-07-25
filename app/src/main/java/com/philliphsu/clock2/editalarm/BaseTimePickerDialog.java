@@ -3,18 +3,17 @@ package com.philliphsu.clock2.editalarm;
 import android.os.Bundle;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.Nullable;
-import android.support.v4.app.DialogFragment;
+import android.support.design.widget.BottomSheetDialogFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 
 import butterknife.ButterKnife;
 
 /**
  * Created by Phillip Hsu on 7/16/2016.
  */
-public abstract class BaseTimePickerDialog extends DialogFragment {
+public abstract class BaseTimePickerDialog extends BottomSheetDialogFragment {
 
     // TODO: Consider private access, and then writing package/protected API that subclasses
     // can use to interface with this field.
@@ -50,9 +49,22 @@ public abstract class BaseTimePickerDialog extends DialogFragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        getDialog().getWindow().requestFeature(Window.FEATURE_NO_TITLE);
-        View view = inflater.inflate(contentLayout(), container, false);
+        // Not needed for bottom sheet dialogs
+//        getDialog().getWindow().requestFeature(Window.FEATURE_NO_TITLE);
+        final View view = inflater.inflate(contentLayout(), container, false);
         ButterKnife.bind(this, view);
+
+//        // We're past onCreateDialog() in the lifecycle, so getDialog() will return something.
+//        getDialog().setOnShowListener(new DialogInterface.OnShowListener() {
+//            @Override
+//            public void onShow(DialogInterface dialog) {
+//                BottomSheetBehavior behavior = BottomSheetBehavior.from((View) view.getParent());
+//                // Every time we show, show at our full height.
+//                // TODO: This is the cause of our anchored FAB and number grid not showing!
+//                behavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+//            }
+//        });
+
         return view;
     }
 
@@ -90,6 +102,7 @@ public abstract class BaseTimePickerDialog extends DialogFragment {
 //    @Override
 //    public Dialog onCreateDialog(Bundle savedInstanceState) {
 //        Dialog dialog = super.onCreateDialog(savedInstanceState);
+//        //dialog = new BottomSheetDialog(getActivity(), R.style.AppTheme_AppCompatDialog/*crashes our app!*/);
 //        // We're past onCreate() in the lifecycle, so we can safely retrieve the host activity.
 //        View view = LayoutInflater.from(getActivity()).inflate(contentLayout(), null);
 //        /**
@@ -98,7 +111,7 @@ public abstract class BaseTimePickerDialog extends DialogFragment {
 //         * @see {@link BottomSheetDialog#wrapInBottomSheet(int, View, ViewGroup.LayoutParams)}
 //         */
 //        dialog.setContentView(view);
-//        // Bind this fragment, not the internal dialog!
+//        // Bind this fragment, not the internal dialog! (There is a bind(Dialog) API.)
 //        ButterKnife.bind(this, view);
 //        final BottomSheetBehavior behavior = BottomSheetBehavior.from((View) view.getParent());
 //        // When we collapse, collapse all the way. Do not be misled by the "docs" in
