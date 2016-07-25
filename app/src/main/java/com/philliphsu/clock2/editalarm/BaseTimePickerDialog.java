@@ -53,18 +53,6 @@ public abstract class BaseTimePickerDialog extends BottomSheetDialogFragment {
 //        getDialog().getWindow().requestFeature(Window.FEATURE_NO_TITLE);
         final View view = inflater.inflate(contentLayout(), container, false);
         ButterKnife.bind(this, view);
-
-//        // We're past onCreateDialog() in the lifecycle, so getDialog() will return something.
-//        getDialog().setOnShowListener(new DialogInterface.OnShowListener() {
-//            @Override
-//            public void onShow(DialogInterface dialog) {
-//                BottomSheetBehavior behavior = BottomSheetBehavior.from((View) view.getParent());
-//                // Every time we show, show at our full height.
-//                // TODO: This is the cause of our anchored FAB and number grid not showing!
-//                behavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-//            }
-//        });
-
         return view;
     }
 
@@ -98,12 +86,13 @@ public abstract class BaseTimePickerDialog extends BottomSheetDialogFragment {
 //        return builder.create();
 //    }
 
-      // Code for BottomSheetDialogs only. To uncomment, highlight and CTRL + /
+    // This was an unsatisfactory solution to forcing the bottom sheet to show at its
+    // fully expanded state. Our anchored FAB and GridLayout buttons would not be visible.
 //    @Override
 //    public Dialog onCreateDialog(Bundle savedInstanceState) {
 //        Dialog dialog = super.onCreateDialog(savedInstanceState);
 //        //dialog = new BottomSheetDialog(getActivity(), R.style.AppTheme_AppCompatDialog/*crashes our app!*/);
-//        // We're past onCreate() in the lifecycle, so we can safely retrieve the host activity.
+//        // We're past onCreate() in the lifecycle, so the activity is alive.
 //        View view = LayoutInflater.from(getActivity()).inflate(contentLayout(), null);
 //        /**
 //         * Adds our view to a ViewGroup that has a BottomSheetBehavior attached. The ViewGroup
@@ -114,16 +103,18 @@ public abstract class BaseTimePickerDialog extends BottomSheetDialogFragment {
 //        // Bind this fragment, not the internal dialog! (There is a bind(Dialog) API.)
 //        ButterKnife.bind(this, view);
 //        final BottomSheetBehavior behavior = BottomSheetBehavior.from((View) view.getParent());
+
 //        // When we collapse, collapse all the way. Do not be misled by the "docs" in
 //        // https://android-developers.blogspot.com.au/2016/02/android-support-library-232.html
 //        // when it says:
 //        // "STATE_COLLAPSED: ... the app:behavior_peekHeight attribute (defaults to 0)"
 //        // While it is true by default, BottomSheetDialogs override this default height.
-//        // See http://stackoverflow.com/a/35634293/5055032 for an alternative solution involving
-//        // defining a style that overrides the attribute.
-//        // TODO: If the sheet is dragged out of view, then the screen remains darkened until
-//        // a subsequent touch on the screen. Consider doing the alt. soln.?
+
+          // This means the sheet is considered "open" even at a height of 0! This is why
+//        // when you swipe to hide the sheet, the screen remains darkened--indicative
+//        // of an open dialog.
 //        behavior.setPeekHeight(0);
+
 //        dialog.setOnShowListener(new DialogInterface.OnShowListener() {
 //            @Override
 //            public void onShow(DialogInterface dialog) {

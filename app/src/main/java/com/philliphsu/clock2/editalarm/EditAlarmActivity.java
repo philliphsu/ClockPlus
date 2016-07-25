@@ -323,12 +323,12 @@ public class EditAlarmActivity extends BaseActivity implements
         // last inputted time.
         // TODO: Read preferences to see what time picker style to show.
         BaseTimePickerDialog dialog;
-//        dialog = NumberGridTimePickerDialog.newInstance(
-//                this, // OnTimeSetListener
-//                0, // Initial hour of day
-//                0, // Initial minute
-//                DateFormat.is24HourFormat(this));
-        dialog = NumpadTimePickerDialog.newInstance(this);
+        dialog = NumberGridTimePickerDialog.newInstance(
+                this, // OnTimeSetListener
+                0, // Initial hour of day
+                0, // Initial minute
+                DateFormat.is24HourFormat(this));
+//        dialog = NumpadTimePickerDialog.newInstance(this);
         dialog.show(getSupportFragmentManager(), TAG_TIME_PICKER);
     }
 

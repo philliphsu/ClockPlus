@@ -7,7 +7,8 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
         <!-- TODO: This doesn't work for BottomSheetDialogs. Verify this works for other types of dialogs. -->
-        <item name="dialogTheme">@style/AppTheme.AppCompatDialog</item>
+        <item name="dialogTheme">@style/AppCompatDialogTheme</item>
+        <item name="bottomSheetDialogTheme">@style/BottomSheetDialogTheme</item>
     </style>
 
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar"/>
@@ -85,8 +86,16 @@
     </style>
 
     <!-- Style for AppCompatDialog from the v7 support library -->
-    <style name="AppTheme.AppCompatDialog" parent="Theme.AppCompat.Light.Dialog">
+    <style name="AppCompatDialogTheme" parent="Theme.AppCompat.Light.Dialog">
         <item name="colorAccent">?android:attr/colorAccent</item>
+    </style>
+    
+    <style name="BottomSheetDialogTheme" parent="Theme.Design.Light.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/ModalStyle</item>
+    </style>
+
+    <style name="ModalStyle" parent="Widget.Design.BottomSheet.Modal">
+        <item name="behavior_peekHeight">@dimen/peek_height_upper_limit</item>
     </style>
 
 </resources>
