@@ -31,7 +31,7 @@
             app:columnCount="3"
             android:layout_marginStart="@dimen/bottom_sheet_edge_margin"
             android:layout_marginEnd="@dimen/bottom_sheet_edge_margin"
-            android:paddingBottom="28dp"/>
+            android:paddingBottom="@dimen/anchored_fab_vertical_space"/>
 
         <View
             android:id="@+id/divider"

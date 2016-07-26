@@ -26,8 +26,11 @@ doesn't work. -->
     <com.philliphsu.clock2.editalarm.NumpadTimePicker
         android:id="@+id/number_grid"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/numpad_height"
+        android:layout_height="310dp"
         android:layout_below="@id/header_divider"
-        android:layout_marginTop="@dimen/bottom_sheet_vertical_space"/>
+        android:layout_marginTop="@dimen/bottom_sheet_vertical_space"
+        android:layout_marginStart="@dimen/bottom_sheet_edge_margin"
+        android:layout_marginEnd="@dimen/bottom_sheet_edge_margin"
+        android:paddingBottom="@dimen/bottom_sheet_edge_margin"/>
 
 </RelativeLayout>
