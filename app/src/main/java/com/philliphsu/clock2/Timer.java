@@ -11,7 +11,7 @@ import java.util.concurrent.TimeUnit;
  */
 @AutoValue
 public abstract class Timer {
-    private static final int MINUTE = 60 * 1000;
+    private static final long MINUTE = TimeUnit.MINUTES.toMillis(1);
 
     private long id;
     private long endTime;

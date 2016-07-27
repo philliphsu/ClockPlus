@@ -18,7 +18,7 @@ public class DummyContent {
      */
     public static final List<Timer> ITEMS = new ArrayList<>();
 
-    private static final int COUNT = 1;
+    private static final int COUNT = 10;
 
     static {
         // Add some sample items.

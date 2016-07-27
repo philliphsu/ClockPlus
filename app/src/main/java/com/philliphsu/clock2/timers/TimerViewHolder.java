@@ -18,6 +18,8 @@ import butterknife.OnClick;
  */
 public class TimerViewHolder extends BaseViewHolder<Timer> {
 
+    private TimerController mController;
+
     @Bind(R.id.label) TextView mLabel;
     @Bind(R.id.duration) CountdownChronometer mChronometer;
     @Bind(R.id.progress_bar) ProgressBar mProgressBar;
@@ -25,6 +27,7 @@ public class TimerViewHolder extends BaseViewHolder<Timer> {
     @Bind(R.id.start_pause) ImageButton mStartPause;
     @Bind(R.id.stop) ImageButton mStop;
 
+    // TODO: Controller param
     public TimerViewHolder(ViewGroup parent, OnListItemInteractionListener<Timer> listener) {
         super(parent, R.layout.item_timer, listener);
     }
@@ -33,16 +36,23 @@ public class TimerViewHolder extends BaseViewHolder<Timer> {
     public void onBind(Timer timer) {
         super.onBind(timer);
         bindLabel(timer.label());
+        // We can't create the controller until this VH binds, because
+        // the chronometer only exists after this point.
+        mController = new TimerController(timer, mChronometer);
         bindChronometer(timer);
     }
 
     @OnClick(R.id.start_pause)
     void startPause() {
-        if (mChronometer.isRunning()) {
-            mChronometer.pause();
+        Timer t = getItem();
+        if (t.isRunning()) {
+            mController.pause();
         } else {
-            // Cold starts, or resumes.
-            mChronometer.start();
+            if (t.hasStarted()) {
+                mController.resume();
+            } else {
+                mController.start();
+            }
         }
     }
 
@@ -64,7 +74,9 @@ public class TimerViewHolder extends BaseViewHolder<Timer> {
 
         if (!timer.hasStarted()) {
             // Set the initial text
-            mChronometer.setDuration(timer.duration());
+            // TODO: Verify the controller should already have initialized
+            // the text when it was constructed.
+//            mChronometer.setDuration(timer.duration());
         } else if (timer.isRunning()) {
             // Re-initialize the base
             mChronometer.setBase(timer.endTime());

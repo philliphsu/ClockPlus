@@ -38,8 +38,6 @@ public class CountdownChronometer extends TextView {
 
     private long mBase;
     private long mNow; // the currently displayed time
-    private long mPause; // the time at which pause() was called
-    private long mDuration;
     private boolean mVisible;
     private boolean mStarted;
     private boolean mRunning;
@@ -110,7 +108,6 @@ public class CountdownChronometer extends TextView {
 //    @android.view.RemotableViewMethod
     public void setBase(long base) {
         mBase = base;
-        mDuration = base - SystemClock.elapsedRealtime();
         dispatchChronometerTick();
         updateText(SystemClock.elapsedRealtime());
     }
@@ -127,26 +124,6 @@ public class CountdownChronometer extends TextView {
      */
     public void setDuration(long duration) {
         setBase(SystemClock.elapsedRealtime() + duration);
-    }
-
-    /**
-     * Return the duration of this countdown.
-     */
-    public long getDuration() {
-        return mDuration;
-    }
-
-    /**
-     * If the base time has not passed yet, adds one minute to it.
-     * Otherwise, sets another countdown for one minute from now.
-     */
-    public void addOneMinute() {
-        if (getBase() <= SystemClock.elapsedRealtime()) {
-            // Expired already
-            setDuration(60 * 1000);
-        } else {
-            setBase(getBase() + 60 * 1000);
-        }
     }
 
     /**
@@ -201,18 +178,6 @@ public class CountdownChronometer extends TextView {
      * make sure that each start() call has a reciprocal call to {@link #stop}.
      */
     public void start() {
-        if (mPause == 0) {
-            // Do a cold start.
-            // Every time BEFORE we do a cold start, we have to set the base again
-            // because time passes between the instant we first call setBase() and the
-            // instant we start the timer. Otherwise, after we start, that interval of time
-            // would immediately get cut off from the duration.
-            setDuration(mDuration);
-        } else if (mPause > 0) {
-            // Resume from a pause
-            setBase(getBase() + SystemClock.elapsedRealtime() - mPause);
-            mPause = 0;
-        }
         mStarted = true;
         updateRunning();
     }
@@ -227,32 +192,6 @@ public class CountdownChronometer extends TextView {
     public void stop() {
         mStarted = false;
         updateRunning();
-    }
-
-    /**
-     * Like {@link #stop()}, but resets the base and the view display.
-     */
-    public void reset() {
-        stop();
-        setDuration(mDuration);
-        mPause = 0;
-    }
-
-    /**
-     * Like {@link #stop()}, but begins measuring the timeout between now
-     * and the next call to {@link #start()}, so that the base can be increased
-     * by this amount. In effect, the countdown can be resumed without being
-     * affected by the timeout.
-     */
-    public void pause() {
-        if (mPause == 0 && mRunning) {
-            stop();
-            mPause = SystemClock.elapsedRealtime();
-        }
-    }
-
-    public boolean isRunning() {
-        return mRunning;
     }
 
     /**
