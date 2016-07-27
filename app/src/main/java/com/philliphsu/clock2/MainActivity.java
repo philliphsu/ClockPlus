@@ -17,6 +17,7 @@ import android.widget.TextView;
 import com.philliphsu.clock2.alarms.AlarmsFragment;
 import com.philliphsu.clock2.editalarm.EditAlarmActivity;
 import com.philliphsu.clock2.settings.SettingsActivity;
+import com.philliphsu.clock2.timers.TimersFragment;
 
 import butterknife.Bind;
 
@@ -147,8 +148,14 @@ public class MainActivity extends BaseActivity {
         @Override
         public Fragment getItem(int position) {
             // getItem is called to instantiate the fragment for the given page.
-            return position == 0 ? AlarmsFragment.newInstance(1)
-                    : PlaceholderFragment.newInstance(position + 1);
+            switch (position) {
+                case 0:
+                    return AlarmsFragment.newInstance(1);
+                case 1:
+                    return new TimersFragment();
+                default:
+                    return PlaceholderFragment.newInstance(position + 1);
+            }
         }
 
         @Override
