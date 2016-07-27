@@ -98,8 +98,9 @@ public abstract class Timer {
     }
 
     public void addOneMinute() {
-        if (!isRunning())
-            throw new IllegalStateException("Cannot extend a timer that is not running");
+        // Allow extending even if paused.
+//        if (!isRunning())
+//            throw new IllegalStateException("Cannot extend a timer that is not running");
         if (expired()) {
             endTime = SystemClock.elapsedRealtime() + MINUTE;
         } else {

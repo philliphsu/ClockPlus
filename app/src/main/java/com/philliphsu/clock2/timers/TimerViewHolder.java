@@ -37,9 +37,10 @@ public class TimerViewHolder extends BaseViewHolder<Timer> {
         super.onBind(timer);
         bindLabel(timer.label());
         // We can't create the controller until this VH binds, because
-        // the chronometer only exists after this point.
-        mController = new TimerController(timer, mChronometer);
+        // the widgets only exist after this point.
+        mController = new TimerController(timer, mChronometer, mAddOneMinute, mStartPause, mStop);
         bindChronometer(timer);
+        bindButtonControls(timer);
     }
 
     @OnClick(R.id.start_pause)
@@ -54,6 +55,16 @@ public class TimerViewHolder extends BaseViewHolder<Timer> {
                 mController.start();
             }
         }
+    }
+
+    @OnClick(R.id.add_one_minute)
+    void addOneMinute() {
+        mController.addOneMinute();
+    }
+
+    @OnClick(R.id.stop)
+    void stop() {
+        mController.stop();
     }
 
     private void bindLabel(String label) {
@@ -93,5 +104,10 @@ public class TimerViewHolder extends BaseViewHolder<Timer> {
             // every time VHs are bound/recycled.
             mChronometer.setDuration(timer.timeRemaining());
         }
+    }
+
+    private void bindButtonControls(Timer timer) {
+        mController.updateStartPauseIcon();
+        mController.setSecondaryButtonsVisible(timer.hasStarted());
     }
 }
