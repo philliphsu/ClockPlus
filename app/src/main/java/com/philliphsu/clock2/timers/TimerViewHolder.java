@@ -38,28 +38,10 @@ public class TimerViewHolder extends BaseViewHolder<Timer> {
 
     @OnClick(R.id.start_pause)
     void startPause() {
-        // Every time BEFORE you call start() on the chronometer, you have to
-        // call setBase() again because time passes between the time we first call
-        // setBase() and the time we start the timer. Otherwise, after start() is called,
-        // that period of time would appear to have counted off already, as the text
-        // display jumps downward by that amount of time from its initial duration.
-        Timer t = getItem();
-        if (t.hasStarted()) {
-            if (t.isRunning()) {
-                // Records the start of this pause
-                t.pause();
-                // Stops the counting, but does not reset any values
-                mChronometer.stop();
-            } else {
-                // Pushes up the end time
-                t.resume();
-                // Use the new end time as reference from now
-                mChronometer.setBase(t.endTime());
-                mChronometer.start();
-            }
+        if (mChronometer.isRunning()) {
+            mChronometer.pause();
         } else {
-            t.start();
-            mChronometer.setBase(t.endTime());
+            // Cold starts, or resumes.
             mChronometer.start();
         }
     }
