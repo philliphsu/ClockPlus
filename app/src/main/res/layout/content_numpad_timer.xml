@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+       xmlns:grid="http://schemas.android.com/apk/res-auto">
+    <Button
+        android:id="@+id/one"
+        style="@style/GridLayoutNumpadButton"
+        android:text="1"/>
+
+    <Button
+        android:id="@+id/two"
+        style="@style/GridLayoutNumpadButton"
+        android:text="2"/>
+
+    <Button
+        android:id="@+id/three"
+        style="@style/GridLayoutNumpadButton"
+        android:text="3"/>
+
+    <Button
+        android:id="@+id/four"
+        style="@style/GridLayoutNumpadButton"
+        android:text="4"/>
+
+    <Button
+        android:id="@+id/five"
+        style="@style/GridLayoutNumpadButton"
+        android:text="5"/>
+
+    <Button
+        android:id="@+id/six"
+        style="@style/GridLayoutNumpadButton"
+        android:text="6"/>
+
+    <Button
+        android:id="@+id/seven"
+        style="@style/GridLayoutNumpadButton"
+        android:text="7"/>
+
+    <Button
+        android:id="@+id/eight"
+        style="@style/GridLayoutNumpadButton"
+        android:text="8"/>
+
+    <Button
+        android:id="@+id/nine"
+        style="@style/GridLayoutNumpadButton"
+        android:text="9"/>
+
+    <Button
+        android:id="@+id/zero"
+        style="@style/GridLayoutNumpadButton"
+        grid:layout_column="1"
+        android:text="0"/>
+
+    <ImageButton
+        android:id="@+id/backspace"
+        android:src="@drawable/ic_backspace_24dp"
+        style="@style/GridLayoutNumpadElement"
+        grid:layout_column="2"/>
+</merge>

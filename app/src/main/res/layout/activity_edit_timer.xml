@@ -28,12 +28,16 @@
                 app:contentInsetStart="72dp">
 
                 <!-- Set inputType to text to get single-line input -->
-                <EditText
+                <TextView
+                    android:id="@+id/label"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
+                    android:background="?selectableItemBackground"
+                    style="@style/TextAppearance.AppCompat.Title"
                     android:hint="Add label"
-                    android:background="@android:color/transparent"
-                    android:inputType="text"/>
+                    android:gravity="center_vertical"
+                    android:maxLines="1"
+                    android:ellipsize="end"/>
 
             </android.support.v7.widget.Toolbar>
 
@@ -41,10 +45,11 @@
                 android:id="@+id/duration"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="00h 00m 00s"
+                android:text="99h 99m 99s"
                 android:textSize="45sp"
                 android:layout_below="@id/toolbar"
-                android:layout_centerHorizontal="true"/>
+                android:layout_marginStart="72dp"
+                style="@style/TextAppearance.AppCompat"/>
 
             <Space
                 android:id="@+id/space"
@@ -54,12 +59,14 @@
 
             <!-- Keep same dimens as FAB for proper alignment -->
             <ImageButton
+                android:id="@+id/add_one_minute"
                 android:layout_width="56dp"
                 android:layout_height="56dp"
                 android:src="@drawable/ic_half_day_1_black_24dp"
                 android:layout_alignParentStart="true"
                 android:background="?selectableItemBackground"
-                android:layout_below="@id/space"/>
+                android:layout_below="@id/space"
+                android:layout_marginStart="16dp"/>
 
             <android.support.design.widget.FloatingActionButton
                 android:id="@+id/fab"
@@ -77,7 +84,8 @@
                 android:src="@drawable/ic_half_day_1_black_24dp"
                 android:layout_alignParentEnd="true"
                 android:background="?selectableItemBackground"
-                android:layout_below="@id/space"/>
+                android:layout_below="@id/space"
+                android:layout_marginEnd="16dp"/>
 
             <Space
                 android:layout_width="match_parent"
@@ -96,6 +104,7 @@
             android:layout_alignParentBottom="true">
 
             <Button
+                android:id="@+id/delete"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
@@ -105,6 +114,7 @@
             <View style="@style/Divider.Vertical"/>
 
             <Button
+                android:id="@+id/save"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
@@ -113,13 +123,18 @@
 
         </LinearLayout>
 
-        <!-- For the synced devices list. Probably better than a ScrollView. -->
-        <android.support.v7.widget.RecyclerView
+        <!-- TODO: Make and use (Timer/DurationPicker)Numpad -->
+        <android.support.v7.widget.GridLayout
+            android:id="@+id/numpad"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            app:columnCount="3"
             android:layout_below="@id/appbar"
-            android:layout_above="@id/footer"
-            android:paddingTop="8dp"/>
+            android:layout_above="@id/footer">
+
+            <include layout="@layout/content_grid_layout_numpad"/>
+
+        </android.support.v7.widget.GridLayout>
 
         <View style="@style/Divider.Horizontal"
               android:layout_above="@id/footer"/>
@@ -127,25 +142,12 @@
     </RelativeLayout>
 
     <ProgressBar
+        android:id="@+id/progress_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_anchor="@id/appbar"
         app:layout_anchorGravity="bottom"
         style="@style/Widget.AppCompat.ProgressBar.Horizontal"
         android:progress="90"/>
-
-    <android.support.v7.widget.GridLayout
-        android:id="@+id/bottom_sheet_numpad"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/numpad_height"
-        app:columnCount="3"
-        app:layout_behavior="@string/bottom_sheet_behavior"
-        app:behavior_hideable="true"
-        app:behavior_peekHeight="100dp"
-        android:background="#FFF">
-
-        <include layout="@layout/content_grid_layout_numpad"/>
-
-    </android.support.v7.widget.GridLayout>
 
 </android.support.design.widget.CoordinatorLayout>
