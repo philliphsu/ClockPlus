@@ -78,6 +78,9 @@
             android:enabled="true"
             android:exported="false">
         </service>
+
+        <activity android:name=".edittimer.EditTimerActivity">
+        </activity>
     </application>
 
 </manifest>

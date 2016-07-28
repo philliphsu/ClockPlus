@@ -19,7 +19,8 @@
     <!-- NumpadTimePickerDialog -->
     <dimen name="numpad_height">300dp</dimen>
     <dimen name="time_input_text_size">45sp</dimen>
-    <dimen name="fab_cell_height">88dp</dimen> <!-- 56dp fab size + 16dp top margin + 16dp bottom margin -->
+    <dimen name="fab_cell_height">88dp
+    </dimen> <!-- 56dp fab size + 16dp top margin + 16dp bottom margin -->
 
     <!-- Bottom sheet specs -->
     <dimen name="bottom_sheet_edge_margin">24dp</dimen>
