@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+       xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <include layout="@layout/content_grid_layout_numpad"/>
+
+    <Button
+        android:id="@+id/leftAlt"
+        style="@style/GridLayoutNumpadButton"
+        app:layout_column="0"/>
+
+    <Button
+        android:id="@+id/rightAlt"
+        style="@style/GridLayoutNumpadButton"
+        app:layout_column="2"/>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_gravity="center"
+        app:layout_column="1"
+        android:src="@drawable/ic_done_24dp"/>
+
+    <ImageButton
+        android:id="@+id/backspace"
+        android:src="@drawable/ic_backspace_24dp"
+        style="@style/GridLayoutNumpadElement"
+        app:layout_column="2"/>
+
+</merge>

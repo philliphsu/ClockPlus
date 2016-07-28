@@ -222,7 +222,7 @@ public class NumberGridTimePickerDialog extends BaseTimePickerDialog /*DialogFra
             }
 
             if (index == MINUTE_INDEX) {
-                createMinutesGrid();
+                createMinuteTuners();
             }
         }
     }
@@ -277,7 +277,7 @@ public class NumberGridTimePickerDialog extends BaseTimePickerDialog /*DialogFra
         onValueSelected(HOUR_INDEX, mSelectedHourOfDay, false);
     }
 
-    private void createMinutesGrid() {
+    private void createMinuteTuners() {
         // https://android-developers.blogspot.com/2009/03/android-layout-tricks-3-optimize-by.html
         // "When inflating a layout starting with a <merge />, you *must* specify a parent ViewGroup
         // and you must set attachToRoot to true (see the documentation of the LayoutInflater#inflate() method)"
@@ -305,8 +305,12 @@ public class NumberGridTimePickerDialog extends BaseTimePickerDialog /*DialogFra
                 return;
             }
             int value = Integer.parseInt(number);
-            if (mCurrentIndex == HOUR_INDEX && !mIs24HourMode && mSelectedHalfDay == HALF_DAY_2) {
-                value = (value % 12) + 12;
+            if (mCurrentIndex == HOUR_INDEX && !mIs24HourMode) {
+                if (value == 12 && mSelectedHalfDay == HALF_DAY_1) {
+                    value = 0;
+                } else if (value != 12 && mSelectedHalfDay == HALF_DAY_2) {
+                    value += 12;
+                }
             }
             onValueSelected(mCurrentIndex, value, true);
         }
@@ -438,7 +442,7 @@ public class NumberGridTimePickerDialog extends BaseTimePickerDialog /*DialogFra
             mInitialHourOfDay = savedInstanceState.getInt(KEY_HOUR_OF_DAY);
             mInitialMinute = savedInstanceState.getInt(KEY_MINUTE);
             mIs24HourMode = savedInstanceState.getBoolean(KEY_IS_24_HOUR_VIEW);
-            mInKbMode = savedInstanceState.getBoolean(KEY_IN_KB_MODE);
+//            mInKbMode = savedInstanceState.getBoolean(KEY_IN_KB_MODE);
             mThemeDark = savedInstanceState.getBoolean(KEY_DARK_THEME);
         }
     }
@@ -460,7 +464,7 @@ public class NumberGridTimePickerDialog extends BaseTimePickerDialog /*DialogFra
         setNumberTexts();
         setClickListenersOnButtons();
         if (mCurrentIndex == MINUTE_INDEX) {
-            createMinutesGrid();
+            createMinuteTuners();
         }
 
         Resources res = getResources();
@@ -672,6 +676,11 @@ public class NumberGridTimePickerDialog extends BaseTimePickerDialog /*DialogFra
 //            }
 //            outState.putBoolean(KEY_DARK_THEME, mThemeDark);
 //        }
+        outState.putInt(KEY_HOUR_OF_DAY, mSelectedHourOfDay);
+        outState.putInt(KEY_MINUTE, mSelectedMinute);
+        outState.putBoolean(KEY_IS_24_HOUR_VIEW, mIs24HourMode);
+        outState.putInt(KEY_CURRENT_ITEM_SHOWING, mCurrentIndex);
+        outState.putBoolean(KEY_DARK_THEME, mThemeDark);
     }
 
 //    /**

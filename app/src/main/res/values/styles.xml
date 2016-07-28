@@ -6,6 +6,9 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <!-- TODO: This doesn't work for BottomSheetDialogs. Verify this works for other types of dialogs. -->
+        <item name="dialogTheme">@style/AppCompatDialogTheme</item>
+        <item name="bottomSheetDialogTheme">@style/BottomSheetDialogTheme</item>
     </style>
 
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar"/>
@@ -57,7 +60,11 @@
     </style>
 
     <style name="Divider">
-        <item name="android:background">?android:attr/listDivider</item>
+        <!-- Won't be visible in a bottom sheet dialog... -->
+        <!--<item name="android:background">?android:attr/listDivider</item>-->
+        <!-- Extracted from the drawable pointed to by the attr. Visible in bottom sheet. -->
+        <item name="android:background">#1f000000</item> <!-- 12% black -->
+        <item name="android:tint">?android:attr/colorForeground</item>
     </style>
 
     <style name="Divider.Horizontal">
@@ -76,6 +83,19 @@
         <!-- We need both focusable attrs for requestFocus() to succeed -->
         <item name="android:focusable">true</item>
         <item name="android:focusableInTouchMode">true</item>
+    </style>
+
+    <!-- Style for AppCompatDialog from the v7 support library -->
+    <style name="AppCompatDialogTheme" parent="Theme.AppCompat.Light.Dialog">
+        <item name="colorAccent">?android:attr/colorAccent</item>
+    </style>
+    
+    <style name="BottomSheetDialogTheme" parent="Theme.Design.Light.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/ModalStyle</item>
+    </style>
+
+    <style name="ModalStyle" parent="Widget.Design.BottomSheet.Modal">
+        <item name="behavior_peekHeight">@dimen/peek_height_upper_limit</item>
     </style>
 
 </resources>
