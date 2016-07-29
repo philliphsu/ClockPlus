@@ -1,153 +1,140 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.design.widget.CoordinatorLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context="com.philliphsu.clock2.edittimer.EditTimerActivity">
-
+    
     <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <!-- If you add elevation, also add to the ProgressBar. -->
-        <RelativeLayout
-            android:id="@+id/appbar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/colorPrimary"
-            android:theme="@style/AppTheme.AppBarOverlay">
-
-            <android.support.v7.widget.Toolbar
-                android:id="@+id/toolbar"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:popupTheme="@style/AppTheme.PopupOverlay"
-                android:layout_alignParentTop="true"
-                app:contentInsetStart="72dp">
-
-                <!-- Set inputType to text to get single-line input -->
-                <TextView
-                    android:id="@+id/label"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:background="?selectableItemBackground"
-                    style="@style/TextAppearance.AppCompat.Title"
-                    android:hint="Add label"
-                    android:gravity="center_vertical"
-                    android:maxLines="1"
-                    android:ellipsize="end"/>
-
-            </android.support.v7.widget.Toolbar>
-
-            <TextView
-                android:id="@+id/duration"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="99h 99m 99s"
-                android:textSize="45sp"
-                android:layout_below="@id/toolbar"
-                android:layout_marginStart="72dp"
-                style="@style/TextAppearance.AppCompat"/>
-
-            <Space
-                android:id="@+id/space"
-                android:layout_width="match_parent"
-                android:layout_height="8dp"
-                android:layout_below="@id/duration"/>
-
-            <!-- Keep same dimens as FAB for proper alignment -->
-            <ImageButton
-                android:id="@+id/add_one_minute"
-                android:layout_width="56dp"
-                android:layout_height="56dp"
-                android:src="@drawable/ic_half_day_1_black_24dp"
-                android:layout_alignParentStart="true"
-                android:background="?selectableItemBackground"
-                android:layout_below="@id/space"
-                android:layout_marginStart="16dp"/>
-
-            <android.support.design.widget.FloatingActionButton
-                android:id="@+id/fab"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/ic_half_day_1_black_24dp"
-                android:layout_below="@id/space"
-                android:layout_centerHorizontal="true"/>
-
-            <!-- Keep same dimens as FAB for proper alignment -->
-            <ImageButton
-                android:id="@+id/stop"
-                android:layout_width="56dp"
-                android:layout_height="56dp"
-                android:src="@drawable/ic_half_day_1_black_24dp"
-                android:layout_alignParentEnd="true"
-                android:background="?selectableItemBackground"
-                android:layout_below="@id/space"
-                android:layout_marginEnd="16dp"/>
-
-            <Space
-                android:layout_width="match_parent"
-                android:layout_height="8dp"
-                android:layout_below="@id/stop"/>
-
-        </RelativeLayout>
-
-        <!-- Must be fixed height or vertical divider will
-        stretch the entire height -->
-        <LinearLayout
-            android:id="@+id/footer"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:orientation="horizontal"
-            android:layout_alignParentBottom="true">
-
-            <Button
-                android:id="@+id/delete"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                style="@style/Widget.AppCompat.Button.Borderless.Colored"
-                android:text="@string/delete"/>
-
-            <View style="@style/Divider.Vertical"/>
-
-            <Button
-                android:id="@+id/save"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                style="@style/Widget.AppCompat.Button.Borderless.Colored"
-                android:text="@string/save"/>
-
-        </LinearLayout>
-
-        <!-- TODO: Make and use (Timer/DurationPicker)Numpad -->
-        <android.support.v7.widget.GridLayout
-            android:id="@+id/numpad"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:columnCount="3"
-            android:layout_below="@id/appbar"
-            android:layout_above="@id/footer">
-
-            <include layout="@layout/content_grid_layout_numpad"/>
-
-        </android.support.v7.widget.GridLayout>
-
-        <View style="@style/Divider.Horizontal"
-              android:layout_above="@id/footer"/>
-
-    </RelativeLayout>
-
-    <ProgressBar
-        android:id="@+id/progress_bar"
+        android:id="@+id/appbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_anchor="@id/appbar"
-        app:layout_anchorGravity="bottom"
-        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
-        android:progress="90"/>
+        android:background="@color/colorPrimary"
+        android:theme="@style/AppTheme.AppBarOverlay"
+        android:layout_alignParentTop="true"
+        android:paddingBottom="16dp">
 
-</android.support.design.widget.CoordinatorLayout>
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:popupTheme="@style/AppTheme.PopupOverlay"
+            app:contentInsetStart="72dp"
+            android:layout_alignParentTop="true">
+
+            <!-- Set inputType to text to get single-line input -->
+            <TextView
+                android:id="@+id/label"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="?selectableItemBackground"
+                style="@style/TextAppearance.AppCompat.Title"
+                android:hint="Add label"
+                android:gravity="center_vertical"
+                android:maxLines="1"
+                android:ellipsize="end"/>
+
+        </android.support.v7.widget.Toolbar>
+
+        <EditText
+            android:id="@+id/hour"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="00"
+            android:background="@android:color/transparent"
+            android:layout_below="@id/toolbar"
+            android:textSize="45sp"
+            android:layout_marginStart="72dp"/>
+        
+        <TextView
+            android:id="@+id/hour_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="h"
+            android:textSize="24sp"
+            android:layout_below="@id/toolbar"
+            android:layout_toEndOf="@id/hour"
+            android:layout_alignBaseline="@id/hour"
+            style="@style/TextAppearance.AppCompat"/>
+
+        <EditText
+            android:id="@+id/minute"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="00"
+            android:background="@android:color/transparent"
+            android:layout_below="@id/toolbar"
+            android:layout_toEndOf="@id/hour_label"
+            android:textSize="45sp"
+            />
+
+        <TextView
+            android:id="@+id/minute_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="m"
+            android:textSize="24sp"
+            android:layout_below="@id/toolbar"
+            android:layout_toEndOf="@id/minute"
+            android:layout_alignBaseline="@id/minute"
+            style="@style/TextAppearance.AppCompat"
+            />
+
+        <EditText
+            android:id="@+id/second"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="00"
+            android:background="@android:color/transparent"
+            android:layout_below="@id/toolbar"
+            android:layout_toEndOf="@id/minute_label"
+            android:textSize="45sp"
+            />
+
+        <TextView
+            android:id="@+id/second_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="s"
+            android:textSize="24sp"
+            android:layout_below="@id/toolbar"
+            android:layout_toEndOf="@id/second"
+            android:layout_alignBaseline="@id/minute"
+            style="@style/TextAppearance.AppCompat"
+            />
+
+        <View
+            android:id="@+id/focus_grabber"
+            style="@style/FocusGrabber"
+            android:layout_toEndOf="@id/second_label"/> <!-- Required for right focus search -->
+        
+    </RelativeLayout>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_half_day_1_black_24dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"/>
+
+    <!-- We don't really need the overhead of the GridLayoutNumpad,
+     because it would be a major hassle to adapt it for timers. -->
+    <android.support.v7.widget.GridLayout
+        android:id="@+id/numpad"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/appbar"
+        android:layout_above="@id/fab"
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
+        app:columnCount="3">
+
+        <include layout="@layout/content_numpad_timer"/>
+
+    </android.support.v7.widget.GridLayout>
+
+</RelativeLayout>
