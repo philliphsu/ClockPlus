@@ -8,4 +8,5 @@
         android:src="@drawable/ic_backspace_24dp"
         style="@style/GridLayoutNumpadElement"
         grid:layout_column="2"/>
+
 </merge>

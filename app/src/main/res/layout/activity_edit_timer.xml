@@ -112,13 +112,33 @@
         
     </RelativeLayout>
 
+    <!-- When fab.hide() is called, it is gone from the layout.
+    The numpad is anchored in between the fab and the appbar,
+    so if the fab is gone, the numpad won't be constrained
+    above the fab anymore. This placeholder takes up the same
+    height as the fab and is always present in the layout,
+    so we can hide() the fab without losing the bottom anchoring
+    on the numpad. -->
+    <!-- TODO: Use 56dp height for v21. Consider writing
+     a dimen resource for this and make different dimen version files,
+      and/or a style resource and make different style version files. -->
+    <!--<Space
+        android:id="@+id/fab_placeholder"
+        android:layout_width="0dp"
+        android:layout_height="88dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"/>-->
+
+    <!-- TODO: Consider defining a style instead. Use the same attrs
+    as below for base API versions, and make a v21 version
+    that includes margin bottom of 16dp. -->
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/ic_half_day_1_black_24dp"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"/>
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true"/>
 
     <!-- We don't really need the overhead of the GridLayoutNumpad,
      because it would be a major hassle to adapt it for timers. -->

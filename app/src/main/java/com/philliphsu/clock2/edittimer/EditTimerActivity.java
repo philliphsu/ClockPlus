@@ -18,11 +18,9 @@ import butterknife.OnClick;
 import butterknife.OnLongClick;
 import butterknife.OnTouch;
 
+// TODO: Rename to CreateTimerActivity
 public class EditTimerActivity extends BaseActivity {
     private static final int FIELD_LENGTH = 2;
-
-    private final int[] mInput = new int[6];
-    private int mCursorAt;
 
     @Bind(R.id.appbar) ViewGroup mAppBar;
     @Bind(R.id.label) TextView mLabel;
@@ -41,6 +39,7 @@ public class EditTimerActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+//        updateStartButtonVisibility();
     }
 
     @Override
@@ -54,6 +53,11 @@ public class EditTimerActivity extends BaseActivity {
         return 0;
     }
 
+    @Override
+    public void finish() {
+        super.finish();
+    }
+
     @OnClick({ R.id.zero, R.id.one, R.id.two, R.id.three, R.id.four,
             R.id.five, R.id.six, R.id.seven, R.id.eight, R.id.nine })
     void onClick(TextView view) {
@@ -63,6 +67,7 @@ public class EditTimerActivity extends BaseActivity {
         int at = field.getSelectionStart();
         field.getText().replace(at, at + 1, view.getText());
         field.setSelection(at + 1);
+//        updateStartButtonVisibility();
         if (field.getSelectionStart() == FIELD_LENGTH) {
             // At the end of the current field, so try to focus to the next field.
             // The search will return null if no view can be focused next.
@@ -78,7 +83,7 @@ public class EditTimerActivity extends BaseActivity {
     }
 
     @OnTouch({ R.id.hour, R.id.minute, R.id.second })
-    boolean captureTouchEvent(EditText field, MotionEvent event) {
+    boolean switchField(EditText field, MotionEvent event) {
         int inType = field.getInputType(); // backup the input type
         field.setInputType(InputType.TYPE_NULL); // disable soft input
         boolean result = field.onTouchEvent(event); // call native handler
@@ -114,6 +119,7 @@ public class EditTimerActivity extends BaseActivity {
         } else {
             field.getText().replace(at - 1, at, "0");
             field.setSelection(at - 1);
+//            updateStartButtonVisibility();
         }
     }
     
@@ -126,6 +132,7 @@ public class EditTimerActivity extends BaseActivity {
         mHour.setSelection(0); // always move the cursor WHILE the field is focused, NEVER focus after!
         mMinute.setSelection(0);
         mSecond.setSelection(0);
+//        mFab.hide(); // instead of updateStartButtonVisibility() because we know everything's zero
         return true;
     }
 
@@ -134,7 +141,33 @@ public class EditTimerActivity extends BaseActivity {
         // TODO: Show the edit label alert dialog.
     }
 
-    public final EditText getFocusedField() {
+    @OnClick(R.id.fab)
+    void startTimer() {
+        int hour = Integer.parseInt(mHour.getText().toString());
+        int minute = Integer.parseInt(mMinute.getText().toString());
+        int second = Integer.parseInt(mSecond.getText().toString());
+        if (hour == 0 && minute == 0 && second == 0)
+            return; // TODO: we could show a toast instead if we cared
+        // TODO: do something with the label
+        mLabel.getText();
+        // TODO: Pass back an intent with the data, or make Timer parcelable
+        // and pass back an instance of Timer. Consider overriding finish()
+        // and doing it there.
+        finish();
+    }
+
+    private EditText getFocusedField() {
         return (EditText) mAppBar.findFocus();
     }
+
+//    private void updateStartButtonVisibility() {
+//        // TODO: parse the field's text to an integer and check > 0 instead?
+//        if (TextUtils.equals(mHour.getText(), "00")
+//                && TextUtils.equals(mMinute.getText(), "00")
+//                && TextUtils.equals(mSecond.getText(), "00")) {
+//            mFab.hide();
+//        } else {
+//            mFab.show();
+//        }
+//    }
 }
