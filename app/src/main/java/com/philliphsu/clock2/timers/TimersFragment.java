@@ -8,13 +8,14 @@ import android.support.v4.content.Loader;
 import com.philliphsu.clock2.RecyclerViewFragment;
 import com.philliphsu.clock2.Timer;
 import com.philliphsu.clock2.edittimer.EditTimerActivity;
+import com.philliphsu.clock2.model.TimerCursor;
 import com.philliphsu.clock2.model.TimerDatabaseHelper;
 import com.philliphsu.clock2.model.TimersListCursorLoader;
 
 public class TimersFragment extends RecyclerViewFragment<
         Timer,
         TimerViewHolder,
-        TimerDatabaseHelper.TimerCursor,
+        TimerCursor,
         TimersCursorAdapter> {
     public static final int REQUEST_CREATE_TIMER = 0;
 
@@ -38,7 +39,7 @@ public class TimersFragment extends RecyclerViewFragment<
     }
 
     @Override
-    public Loader<TimerDatabaseHelper.TimerCursor> onCreateLoader(int id, Bundle args) {
+    public Loader<TimerCursor> onCreateLoader(int id, Bundle args) {
         return new TimersListCursorLoader(getActivity());
     }
 

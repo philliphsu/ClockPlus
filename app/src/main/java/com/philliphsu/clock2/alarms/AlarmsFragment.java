@@ -1,26 +1,20 @@
 package com.philliphsu.clock2.alarms;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 
 import com.philliphsu.clock2.Alarm;
 import com.philliphsu.clock2.AsyncItemChangeHandler;
-import com.philliphsu.clock2.OnListItemInteractionListener;
 import com.philliphsu.clock2.R;
+import com.philliphsu.clock2.RecyclerViewFragment;
 import com.philliphsu.clock2.editalarm.EditAlarmActivity;
+import com.philliphsu.clock2.model.AlarmCursor;
 import com.philliphsu.clock2.model.AlarmsListCursorLoader;
 import com.philliphsu.clock2.util.AlarmController;
 import com.philliphsu.clock2.util.DelayedSnackbarHandler;
@@ -28,10 +22,11 @@ import com.philliphsu.clock2.util.DelayedSnackbarHandler;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
-// TODO: Use native fragments since we're targeting API >=19?
-// TODO: Use native LoaderCallbacks.
-public class AlarmsFragment extends Fragment implements LoaderCallbacks<Cursor>,
-        OnListItemInteractionListener<Alarm>, ScrollHandler {
+public class AlarmsFragment extends RecyclerViewFragment<
+        Alarm,
+        AlarmViewHolder,
+        AlarmCursor,
+        AlarmsCursorAdapter> implements ScrollHandler {
     private static final String TAG = "AlarmsFragment";
     private static final int REQUEST_EDIT_ALARM = 0;
     // Public because MainActivity needs to use it.
@@ -76,23 +71,6 @@ public class AlarmsFragment extends Fragment implements LoaderCallbacks<Cursor>,
         mAlarmController = new AlarmController(getActivity(), mSnackbarAnchor);
         mAsyncItemChangeHandler = new AsyncItemChangeHandler(getActivity(),
                 mSnackbarAnchor, this, mAlarmController);
-
-        getLoaderManager().initLoader(0, null, this);
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_alarms, container, false);
-        ButterKnife.bind(this, view);
-
-        // Set the adapter
-        Context context = view.getContext();
-        mList.setLayoutManager(new LinearLayoutManager(context));
-        mAdapter = new AlarmsCursorAdapter(this, mAlarmController);
-        mList.setAdapter(mAdapter);
-
-        return view;
     }
 
     @Override
@@ -110,20 +88,29 @@ public class AlarmsFragment extends Fragment implements LoaderCallbacks<Cursor>,
     }
 
     @Override
-    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+    public Loader<AlarmCursor> onCreateLoader(int id, Bundle args) {
         return new AlarmsListCursorLoader(getActivity());
     }
 
     @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        mAdapter.swapCursor(data);
+    public void onLoadFinished(Loader<AlarmCursor> loader, AlarmCursor data) {
+        super.onLoadFinished(loader, data);
         // Scroll to the last modified alarm
         performScrollToStableId();
     }
 
     @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
-        mAdapter.swapCursor(null);
+    public void onFabClick() {
+        Intent intent = new Intent(getActivity(), EditAlarmActivity.class);
+        startActivityForResult(intent, REQUEST_CREATE_ALARM);
+    }
+
+    @Override
+    protected AlarmsCursorAdapter getAdapter() {
+        if (mAdapter == null) {
+            mAdapter = new AlarmsCursorAdapter(this, mAlarmController);
+        }
+        return mAdapter;
     }
 
     @Override

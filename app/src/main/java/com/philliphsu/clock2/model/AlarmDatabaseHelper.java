@@ -24,6 +24,7 @@ import static com.philliphsu.clock2.DaysOfWeek.WEDNESDAY;
  *
  * TODO: We can generalize this class to all data models, not just Alarms.
  */
+@Deprecated
 public class AlarmDatabaseHelper extends SQLiteOpenHelper {
     private static final String TAG = "AlarmDatabaseHelper";
     private static final String DB_NAME = "alarms.db";

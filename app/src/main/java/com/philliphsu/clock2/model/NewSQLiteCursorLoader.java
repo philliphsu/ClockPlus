@@ -17,10 +17,9 @@ import com.philliphsu.clock2.util.LocalBroadcastHelper;
 public abstract class NewSQLiteCursorLoader<
         T extends ObjectWithId,
         C extends BaseItemCursor<T>>
-        extends AsyncTaskLoader<C> {
-    private static final String TAG = "SQLiteCursorLoader";
+    extends AsyncTaskLoader<C> {
 
-    public static final String ACTION_CHANGE_CONTENT = "com.philliphsu.clock2.model.action.CHANGE_CONTENT";
+    private static final String TAG = "SQLiteCursorLoader";
 
     private C mCursor;
     private OnContentChangeReceiver mOnContentChangeReceiver;
@@ -30,6 +29,13 @@ public abstract class NewSQLiteCursorLoader<
     }
 
     protected abstract C loadCursor();
+
+    /**
+     * @return the Intent action that will be registered to this Loader
+     * for receiving broadcasts about underlying data changes to our
+     * designated database table
+     */
+    protected abstract String getOnContentChangeAction();
 
     /* Runs on a worker thread */
     @Override
@@ -81,7 +87,7 @@ public abstract class NewSQLiteCursorLoader<
         if (mOnContentChangeReceiver == null) {
             mOnContentChangeReceiver = new OnContentChangeReceiver();
             LocalBroadcastHelper.registerReceiver(getContext(),
-                    mOnContentChangeReceiver, ACTION_CHANGE_CONTENT);
+                    mOnContentChangeReceiver, getOnContentChangeAction());
         }
 
         if (takeContentChanged() || mCursor == null) {

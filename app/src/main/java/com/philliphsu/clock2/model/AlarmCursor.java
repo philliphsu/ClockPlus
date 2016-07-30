@@ -1,0 +1,58 @@
+package com.philliphsu.clock2.model;
+
+import android.database.Cursor;
+
+import com.philliphsu.clock2.Alarm;
+
+import static com.philliphsu.clock2.DaysOfWeek.FRIDAY;
+import static com.philliphsu.clock2.DaysOfWeek.MONDAY;
+import static com.philliphsu.clock2.DaysOfWeek.SATURDAY;
+import static com.philliphsu.clock2.DaysOfWeek.SUNDAY;
+import static com.philliphsu.clock2.DaysOfWeek.THURSDAY;
+import static com.philliphsu.clock2.DaysOfWeek.TUESDAY;
+import static com.philliphsu.clock2.DaysOfWeek.WEDNESDAY;
+
+/**
+ * Created by Phillip Hsu on 7/30/2016.
+ */
+// An alternative method to creating an Alarm from a cursor is to
+// make an Alarm constructor that takes an Cursor param. However,
+// this method has the advantage of keeping the contents of
+// the Alarm class as pure Java, which can facilitate unit testing
+// because it has no dependence on Cursor, which is part of the Android SDK.
+public class AlarmCursor extends BaseItemCursor<Alarm> {
+    private static final String TAG = "AlarmCursor";
+
+    public AlarmCursor(Cursor c) {
+        super(c);
+    }
+
+    /**
+     * @return an Alarm instance configured for the current row,
+     * or null if the current row is invalid
+     */
+    @Override
+    public Alarm getItem() {
+        if (isBeforeFirst() || isAfterLast())
+            return null;
+        Alarm alarm = Alarm.builder()
+                .hour(getInt(getColumnIndexOrThrow(AlarmsTable.COLUMN_HOUR)))
+                .minutes(getInt(getColumnIndexOrThrow(AlarmsTable.COLUMN_MINUTES)))
+                .vibrates(isTrue(AlarmsTable.COLUMN_VIBRATES))
+                .ringtone(getString(getColumnIndexOrThrow(AlarmsTable.COLUMN_RINGTONE)))
+                .label(getString(getColumnIndexOrThrow(AlarmsTable.COLUMN_LABEL)))
+                .build();
+        alarm.setId(getLong(getColumnIndexOrThrow(AlarmsTable.COLUMN_ID)));
+        alarm.setEnabled(isTrue(AlarmsTable.COLUMN_ENABLED));
+        alarm.setSnoozing(getLong(getColumnIndexOrThrow(AlarmsTable.COLUMN_SNOOZING_UNTIL_MILLIS)));
+        alarm.setRecurring(SUNDAY, isTrue(AlarmsTable.COLUMN_SUNDAY));
+        alarm.setRecurring(MONDAY, isTrue(AlarmsTable.COLUMN_MONDAY));
+        alarm.setRecurring(TUESDAY, isTrue(AlarmsTable.COLUMN_TUESDAY));
+        alarm.setRecurring(WEDNESDAY, isTrue(AlarmsTable.COLUMN_WEDNESDAY));
+        alarm.setRecurring(THURSDAY, isTrue(AlarmsTable.COLUMN_THURSDAY));
+        alarm.setRecurring(FRIDAY, isTrue(AlarmsTable.COLUMN_FRIDAY));
+        alarm.setRecurring(SATURDAY, isTrue(AlarmsTable.COLUMN_SATURDAY));
+        alarm.ignoreUpcomingRingTime(isTrue(AlarmsTable.COLUMN_IGNORE_UPCOMING_RING_TIME));
+        return alarm;
+    }
+}

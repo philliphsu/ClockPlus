@@ -25,7 +25,7 @@ public abstract class BaseItemCursor<T extends ObjectWithId> extends CursorWrapp
             Log.e(TAG, "Failed to retrieve id, cursor out of range");
             return -1;
         }
-        return getLong(getColumnIndexOrThrow(BaseDatabaseHelper.COLUMN_ID));
+        return getLong(getColumnIndexOrThrow("_id")); // TODO: Refer to a constant instead of a hardcoded value
     }
 
     /**

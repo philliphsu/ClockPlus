@@ -10,6 +10,7 @@ import java.util.ArrayList;
 /**
  * Created by Phillip Hsu on 6/25/2016.
  */
+@Deprecated
 public class DatabaseManager {
 
     private static DatabaseManager sDatabaseManager;

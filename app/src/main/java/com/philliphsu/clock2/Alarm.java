@@ -6,6 +6,7 @@ import android.support.annotation.NonNull;
 
 import com.google.auto.value.AutoValue;
 import com.philliphsu.clock2.model.JsonSerializable;
+import com.philliphsu.clock2.model.ObjectWithId;
 
 import org.json.JSONObject;
 
@@ -21,11 +22,10 @@ import static com.philliphsu.clock2.DaysOfWeek.SUNDAY;
  * Created by Phillip Hsu on 5/26/2016.
  */
 @AutoValue
-public abstract class Alarm implements JsonSerializable, Parcelable {
+public abstract class Alarm extends ObjectWithId implements JsonSerializable, Parcelable {
     private static final int MAX_MINUTES_CAN_SNOOZE = 30;
 
     // =================== MUTABLE =======================
-    private long id;
     private long snoozingUntilMillis;
     private boolean enabled;
     private final boolean[] recurringDays = new boolean[NUM_DAYS];
@@ -204,18 +204,15 @@ public abstract class Alarm implements JsonSerializable, Parcelable {
     }
 
     public int intId() {
-        return (int) id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
+        return (int) getId();
     }
 
     // TODO: Remove method signature from JsonSerializable interface.
     // TODO: Remove final modifier.
+    // TODO: Rename to getId() so usages refer to ObjectWithId#getId(), then delete this method.
     @Override
     public final long id() {
-        return id;
+        return getId();
     }
 
     @Deprecated
@@ -246,7 +243,7 @@ public abstract class Alarm implements JsonSerializable, Parcelable {
         // because when we recreate the object, we can't initialize
         // those mutable fields until after we call build(). Values
         // in the parcel are read in the order they were written.
-        dest.writeLong(id);
+        dest.writeLong(getId());
         dest.writeLong(snoozingUntilMillis);
         dest.writeInt(enabled ? 1 : 0);
         dest.writeBooleanArray(recurringDays);
@@ -261,7 +258,7 @@ public abstract class Alarm implements JsonSerializable, Parcelable {
                 .ringtone(in.readString())
                 .vibrates(in.readInt() != 0)
                 .build();
-        alarm.id = in.readLong();
+        alarm.setId(in.readLong());
         alarm.snoozingUntilMillis = in.readLong();
         alarm.enabled = in.readInt() != 0;
         in.readBooleanArray(alarm.recurringDays);

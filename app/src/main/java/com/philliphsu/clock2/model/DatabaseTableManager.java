@@ -9,26 +9,21 @@ import android.database.sqlite.SQLiteOpenHelper;
 import com.philliphsu.clock2.util.LocalBroadcastHelper;
 
 /**
- * Created by Phillip Hsu on 7/29/2016.
+ * Created by Phillip Hsu on 7/30/2016.
  */
-@Deprecated
-public abstract class BaseDatabaseHelper<T extends ObjectWithId> extends SQLiteOpenHelper {
+public abstract class DatabaseTableManager<T extends ObjectWithId> {
+    // TODO: Consider implementing BaseColumns for your table schemas.
+    // This column should be present in all table schemas, and the value is simple enough
+    // we can reproduce it here instead of relying on our subclasses to retrieve it from
+    // their designated table schema.
+    private static final String COLUMN_ID = "_id";
 
-    public static final String COLUMN_ID = "_id";
-
+    private final SQLiteOpenHelper mDbHelper;
     private final Context mAppContext;
 
-    /**
-     * @param context the Context with which the application context will be retrieved
-     * @param name the name of the database file. Because this is required by the SQLiteOpenHelper
-     *             constructor, we can't, for instance, have an abstract getDatabaseFileName() that
-     *             subclasses implement and the base class can call on their behalf.
-     * @param version the version
-     */
-    public BaseDatabaseHelper(Context context, String name,
-                              /*SQLiteDatabase.CursorFactory factory,*/
-                              int version) {
-        super(context.getApplicationContext(), name, null, version);
+    public DatabaseTableManager(Context context) {
+        // Internally uses the app context
+        mDbHelper = new ClockAppDatabaseHelper(context);
         mAppContext = context.getApplicationContext();
     }
 
@@ -46,6 +41,14 @@ public abstract class BaseDatabaseHelper<T extends ObjectWithId> extends SQLiteO
     protected abstract ContentValues toContentValues(T item);
 
     /**
+     * @return the Intent action that will be used to send broadcasts
+     * to our designated {@link NewSQLiteCursorLoader} whenever an
+     * underlying change to our data is detected. The Loader should
+     * receive the broadcast and reload its data.
+     */
+    protected abstract String getOnContentChangeAction();
+
+    /**
      * @return optional String specifying the sort order
      * to use when querying the database. The default
      * implementation returns null, which may return
@@ -56,7 +59,7 @@ public abstract class BaseDatabaseHelper<T extends ObjectWithId> extends SQLiteO
     }
 
     public long insertItem(T item) {
-        long id = getWritableDatabase().insert(
+        long id = mDbHelper.getWritableDatabase().insert(
                 getTableName(), null, toContentValues(item));
         item.setId(id);
         notifyContentChanged();
@@ -65,7 +68,7 @@ public abstract class BaseDatabaseHelper<T extends ObjectWithId> extends SQLiteO
 
     public int updateItem(long id, T newItem) {
         newItem.setId(id);
-        SQLiteDatabase db = getWritableDatabase();
+        SQLiteDatabase db = mDbHelper.getWritableDatabase();
         int rowsUpdated = db.update(getTableName(),
                 toContentValues(newItem),
                 COLUMN_ID + " = " + id,
@@ -75,7 +78,7 @@ public abstract class BaseDatabaseHelper<T extends ObjectWithId> extends SQLiteO
     }
 
     public int deleteItem(T item) {
-        SQLiteDatabase db = getWritableDatabase();
+        SQLiteDatabase db = mDbHelper.getWritableDatabase();
         int rowsDeleted = db.delete(getTableName(),
                 COLUMN_ID + " = " + item.getId(),
                 null);
@@ -93,7 +96,7 @@ public abstract class BaseDatabaseHelper<T extends ObjectWithId> extends SQLiteO
     }
 
     protected Cursor queryItems(String where, String limit) {
-        return getReadableDatabase().query(getTableName(),
+        return mDbHelper.getReadableDatabase().query(getTableName(),
                 null, // All columns
                 where, // Selection, i.e. where COLUMN_* = [value we're looking for]
                 null, // selection args, none b/c id already specified in selection
@@ -103,13 +106,7 @@ public abstract class BaseDatabaseHelper<T extends ObjectWithId> extends SQLiteO
                 limit); // limit
     }
 
-    /**
-     * Broadcasts to any registered receivers that the data backed
-     * by this helper has changed, and so they should requery and
-     * update themselves as necessary.
-     */
     private void notifyContentChanged() {
-        LocalBroadcastHelper.sendBroadcast(mAppContext,
-                SQLiteCursorLoader.ACTION_CHANGE_CONTENT);
+        LocalBroadcastHelper.sendBroadcast(mAppContext, getOnContentChangeAction());
     }
 }

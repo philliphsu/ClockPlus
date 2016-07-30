@@ -10,6 +10,7 @@ import com.philliphsu.clock2.Timer;
 /**
  * Created by Phillip Hsu on 7/29/2016.
  */
+@Deprecated
 public class TimerDatabaseHelper extends BaseDatabaseHelper<Timer> {
     private static final String TAG = "TimerDatabaseHelper";
     private static final String DB_NAME = "timers.db";
@@ -108,25 +109,4 @@ public class TimerDatabaseHelper extends BaseDatabaseHelper<Timer> {
         return new TimerCursor(c);
     }
 
-    public static class TimerCursor extends BaseItemCursor<Timer> {
-
-        public TimerCursor(Cursor cursor) {
-            super(cursor);
-        }
-
-        @Override
-        public Timer getItem() {
-            if (isBeforeFirst() || isAfterLast())
-                return null;
-            int hour = getInt(getColumnIndexOrThrow(COLUMN_HOUR));
-            int minute = getInt(getColumnIndexOrThrow(COLUMN_MINUTE));
-            int second = getInt(getColumnIndexOrThrow(COLUMN_SECOND));
-            String label = getString(getColumnIndexOrThrow(COLUMN_LABEL));
-//            String group = getString(getColumnIndexOrThrow(COLUMN_GROUP));
-            Timer t = Timer.create(hour, minute, second, label, /*group*/"");
-            t.setEndTime(getInt(getColumnIndexOrThrow(COLUMN_END_TIME)));
-            t.setPauseTime(getInt(getColumnIndexOrThrow(COLUMN_PAUSE_TIME)));
-            return t;
-        }
-    }
 }
