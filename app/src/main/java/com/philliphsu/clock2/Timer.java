@@ -3,6 +3,7 @@ package com.philliphsu.clock2;
 import android.os.SystemClock;
 
 import com.google.auto.value.AutoValue;
+import com.philliphsu.clock2.model.ObjectWithId;
 
 import java.util.concurrent.TimeUnit;
 
@@ -10,10 +11,9 @@ import java.util.concurrent.TimeUnit;
  * Created by Phillip Hsu on 7/25/2016.
  */
 @AutoValue
-public abstract class Timer {
+public abstract class Timer extends ObjectWithId {
     private static final long MINUTE = TimeUnit.MINUTES.toMillis(1);
 
-    private long id;
     private long endTime;
     private long pauseTime;
 
@@ -40,14 +40,6 @@ public abstract class Timer {
             throw new IllegalArgumentException("Cannot create a timer with h = "
                     + hour + ", m = " + minute + ", s = " + second);
         return new AutoValue_Timer(hour, minute, second, group, label);
-    }
-
-    public long id() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
     }
 
     public long endTime() {
@@ -114,5 +106,26 @@ public abstract class Timer {
 
     public boolean isRunning() {
         return hasStarted() && pauseTime == 0;
+    }
+
+    /**
+     * TO ONLY BE CALLED BY TIMERDATABASEHELPER.
+     */
+    public void setEndTime(long endTime) {
+        this.endTime = endTime;
+    }
+
+    /**
+     * TO ONLY BE CALLED BY TIMERDATABASEHELPER.
+     */
+    public void setPauseTime(long pauseTime) {
+        this.pauseTime = pauseTime;
+    }
+
+    /**
+     * TO ONLY BE CALLED BY TIMERDATABASEHELPER.
+     */
+    public long pauseTime() {
+        return pauseTime;
     }
 }

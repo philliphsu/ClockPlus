@@ -13,7 +13,7 @@ import com.philliphsu.clock2.util.AlarmController;
 /**
  * Created by Phillip Hsu on 6/29/2016.
  *
- * TODO: Make this abstract for other data types.
+ * TODO: Extend from BaseCursorAdapter
  */
 public class AlarmsCursorAdapter extends RecyclerView.Adapter<AlarmViewHolder> {
     private static final String TAG = "AlarmsCursorAdapter";

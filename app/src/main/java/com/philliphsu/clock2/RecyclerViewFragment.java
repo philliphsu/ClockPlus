@@ -1,6 +1,5 @@
 package com.philliphsu.clock2;
 
-import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.LoaderManager;
@@ -11,16 +10,20 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.philliphsu.clock2.model.BaseItemCursor;
+import com.philliphsu.clock2.model.ObjectWithId;
+
 import butterknife.Bind;
 
 /**
  * Created by Phillip Hsu on 7/26/2016.
  */
-public abstract class RecyclerViewFragment<T,
+public abstract class RecyclerViewFragment<T extends ObjectWithId,
         VH extends BaseViewHolder<T>,
-        A extends BaseAdapter<T, VH>> // TODO: From AlarmsCursorAdapter, abstract it out and use that type here.
+        C extends BaseItemCursor<T>,
+        A extends BaseCursorAdapter<T, VH, C>>
     extends BaseFragment implements
-        LoaderManager.LoaderCallbacks<Cursor>,
+        LoaderManager.LoaderCallbacks<C>,
         OnListItemInteractionListener<T> {
 
     private A mAdapter;
@@ -45,6 +48,12 @@ public abstract class RecyclerViewFragment<T,
         return new LinearLayoutManager(getActivity());
     }
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        getLoaderManager().initLoader(0, null, this);
+    }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -55,15 +64,13 @@ public abstract class RecyclerViewFragment<T,
     }
 
     @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        // TODO: Change the adapter type to one that supports Cursors as its dataset
-//        mAdapter.swapCursor(data);
+    public void onLoadFinished(Loader<C> loader, C data) {
+        mAdapter.swapCursor(data);
     }
 
     @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
-        // TODO: Change the adapter type to one that supports Cursors as its dataset
-//        mAdapter.swapCursor(null);
+    public void onLoaderReset(Loader<C> loader) {
+        mAdapter.swapCursor(null);
     }
 
     /**

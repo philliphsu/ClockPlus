@@ -153,6 +153,7 @@ public class EditTimerActivity extends BaseActivity {
         // TODO: Pass back an intent with the data, or make Timer parcelable
         // and pass back an instance of Timer. Consider overriding finish()
         // and doing it there.
+        setResult(RESULT_OK);
         finish();
     }
 

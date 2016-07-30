@@ -79,7 +79,13 @@
             android:exported="false">
         </service>
 
-        <activity android:name=".edittimer.EditTimerActivity">
+        <activity android:name=".edittimer.EditTimerActivity"
+                  android:label="@string/title_activity_create_timer"
+                  android:parentActivityName=".MainActivity"
+                  android:windowSoftInputMode="adjustNothing">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.philliphsu.clock2.MainActivity"/>
         </activity>
     </application>
 

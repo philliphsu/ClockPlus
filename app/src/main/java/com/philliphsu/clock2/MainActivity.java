@@ -15,7 +15,6 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.philliphsu.clock2.alarms.AlarmsFragment;
-import com.philliphsu.clock2.editalarm.EditAlarmActivity;
 import com.philliphsu.clock2.settings.SettingsActivity;
 import com.philliphsu.clock2.timers.TimersFragment;
 
@@ -56,13 +55,17 @@ public class MainActivity extends BaseActivity {
         mFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(MainActivity.this, EditAlarmActivity.class);
-                // Call Fragment#startActivityForResult() instead of Activity#startActivityForResult()
-                // because we want the result to be handled in the Fragment, not in this Activity.
-                // FragmentActivity does NOT deliver the result to the Fragment, i.e. your
-                // Fragment's onActivityResult() will NOT be called.
-                mSectionsPagerAdapter.getCurrentFragment()
-                        .startActivityForResult(intent, AlarmsFragment.REQUEST_CREATE_ALARM);
+//                Intent intent = new Intent(MainActivity.this, EditAlarmActivity.class);
+//                // Call Fragment#startActivityForResult() instead of Activity#startActivityForResult()
+//                // because we want the result to be handled in the Fragment, not in this Activity.
+//                // FragmentActivity does NOT deliver the result to the Fragment, i.e. your
+//                // Fragment's onActivityResult() will NOT be called.
+//                mSectionsPagerAdapter.getCurrentFragment()
+//                        .startActivityForResult(intent, AlarmsFragment.REQUEST_CREATE_ALARM);
+                Fragment f;
+                if ((f = mSectionsPagerAdapter.getCurrentFragment()) instanceof RecyclerViewFragment) {
+                    ((RecyclerViewFragment) f).onFabClick();
+                }
             }
         });
     }
