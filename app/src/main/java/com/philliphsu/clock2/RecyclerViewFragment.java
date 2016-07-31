@@ -18,7 +18,8 @@ import butterknife.Bind;
 /**
  * Created by Phillip Hsu on 7/26/2016.
  */
-public abstract class RecyclerViewFragment<T extends ObjectWithId,
+public abstract class RecyclerViewFragment<
+        T extends ObjectWithId,
         VH extends BaseViewHolder<T>,
         C extends BaseItemCursor<T>,
         A extends BaseCursorAdapter<T, VH, C>>

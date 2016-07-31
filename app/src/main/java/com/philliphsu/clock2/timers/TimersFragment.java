@@ -9,7 +9,6 @@ import com.philliphsu.clock2.RecyclerViewFragment;
 import com.philliphsu.clock2.Timer;
 import com.philliphsu.clock2.edittimer.EditTimerActivity;
 import com.philliphsu.clock2.model.TimerCursor;
-import com.philliphsu.clock2.model.TimerDatabaseHelper;
 import com.philliphsu.clock2.model.TimersListCursorLoader;
 
 public class TimersFragment extends RecyclerViewFragment<
@@ -23,8 +22,6 @@ public class TimersFragment extends RecyclerViewFragment<
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
 //        if (resultCode != Activity.RESULT_OK || data == null)
 //            return;
-        TimerDatabaseHelper db = new TimerDatabaseHelper(getActivity());
-        db.insertItem(Timer.create(1, 0, 0));
     }
 
     @Override

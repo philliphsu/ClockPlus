@@ -138,7 +138,7 @@ public class AlarmsFragment extends RecyclerViewFragment<
                 if (data.getBooleanExtra(EditAlarmActivity.EXTRA_IS_DELETING, false)) {
                     // TODO: Should we delay this too? It seems animations run
                     // some of the time.
-                    mAsyncItemChangeHandler.asyncRemoveAlarm(alarm);
+                    mAsyncItemChangeHandler.asyncDelete(alarm);
                 } else {
                     // TODO: Increase the delay, because update animation is
                     // more elusive than insert.
@@ -206,15 +206,15 @@ public class AlarmsFragment extends RecyclerViewFragment<
         }
 
         void asyncAddAlarm() {
-            mAsyncItemChangeHandler.asyncAddAlarm(mAlarm);
+            mAsyncItemChangeHandler.asyncInsert(mAlarm);
         }
 
         void asyncUpdateAlarm() {
-            mAsyncItemChangeHandler.asyncUpdateAlarm(mAlarm);
+            mAsyncItemChangeHandler.asyncUpdate(mAlarm.getId(), mAlarm);
         }
 
         void asyncRemoveAlarm() {
-            mAsyncItemChangeHandler.asyncRemoveAlarm(mAlarm);
+            mAsyncItemChangeHandler.asyncDelete(mAlarm);
         }
     }
 
