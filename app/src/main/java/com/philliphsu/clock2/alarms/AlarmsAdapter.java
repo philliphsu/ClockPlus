@@ -9,7 +9,8 @@ import com.philliphsu.clock2.OnListItemInteractionListener;
 import java.util.Arrays;
 import java.util.List;
 
-public class AlarmsAdapter extends BaseAdapter<Alarm, AlarmViewHolder> {
+@Deprecated
+public class AlarmsAdapter extends BaseAdapter<Alarm, BaseAlarmViewHolder> {
 
     public AlarmsAdapter(List<Alarm> alarms, OnListItemInteractionListener<Alarm> listener) {
         super(Alarm.class, alarms, listener);
@@ -22,8 +23,8 @@ public class AlarmsAdapter extends BaseAdapter<Alarm, AlarmViewHolder> {
     }
 
     @Override
-    public AlarmViewHolder onCreateViewHolder(ViewGroup parent, OnListItemInteractionListener<Alarm> listener) {
-        return new AlarmViewHolder(parent, listener);
+    public BaseAlarmViewHolder onCreateViewHolder(ViewGroup parent, OnListItemInteractionListener<Alarm> listener) {
+        return new CollapsedAlarmViewHolder(parent, listener);
     }
 
     @Override

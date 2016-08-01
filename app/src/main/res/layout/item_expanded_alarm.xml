@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingTop="@dimen/item_padding_top"
+                android:paddingStart="@dimen/item_padding_start"
+                android:paddingEnd="@dimen/item_padding_end">
+
+    <include layout="@layout/alarm_time_layout"/>
+
+    <LinearLayout
+        android:id="@+id/days"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <ToggleButton
+            android:id="@+id/day0"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:textAllCaps="true"
+            android:textStyle="bold"
+            android:background="?selectableItemBackground"
+            android:textColor="@color/toggle_alarm_days"/>
+
+        <ToggleButton
+            android:id="@+id/day1"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:textAllCaps="true"
+            android:textStyle="bold"
+            android:background="?selectableItemBackground"
+            android:textColor="@color/toggle_alarm_days"
+            />
+
+        <ToggleButton
+            android:id="@+id/day2"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:textAllCaps="true"
+            android:textStyle="bold"
+            android:background="?selectableItemBackground"
+            android:textColor="@color/toggle_alarm_days"
+            />
+
+        <ToggleButton
+            android:id="@+id/day3"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:textAllCaps="true"
+            android:textStyle="bold"
+            android:background="?selectableItemBackground"
+            android:textColor="@color/toggle_alarm_days"
+            />
+
+        <ToggleButton
+            android:id="@+id/day4"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:textAllCaps="true"
+            android:textStyle="bold"
+            android:background="?selectableItemBackground"
+            android:textColor="@color/toggle_alarm_days"
+            />
+
+        <ToggleButton
+            android:id="@+id/day5"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:textAllCaps="true"
+            android:textStyle="bold"
+            android:background="?selectableItemBackground"
+            android:textColor="@color/toggle_alarm_days"
+            />
+
+        <ToggleButton
+            android:id="@+id/day6"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:textAllCaps="true"
+            android:textStyle="bold"
+            android:background="?selectableItemBackground"
+            android:textColor="@color/toggle_alarm_days"
+            />
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/label"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:hint="Add label"
+        android:layout_marginBottom="8dp"
+        android:gravity="center_vertical"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/ringtone"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="?android:attr/selectableItemBackground"
+            android:text="Ringtone"
+            android:gravity="center_vertical"
+            android:textAppearance="@style/TextAppearance.AppCompat"
+            android:textSize="18sp"/>
+
+        <CheckBox
+            android:id="@id/vibrate"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="Vibrate"/>
+
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/dismiss"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/dismiss_now"
+        style="@style/Widget.AppCompat.Button.Colored"
+        android:layout_marginBottom="@dimen/item_margin_between_elements"/>
+
+    <View
+        android:id="@+id/divider"
+        style="@style/Divider.Horizontal"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="end">
+
+        <Button
+            android:id="@+id/delete"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/Widget.AppCompat.Button.Borderless.Colored"
+            android:text="@string/delete"/>
+
+        <Button
+            android:id="@+id/save"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/Widget.AppCompat.Button.Borderless.Colored"
+            android:text="@string/save"/>
+
+    </LinearLayout>
+
+</LinearLayout>

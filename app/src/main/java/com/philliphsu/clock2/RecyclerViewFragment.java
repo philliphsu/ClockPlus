@@ -36,9 +36,13 @@ public abstract class RecyclerViewFragment<
     public abstract void onFabClick();
 
     /**
-     * @return the adapter to set on the RecyclerView
+     * @return the adapter to set on the RecyclerView. SUBCLASSES MUST OVERRIDE THIS, BECAUSE THE
+     * DEFAULT IMPLEMENTATION WILL ALWAYS RETURN AN UNINITIALIZED ADAPTER INSTANCE.
      */
-    protected abstract A getAdapter();
+    @Nullable
+    protected A getAdapter() {
+        return mAdapter;
+    }
 
     /**
      * @return the LayoutManager to set on the RecyclerView. The default implementation

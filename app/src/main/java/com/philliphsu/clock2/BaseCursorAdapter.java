@@ -21,7 +21,7 @@ public abstract class BaseCursorAdapter<
     private final OnListItemInteractionListener<T> mListener;
     private C mCursor;
 
-    protected abstract VH onCreateViewHolder(ViewGroup parent, OnListItemInteractionListener<T> listener);
+    protected abstract VH onCreateViewHolder(ViewGroup parent, OnListItemInteractionListener<T> listener, int viewType);
 
     public BaseCursorAdapter(OnListItemInteractionListener<T> listener) {
         mListener = listener;
@@ -40,7 +40,7 @@ public abstract class BaseCursorAdapter<
      */
     @Override
     public VH onCreateViewHolder(ViewGroup parent, int viewType) {
-        return onCreateViewHolder(parent, mListener);
+        return onCreateViewHolder(parent, mListener, viewType);
     }
 
     @Override

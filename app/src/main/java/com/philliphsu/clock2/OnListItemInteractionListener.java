@@ -12,6 +12,6 @@ package com.philliphsu.clock2;
  * be easily adapted to not just Fragments, but also custom Views, Activities, etc.
  */
 public interface OnListItemInteractionListener<T> {
-    void onListItemClick(T item);
+    void onListItemClick(T item, int position);
     void onListItemDeleted(T item);
 }

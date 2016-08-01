@@ -9,6 +9,9 @@
     android:orientation="vertical"
     android:background="?selectableItemBackground">
 
+    <!-- We could ALMOST get rid of this, if not for the
+    AlarmCountdown needing to be anchored to the left of
+    the label. -->
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -16,28 +19,7 @@
         android:paddingStart="@dimen/item_padding_start"
         android:paddingEnd="@dimen/item_padding_end">
 
-        <RelativeLayout
-            android:id="@+id/time_layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/item_margin_between_elements">
-
-            <TextView
-                android:id="@+id/time"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="1:20"
-                android:textAppearance="@style/TextAppearance.AppCompat"
-                android:textSize="@dimen/alarm_time_text_size"/>
-
-            <android.support.v7.widget.SwitchCompat
-                android:id="@+id/on_off_switch"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_centerVertical="true"/>
-
-        </RelativeLayout>
+        <include layout="@layout/alarm_time_layout"/>
 
         <TextView
             android:id="@+id/label"

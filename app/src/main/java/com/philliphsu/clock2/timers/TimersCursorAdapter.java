@@ -17,7 +17,7 @@ public class TimersCursorAdapter extends BaseCursorAdapter<Timer, TimerViewHolde
     }
 
     @Override
-    protected TimerViewHolder onCreateViewHolder(ViewGroup parent, OnListItemInteractionListener<Timer> listener) {
+    protected TimerViewHolder onCreateViewHolder(ViewGroup parent, OnListItemInteractionListener<Timer> listener, int viewType) {
         return new TimerViewHolder(parent, listener);
     }
 }

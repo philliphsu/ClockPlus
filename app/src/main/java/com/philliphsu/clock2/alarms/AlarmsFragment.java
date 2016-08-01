@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.Nullable;
 import android.support.v4.content.Loader;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -20,11 +21,10 @@ import com.philliphsu.clock2.util.AlarmController;
 import com.philliphsu.clock2.util.DelayedSnackbarHandler;
 
 import butterknife.Bind;
-import butterknife.ButterKnife;
 
 public class AlarmsFragment extends RecyclerViewFragment<
         Alarm,
-        AlarmViewHolder,
+        BaseAlarmViewHolder,
         AlarmCursor,
         AlarmsCursorAdapter> implements ScrollHandler {
     private static final String TAG = "AlarmsFragment";
@@ -32,7 +32,7 @@ public class AlarmsFragment extends RecyclerViewFragment<
     // Public because MainActivity needs to use it.
     public static final int REQUEST_CREATE_ALARM = 1;
 
-    private AlarmsCursorAdapter mAdapter;
+//    private AlarmsCursorAdapter mAdapter;
     private AsyncItemChangeHandler mAsyncItemChangeHandler;
     private AlarmController mAlarmController;
     private Handler mHandler = new Handler();
@@ -82,12 +82,6 @@ public class AlarmsFragment extends RecyclerViewFragment<
     }
 
     @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        ButterKnife.unbind(this); // Only for fragments!
-    }
-
-    @Override
     public Loader<AlarmCursor> onCreateLoader(int id, Bundle args) {
         return new AlarmsListCursorLoader(getActivity());
     }
@@ -95,7 +89,8 @@ public class AlarmsFragment extends RecyclerViewFragment<
     @Override
     public void onLoadFinished(Loader<AlarmCursor> loader, AlarmCursor data) {
         super.onLoadFinished(loader, data);
-        // Scroll to the last modified alarm
+        // This may have been a requery due to content change. If the change
+        // was an insertion, scroll to the last modified alarm.
         performScrollToStableId();
     }
 
@@ -105,12 +100,13 @@ public class AlarmsFragment extends RecyclerViewFragment<
         startActivityForResult(intent, REQUEST_CREATE_ALARM);
     }
 
+    @Nullable
     @Override
     protected AlarmsCursorAdapter getAdapter() {
-        if (mAdapter == null) {
-            mAdapter = new AlarmsCursorAdapter(this, mAlarmController);
-        }
-        return mAdapter;
+        if (super.getAdapter() != null)
+            return super.getAdapter();
+        // Create a new adapter
+        return new AlarmsCursorAdapter(this, mAlarmController);
     }
 
     @Override
@@ -154,10 +150,14 @@ public class AlarmsFragment extends RecyclerViewFragment<
     }
 
     @Override
-    public void onListItemClick(Alarm item) {
-        Intent intent = new Intent(getActivity(), EditAlarmActivity.class);
-        intent.putExtra(EditAlarmActivity.EXTRA_ALARM_ID, item.id());
-        startActivityForResult(intent, REQUEST_EDIT_ALARM);
+    public void onListItemClick(Alarm item, int position) {
+//        Intent intent = new Intent(getActivity(), EditAlarmActivity.class);
+//        intent.putExtra(EditAlarmActivity.EXTRA_ALARM_ID, item.id());
+//        startActivityForResult(intent, REQUEST_EDIT_ALARM);
+        boolean expanded = getAdapter().expand(position);
+        if (!expanded) {
+            getAdapter().collapse(position);
+        }
     }
 
     @Override
@@ -173,20 +173,21 @@ public class AlarmsFragment extends RecyclerViewFragment<
     private void performScrollToStableId() {
         if (mScrollToStableId != RecyclerView.NO_ID) {
             int position = -1;
-            for (int i = 0; i < mAdapter.getItemCount(); i++) {
-                if (mAdapter.getItemId(i) == mScrollToStableId) {
+            for (int i = 0; i < getAdapter().getItemCount(); i++) {
+                if (getAdapter().getItemId(i) == mScrollToStableId) {
                     position = i;
                     break;
                 }
             }
             if (position >= 0) {
                 scrollToPosition(position);
+                // We were called because of a requery due to an insertion.
+                getAdapter().expand(position);
             }
         }
         // Reset
         mScrollToStableId = RecyclerView.NO_ID;
     }
-
 
     @Deprecated
     @Override

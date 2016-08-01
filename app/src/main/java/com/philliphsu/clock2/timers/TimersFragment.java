@@ -3,6 +3,7 @@ package com.philliphsu.clock2.timers;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.content.Loader;
 
 import com.philliphsu.clock2.RecyclerViewFragment;
@@ -30,8 +31,12 @@ public class TimersFragment extends RecyclerViewFragment<
         startActivityForResult(intent, REQUEST_CREATE_TIMER);
     }
 
+    @Nullable
     @Override
     protected TimersCursorAdapter getAdapter() {
+        if (super.getAdapter() != null)
+            return super.getAdapter();
+        // Create a new adapter
         return new TimersCursorAdapter(this);
     }
 
@@ -41,7 +46,7 @@ public class TimersFragment extends RecyclerViewFragment<
     }
 
     @Override
-    public void onListItemClick(Timer item) {
+    public void onListItemClick(Timer item, int position) {
 
     }
 
