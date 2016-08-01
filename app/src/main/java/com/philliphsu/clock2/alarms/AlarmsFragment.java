@@ -26,13 +26,15 @@ public class AlarmsFragment extends RecyclerViewFragment<
         Alarm,
         BaseAlarmViewHolder,
         AlarmCursor,
-        AlarmsCursorAdapter> implements ScrollHandler {
+        AlarmsCursorAdapter> implements ScrollHandler { // TODO: Move interface to base class
     private static final String TAG = "AlarmsFragment";
     private static final int REQUEST_EDIT_ALARM = 0;
     // Public because MainActivity needs to use it.
+    // TODO: private because we handle fab clicks in the fragment now
     public static final int REQUEST_CREATE_ALARM = 1;
 
 //    private AlarmsCursorAdapter mAdapter;
+    // TODO: Since we only use this in onActivityResult(), we also don't need this anymore.
     private AsyncItemChangeHandler mAsyncItemChangeHandler;
     private AlarmController mAlarmController;
     private Handler mHandler = new Handler();
@@ -91,6 +93,7 @@ public class AlarmsFragment extends RecyclerViewFragment<
         super.onLoadFinished(loader, data);
         // This may have been a requery due to content change. If the change
         // was an insertion, scroll to the last modified alarm.
+        // TODO: If the change was an update, this presents a problem.
         performScrollToStableId();
     }
 
@@ -109,6 +112,8 @@ public class AlarmsFragment extends RecyclerViewFragment<
         return new AlarmsCursorAdapter(this, mAlarmController);
     }
 
+    // TODO: We're not using EditAlarmActivity anymore, so move this logic somewhere else.
+    // We also don't need to delay the change to get animations working.
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         Log.d(TAG, "onActivityResult()");
@@ -161,6 +166,26 @@ public class AlarmsFragment extends RecyclerViewFragment<
     }
 
     @Override
+    // TODO: Rename to onListItem***Delete*** because the item hasn't been deleted from our db yet
+    public void onListItemDeleted(final Alarm item) {
+        // The corresponding VH will be automatically removed from view following
+        // the requery, so we don't have to do anything to it.
+        mAsyncItemChangeHandler.asyncDelete(item);
+    }
+
+    @Override
+    public void onListItemUpdate(Alarm item, int position) {
+        // Once we update the relevant row in the db table, the VH will still
+        // be in view. While the requery will probably update the values displayed
+        // by the VH, the VH remains in its expanded state from before we were
+        // called. Tell the adapter reset its expanded position.
+        // TODO: Implement editing in the expanded VH. Then verify that changes
+        // while in that VH are saved and updated after the requery.
+//        getAdapter().collapse(position);
+        mAsyncItemChangeHandler.asyncUpdate(item.getId(), item);
+    }
+
+    @Override
     public void setScrollToStableId(long id) {
         mScrollToStableId = id;
     }
@@ -181,19 +206,18 @@ public class AlarmsFragment extends RecyclerViewFragment<
             }
             if (position >= 0) {
                 scrollToPosition(position);
-                // We were called because of a requery due to an insertion.
-                getAdapter().expand(position);
+                // We were called because of a requery. If it was due to an insertion,
+                // expand the newly added alarm.
+                boolean expanded = getAdapter().expand(position);
+                if (!expanded) {
+                    // Otherwise, it was due to an item update. The VH is expanded
+                    // at this point, so reset it.
+                    getAdapter().collapse(position);
+                }
             }
         }
         // Reset
         mScrollToStableId = RecyclerView.NO_ID;
-    }
-
-    @Deprecated
-    @Override
-    public void onListItemDeleted(final Alarm item) {
-        // TODO: This doesn't need to be defined in the interface.
-        // TODO: Delete this method.
     }
 
     private static abstract class BaseAsyncItemChangeRunnable {

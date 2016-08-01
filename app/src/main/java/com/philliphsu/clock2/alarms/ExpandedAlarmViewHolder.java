@@ -2,6 +2,7 @@ package com.philliphsu.clock2.alarms;
 
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -29,9 +30,23 @@ public class ExpandedAlarmViewHolder extends BaseAlarmViewHolder {
     @Bind({R.id.day0, R.id.day1, R.id.day2, R.id.day3, R.id.day4, R.id.day5, R.id.day6})
     ToggleButton[] mDays;
 
-    public ExpandedAlarmViewHolder(ViewGroup parent, OnListItemInteractionListener<Alarm> listener,
+    public ExpandedAlarmViewHolder(ViewGroup parent, final OnListItemInteractionListener<Alarm> listener,
                                    AlarmController controller) {
         super(parent, R.layout.item_expanded_alarm, listener, controller);
+        // Manually bind listeners, or else you'd need to write a getter for the
+        // OnListItemInteractionListener in the BaseViewHolder for use in method binding.
+        mDelete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                listener.onListItemDeleted(getAlarm());
+            }
+        });
+        mSave.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                listener.onListItemUpdate(getAlarm(), getAdapterPosition());
+            }
+        });
     }
 
     @Override
@@ -52,10 +67,10 @@ public class ExpandedAlarmViewHolder extends BaseAlarmViewHolder {
         // TODO
     }
 
-    @OnClick(R.id.delete)
-    void delete() {
-        // TODO
-    }
+//    @OnClick(R.id.delete)
+//    void delete() {
+//        // TODO
+//    }
 
     @OnClick(R.id.ringtone)
     void showRingtonePickerDialog() {

@@ -54,4 +54,9 @@ public class TimersFragment extends RecyclerViewFragment<
     public void onListItemDeleted(Timer item) {
 
     }
+
+    @Override
+    public void onListItemUpdate(Timer item, int position) {
+
+    }
 }

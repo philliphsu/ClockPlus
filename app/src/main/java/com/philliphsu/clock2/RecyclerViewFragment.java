@@ -84,7 +84,6 @@ public abstract class RecyclerViewFragment<
      */
     @Override
     protected int contentLayout() {
-        // TODO: Rename to fragment_recycler_view
-        return R.layout.fragment_alarms;
+        return R.layout.fragment_recycler_view;
     }
 }

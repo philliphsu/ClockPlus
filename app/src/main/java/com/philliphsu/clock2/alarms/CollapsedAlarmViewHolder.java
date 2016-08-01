@@ -38,6 +38,7 @@ public class CollapsedAlarmViewHolder extends BaseAlarmViewHolder implements Ala
     @Override
     public void onBind(Alarm alarm) {
         super.onBind(alarm);
+        // TOneverDO: do custom binding before super call, or else NPEs.
         bindCountdown(alarm.isEnabled(), alarm.ringsIn());
         bindDays(alarm);
     }
@@ -62,7 +63,14 @@ public class CollapsedAlarmViewHolder extends BaseAlarmViewHolder implements Ala
     protected void bindLabel(boolean visible, String label) {
         // Should also be visible even if label has zero length so mCountdown is properly positioned
         // next to mLabel. That is, mCountdown's layout position is dependent on mLabel being present.
-        super.bindLabel(visible || mCountdown.getVisibility() == VISIBLE, label);
+
+        // The countdown is visible if the alarm is enabled. We must keep this invariant in sync
+        // with our bindCountdown() logic. If we test against the
+        // visibility of the countdown view itself, we will find it is always visible
+        // at this point, because bindCountdown() has not been called yet. As such, that is
+        // not a valid solution. We unfortunately
+        // cannot change the order of the view binding done in onBind().
+        super.bindLabel(visible || getAlarm().isEnabled(), label);
     }
 
     private void bindDays(Alarm alarm) {
