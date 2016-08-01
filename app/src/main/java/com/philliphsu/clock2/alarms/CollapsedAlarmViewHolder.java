@@ -25,13 +25,13 @@ public class CollapsedAlarmViewHolder extends BaseAlarmViewHolder implements Ala
 
     @Deprecated // TODO: Delete this, the only usage is from AlarmsAdapter (SortedList), which is not used anymore.
     public CollapsedAlarmViewHolder(ViewGroup parent, OnListItemInteractionListener<Alarm> listener) {
-        super(parent, R.layout.item_alarm, listener, null);
+        super(parent, R.layout.item_collapsed_alarm, listener, null);
         mCountdown.setOnTickListener(this);
     }
 
     public CollapsedAlarmViewHolder(ViewGroup parent, OnListItemInteractionListener<Alarm> listener,
                                     AlarmController alarmController) {
-        super(parent, R.layout.item_alarm, listener, alarmController);
+        super(parent, R.layout.item_collapsed_alarm, listener, alarmController);
         mCountdown.setOnTickListener(this);
     }
 

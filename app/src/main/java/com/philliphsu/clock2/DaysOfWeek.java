@@ -27,6 +27,7 @@ public class DaysOfWeek implements DaysOfWeekHelper {
     private static final int[] LABELS_RES = new int[NUM_DAYS];
     
     static {
+        // TODO: use `new DateFormatSymbols().getShortWeekdays()` to set texts
         LABELS_RES[SUNDAY] = R.string.sun;
         LABELS_RES[MONDAY] = R.string.mon;
         LABELS_RES[TUESDAY] = R.string.tue;

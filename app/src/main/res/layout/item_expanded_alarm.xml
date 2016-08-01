@@ -1,162 +1,190 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<!-- Wrapped in a CardView to simulate elevation of the main view.
+  - There will be margins around the card on devices that are pre-Lollipop,
+  - and the margin size is proportional to the set cardElevation. As a result, the
+  - default item animation when collapsing/expanding the ViewHolder shows the views
+  - that are common to both VHs (primarily the time text and the on-off switch)
+  - shifting slightly during the transition. We are neglecting this blight because
+  - we don't expect many devices below Lollipop using our app.
+  -->
+<!-- TODO: Write a layout for v21 that instead uses the elevation attribute normally.
+  - You may have to set a non-transparent background on the main view.
+  -->
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    xmlns:app="http://schemas.android.com/apk/res-auto"
+                                    app:cardElevation="2dp"
+                                    app:cardCornerRadius="0dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingTop="@dimen/item_padding_top"
+            android:paddingStart="@dimen/item_padding_start"
+            android:paddingEnd="@dimen/item_padding_end">
+
+            <include layout="@layout/alarm_time_layout"/>
+
+            <LinearLayout
+                android:id="@+id/days"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:paddingTop="@dimen/item_padding_top"
-                android:paddingStart="@dimen/item_padding_start"
-                android:paddingEnd="@dimen/item_padding_end">
+                android:orientation="horizontal">
 
-    <include layout="@layout/alarm_time_layout"/>
+                <ToggleButton
+                    android:id="@+id/day0"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:textAllCaps="true"
+                    android:textStyle="bold"
+                    android:background="?selectableItemBackground"
+                    android:textColor="@color/toggle_alarm_days"/>
 
-    <LinearLayout
-        android:id="@+id/days"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
+                <ToggleButton
+                    android:id="@+id/day1"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:textAllCaps="true"
+                    android:textStyle="bold"
+                    android:background="?selectableItemBackground"
+                    android:textColor="@color/toggle_alarm_days"
+                    />
 
-        <ToggleButton
-            android:id="@+id/day0"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:textAllCaps="true"
-            android:textStyle="bold"
-            android:background="?selectableItemBackground"
-            android:textColor="@color/toggle_alarm_days"/>
+                <ToggleButton
+                    android:id="@+id/day2"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:textAllCaps="true"
+                    android:textStyle="bold"
+                    android:background="?selectableItemBackground"
+                    android:textColor="@color/toggle_alarm_days"
+                    />
 
-        <ToggleButton
-            android:id="@+id/day1"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:textAllCaps="true"
-            android:textStyle="bold"
-            android:background="?selectableItemBackground"
-            android:textColor="@color/toggle_alarm_days"
-            />
+                <ToggleButton
+                    android:id="@+id/day3"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:textAllCaps="true"
+                    android:textStyle="bold"
+                    android:background="?selectableItemBackground"
+                    android:textColor="@color/toggle_alarm_days"
+                    />
 
-        <ToggleButton
-            android:id="@+id/day2"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:textAllCaps="true"
-            android:textStyle="bold"
-            android:background="?selectableItemBackground"
-            android:textColor="@color/toggle_alarm_days"
-            />
+                <ToggleButton
+                    android:id="@+id/day4"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:textAllCaps="true"
+                    android:textStyle="bold"
+                    android:background="?selectableItemBackground"
+                    android:textColor="@color/toggle_alarm_days"
+                    />
 
-        <ToggleButton
-            android:id="@+id/day3"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:textAllCaps="true"
-            android:textStyle="bold"
-            android:background="?selectableItemBackground"
-            android:textColor="@color/toggle_alarm_days"
-            />
+                <ToggleButton
+                    android:id="@+id/day5"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:textAllCaps="true"
+                    android:textStyle="bold"
+                    android:background="?selectableItemBackground"
+                    android:textColor="@color/toggle_alarm_days"
+                    />
 
-        <ToggleButton
-            android:id="@+id/day4"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:textAllCaps="true"
-            android:textStyle="bold"
-            android:background="?selectableItemBackground"
-            android:textColor="@color/toggle_alarm_days"
-            />
+                <ToggleButton
+                    android:id="@+id/day6"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:textAllCaps="true"
+                    android:textStyle="bold"
+                    android:background="?selectableItemBackground"
+                    android:textColor="@color/toggle_alarm_days"
+                    />
 
-        <ToggleButton
-            android:id="@+id/day5"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:textAllCaps="true"
-            android:textStyle="bold"
-            android:background="?selectableItemBackground"
-            android:textColor="@color/toggle_alarm_days"
-            />
+            </LinearLayout>
 
-        <ToggleButton
-            android:id="@+id/day6"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:textAllCaps="true"
-            android:textStyle="bold"
-            android:background="?selectableItemBackground"
-            android:textColor="@color/toggle_alarm_days"
-            />
+            <TextView
+                android:id="@+id/label"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:hint="Add label"
+                android:layout_marginBottom="8dp"
+                android:gravity="center_vertical"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/ringtone"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="?android:attr/selectableItemBackground"
+                    android:text="Ringtone"
+                    android:gravity="center_vertical"
+                    android:textAppearance="@style/TextAppearance.AppCompat"
+                    android:textSize="18sp"/>
+
+                <CheckBox
+                    android:id="@id/vibrate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:text="Vibrate"/>
+
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/dismiss"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/dismiss_now"
+                style="@style/Widget.AppCompat.Button.Colored"
+                android:layout_marginBottom="@dimen/item_margin_between_elements"/>
+
+        </LinearLayout>
+
+        <View
+            android:id="@+id/divider"
+            style="@style/Divider.Horizontal"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="end">
+
+            <Button
+                android:id="@+id/delete"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/Widget.AppCompat.Button.Borderless.Colored"
+                android:text="@string/delete"/>
+
+            <Button
+                android:id="@+id/save"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                style="@style/Widget.AppCompat.Button.Borderless.Colored"
+                android:text="@string/save"/>
+
+        </LinearLayout>
+
 
     </LinearLayout>
 
-    <TextView
-        android:id="@+id/label"
-        android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:hint="Add label"
-        android:layout_marginBottom="8dp"
-        android:gravity="center_vertical"/>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <Button
-            android:id="@+id/ringtone"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:background="?android:attr/selectableItemBackground"
-            android:text="Ringtone"
-            android:gravity="center_vertical"
-            android:textAppearance="@style/TextAppearance.AppCompat"
-            android:textSize="18sp"/>
-
-        <CheckBox
-            android:id="@id/vibrate"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:text="Vibrate"/>
-
-    </LinearLayout>
-
-    <Button
-        android:id="@+id/dismiss"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/dismiss_now"
-        style="@style/Widget.AppCompat.Button.Colored"
-        android:layout_marginBottom="@dimen/item_margin_between_elements"/>
-
-    <View
-        android:id="@+id/divider"
-        style="@style/Divider.Horizontal"/>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="end">
-
-        <Button
-            android:id="@+id/delete"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            style="@style/Widget.AppCompat.Button.Borderless.Colored"
-            android:text="@string/delete"/>
-
-        <Button
-            android:id="@+id/save"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            style="@style/Widget.AppCompat.Button.Borderless.Colored"
-            android:text="@string/save"/>
-
-    </LinearLayout>
-
-</LinearLayout>
+</android.support.v7.widget.CardView>
