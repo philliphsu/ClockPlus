@@ -12,7 +12,7 @@ import com.philliphsu.clock2.Alarm;
 import com.philliphsu.clock2.PendingAlarmScheduler;
 import com.philliphsu.clock2.R;
 import com.philliphsu.clock2.UpcomingAlarmReceiver;
-import com.philliphsu.clock2.model.DatabaseManager;
+import com.philliphsu.clock2.model.AlarmsTableManager;
 import com.philliphsu.clock2.ringtone.RingtoneActivity;
 import com.philliphsu.clock2.ringtone.RingtoneService;
 
@@ -34,6 +34,7 @@ public final class AlarmController {
 
     private final Context mAppContext;
     private final View mSnackbarAnchor;
+    private final AlarmsTableManager mTableManager;
 
     /**
      *
@@ -43,6 +44,7 @@ public final class AlarmController {
     public AlarmController(Context context, View snackbarAnchor) {
         mAppContext = context.getApplicationContext();
         mSnackbarAnchor = snackbarAnchor;
+        mTableManager = new AlarmsTableManager(context);
     }
 
     /**
@@ -174,7 +176,7 @@ public final class AlarmController {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                DatabaseManager.getInstance(mAppContext).updateAlarm(alarm.id(), alarm);
+                mTableManager.updateItem(alarm.id(), alarm);
             }
         }).start();
     }

@@ -4,7 +4,8 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
-import com.philliphsu.clock2.model.DatabaseManager;
+import com.philliphsu.clock2.model.AlarmCursor;
+import com.philliphsu.clock2.model.AlarmsTableManager;
 import com.philliphsu.clock2.util.AlarmController;
 
 import static com.philliphsu.clock2.util.Preconditions.checkNotNull;
@@ -41,8 +42,8 @@ public class PendingAlarmScheduler extends BroadcastReceiver {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                Alarm alarm = checkNotNull(DatabaseManager
-                        .getInstance(context).getAlarm(id));
+                AlarmCursor cursor = new AlarmsTableManager(context).queryItem(id);
+                Alarm alarm = checkNotNull(cursor.getItem());
                 if (!alarm.isEnabled()) {
                     throw new IllegalStateException("Alarm must be enabled!");
                 }

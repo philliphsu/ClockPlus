@@ -14,24 +14,33 @@ import com.philliphsu.clock2.util.LocalBroadcastHelper;
  *
  * Efficiently loads and holds a Cursor.
  */
-public abstract class SQLiteCursorLoader extends AsyncTaskLoader<Cursor> {
+public abstract class SQLiteCursorLoader<
+        T extends ObjectWithId,
+        C extends BaseItemCursor<T>>
+    extends AsyncTaskLoader<C> {
+
     private static final String TAG = "SQLiteCursorLoader";
 
-    public static final String ACTION_CHANGE_CONTENT = "com.philliphsu.clock2.model.action.CHANGE_CONTENT";
-
-    private Cursor mCursor;
+    private C mCursor;
     private OnContentChangeReceiver mOnContentChangeReceiver;
 
     public SQLiteCursorLoader(Context context) {
         super(context);
     }
 
-    protected abstract Cursor loadCursor();
+    protected abstract C loadCursor();
+
+    /**
+     * @return the Intent action that will be registered to this Loader
+     * for receiving broadcasts about underlying data changes to our
+     * designated database table
+     */
+    protected abstract String getOnContentChangeAction();
 
     /* Runs on a worker thread */
     @Override
-    public Cursor loadInBackground() {
-        Cursor cursor = loadCursor();
+    public C loadInBackground() {
+        C cursor = loadCursor();
         if (cursor != null) {
             // Ensure that the content window is filled
             // Ensure that the data is available in memory once it is
@@ -43,7 +52,7 @@ public abstract class SQLiteCursorLoader extends AsyncTaskLoader<Cursor> {
 
     /* Runs on the UI thread */
     @Override
-    public void deliverResult(Cursor cursor) {
+    public void deliverResult(C cursor) {
         if (isReset()) {
             // An async query came in while the loader is stopped
             if (cursor != null) {
@@ -78,7 +87,7 @@ public abstract class SQLiteCursorLoader extends AsyncTaskLoader<Cursor> {
         if (mOnContentChangeReceiver == null) {
             mOnContentChangeReceiver = new OnContentChangeReceiver();
             LocalBroadcastHelper.registerReceiver(getContext(),
-                    mOnContentChangeReceiver, ACTION_CHANGE_CONTENT);
+                    mOnContentChangeReceiver, getOnContentChangeAction());
         }
 
         if (takeContentChanged() || mCursor == null) {
@@ -93,7 +102,7 @@ public abstract class SQLiteCursorLoader extends AsyncTaskLoader<Cursor> {
     }
 
     @Override
-    public void onCanceled(Cursor cursor) {
+    public void onCanceled(C cursor) {
         if (cursor != null && !cursor.isClosed()) {
             cursor.close();
         }

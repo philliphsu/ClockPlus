@@ -12,10 +12,18 @@ public class ClockAppDatabaseHelper extends SQLiteOpenHelper {
     private static final String DB_NAME = "clock_app.db";
     private static final int VERSION_1 = 1;
 
+    private static ClockAppDatabaseHelper sDatabaseHelper;
+
+    public static ClockAppDatabaseHelper getInstance(Context context) {
+        if (sDatabaseHelper == null)
+            sDatabaseHelper = new ClockAppDatabaseHelper(context);
+        return sDatabaseHelper;
+    }
+
     /**
      * @param context the Context with which the application context will be retrieved
      */
-    public ClockAppDatabaseHelper(Context context) {
+    private ClockAppDatabaseHelper(Context context) {
         super(context.getApplicationContext(), DB_NAME, null, VERSION_1);
     }
 

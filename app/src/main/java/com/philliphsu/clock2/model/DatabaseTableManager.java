@@ -23,7 +23,7 @@ public abstract class DatabaseTableManager<T extends ObjectWithId> {
 
     public DatabaseTableManager(Context context) {
         // Internally uses the app context
-        mDbHelper = new ClockAppDatabaseHelper(context);
+        mDbHelper = ClockAppDatabaseHelper.getInstance(context);
         mAppContext = context.getApplicationContext();
     }
 
@@ -42,7 +42,7 @@ public abstract class DatabaseTableManager<T extends ObjectWithId> {
 
     /**
      * @return the Intent action that will be used to send broadcasts
-     * to our designated {@link NewSQLiteCursorLoader} whenever an
+     * to our designated {@link SQLiteCursorLoader} whenever an
      * underlying change to our data is detected. The Loader should
      * receive the broadcast and reload its data.
      */
@@ -87,7 +87,15 @@ public abstract class DatabaseTableManager<T extends ObjectWithId> {
     }
 
     public Cursor queryItem(long id) {
-        return queryItems(COLUMN_ID + " = " + id, "1");
+        Cursor c = queryItems(COLUMN_ID + " = " + id, "1");
+        // Since the query returns at most one row, move the cursor to that row.
+        // Most callers of this method will not know they have to move the cursor.
+        // How come we don't need to do this for queries that can potentially return
+        // multiple rows? Because those returned cursors will almost always be
+        // displayed by a BaseCursorAdapter, which moves cursors to the appropriate
+        // positions as it binds VHs.
+        c.moveToFirst();
+        return c;
     }
 
     public Cursor queryItems() {

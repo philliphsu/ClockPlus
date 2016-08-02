@@ -21,7 +21,8 @@ import android.util.Log;
 
 import com.philliphsu.clock2.Alarm;
 import com.philliphsu.clock2.R;
-import com.philliphsu.clock2.model.DatabaseManager;
+import com.philliphsu.clock2.model.AlarmCursor;
+import com.philliphsu.clock2.model.AlarmsTableManager;
 import com.philliphsu.clock2.util.AlarmController;
 import com.philliphsu.clock2.util.AlarmUtils;
 import com.philliphsu.clock2.util.LocalBroadcastHelper;
@@ -96,8 +97,8 @@ public class RingtoneService extends Service { // TODO: abstract this, make subc
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    mAlarm = checkNotNull(DatabaseManager
-                            .getInstance(RingtoneService.this).getAlarm(id));
+                    AlarmCursor cursor = new AlarmsTableManager(RingtoneService.this).queryItem(id);
+                    mAlarm = checkNotNull(cursor.getItem());
                     playRingtone();
                 }
             }).start();

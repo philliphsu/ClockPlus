@@ -7,7 +7,7 @@ import com.philliphsu.clock2.Alarm;
 /**
  * Created by Phillip Hsu on 6/28/2016.
  */
-public class AlarmsListCursorLoader extends NewSQLiteCursorLoader<Alarm, AlarmCursor> {
+public class AlarmsListCursorLoader extends SQLiteCursorLoader<Alarm, AlarmCursor> {
     public static final String ACTION_CHANGE_CONTENT
             = "com.philliphsu.clock2.model.AlarmsListCursorLoader.action.CHANGE_CONTENT";
 

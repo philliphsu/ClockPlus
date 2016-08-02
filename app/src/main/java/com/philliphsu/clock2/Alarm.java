@@ -75,7 +75,7 @@ public abstract class Alarm extends ObjectWithId implements JsonSerializable, Pa
     }
 
     /** <b>ONLY CALL THIS WHEN CREATING AN ALARM INSTANCE FROM A CURSOR</b> */
-    // TODO: To be even more safe, create a ctor that takes the two Cursors and
+    // TODO: To be even more safe, create a ctor that takes a Cursor and
     // initialize the instance here instead of in AlarmDatabaseHelper.
     public void setSnoozing(long snoozingUntilMillis) {
         this.snoozingUntilMillis = snoozingUntilMillis;

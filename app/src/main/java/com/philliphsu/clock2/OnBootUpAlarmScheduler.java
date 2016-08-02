@@ -4,8 +4,8 @@ import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
 
-import com.philliphsu.clock2.model.AlarmDatabaseHelper.AlarmCursor;
-import com.philliphsu.clock2.model.DatabaseManager;
+import com.philliphsu.clock2.model.AlarmCursor;
+import com.philliphsu.clock2.model.AlarmsTableManager;
 import com.philliphsu.clock2.util.AlarmController;
 
 /**
@@ -61,9 +61,9 @@ public class OnBootUpAlarmScheduler extends IntentService {
         if (intent != null) {
             AlarmController controller = new AlarmController(this, null);
             // IntentService works in a background thread, so this won't hold us up.
-            AlarmCursor cursor = DatabaseManager.getInstance(this).queryEnabledAlarms();
+            AlarmCursor cursor = new AlarmsTableManager(this).queryEnabledAlarms();
             while (cursor.moveToNext()) {
-                Alarm alarm = cursor.getAlarm();
+                Alarm alarm = cursor.getItem();
                 if (!alarm.isEnabled()) {
                     throw new IllegalStateException(
                             "queryEnabledAlarms() returned alarm(s) that aren't enabled");

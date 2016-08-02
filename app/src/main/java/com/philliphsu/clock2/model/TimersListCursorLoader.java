@@ -7,7 +7,7 @@ import com.philliphsu.clock2.Timer;
 /**
  * Created by Phillip Hsu on 7/29/2016.
  */
-public class TimersListCursorLoader extends NewSQLiteCursorLoader<Timer, TimerCursor> {
+public class TimersListCursorLoader extends SQLiteCursorLoader<Timer, TimerCursor> {
     public static final String ACTION_CHANGE_CONTENT
             = "com.philliphsu.clock2.model.TimersListCursorLoader.action.CHANGE_CONTENT";
 

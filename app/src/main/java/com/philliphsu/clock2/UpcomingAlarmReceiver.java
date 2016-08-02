@@ -9,7 +9,8 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.v4.app.NotificationCompat;
 
-import com.philliphsu.clock2.model.DatabaseManager;
+import com.philliphsu.clock2.model.AlarmCursor;
+import com.philliphsu.clock2.model.AlarmsTableManager;
 import com.philliphsu.clock2.util.AlarmController;
 
 import static android.app.PendingIntent.FLAG_ONE_SHOT;
@@ -41,7 +42,8 @@ public class UpcomingAlarmReceiver extends BroadcastReceiver {
             new AsyncTask<Void, Void, Alarm>() {
                 @Override
                 protected Alarm doInBackground(Void... params) {
-                    return checkNotNull(DatabaseManager.getInstance(context).getAlarm(id));
+                    AlarmCursor cursor = new AlarmsTableManager(context).queryItem(id);
+                    return checkNotNull(cursor.getItem());
                 }
 
                 @Override

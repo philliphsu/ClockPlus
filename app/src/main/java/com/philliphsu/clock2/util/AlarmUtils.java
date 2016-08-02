@@ -13,7 +13,7 @@ import com.philliphsu.clock2.Alarm;
 import com.philliphsu.clock2.PendingAlarmScheduler;
 import com.philliphsu.clock2.R;
 import com.philliphsu.clock2.UpcomingAlarmReceiver;
-import com.philliphsu.clock2.model.DatabaseManager;
+import com.philliphsu.clock2.model.AlarmsTableManager;
 import com.philliphsu.clock2.ringtone.RingtoneActivity;
 import com.philliphsu.clock2.ringtone.RingtoneService;
 
@@ -30,6 +30,7 @@ import static java.util.concurrent.TimeUnit.HOURS;
  * managing the upcoming alarm notification.
  *
  * TODO: Adapt this to Timers too...
+ * TODO: Keep only utility methods. Not the scheduling and cancelling methods.
  */
 public final class AlarmUtils {
     private static final String TAG = "AlarmUtils";
@@ -219,7 +220,7 @@ public final class AlarmUtils {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                DatabaseManager.getInstance(c).updateAlarm(alarm.id(), alarm);
+                new AlarmsTableManager(c).updateItem(alarm.id(), alarm);
             }
         }).start();
     }

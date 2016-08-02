@@ -18,6 +18,6 @@ public class AlarmLoader extends DataLoader<Alarm> {
 
     @Override
     public Alarm loadInBackground() {
-        return DatabaseManager.getInstance(getContext()).getAlarm(mAlarmId);
+        return new AlarmsTableManager(getContext()).queryItem(mAlarmId).getItem();
     }
 }
