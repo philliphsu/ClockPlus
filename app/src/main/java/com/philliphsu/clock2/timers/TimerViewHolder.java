@@ -1,6 +1,5 @@
 package com.philliphsu.clock2.timers;
 
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
@@ -52,17 +51,7 @@ public class TimerViewHolder extends BaseViewHolder<Timer> {
 
     @OnClick(R.id.start_pause)
     void startPause() {
-        Timer t = getItem();
-        if (t.isRunning()) {
-//            mController.pause();
-            t.pause();
-        } else {
-            if (t.hasStarted()) {
-                t.resume();
-            } else {
-                t.start();
-            }
-        }
+        TimerController.startPause(getItem());
         // Persist value changes
         update();
     }

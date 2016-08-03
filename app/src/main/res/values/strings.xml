@@ -191,4 +191,6 @@
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="title_activity_create_timer">CreateTimerActivity</string>
+
+    <string name="timer">Timer</string>
 </resources>

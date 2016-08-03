@@ -6,6 +6,9 @@ import android.support.v4.content.AsyncTaskLoader;
 /**
  * Created by Phillip Hsu on 6/30/2016.
  */
+// TODO: Consider adding a DatabaseTableManager type param, so we can then
+// implement loadInBackground for subclasses. You would, however, need to write
+// an abstract method getTableManager() that subclasses implement for us.
 public abstract class DataLoader<D> extends AsyncTaskLoader<D> {
 
     private D mData;

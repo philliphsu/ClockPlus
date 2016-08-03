@@ -1,7 +1,5 @@
 package com.philliphsu.clock2.timers;
 
-import android.widget.ImageButton;
-
 import com.philliphsu.clock2.Timer;
 
 /**
@@ -9,27 +7,26 @@ import com.philliphsu.clock2.Timer;
  */
 public class TimerController {
     private final Timer mTimer;
-    private final CountdownChronometer mChronometer;
-    private final ImageButton mAddOneMinute;
-    private final ImageButton mStartPause;
-    private final ImageButton mStop;
 
-    public TimerController(Timer timer, CountdownChronometer chronometer, ImageButton addOneMinute,
-                           ImageButton startPause, ImageButton stop) {
-        mTimer = timer;
-        mChronometer = chronometer;
-        mAddOneMinute = addOneMinute;
-        mStartPause = startPause;
-        mStop = stop;
-
-//        init();
+    /**
+     * Calls the appropriate state on the given Timer, based on
+     * its current state.
+     */
+    public static void startPause(Timer timer) {
+        if (timer.hasStarted()) {
+            if (timer.isRunning()) {
+                timer.pause();
+            } else {
+                timer.resume();
+            }
+        } else {
+            timer.start();
+        }
     }
-    
-//    private void init() {
-//        mChronometer.setBase(SystemClock.elapsedRealtime() + mTimer.duration());
-//        updateStartPauseIcon();
-//        setSecondaryButtonsVisible(false);
-//    }
+
+    public TimerController(Timer timer) {
+        mTimer = timer;
+    }
 
     public void start() {
         mTimer.start();

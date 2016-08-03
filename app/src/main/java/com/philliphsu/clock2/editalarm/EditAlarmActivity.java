@@ -28,8 +28,8 @@ import com.philliphsu.clock2.BaseActivity;
 import com.philliphsu.clock2.DaysOfWeek;
 import com.philliphsu.clock2.R;
 import com.philliphsu.clock2.SharedPreferencesHelper;
+import com.philliphsu.clock2.alarms.AlarmActivity;
 import com.philliphsu.clock2.model.AlarmLoader;
-import com.philliphsu.clock2.ringtone.RingtoneActivity;
 import com.philliphsu.clock2.util.AlarmController;
 import com.philliphsu.clock2.util.AlarmUtils;
 import com.philliphsu.clock2.util.DateFormatUtils;
@@ -543,8 +543,8 @@ public class EditAlarmActivity extends BaseActivity implements
     @Override
     public void cancelAlarm(Alarm alarm, boolean showToast) {
         new AlarmController(this, mMainContent).cancelAlarm(alarm, true);
-        if (RingtoneActivity.isAlive()) {
-            LocalBroadcastHelper.sendBroadcast(this, RingtoneActivity.ACTION_FINISH);
+        if (AlarmActivity.isAlive()) {
+            LocalBroadcastHelper.sendBroadcast(this, AlarmActivity.ACTION_FINISH);
         }
     }
 

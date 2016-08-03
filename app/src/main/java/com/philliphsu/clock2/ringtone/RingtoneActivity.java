@@ -4,26 +4,20 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.LayoutRes;
+import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.Button;
 
-import com.philliphsu.clock2.Alarm;
-import com.philliphsu.clock2.R;
-import com.philliphsu.clock2.model.AlarmLoader;
-import com.philliphsu.clock2.util.AlarmController;
 import com.philliphsu.clock2.util.LocalBroadcastHelper;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
  * status bar and navigation/system bar) with user interaction.
- *
- * TODO: Make this abstract and make appropriate subclasses for Alarms and Timers.
  */
-public class RingtoneActivity extends AppCompatActivity implements
-        android.support.v4.app.LoaderManager.LoaderCallbacks<Alarm> {
+public abstract class RingtoneActivity<T> extends AppCompatActivity implements LoaderCallbacks<T> {
     private static final String TAG = "RingtoneActivity";
 
     // Shared with RingtoneService
@@ -32,14 +26,19 @@ public class RingtoneActivity extends AppCompatActivity implements
 
     private static boolean sIsAlive = false;
 
-    private long mAlarmId;
-    private Alarm mAlarm;
-    private AlarmController mAlarmController;
+    private long mItemId;
+    private T mItem;
+
+    public abstract Loader<T> onCreateLoader(long itemId);
+
+    // TODO: Should we extend from BaseActivity instead?
+    @LayoutRes
+    public abstract int layoutResource();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_ringtone);
+        setContentView(layoutResource());
         sIsAlive = true;
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
@@ -47,8 +46,8 @@ public class RingtoneActivity extends AppCompatActivity implements
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
 
-        mAlarmId = getIntent().getLongExtra(EXTRA_ITEM_ID, -1);
-        if (mAlarmId < 0) {
+        mItemId = getIntent().getLongExtra(EXTRA_ITEM_ID, -1);
+        if (mItemId < 0) {
             throw new IllegalStateException("Cannot start RingtoneActivity without item's id");
         }
         // The reason we don't use a thread to load the alarm is because this is an
@@ -57,43 +56,31 @@ public class RingtoneActivity extends AppCompatActivity implements
         getSupportLoaderManager().initLoader(0, null, this);
 
         Intent intent = new Intent(this, RingtoneService.class)
-                .putExtra(EXTRA_ITEM_ID, mAlarmId);
+                .putExtra(EXTRA_ITEM_ID, mItemId);
         startService(intent);
-
-        mAlarmController = new AlarmController(this, null);
-
-        // TODO: Butterknife binding
-        Button snooze = (Button) findViewById(R.id.btn_snooze);
-        snooze.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                snooze();
-            }
-        });
-        Button dismiss = (Button) findViewById(R.id.btn_dismiss);
-        dismiss.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dismiss();
-            }
-        });
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+        // TODO: Do we need this anymore? I think this broadcast was only sent from
+        // EditAlarmActivity?
         LocalBroadcastHelper.registerReceiver(this, mFinishReceiver, ACTION_FINISH);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
+        // TODO: Do we need this anymore? I think this broadcast was only sent from
+        // EditAlarmActivity?
         LocalBroadcastHelper.unregisterReceiver(this, mFinishReceiver);
     }
 
     @Override
     protected void onNewIntent(Intent intent) {
         //super.onNewIntent(intent); // Not needed since no fragments hosted?
+        // TODO: Do we need this anymore? I think the broadcast that calls through to
+        // this was only sent from EditAlarmActivity?
 
         // Notifies alarm missed and stops the service
         LocalBroadcastHelper.sendBroadcast(this, RingtoneService.ACTION_NOTIFY_MISSED);
@@ -138,22 +125,17 @@ public class RingtoneActivity extends AppCompatActivity implements
     }
 
     @Override
-    public Loader<Alarm> onCreateLoader(int id, Bundle args) {
-        return new AlarmLoader(this, mAlarmId);
+    public Loader<T> onCreateLoader(int id, Bundle args) {
+        return onCreateLoader(mItemId);
     }
 
     @Override
-    public void onLoadFinished(Loader<Alarm> loader, Alarm data) {
-        mAlarm = data;
-        if (mAlarm != null) {
-            // TODO: If the upcoming alarm notification isn't present, verify other notifications aren't affected.
-            // This could be the case if we're starting a new instance of this activity after leaving the first launch.
-            mAlarmController.removeUpcomingAlarmNotification(mAlarm);
-        }
+    public void onLoadFinished(Loader<T> loader, T data) {
+        mItem = data;
     }
 
     @Override
-    public void onLoaderReset(Loader<Alarm> loader) {
+    public void onLoaderReset(Loader<T> loader) {
         // Do nothing
     }
 
@@ -161,28 +143,17 @@ public class RingtoneActivity extends AppCompatActivity implements
         return sIsAlive;
     }
 
-    private void snooze() {
-        if (mAlarm != null) {
-            mAlarmController.snoozeAlarm(mAlarm);
-        }
-        // Can't call dismiss() because we don't want to also call cancelAlarm()! Why? For example,
-        // we don't want the alarm, if it has no recurrence, to be turned off right now.
-        stopAndFinish();
-    }
-
-    private void dismiss() {
-        if (mAlarm != null) {
-            // TODO do we really need to cancel the intent and alarm?
-            mAlarmController.cancelAlarm(mAlarm, false);
-        }
-        stopAndFinish();
-    }
-
-    private void stopAndFinish() {
+    /**
+     * Exposed to subclasses so they can force us to stop the
+     * ringtone and finish us.
+     */
+    protected final void stopAndFinish() {
         stopService(new Intent(this, RingtoneService.class));
         finish();
     }
 
+    // TODO: Do we need this anymore? I think this broadcast was only sent from
+    // EditAlarmActivity?
     private final BroadcastReceiver mFinishReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {

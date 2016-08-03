@@ -203,8 +203,9 @@ public abstract class Alarm extends ObjectWithId implements JsonSerializable, Pa
         return !ignoreUpcomingRingTime && ringsIn() <= TimeUnit.HOURS.toMillis(hours);
     }
 
+    // TODO: Rename to getIntId() so usages refer to ObjectWithId#getIntId(), then delete this method.
     public int intId() {
-        return (int) getId();
+        return getIntId();
     }
 
     // TODO: Remove method signature from JsonSerializable interface.

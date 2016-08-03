@@ -11,6 +11,8 @@ public class AlarmLoader extends DataLoader<Alarm> {
 
     private long mAlarmId;
 
+    // TODO: Consider writing a super ctor that has the id param, so
+    // subclasses don't need to write their own.
     public AlarmLoader(Context context, long alarmId) {
         super(context);
         mAlarmId = alarmId;

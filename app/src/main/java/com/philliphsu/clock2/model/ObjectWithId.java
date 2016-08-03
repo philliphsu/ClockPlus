@@ -15,4 +15,8 @@ public abstract class ObjectWithId {
     public final void setId(long id) {
         this.id = id;
     }
+
+    public final int getIntId() {
+        return (int) id;
+    }
 }

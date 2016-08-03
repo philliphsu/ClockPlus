@@ -220,6 +220,10 @@ public class RingtoneService extends Service { // TODO: abstract this, make subc
     }
 
     private void finishActivity() {
+        // I think this will be received by all instances of RingtoneActivity
+        // subclasses in memory.. but since we realistically expect only one
+        // instance alive at any given time, we don't need to worry about having
+        // to restrict the broadcast to only the subclass that's alive.
         LocalBroadcastHelper.sendBroadcast(this, RingtoneActivity.ACTION_FINISH);
     }
 

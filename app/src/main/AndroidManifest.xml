@@ -21,13 +21,13 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity
+        <!--<activity
             android:name=".ringtone.RingtoneActivity"
             android:excludeFromRecents="true"
             android:label="@string/title_activity_ringtone"
             android:launchMode="singleTask"
             android:taskAffinity="com.philliphsu.clock2.RingtoneActivity">
-        </activity>
+        </activity>-->
 
         <service
             android:name=".ringtone.RingtoneService"
@@ -79,13 +79,32 @@
             android:exported="false">
         </service>
 
-        <activity android:name=".edittimer.EditTimerActivity"
-                  android:label="@string/title_activity_create_timer"
-                  android:parentActivityName=".MainActivity"
-                  android:windowSoftInputMode="adjustNothing">
+        <activity
+            android:name=".edittimer.EditTimerActivity"
+            android:label="@string/title_activity_create_timer"
+            android:parentActivityName=".MainActivity"
+            android:windowSoftInputMode="adjustNothing">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.philliphsu.clock2.MainActivity"/>
+        </activity>
+
+        <service
+            android:name=".timers.TimerNotificationService"
+            android:exported="false">
+        </service>
+
+        <activity android:name=".timers.TimesUpActivity"
+                  android:excludeFromRecents="true"
+                  android:label="@string/title_activity_ringtone"
+                  android:launchMode="singleTask"
+                  android:taskAffinity="com.philliphsu.clock2.RingtoneActivity">
+        </activity>
+        <activity android:name=".alarms.AlarmActivity"
+                  android:excludeFromRecents="true"
+                  android:label="@string/title_activity_ringtone"
+                  android:launchMode="singleTask"
+                  android:taskAffinity="com.philliphsu.clock2.RingtoneActivity">
         </activity>
     </application>
 
