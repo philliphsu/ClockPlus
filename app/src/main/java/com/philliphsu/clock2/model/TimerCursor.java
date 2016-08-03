@@ -23,8 +23,9 @@ public class TimerCursor extends BaseItemCursor<Timer> {
         String label = getString(getColumnIndexOrThrow(TimersTable.COLUMN_LABEL));
 //            String group = getString(getColumnIndexOrThrow(COLUMN_GROUP));
         Timer t = Timer.create(hour, minute, second, label, /*group*/"");
-        t.setEndTime(getInt(getColumnIndexOrThrow(TimersTable.COLUMN_END_TIME)));
-        t.setPauseTime(getInt(getColumnIndexOrThrow(TimersTable.COLUMN_PAUSE_TIME)));
+        t.setId(getLong(getColumnIndexOrThrow(TimersTable.COLUMN_ID)));
+        t.setEndTime(getLong(getColumnIndexOrThrow(TimersTable.COLUMN_END_TIME)));
+        t.setPauseTime(getLong(getColumnIndexOrThrow(TimersTable.COLUMN_PAUSE_TIME)));
         return t;
     }
 }

@@ -11,7 +11,7 @@ import java.util.concurrent.TimeUnit;
  * Created by Phillip Hsu on 7/25/2016.
  */
 @AutoValue
-public abstract class Timer extends ObjectWithId {
+public abstract class Timer extends ObjectWithId /*implements Parcelable*/ {
     private static final long MINUTE = TimeUnit.MINUTES.toMillis(1);
 
     private long endTime;
@@ -128,4 +128,18 @@ public abstract class Timer extends ObjectWithId {
     public long pauseTime() {
         return pauseTime;
     }
+
+//    @Override
+//    public int describeContents() {
+//        return 0;
+//    }
+//
+//    @Override
+//    public void writeToParcel(Parcel dest, int flags) {
+//        dest.writeInt(hour());
+//        dest.writeInt(minute());
+//        dest.writeInt(second());
+//        dest.writeString(group());
+//        dest.writeString(label());
+//    }
 }

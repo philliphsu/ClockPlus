@@ -2,6 +2,7 @@ package com.philliphsu.clock2.timers;
 
 import android.view.ViewGroup;
 
+import com.philliphsu.clock2.AsyncTimersTableUpdateHandler;
 import com.philliphsu.clock2.BaseCursorAdapter;
 import com.philliphsu.clock2.OnListItemInteractionListener;
 import com.philliphsu.clock2.Timer;
@@ -12,12 +13,18 @@ import com.philliphsu.clock2.model.TimerCursor;
  */
 public class TimersCursorAdapter extends BaseCursorAdapter<Timer, TimerViewHolder, TimerCursor> {
 
-    public TimersCursorAdapter(OnListItemInteractionListener<Timer> listener) {
+    private final AsyncTimersTableUpdateHandler mAsyncTimersTableUpdateHandler;
+
+    public TimersCursorAdapter(OnListItemInteractionListener<Timer> listener,
+                               AsyncTimersTableUpdateHandler asyncTimersTableUpdateHandler) {
         super(listener);
+        mAsyncTimersTableUpdateHandler = asyncTimersTableUpdateHandler;
     }
 
     @Override
     protected TimerViewHolder onCreateViewHolder(ViewGroup parent, OnListItemInteractionListener<Timer> listener, int viewType) {
-        return new TimerViewHolder(parent, listener);
+        return new TimerViewHolder(parent, listener, mAsyncTimersTableUpdateHandler);
     }
+
+
 }

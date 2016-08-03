@@ -1,10 +1,13 @@
 package com.philliphsu.clock2.timers;
 
+import android.util.Log;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.philliphsu.clock2.AsyncTimersTableUpdateHandler;
 import com.philliphsu.clock2.BaseViewHolder;
 import com.philliphsu.clock2.OnListItemInteractionListener;
 import com.philliphsu.clock2.R;
@@ -17,8 +20,10 @@ import butterknife.OnClick;
  * Created by Phillip Hsu on 7/25/2016.
  */
 public class TimerViewHolder extends BaseViewHolder<Timer> {
+    private static final String TAG = "TimerViewHolder";
 
-    private TimerController mController;
+//    private TimerController mController;
+    private final AsyncTimersTableUpdateHandler mAsyncTimersTableUpdateHandler;
 
     @Bind(R.id.label) TextView mLabel;
     @Bind(R.id.duration) CountdownChronometer mChronometer;
@@ -28,17 +33,19 @@ public class TimerViewHolder extends BaseViewHolder<Timer> {
     @Bind(R.id.stop) ImageButton mStop;
 
     // TODO: Controller param
-    public TimerViewHolder(ViewGroup parent, OnListItemInteractionListener<Timer> listener) {
+    public TimerViewHolder(ViewGroup parent, OnListItemInteractionListener<Timer> listener,
+                           AsyncTimersTableUpdateHandler asyncTimersTableUpdateHandler) {
         super(parent, R.layout.item_timer, listener);
+        mAsyncTimersTableUpdateHandler = asyncTimersTableUpdateHandler;
     }
 
     @Override
     public void onBind(Timer timer) {
         super.onBind(timer);
         bindLabel(timer.label());
-        // We can't create the controller until this VH binds, because
-        // the widgets only exist after this point.
-        mController = new TimerController(timer, mChronometer, mAddOneMinute, mStartPause, mStop);
+//        // We can't create the controller until this VH binds, because
+//        // the widgets only exist after this point.
+//        mController = new TimerController(timer, mChronometer, mAddOneMinute, mStartPause, mStop);
         bindChronometer(timer);
         bindButtonControls(timer);
     }
@@ -47,24 +54,30 @@ public class TimerViewHolder extends BaseViewHolder<Timer> {
     void startPause() {
         Timer t = getItem();
         if (t.isRunning()) {
-            mController.pause();
+//            mController.pause();
+            t.pause();
         } else {
             if (t.hasStarted()) {
-                mController.resume();
+                t.resume();
             } else {
-                mController.start();
+                t.start();
             }
         }
+        // Persist value changes
+        update();
     }
 
     @OnClick(R.id.add_one_minute)
     void addOneMinute() {
-        mController.addOneMinute();
+        getItem().addOneMinute();
+        // Persist end time increase
+        update();
     }
 
     @OnClick(R.id.stop)
     void stop() {
-        mController.stop();
+        getItem().stop();
+        update();
     }
 
     private void bindLabel(String label) {
@@ -85,9 +98,7 @@ public class TimerViewHolder extends BaseViewHolder<Timer> {
 
         if (!timer.hasStarted()) {
             // Set the initial text
-            // TODO: Verify the controller should already have initialized
-            // the text when it was constructed.
-//            mChronometer.setDuration(timer.duration());
+            mChronometer.setDuration(timer.duration());
         } else if (timer.isRunning()) {
             // Re-initialize the base
             mChronometer.setBase(timer.endTime());
@@ -107,7 +118,19 @@ public class TimerViewHolder extends BaseViewHolder<Timer> {
     }
 
     private void bindButtonControls(Timer timer) {
-        mController.updateStartPauseIcon();
-        mController.setSecondaryButtonsVisible(timer.hasStarted());
+        // TODO: Pause and start icons, resp.
+//        mStartPause.setImageResource(timer.isRunning() ? 0 : 0);
+        int visibility = timer.hasStarted() ? View.VISIBLE : View.INVISIBLE;
+        mAddOneMinute.setVisibility(visibility);
+        mStop.setVisibility(visibility);
+    }
+
+    private void update() {
+        Timer t = getItem();
+        mAsyncTimersTableUpdateHandler.asyncUpdate(
+                // Alternatively, use ViewHolder#getItemId() because we can forget
+                // to set the id on the object in BaseItemCursor#getItem(). We
+                // luckily remembered to this time!
+                t.getId(), t);
     }
 }

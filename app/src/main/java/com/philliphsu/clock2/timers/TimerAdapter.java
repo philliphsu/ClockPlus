@@ -11,6 +11,7 @@ import java.util.List;
 /**
  * Created by Phillip Hsu on 7/26/2016.
  */
+@Deprecated
 public class TimerAdapter extends BaseAdapter<Timer, TimerViewHolder> {
 
     public TimerAdapter(List<Timer> items, OnListItemInteractionListener<Timer> listener) {
@@ -19,7 +20,7 @@ public class TimerAdapter extends BaseAdapter<Timer, TimerViewHolder> {
 
     @Override
     protected TimerViewHolder onCreateViewHolder(ViewGroup parent, OnListItemInteractionListener<Timer> listener) {
-        return new TimerViewHolder(parent, listener);
+        return new TimerViewHolder(parent, listener, null);
     }
 
     @Override

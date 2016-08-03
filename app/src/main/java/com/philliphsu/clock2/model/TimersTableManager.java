@@ -3,6 +3,7 @@ package com.philliphsu.clock2.model;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.util.Log;
 
 import com.philliphsu.clock2.Timer;
 
@@ -10,6 +11,7 @@ import com.philliphsu.clock2.Timer;
  * Created by Phillip Hsu on 7/30/2016.
  */
 public class TimersTableManager extends DatabaseTableManager<Timer> {
+    public static final String TAG = "TimersTableManager";
 
     public TimersTableManager(Context context) {
         super(context);
@@ -22,7 +24,7 @@ public class TimersTableManager extends DatabaseTableManager<Timer> {
 
     @Override
     public TimerCursor queryItem(long id) {
-        return wrapInTimerCursor(queryItem(id));
+        return wrapInTimerCursor(super.queryItem(id));
     }
 
     @Override
@@ -48,6 +50,7 @@ public class TimersTableManager extends DatabaseTableManager<Timer> {
         cv.put(TimersTable.COLUMN_SECOND, timer.second());
         cv.put(TimersTable.COLUMN_LABEL, timer.label());
 //        cv.put(TimersTable.COLUMN_GROUP, timer.group());
+        Log.d(TAG, "endTime = " + timer.endTime() + ", pauseTime = " + timer.pauseTime());
         cv.put(TimersTable.COLUMN_END_TIME, timer.endTime());
         cv.put(TimersTable.COLUMN_PAUSE_TIME, timer.pauseTime());
         return cv;

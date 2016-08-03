@@ -6,12 +6,11 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.content.Loader;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 
 import com.philliphsu.clock2.Alarm;
-import com.philliphsu.clock2.AsyncItemChangeHandler;
+import com.philliphsu.clock2.AsyncAlarmsTableUpdateHandler;
 import com.philliphsu.clock2.R;
 import com.philliphsu.clock2.RecyclerViewFragment;
 import com.philliphsu.clock2.editalarm.EditAlarmActivity;
@@ -19,8 +18,6 @@ import com.philliphsu.clock2.model.AlarmCursor;
 import com.philliphsu.clock2.model.AlarmsListCursorLoader;
 import com.philliphsu.clock2.util.AlarmController;
 import com.philliphsu.clock2.util.DelayedSnackbarHandler;
-
-import butterknife.Bind;
 
 public class AlarmsFragment extends RecyclerViewFragment<
         Alarm,
@@ -34,14 +31,10 @@ public class AlarmsFragment extends RecyclerViewFragment<
     public static final int REQUEST_CREATE_ALARM = 1;
 
 //    private AlarmsCursorAdapter mAdapter;
-    // TODO: Since we only use this in onActivityResult(), we also don't need this anymore.
-    private AsyncItemChangeHandler mAsyncItemChangeHandler;
+    private AsyncAlarmsTableUpdateHandler mAsyncAlarmsTableUpdateHandler;
     private AlarmController mAlarmController;
     private Handler mHandler = new Handler();
     private View mSnackbarAnchor;
-    private long mScrollToStableId = RecyclerView.NO_ID;
-
-    @Bind(R.id.list) RecyclerView mList;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -71,7 +64,7 @@ public class AlarmsFragment extends RecyclerViewFragment<
         // See the Fragment lifecycle.
         mSnackbarAnchor = getActivity().findViewById(R.id.main_content);
         mAlarmController = new AlarmController(getActivity(), mSnackbarAnchor);
-        mAsyncItemChangeHandler = new AsyncItemChangeHandler(getActivity(),
+        mAsyncAlarmsTableUpdateHandler = new AsyncAlarmsTableUpdateHandler(getActivity(),
                 mSnackbarAnchor, this, mAlarmController);
     }
 
@@ -91,10 +84,8 @@ public class AlarmsFragment extends RecyclerViewFragment<
     @Override
     public void onLoadFinished(Loader<AlarmCursor> loader, AlarmCursor data) {
         super.onLoadFinished(loader, data);
-        // This may have been a requery due to content change. If the change
-        // was an insertion, scroll to the last modified alarm.
-        // TODO: If the change was an update, this presents a problem.
-        performScrollToStableId();
+        // TODO: If this was a content change due to an update, verify that
+        // we scroll to the updated alarm if its sort order changes.
     }
 
     @Override
@@ -108,7 +99,10 @@ public class AlarmsFragment extends RecyclerViewFragment<
     protected AlarmsCursorAdapter getAdapter() {
         if (super.getAdapter() != null)
             return super.getAdapter();
-        // Create a new adapter
+        // Create a new adapter. This is called before we can initialize mAlarmController,
+        // so right now it is null. However, after super.onCreate() returns, it is initialized, and
+        // the reference variable will be pointing to an actual object. This assignment "propagates"
+        // to all references to mAlarmController.
         return new AlarmsCursorAdapter(this, mAlarmController);
     }
 
@@ -132,19 +126,19 @@ public class AlarmsFragment extends RecyclerViewFragment<
         switch (requestCode) {
             case REQUEST_CREATE_ALARM:
                 mHandler.postDelayed(
-                        new AsyncAddItemRunnable(mAsyncItemChangeHandler, alarm),
+                        new AsyncAddItemRunnable(mAsyncAlarmsTableUpdateHandler, alarm),
                         300);
                 break;
             case REQUEST_EDIT_ALARM:
                 if (data.getBooleanExtra(EditAlarmActivity.EXTRA_IS_DELETING, false)) {
                     // TODO: Should we delay this too? It seems animations run
                     // some of the time.
-                    mAsyncItemChangeHandler.asyncDelete(alarm);
+                    mAsyncAlarmsTableUpdateHandler.asyncDelete(alarm);
                 } else {
                     // TODO: Increase the delay, because update animation is
                     // more elusive than insert.
                     mHandler.postDelayed(
-                            new AsyncUpdateItemRunnable(mAsyncItemChangeHandler, alarm),
+                            new AsyncUpdateItemRunnable(mAsyncAlarmsTableUpdateHandler, alarm),
                             300);
                 }
                 break;
@@ -165,12 +159,16 @@ public class AlarmsFragment extends RecyclerViewFragment<
         }
     }
 
+    /////////////////////////////////////////////////////////////////////////////////////////////////
+    // TODO: Just like with TimersCursorAdapter, we could pass in the mAsyncAlarmsTableUpdateHandler
+    // to the AlarmsCursorAdapter and call these on the save and delete button click bindings.
+
     @Override
     // TODO: Rename to onListItem***Delete*** because the item hasn't been deleted from our db yet
     public void onListItemDeleted(final Alarm item) {
         // The corresponding VH will be automatically removed from view following
         // the requery, so we don't have to do anything to it.
-        mAsyncItemChangeHandler.asyncDelete(item);
+        mAsyncAlarmsTableUpdateHandler.asyncDelete(item);
     }
 
     @Override
@@ -182,70 +180,54 @@ public class AlarmsFragment extends RecyclerViewFragment<
         // TODO: Implement editing in the expanded VH. Then verify that changes
         // while in that VH are saved and updated after the requery.
 //        getAdapter().collapse(position);
-        mAsyncItemChangeHandler.asyncUpdate(item.getId(), item);
+        mAsyncAlarmsTableUpdateHandler.asyncUpdate(item.getId(), item);
     }
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////
 
     @Override
-    public void setScrollToStableId(long id) {
-        mScrollToStableId = id;
-    }
-
-    @Override
-    public void scrollToPosition(int position) {
-        mList.smoothScrollToPosition(position);
-    }
-
-    private void performScrollToStableId() {
-        if (mScrollToStableId != RecyclerView.NO_ID) {
-            int position = -1;
-            for (int i = 0; i < getAdapter().getItemCount(); i++) {
-                if (getAdapter().getItemId(i) == mScrollToStableId) {
-                    position = i;
-                    break;
-                }
-            }
-            if (position >= 0) {
-                scrollToPosition(position);
-                // We were called because of a requery. If it was due to an insertion,
-                // expand the newly added alarm.
-                boolean expanded = getAdapter().expand(position);
-                if (!expanded) {
-                    // Otherwise, it was due to an item update. The VH is expanded
-                    // at this point, so reset it.
-                    getAdapter().collapse(position);
-                }
-            }
+    protected void onScrolledToStableId(long id, int position) {
+        // We were called because of a requery. If it was due to an insertion,
+        // expand the newly added alarm.
+        boolean expanded = getAdapter().expand(position);
+        if (!expanded) {
+            // Otherwise, it was due to an item update. The VH is expanded
+            // at this point, so reset it.
+            getAdapter().collapse(position);
         }
-        // Reset
-        mScrollToStableId = RecyclerView.NO_ID;
     }
 
+    /////////////////////////////////////////////////////////////////////////////////////
+    // TODO: We won't need these anymore, since we won't handle the db
+    // update in onActivityResult() anymore.
+
+    @Deprecated
     private static abstract class BaseAsyncItemChangeRunnable {
         // TODO: Will holding onto this cause a memory leak?
-        private final AsyncItemChangeHandler mAsyncItemChangeHandler;
+        private final AsyncAlarmsTableUpdateHandler mAsyncAlarmsTableUpdateHandler;
         private final Alarm mAlarm;
 
-        BaseAsyncItemChangeRunnable(AsyncItemChangeHandler asyncItemChangeHandler, Alarm alarm) {
-            mAsyncItemChangeHandler = asyncItemChangeHandler;
+        BaseAsyncItemChangeRunnable(AsyncAlarmsTableUpdateHandler asyncAlarmsTableUpdateHandler, Alarm alarm) {
+            mAsyncAlarmsTableUpdateHandler = asyncAlarmsTableUpdateHandler;
             mAlarm = alarm;
         }
 
         void asyncAddAlarm() {
-            mAsyncItemChangeHandler.asyncInsert(mAlarm);
+            mAsyncAlarmsTableUpdateHandler.asyncInsert(mAlarm);
         }
 
         void asyncUpdateAlarm() {
-            mAsyncItemChangeHandler.asyncUpdate(mAlarm.getId(), mAlarm);
+            mAsyncAlarmsTableUpdateHandler.asyncUpdate(mAlarm.getId(), mAlarm);
         }
 
         void asyncRemoveAlarm() {
-            mAsyncItemChangeHandler.asyncDelete(mAlarm);
+            mAsyncAlarmsTableUpdateHandler.asyncDelete(mAlarm);
         }
     }
 
     private static class AsyncAddItemRunnable extends BaseAsyncItemChangeRunnable implements Runnable {
-        AsyncAddItemRunnable(AsyncItemChangeHandler asyncItemChangeHandler, Alarm alarm) {
-            super(asyncItemChangeHandler, alarm);
+        AsyncAddItemRunnable(AsyncAlarmsTableUpdateHandler asyncAlarmsTableUpdateHandler, Alarm alarm) {
+            super(asyncAlarmsTableUpdateHandler, alarm);
         }
 
         @Override
@@ -255,8 +237,8 @@ public class AlarmsFragment extends RecyclerViewFragment<
     }
 
     private static class AsyncUpdateItemRunnable extends BaseAsyncItemChangeRunnable implements Runnable {
-        AsyncUpdateItemRunnable(AsyncItemChangeHandler asyncItemChangeHandler, Alarm alarm) {
-            super(asyncItemChangeHandler, alarm);
+        AsyncUpdateItemRunnable(AsyncAlarmsTableUpdateHandler asyncAlarmsTableUpdateHandler, Alarm alarm) {
+            super(asyncAlarmsTableUpdateHandler, alarm);
         }
 
         @Override
@@ -266,8 +248,8 @@ public class AlarmsFragment extends RecyclerViewFragment<
     }
 
     private static class AsyncRemoveItemRunnable extends BaseAsyncItemChangeRunnable implements Runnable {
-        AsyncRemoveItemRunnable(AsyncItemChangeHandler asyncItemChangeHandler, Alarm alarm) {
-            super(asyncItemChangeHandler, alarm);
+        AsyncRemoveItemRunnable(AsyncAlarmsTableUpdateHandler asyncAlarmsTableUpdateHandler, Alarm alarm) {
+            super(asyncAlarmsTableUpdateHandler, alarm);
         }
 
         @Override

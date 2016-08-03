@@ -1,5 +1,6 @@
 package com.philliphsu.clock2.edittimer;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.GridLayout;
@@ -21,6 +22,11 @@ import butterknife.OnTouch;
 // TODO: Rename to CreateTimerActivity
 public class EditTimerActivity extends BaseActivity {
     private static final int FIELD_LENGTH = 2;
+    public static final String EXTRA_HOUR = "com.philliphsu.clock2.edittimer.extra.HOUR";
+    public static final String EXTRA_MINUTE = "com.philliphsu.clock2.edittimer.extra.MINUTE";
+    public static final String EXTRA_SECOND = "com.philliphsu.clock2.edittimer.extra.SECOND";
+    public static final String EXTRA_LABEL = "com.philliphsu.clock2.edittimer.extra.LABEL";
+    public static final String EXTRA_START_TIMER = "com.philliphsu.clock2.edittimer.extra.START_TIMER";
 
     @Bind(R.id.appbar) ViewGroup mAppBar;
     @Bind(R.id.label) TextView mLabel;
@@ -148,12 +154,15 @@ public class EditTimerActivity extends BaseActivity {
         int second = Integer.parseInt(mSecond.getText().toString());
         if (hour == 0 && minute == 0 && second == 0)
             return; // TODO: we could show a toast instead if we cared
-        // TODO: do something with the label
-        mLabel.getText();
-        // TODO: Pass back an intent with the data, or make Timer parcelable
-        // and pass back an instance of Timer. Consider overriding finish()
-        // and doing it there.
-        setResult(RESULT_OK);
+        // TODO: Consider overriding finish() and doing this there.
+        // TODO: Timer's group?
+        Intent data = new Intent()
+                .putExtra(EXTRA_HOUR, hour)
+                .putExtra(EXTRA_MINUTE, minute)
+                .putExtra(EXTRA_SECOND, second)
+                .putExtra(EXTRA_LABEL, mLabel.getText().toString())
+                .putExtra(EXTRA_START_TIMER, true);
+        setResult(RESULT_OK, data);
         finish();
     }
 

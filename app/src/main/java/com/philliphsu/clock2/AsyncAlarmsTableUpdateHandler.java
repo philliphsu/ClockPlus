@@ -10,12 +10,10 @@ import com.philliphsu.clock2.util.AlarmController;
 
 /**
  * Created by Phillip Hsu on 7/1/2016.
- *
- * TODO: Rename to AsyncAlarmChangeHandler
  * TODO: Consider making an AsyncDatabaseChangeHandlerWithSnackbar abstract class
  */
-public final class AsyncItemChangeHandler extends AsyncDatabaseChangeHandler<Alarm, AlarmsTableManager> {
-    private static final String TAG = "AsyncItemChangeHandler";
+public final class AsyncAlarmsTableUpdateHandler extends AsyncDatabaseTableUpdateHandler<Alarm, AlarmsTableManager> {
+    private static final String TAG = "AsyncAlarmsTableUpdateHandler";
 
     private final View mSnackbarAnchor;
     private final AlarmController mAlarmController;
@@ -24,9 +22,9 @@ public final class AsyncItemChangeHandler extends AsyncDatabaseChangeHandler<Ala
      * @param context the Context from which we get the application context
      * @param snackbarAnchor
      */
-    public AsyncItemChangeHandler(Context context, View snackbarAnchor,
-                                  ScrollHandler scrollHandler,
-                                  AlarmController alarmController) {
+    public AsyncAlarmsTableUpdateHandler(Context context, View snackbarAnchor,
+                                         ScrollHandler scrollHandler,
+                                         AlarmController alarmController) {
         super(context, scrollHandler);
         mSnackbarAnchor = snackbarAnchor;
         mAlarmController = alarmController;

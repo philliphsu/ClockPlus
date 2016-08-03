@@ -10,10 +10,10 @@ import com.philliphsu.clock2.model.ObjectWithId;
 /**
  * Created by Phillip Hsu on 7/1/2016.
  */
-public abstract class AsyncDatabaseChangeHandler<
+public abstract class AsyncDatabaseTableUpdateHandler<
         T extends ObjectWithId,
         TM extends DatabaseTableManager<T>> {
-    private static final String TAG = "AsyncDatabaseChangeHandler";
+    private static final String TAG = "AsyncDatabaseTableUpdateHandler";
 
     private final Context mAppContext;
     private final ScrollHandler mScrollHandler;
@@ -22,7 +22,7 @@ public abstract class AsyncDatabaseChangeHandler<
     /**
      * @param context the Context from which we get the application context
      */
-    public AsyncDatabaseChangeHandler(Context context, ScrollHandler scrollHandler) {
+    public AsyncDatabaseTableUpdateHandler(Context context, ScrollHandler scrollHandler) {
         mAppContext = context.getApplicationContext(); // to prevent memory leaks
         mScrollHandler = scrollHandler;
         mTableManager = getTableManager(context);

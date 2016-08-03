@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.philliphsu.clock2.alarms.ScrollHandler;
 import com.philliphsu.clock2.model.BaseItemCursor;
 import com.philliphsu.clock2.model.ObjectWithId;
 
@@ -25,15 +26,25 @@ public abstract class RecyclerViewFragment<
         A extends BaseCursorAdapter<T, VH, C>>
     extends BaseFragment implements
         LoaderManager.LoaderCallbacks<C>,
-        OnListItemInteractionListener<T> {
+        OnListItemInteractionListener<T>,
+        ScrollHandler {
 
     private A mAdapter;
+    private long mScrollToStableId = RecyclerView.NO_ID;
 
     // TODO: Rename id to recyclerView?
     // TODO: Rename variable to mRecyclerView?
     @Bind(R.id.list) RecyclerView mList;
 
     public abstract void onFabClick();
+
+    /**
+     * Callback invoked when we have scrolled to the stable id as set in
+     * {@link #setScrollToStableId(long)}.
+     * @param id the stable id we have scrolled to
+     * @param position the position of the item with this stable id
+     */
+    protected abstract void onScrolledToStableId(long id, int position);
 
     /**
      * @return the adapter to set on the RecyclerView. SUBCLASSES MUST OVERRIDE THIS, BECAUSE THE
@@ -71,6 +82,9 @@ public abstract class RecyclerViewFragment<
     @Override
     public void onLoadFinished(Loader<C> loader, C data) {
         mAdapter.swapCursor(data);
+        // This may have been a requery due to content change. If the change
+        // was an insertion, scroll to the last modified alarm.
+        performScrollToStableId();
     }
 
     @Override
@@ -85,5 +99,33 @@ public abstract class RecyclerViewFragment<
     @Override
     protected int contentLayout() {
         return R.layout.fragment_recycler_view;
+    }
+
+    @Override
+    public void setScrollToStableId(long id) {
+        mScrollToStableId = id;
+    }
+
+    @Override
+    public void scrollToPosition(int position) {
+        mList.smoothScrollToPosition(position);
+    }
+
+    private void performScrollToStableId() {
+        if (mScrollToStableId != RecyclerView.NO_ID) {
+            int position = -1;
+            for (int i = 0; i < mAdapter.getItemCount(); i++) {
+                if (mAdapter.getItemId(i) == mScrollToStableId) {
+                    position = i;
+                    break;
+                }
+            }
+            if (position >= 0) {
+                scrollToPosition(position);
+                onScrolledToStableId(mScrollToStableId, position);
+            }
+        }
+        // Reset
+        mScrollToStableId = RecyclerView.NO_ID;
     }
 }
