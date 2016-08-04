@@ -73,9 +73,9 @@ public abstract class DatabaseTableManager<T extends ObjectWithId> {
                 toContentValues(newItem),
                 COLUMN_ID + " = " + id,
                 null);
-        if (rowsUpdated == 0) {
-            throw new IllegalStateException("wtf?");
-        }
+//        if (rowsUpdated == 0) {
+//            throw new IllegalStateException("wtf?");
+//        }
         notifyContentChanged();
         return rowsUpdated;
     }

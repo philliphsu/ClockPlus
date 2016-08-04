@@ -1,34 +1,23 @@
 package com.philliphsu.clock2.ringtone;
 
 import android.app.Notification;
-import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
 import android.media.AudioManager;
 import android.media.Ringtone;
-import android.media.RingtoneManager;
-import android.net.Uri;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Vibrator;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import com.philliphsu.clock2.Alarm;
 import com.philliphsu.clock2.R;
-import com.philliphsu.clock2.model.AlarmCursor;
-import com.philliphsu.clock2.model.AlarmsTableManager;
-import com.philliphsu.clock2.util.AlarmController;
-import com.philliphsu.clock2.util.AlarmUtils;
 import com.philliphsu.clock2.util.LocalBroadcastHelper;
 
-import static com.philliphsu.clock2.util.DateFormatUtils.formatTime;
-import static com.philliphsu.clock2.util.Preconditions.checkNotNull;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Runs in the foreground. While it can still be killed by the system, it stays alive significantly
@@ -40,89 +29,104 @@ import static com.philliphsu.clock2.util.Preconditions.checkNotNull;
  *
  * TOneverDO: Change this to not be a started service!
  */
-public class RingtoneService extends Service { // TODO: abstract this, make subclasses
+// TODO: Remove this from manifest, keep only the subclasses.
+public abstract class RingtoneService<T> extends Service {
     private static final String TAG = "RingtoneService";
 
-    /* TOneverDO: not private */
-    private static final String ACTION_SNOOZE = "com.philliphsu.clock2.ringtone.action.SNOOZE";
-    private static final String ACTION_DISMISS = "com.philliphsu.clock2.ringtone.action.DISMISS";
     // public okay
     public static final String ACTION_NOTIFY_MISSED = "com.philliphsu.clock2.ringtone.action.NOTIFY_MISSED";
-    // TODO: Same value as RingtoneActivity.EXTRA_ITEM_ID. Is it important enough to define a different constant?
-    private static final String EXTRA_ITEM_ID = "com.philliphsu.clock2.ringtone.extra.ITEM_ID";
+//    public static final String EXTRA_ITEM_ID = RingtoneActivity.EXTRA_ITEM_ID;
+    public static final String EXTRA_ITEM = RingtoneActivity.EXTRA_ITEM;
 
     private AudioManager mAudioManager;
-    @Nullable private Vibrator mVibrator;
     private Ringtone mRingtone;
-    private Alarm mAlarm;
-    private String mNormalRingTime;
-    private AlarmController mAlarmController;
-    private boolean mAutoSilenced = false;
+    @Nullable private Vibrator mVibrator;
+
     // TODO: Using Handler for this is ill-suited? Alarm ringing could outlast the
     // application's life. Use AlarmManager API instead.
     private final Handler mSilenceHandler = new Handler();
+
     private final Runnable mSilenceRunnable = new Runnable() {
         @Override
         public void run() {
-            mAutoSilenced = true;
-            // TODO do we really need to cancel the alarm and intent?
-            mAlarmController.cancelAlarm(mAlarm, false);
+            onAutoSilenced();
+            // TODO: Consider not finishing the activity, but update
+            // its view to display that this ringing was missed?
             finishActivity();
             stopSelf();
         }
     };
-    private final BroadcastReceiver mNotifyMissedReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            mAutoSilenced = true;
-            // TODO: Do we need to call mAlarmController.cancelAlarm()?
-            stopSelf();
-            // Activity finishes itself
-        }
-    };
+
+    // Pretty sure we don't need this anymore...
+//    private final BroadcastReceiver mNotifyMissedReceiver = new BroadcastReceiver() {
+//        @Override
+//        public void onReceive(Context context, Intent intent) {
+//            // TODO: Do we need to call mAlarmController.cancelAlarm()?
+//            onAutoSilenced();
+//            stopSelf();
+//            // Activity finishes itself
+//        }
+//    };
+
+    protected abstract void onAutoSilenced();
+
+    protected abstract Ringtone getRingtone();
+
+    /**
+     * @return the notification to show when this Service starts in the foreground
+     */
+    protected abstract Notification getForegroundNotification();
+
+    protected abstract boolean doesVibrate();
+
+    /**
+     * @return the number of minutes to keep ringing before auto silence
+     */
+    protected abstract int minutesToAutoSilence();
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        final long id = intent.getLongExtra(EXTRA_ITEM_ID, -1);
-        if (id < 0)
-            throw new IllegalStateException("No item id set");
-        if (intent.getAction() == null) {
-            // http://stackoverflow.com/q/8696146/5055032
-            // Start our own thread to load the alarm instead of using a loader,
-            // because Services do not have a built-in LoaderManager (because they have no need for one since
-            // their lifecycle is not complex like in Activities/Fragments) and our
-            // work is simple enough that getting loaders to work here is not
-            // worth the effort.
-            // TODO: Will using the Runnable like this cause a memory leak?
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    AlarmCursor cursor = new AlarmsTableManager(RingtoneService.this).queryItem(id);
-                    mAlarm = checkNotNull(cursor.getItem());
-                    playRingtone();
-                }
-            }).start();
-        } else {
-            if (ACTION_SNOOZE.equals(intent.getAction())) {
-                mAlarmController.snoozeAlarm(mAlarm);
-            } else if (ACTION_DISMISS.equals(intent.getAction())) {
-                mAlarmController.cancelAlarm(mAlarm, false); // TODO do we really need to cancel the intent and alarm?
-            } else {
-                throw new UnsupportedOperationException();
-            }
-            // ==========================================================================
-            stopSelf(startId);
-            finishActivity();
-        }
+        // Play ringtone, if not already playing
+        if (mAudioManager == null && mRingtone == null) {
+            // TOneverDO: Pass 0 as the first argument
+            startForeground(R.id.ringtone_service_notification, getForegroundNotification());
 
-        return START_NOT_STICKY; // If killed while started, don't recreate. Should be sufficient.
+            mAudioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
+            // Request audio focus first, so we don't play our ringtone on top of any
+            // other apps that currently have playback.
+            int result = mAudioManager.requestAudioFocus(
+                    null, // Playback will likely be short, so don't worry about listening for focus changes
+                    AudioManager.STREAM_ALARM,
+                    // Request permanent focus, as ringing could last several minutes
+                    AudioManager.AUDIOFOCUS_GAIN);
+            if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
+                mRingtone = getRingtone();
+                // Deprecated, but the alternative AudioAttributes requires API 21
+                mRingtone.setStreamType(AudioManager.STREAM_ALARM);
+                mRingtone.play();
+                if (doesVibrate()) {
+                    mVibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
+                    mVibrator.vibrate(new long[] { // apply pattern
+                            0, // millis to wait before turning vibrator on
+                            500, // millis to keep vibrator on before turning off
+                            500, // millis to wait before turning back on
+                            500 // millis to keep on before turning off
+                    }, 2 /* start repeating at this index of the array, after one cycle */);
+                }
+                // Schedule auto silence
+                mSilenceHandler.postDelayed(mSilenceRunnable,
+                        TimeUnit.MINUTES.toMillis(minutesToAutoSilence()));
+            }
+        }
+        // If killed while started, don't recreate. Should be sufficient.
+        return START_NOT_STICKY;
     }
 
     @Override
     public void onCreate() {
         super.onCreate();
-        LocalBroadcastHelper.registerReceiver(this, mNotifyMissedReceiver, ACTION_NOTIFY_MISSED);
-        mAlarmController = new AlarmController(this, null);
+        // Pretty sure this won't ever get called anymore...
+//        LocalBroadcastHelper.registerReceiver(this, mNotifyMissedReceiver, ACTION_NOTIFY_MISSED);
     }
 
     @Override
@@ -134,103 +138,40 @@ public class RingtoneService extends Service { // TODO: abstract this, make subc
             mVibrator.cancel();
         }
         mSilenceHandler.removeCallbacks(mSilenceRunnable);
-        if (mAutoSilenced) {
-            // Post notification that alarm was missed, or timer expired.
-            // TODO: You should probably do this in the appropriate subclass.
-            NotificationManager nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-            Notification note = new NotificationCompat.Builder(this)
-                    .setContentTitle(getString(R.string.missed_alarm))
-                    .setContentText(mNormalRingTime)
-                    .setSmallIcon(R.mipmap.ic_launcher)
-                    .build();
-            // A tag with the name of the subclass is used in addition to the item's id to prevent
-            // conflicting notifications for items of different class types. Items of any class type
-            // have ids starting from 0.
-            nm.notify(getClass().getName(), mAlarm.intId(), note);
-        }
         stopForeground(true);
-        LocalBroadcastHelper.unregisterReceiver(this, mNotifyMissedReceiver);
+//        LocalBroadcastHelper.unregisterReceiver(this, mNotifyMissedReceiver);
     }
 
     @Override
-    public IBinder onBind(Intent intent) {
+    public final IBinder onBind(Intent intent) {
         return null;
     }
 
-    private void playRingtone() {
-        if (mAudioManager == null && mRingtone == null) {
-            // TODO: The below call requires a notification, and there is no way to provide one suitable
-            // for both Alarms and Timers. Consider making this class abstract, and have subclasses
-            // implement an abstract method that calls startForeground(). You would then call that
-            // method here instead.
-            String title = mAlarm.label().isEmpty()
-                    ? getString(R.string.alarm)
-                    : mAlarm.label();
-            mNormalRingTime = formatTime(this, System.currentTimeMillis()); // now
-            Notification note = new NotificationCompat.Builder(this)
-                    // Required contents
-                    .setSmallIcon(R.mipmap.ic_launcher) // TODO: alarm icon
-                    .setContentTitle(title)
-                    .setContentText(mNormalRingTime)
-                    .addAction(R.mipmap.ic_launcher,
-                            getString(R.string.snooze),
-                            getPendingIntent(ACTION_SNOOZE, mAlarm))
-                    .addAction(R.mipmap.ic_launcher,
-                            getString(R.string.dismiss),
-                            getPendingIntent(ACTION_DISMISS, mAlarm))
-                    .build();
-            startForeground(R.id.ringtone_service_notification, note); // TOneverDO: Pass 0 as the first argument
-
-            mAudioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
-            if (mAlarm.vibrates()) {
-                mVibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
-            }
-            // Request audio focus first, so we don't play our ringtone on top of any
-            // other apps that currently have playback.
-            int result = mAudioManager.requestAudioFocus(
-                    null, // Playback will likely be short, so don't worry about listening for focus changes
-                    AudioManager.STREAM_ALARM,
-                    // Request permanent focus, as ringing could last several minutes
-                    AudioManager.AUDIOFOCUS_GAIN);
-            if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
-                Uri ringtone = Uri.parse(mAlarm.ringtone());
-                mRingtone = RingtoneManager.getRingtone(this, ringtone);
-                // Deprecated, but the alternative AudioAttributes requires API 21
-                mRingtone.setStreamType(AudioManager.STREAM_ALARM);
-                mRingtone.play();
-                if (mVibrator != null) {
-                    mVibrator.vibrate(new long[] { // apply pattern
-                            0, // millis to wait before turning vibrator on
-                            500, // millis to keep vibrator on before turning off
-                            500, // millis to wait before turning back on
-                            500 // millis to keep on before turning off
-                    }, 2 /* start repeating at this index of the array, after one cycle */);
-                }
-                scheduleAutoSilence();
-            }
-        }
-    }
-
-    // TODO: For Timers, update the foreground notification to say "timer expired". Also,
-    // if Alarms and Timers will have distinct settings for the minutes to silence after, then consider
-    // doing this in the respective subclass of this service.
-    private void scheduleAutoSilence() {
-        int minutes = AlarmUtils.minutesToSilenceAfter(this);
-        mSilenceHandler.postDelayed(mSilenceRunnable, /*minutes * 60000*/70000); // TODO: uncomment
-    }
-
-    private void finishActivity() {
+    /**
+     * Exposed to let subclasses finish their designated activity from, e.g. a
+     * notification action.
+     */
+    protected void finishActivity() {
         // I think this will be received by all instances of RingtoneActivity
         // subclasses in memory.. but since we realistically expect only one
         // instance alive at any given time, we don't need to worry about having
         // to restrict the broadcast to only the subclass that's alive.
+        // TODO: If we cared, we could write an abstract method called getFinishAction()
+        // that subclasses implement, and call that here instead. The subclass of
+        // RingtoneActivity would define their own ACTION_FINISH constants, and
+        // the RingtoneService subclass retrieves that constant and returns it to us.
         LocalBroadcastHelper.sendBroadcast(this, RingtoneActivity.ACTION_FINISH);
     }
 
-    private PendingIntent getPendingIntent(@NonNull String action, Alarm alarm) {
+    /**
+     * Exposed so subclasses can create their notification actions.
+     */
+    // TODO: Consider changing Alarm param to int requestCode param.
+    protected final PendingIntent getPendingIntent(@NonNull String action, Alarm alarm) {
         Intent intent = new Intent(this, getClass())
-                .setAction(action)
-                .putExtra(EXTRA_ITEM_ID, alarm.id());
+                .setAction(action);
+                // TODO: Why do we need this?
+//                .putExtra(EXTRA_ITEM_ID, alarm.id());
         return PendingIntent.getService(
                 this,
                 alarm.intId(),

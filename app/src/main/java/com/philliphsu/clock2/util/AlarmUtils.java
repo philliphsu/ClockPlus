@@ -14,8 +14,8 @@ import com.philliphsu.clock2.PendingAlarmScheduler;
 import com.philliphsu.clock2.R;
 import com.philliphsu.clock2.UpcomingAlarmReceiver;
 import com.philliphsu.clock2.alarms.AlarmActivity;
+import com.philliphsu.clock2.alarms.AlarmRingtoneService;
 import com.philliphsu.clock2.model.AlarmsTableManager;
-import com.philliphsu.clock2.ringtone.RingtoneService;
 
 import static android.app.PendingIntent.FLAG_CANCEL_CURRENT;
 import static android.app.PendingIntent.FLAG_NO_CREATE;
@@ -140,7 +140,7 @@ public final class AlarmUtils {
         save(c, a);
 
         // If service is not running, nothing happens
-        c.stopService(new Intent(c, RingtoneService.class));
+        c.stopService(new Intent(c, AlarmRingtoneService.class));
     }
 
     public static void snoozeAlarm(Context c, Alarm a) {
@@ -181,7 +181,7 @@ public final class AlarmUtils {
     private static PendingIntent alarmIntent(Context context, Alarm alarm, boolean retrievePrevious) {
         // TODO: Use appropriate subclass instead
         Intent intent = new Intent(context, AlarmActivity.class)
-                .putExtra(AlarmActivity.EXTRA_ITEM_ID, alarm.id());
+                .putExtra(AlarmActivity.EXTRA_ITEM, alarm);
         int flag = retrievePrevious ? FLAG_NO_CREATE : FLAG_CANCEL_CURRENT;
         PendingIntent pi = getActivity(context, alarm.intId(), intent, flag);
         // Even when we try to retrieve a previous instance that actually did exist,

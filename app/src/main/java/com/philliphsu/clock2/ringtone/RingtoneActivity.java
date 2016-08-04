@@ -4,9 +4,8 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.annotation.LayoutRes;
-import android.support.v4.app.LoaderManager.LoaderCallbacks;
-import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.WindowManager;
@@ -17,23 +16,26 @@ import com.philliphsu.clock2.util.LocalBroadcastHelper;
  * An example full-screen activity that shows and hides the system UI (i.e.
  * status bar and navigation/system bar) with user interaction.
  */
-public abstract class RingtoneActivity<T> extends AppCompatActivity implements LoaderCallbacks<T> {
+public abstract class RingtoneActivity<T extends Parcelable> extends AppCompatActivity /*implements LoaderCallbacks<T>*/ {
     private static final String TAG = "RingtoneActivity";
 
     // Shared with RingtoneService
-    public static final String EXTRA_ITEM_ID = "com.philliphsu.clock2.ringtone.extra.ITEM_ID";
-    public static final String ACTION_FINISH = "com.philliphsu.clock2.ringtone.action.UNBIND";
+//    public static final String EXTRA_ITEM_ID = "com.philliphsu.clock2.ringtone.extra.ITEM_ID";
+    public static final String ACTION_FINISH = "com.philliphsu.clock2.ringtone.action.FINISH";
+    public static final String EXTRA_ITEM = "com.philliphsu.clock2.ringtone.extra.ITEM";
 
     private static boolean sIsAlive = false;
 
-    private long mItemId;
-    private T mItem;
+//    private long mItemId;
+//    private T mItem;
 
-    public abstract Loader<T> onCreateLoader(long itemId);
+//    public abstract Loader<T> onCreateLoader(long itemId);
 
     // TODO: Should we extend from BaseActivity instead?
     @LayoutRes
     public abstract int layoutResource();
+
+    protected abstract Class<? extends RingtoneService> getRingtoneServiceClass();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,17 +48,17 @@ public abstract class RingtoneActivity<T> extends AppCompatActivity implements L
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
 
-        mItemId = getIntent().getLongExtra(EXTRA_ITEM_ID, -1);
-        if (mItemId < 0) {
-            throw new IllegalStateException("Cannot start RingtoneActivity without item's id");
-        }
+//        mItemId = getIntent().getLongExtra(EXTRA_ITEM_ID, -1);
+//        if (mItemId < 0) {
+//            throw new IllegalStateException("Cannot start RingtoneActivity without item's id");
+//        }
         // The reason we don't use a thread to load the alarm is because this is an
         // Activity, which has complex lifecycle. LoaderManager is designed to help
         // us through the vagaries of the lifecycle that could affect loading data.
-        getSupportLoaderManager().initLoader(0, null, this);
+//        getSupportLoaderManager().initLoader(0, null, this);
 
-        Intent intent = new Intent(this, RingtoneService.class)
-                .putExtra(EXTRA_ITEM_ID, mItemId);
+        Intent intent = new Intent(this, getRingtoneServiceClass())
+                .putExtra(EXTRA_ITEM, getIntent().getParcelableExtra(EXTRA_ITEM));
         startService(intent);
     }
 
@@ -124,20 +126,20 @@ public abstract class RingtoneActivity<T> extends AppCompatActivity implements L
         sIsAlive = false;
     }
 
-    @Override
-    public Loader<T> onCreateLoader(int id, Bundle args) {
-        return onCreateLoader(mItemId);
-    }
-
-    @Override
-    public void onLoadFinished(Loader<T> loader, T data) {
-        mItem = data;
-    }
-
-    @Override
-    public void onLoaderReset(Loader<T> loader) {
-        // Do nothing
-    }
+//    @Override
+//    public Loader<T> onCreateLoader(int id, Bundle args) {
+//        return onCreateLoader(mItemId);
+//    }
+//
+//    @Override
+//    public void onLoadFinished(Loader<T> loader, T data) {
+//        mItem = data;
+//    }
+//
+//    @Override
+//    public void onLoaderReset(Loader<T> loader) {
+//        // Do nothing
+//    }
 
     public static boolean isAlive() {
         return sIsAlive;
@@ -148,7 +150,7 @@ public abstract class RingtoneActivity<T> extends AppCompatActivity implements L
      * ringtone and finish us.
      */
     protected final void stopAndFinish() {
-        stopService(new Intent(this, RingtoneService.class));
+        stopService(new Intent(this, getRingtoneServiceClass()));
         finish();
     }
 

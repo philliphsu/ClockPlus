@@ -21,19 +21,21 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <!--<activity
+        <!--
+        <activity
             android:name=".ringtone.RingtoneActivity"
             android:excludeFromRecents="true"
             android:label="@string/title_activity_ringtone"
             android:launchMode="singleTask"
             android:taskAffinity="com.philliphsu.clock2.RingtoneActivity">
-        </activity>-->
+        </activity>
+        -->
 
-        <service
+        <!--<service
             android:name=".ringtone.RingtoneService"
             android:enabled="true"
             android:exported="false">
-        </service>
+        </service>-->
 
         <receiver
             android:name=".UpcomingAlarmReceiver"
@@ -94,18 +96,26 @@
             android:exported="false">
         </service>
 
-        <activity android:name=".timers.TimesUpActivity"
-                  android:excludeFromRecents="true"
-                  android:label="@string/title_activity_ringtone"
-                  android:launchMode="singleTask"
-                  android:taskAffinity="com.philliphsu.clock2.RingtoneActivity">
+        <activity
+            android:name=".timers.TimesUpActivity"
+            android:excludeFromRecents="true"
+            android:label="@string/title_activity_ringtone"
+            android:launchMode="singleTask"
+            android:taskAffinity="com.philliphsu.clock2.RingtoneActivity">
         </activity>
-        <activity android:name=".alarms.AlarmActivity"
-                  android:excludeFromRecents="true"
-                  android:label="@string/title_activity_ringtone"
-                  android:launchMode="singleTask"
-                  android:taskAffinity="com.philliphsu.clock2.RingtoneActivity">
+        <activity
+            android:name=".alarms.AlarmActivity"
+            android:excludeFromRecents="true"
+            android:label="@string/title_activity_ringtone"
+            android:launchMode="singleTask"
+            android:taskAffinity="com.philliphsu.clock2.RingtoneActivity">
         </activity>
+
+        <service
+            android:name=".alarms.AlarmRingtoneService"
+            android:enabled="true"
+            android:exported="false">
+        </service>
     </application>
 
 </manifest>

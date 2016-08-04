@@ -4,8 +4,6 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.os.SystemClock;
-import android.util.Log;
 
 import com.philliphsu.clock2.alarms.ScrollHandler;
 import com.philliphsu.clock2.model.TimersTableManager;
@@ -29,14 +27,12 @@ public final class AsyncTimersTableUpdateHandler extends AsyncDatabaseTableUpdat
 
     @Override
     protected void onPostAsyncDelete(Integer result, Timer timer) {
-        cancelAlarm(timer);
+        cancelAlarm(timer, true);
     }
 
     @Override
     protected void onPostAsyncInsert(Long result, Timer timer) {
-        Log.d(TAG, "onPostAsyncInsert()");
         if (timer.isRunning()) {
-            Log.d(TAG, "Scheduling alarm for timer launch");
             scheduleAlarm(timer);
         }
     }
@@ -48,7 +44,7 @@ public final class AsyncTimersTableUpdateHandler extends AsyncDatabaseTableUpdat
             // will remove and replace it.
             scheduleAlarm(timer);
         } else {
-            cancelAlarm(timer);
+            cancelAlarm(timer, !timer.hasStarted());
         }
     }
 
@@ -65,19 +61,20 @@ public final class AsyncTimersTableUpdateHandler extends AsyncDatabaseTableUpdat
     }
 
     private void scheduleAlarm(Timer timer) {
-        Log.d(TAG, String.format("now = %d, endTime = %d", SystemClock.elapsedRealtime(), timer.endTime()));
         AlarmManager am = (AlarmManager) getContext().getSystemService(Context.ALARM_SERVICE);
         am.setExact(AlarmManager.ELAPSED_REALTIME_WAKEUP, timer.endTime(), createTimesUpIntent(timer));
         TimerNotificationService.showNotification(getContext(), timer.getId());
     }
 
-    private void cancelAlarm(Timer timer) {
+    private void cancelAlarm(Timer timer, boolean removeNotification) {
         // Cancel the alarm scheduled. If one was never scheduled, does nothing.
         AlarmManager am = (AlarmManager) getContext().getSystemService(Context.ALARM_SERVICE);
         PendingIntent pi = createTimesUpIntent(timer);
         // Now can't be null
         am.cancel(pi);
         pi.cancel();
-        TimerNotificationService.cancelNotification(getContext(), timer.getId());
+        if (removeNotification) {
+            TimerNotificationService.cancelNotification(getContext(), timer.getId());
+        }
     }
 }

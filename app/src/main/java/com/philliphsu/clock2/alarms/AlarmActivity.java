@@ -1,14 +1,13 @@
 package com.philliphsu.clock2.alarms;
 
 import android.os.Bundle;
-import android.support.v4.content.Loader;
 import android.view.View;
 import android.widget.Button;
 
 import com.philliphsu.clock2.Alarm;
 import com.philliphsu.clock2.R;
-import com.philliphsu.clock2.model.AlarmLoader;
 import com.philliphsu.clock2.ringtone.RingtoneActivity;
+import com.philliphsu.clock2.ringtone.RingtoneService;
 import com.philliphsu.clock2.util.AlarmController;
 
 public class AlarmActivity extends RingtoneActivity<Alarm> {
@@ -20,7 +19,13 @@ public class AlarmActivity extends RingtoneActivity<Alarm> {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if ((mAlarm = getIntent().getParcelableExtra(EXTRA_ITEM)) == null) {
+            throw new IllegalStateException("Cannot start AlarmActivity without an Alarm");
+        }
         mAlarmController = new AlarmController(this, null);
+        // TODO: If the upcoming alarm notification isn't present, verify other notifications aren't affected.
+        // This could be the case if we're starting a new instance of this activity after leaving the first launch.
+        mAlarmController.removeUpcomingAlarmNotification(mAlarm);
         // TODO: Butterknife binding
         Button snooze = (Button) findViewById(R.id.btn_snooze);
         snooze.setOnClickListener(new View.OnClickListener() {
@@ -38,25 +43,30 @@ public class AlarmActivity extends RingtoneActivity<Alarm> {
         });
     }
 
-    @Override
-    public Loader<Alarm> onCreateLoader(long id) {
-        return new AlarmLoader(this, id);
-    }
-
-    @Override
-    public void onLoadFinished(Loader<Alarm> loader, Alarm data) {
-        super.onLoadFinished(loader, data);
-        mAlarm = data;
-        if (data != null) {
-            // TODO: If the upcoming alarm notification isn't present, verify other notifications aren't affected.
-            // This could be the case if we're starting a new instance of this activity after leaving the first launch.
-            mAlarmController.removeUpcomingAlarmNotification(data);
-        }
-    }
+//    @Override
+//    public Loader<Alarm> onCreateLoader(long id) {
+//        return new AlarmLoader(this, id);
+//    }
+//
+//    @Override
+//    public void onLoadFinished(Loader<Alarm> loader, Alarm data) {
+//        super.onLoadFinished(loader, data);
+//        mAlarm = data;
+//        if (data != null) {
+//            // TODO: If the upcoming alarm notification isn't present, verify other notifications aren't affected.
+//            // This could be the case if we're starting a new instance of this activity after leaving the first launch.
+//            mAlarmController.removeUpcomingAlarmNotification(data);
+//        }
+//    }
 
     @Override
     public int layoutResource() {
         return R.layout.activity_ringtone;
+    }
+
+    @Override
+    protected Class<? extends RingtoneService> getRingtoneServiceClass() {
+        return AlarmRingtoneService.class;
     }
 
     private void snooze() {
