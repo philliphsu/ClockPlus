@@ -59,7 +59,7 @@ public class AlarmRingtoneService extends RingtoneService<Alarm> {
                 .setContentText(mNormalRingTime)
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .build();
-        nm.notify(TAG, getRingingObject().intId(), note);
+        nm.notify(TAG, getRingingObject().getIntId(), note);
     }
 
     @Override

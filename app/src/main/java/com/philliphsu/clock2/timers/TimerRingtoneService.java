@@ -1,6 +1,7 @@
 package com.philliphsu.clock2.timers;
 
 import android.app.Notification;
+import android.app.NotificationManager;
 import android.content.Intent;
 import android.net.Uri;
 import android.provider.Settings;
@@ -12,6 +13,7 @@ import com.philliphsu.clock2.Timer;
 import com.philliphsu.clock2.ringtone.RingtoneService;
 
 public class TimerRingtoneService extends RingtoneService<Timer> {
+    private static final String TAG = "TimerRingtoneService";
 
     // private because they refer to our foreground notification's actions.
     // we reuse these from TimerNotificationService because they're just constants, the values
@@ -48,8 +50,15 @@ public class TimerRingtoneService extends RingtoneService<Timer> {
 
     @Override
     protected void onAutoSilenced() {
-        // TODO: We probably have relevant code to copy over from the old project.
-        // TODO: Stop the Timer and update the table
+        mController.stop();
+        // Post notification that alarm was missed
+        NotificationManager nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        Notification note = new NotificationCompat.Builder(this)
+                .setContentTitle(getString(R.string.timer_expired))
+                .setContentText(getRingingObject().label())
+                .setSmallIcon(R.mipmap.ic_launcher) // TODO: correct icon
+                .build();
+        nm.notify(TAG, getRingingObject().getIntId(), note);
     }
 
     @Override

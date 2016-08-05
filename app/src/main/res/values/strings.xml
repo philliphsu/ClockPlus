@@ -196,4 +196,5 @@
     <string name="times_up">Time\'s up</string>
     <string name="add_one_minute">Add 1 minute</string>
     <string name="stop">Stop</string>
+    <string name="timer_expired">Timer expired</string>
 </resources>
