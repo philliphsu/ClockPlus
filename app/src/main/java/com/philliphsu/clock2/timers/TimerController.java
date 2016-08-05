@@ -1,5 +1,6 @@
 package com.philliphsu.clock2.timers;
 
+import com.philliphsu.clock2.AsyncTimersTableUpdateHandler;
 import com.philliphsu.clock2.Timer;
 
 /**
@@ -7,68 +8,40 @@ import com.philliphsu.clock2.Timer;
  */
 public class TimerController {
     private final Timer mTimer;
+    private final AsyncTimersTableUpdateHandler mUpdateHandler;
+
+    public TimerController(Timer timer, AsyncTimersTableUpdateHandler updateHandler) {
+        mTimer = timer;
+        mUpdateHandler = updateHandler;
+    }
 
     /**
-     * Calls the appropriate state on the given Timer, based on
-     * its current state.
+     * Start/resume or pause the timer.
      */
-    public static void startPause(Timer timer) {
-        if (timer.hasStarted()) {
-            if (timer.isRunning()) {
-                timer.pause();
+    public void startPause() {
+        if (mTimer.hasStarted()) {
+            if (mTimer.isRunning()) {
+                mTimer.pause();
             } else {
-                timer.resume();
+                mTimer.resume();
             }
         } else {
-            timer.start();
+            mTimer.start();
         }
-    }
-
-    public TimerController(Timer timer) {
-        mTimer = timer;
-    }
-
-    public void start() {
-        mTimer.start();
-//        mChronometer.setBase(mTimer.endTime());
-//        mChronometer.start();
-//        updateStartPauseIcon();
-//        setSecondaryButtonsVisible(true);
-
-    }
-
-    public void pause() {
-        mTimer.pause();
-//        mChronometer.stop();
-//        updateStartPauseIcon();
-    }
-
-    public void resume() {
-        mTimer.resume();
-//        mChronometer.setBase(mTimer.endTime());
-//        mChronometer.start();
-//        updateStartPauseIcon();
+        update();
     }
 
     public void stop() {
         mTimer.stop();
-//        mChronometer.stop();
-//        init();
+        update();
     }
 
     public void addOneMinute() {
         mTimer.addOneMinute();
-//        mChronometer.setBase(mTimer.endTime());
+        update();
     }
 
-//    public void updateStartPauseIcon() {
-//        // TODO: Pause and start icons, resp.
-//        mStartPause.setImageResource(mTimer.isRunning() ? 0 : 0);
-//    }
-
-//    public void setSecondaryButtonsVisible(boolean visible) {
-//        int visibility = visible ? View.VISIBLE : View.INVISIBLE;
-//        mAddOneMinute.setVisibility(visibility);
-//        mStop.setVisibility(visibility);
-//    }
+    private void update() {
+        mUpdateHandler.asyncUpdate(mTimer.getId(), mTimer);
+    }
 }

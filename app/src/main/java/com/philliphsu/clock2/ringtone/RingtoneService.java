@@ -6,14 +6,16 @@ import android.app.Service;
 import android.content.Intent;
 import android.media.AudioManager;
 import android.media.Ringtone;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.Parcelable;
 import android.os.Vibrator;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
-import com.philliphsu.clock2.Alarm;
 import com.philliphsu.clock2.R;
 import com.philliphsu.clock2.util.LocalBroadcastHelper;
 
@@ -29,18 +31,18 @@ import java.util.concurrent.TimeUnit;
  *
  * TOneverDO: Change this to not be a started service!
  */
-// TODO: Remove this from manifest, keep only the subclasses.
-public abstract class RingtoneService<T> extends Service {
+public abstract class RingtoneService<T extends Parcelable> extends Service {
     private static final String TAG = "RingtoneService";
 
     // public okay
     public static final String ACTION_NOTIFY_MISSED = "com.philliphsu.clock2.ringtone.action.NOTIFY_MISSED";
 //    public static final String EXTRA_ITEM_ID = RingtoneActivity.EXTRA_ITEM_ID;
-    public static final String EXTRA_ITEM = RingtoneActivity.EXTRA_ITEM;
+    public static final String EXTRA_RINGING_OBJECT = RingtoneActivity.EXTRA_RINGING_OBJECT;
 
     private AudioManager mAudioManager;
     private Ringtone mRingtone;
     @Nullable private Vibrator mVibrator;
+    private T mRingingObject;
 
     // TODO: Using Handler for this is ill-suited? Alarm ringing could outlast the
     // application's life. Use AlarmManager API instead.
@@ -57,7 +59,8 @@ public abstract class RingtoneService<T> extends Service {
         }
     };
 
-    // Pretty sure we don't need this anymore...
+    // Pretty sure this won't ever get called anymore... b/c EditAlarmActivity, the only component
+    // that sends such a broadcast, is deprecated.
 //    private final BroadcastReceiver mNotifyMissedReceiver = new BroadcastReceiver() {
 //        @Override
 //        public void onReceive(Context context, Intent intent) {
@@ -68,9 +71,13 @@ public abstract class RingtoneService<T> extends Service {
 //        }
 //    };
 
+    /**
+     * Callback invoked when this Service is stopping and the corresponding
+     * {@link RingtoneActivity} is finishing.
+     */
     protected abstract void onAutoSilenced();
 
-    protected abstract Ringtone getRingtone();
+    protected abstract Uri getRingtoneUri();
 
     /**
      * @return the notification to show when this Service starts in the foreground
@@ -86,6 +93,11 @@ public abstract class RingtoneService<T> extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        if (mRingingObject == null) {
+            if ((mRingingObject = intent.getParcelableExtra(EXTRA_RINGING_OBJECT)) == null) {
+                throw new IllegalStateException("Cannot start RingtoneService without a ringing object");
+            }
+        }
         // Play ringtone, if not already playing
         if (mAudioManager == null && mRingtone == null) {
             // TOneverDO: Pass 0 as the first argument
@@ -100,7 +112,7 @@ public abstract class RingtoneService<T> extends Service {
                     // Request permanent focus, as ringing could last several minutes
                     AudioManager.AUDIOFOCUS_GAIN);
             if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
-                mRingtone = getRingtone();
+                mRingtone = RingtoneManager.getRingtone(this, getRingtoneUri());
                 // Deprecated, but the alternative AudioAttributes requires API 21
                 mRingtone.setStreamType(AudioManager.STREAM_ALARM);
                 mRingtone.play();
@@ -125,7 +137,8 @@ public abstract class RingtoneService<T> extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        // Pretty sure this won't ever get called anymore...
+        // Pretty sure this won't ever get called anymore... b/c EditAlarmActivity, the only component
+        // that sends such a broadcast, is deprecated.
 //        LocalBroadcastHelper.registerReceiver(this, mNotifyMissedReceiver, ACTION_NOTIFY_MISSED);
     }
 
@@ -139,6 +152,8 @@ public abstract class RingtoneService<T> extends Service {
         }
         mSilenceHandler.removeCallbacks(mSilenceRunnable);
         stopForeground(true);
+        // Pretty sure this won't ever get called anymore... b/c EditAlarmActivity, the only component
+        // that sends such a broadcast, is deprecated.
 //        LocalBroadcastHelper.unregisterReceiver(this, mNotifyMissedReceiver);
     }
 
@@ -166,16 +181,17 @@ public abstract class RingtoneService<T> extends Service {
     /**
      * Exposed so subclasses can create their notification actions.
      */
-    // TODO: Consider changing Alarm param to int requestCode param.
-    protected final PendingIntent getPendingIntent(@NonNull String action, Alarm alarm) {
+    protected final PendingIntent getPendingIntent(@NonNull String action, int requestCode) {
         Intent intent = new Intent(this, getClass())
                 .setAction(action);
-                // TODO: Why do we need this?
-//                .putExtra(EXTRA_ITEM_ID, alarm.id());
         return PendingIntent.getService(
                 this,
-                alarm.intId(),
+                requestCode,
                 intent,
                 PendingIntent.FLAG_ONE_SHOT);
+    }
+
+    protected final T getRingingObject() {
+        return mRingingObject;
     }
 }

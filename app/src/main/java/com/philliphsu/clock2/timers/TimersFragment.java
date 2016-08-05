@@ -33,6 +33,8 @@ public class TimersFragment extends RecyclerViewFragment<
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode != Activity.RESULT_OK || data == null)
             return;
+        // TODO: From EditTimerActivity, pass back the Timer as a parcelable and
+        // retrieve it here directly.
         int hour = data.getIntExtra(EditTimerActivity.EXTRA_HOUR, -1);
         int minute = data.getIntExtra(EditTimerActivity.EXTRA_MINUTE, -1);
         int second = data.getIntExtra(EditTimerActivity.EXTRA_SECOND, -1);

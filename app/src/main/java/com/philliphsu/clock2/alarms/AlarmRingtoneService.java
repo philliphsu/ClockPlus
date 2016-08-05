@@ -3,8 +3,6 @@ package com.philliphsu.clock2.alarms;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.content.Intent;
-import android.media.Ringtone;
-import android.media.RingtoneManager;
 import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
 
@@ -24,41 +22,16 @@ public class AlarmRingtoneService extends RingtoneService<Alarm> {
 
     private String mNormalRingTime;
     private AlarmController mAlarmController;
-    private Alarm mAlarm;
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        // TOneverDO: Call super before our custom logic
-        if (intent.getAction() == null) {
-//            final long id = intent.getLongExtra(EXTRA_ITEM_ID, -1);
-//            if (id < 0)
-//                throw new IllegalStateException("No item id set");
-            // http://stackoverflow.com/q/8696146/5055032
-            // Start our own thread to load the alarm instead of using a loader,
-            // because Services do not have a built-in LoaderManager (because they have no need for one since
-            // their lifecycle is not complex like in Activities/Fragments) and our
-            // work is simple enough that getting loaders to work here is not
-            // worth the effort.
-//            // TODO: Will using the Runnable like this cause a memory leak?
-//            new Thread(new Runnable() {
-//                @Override
-//                public void run() {
-//                    // TODO: We don't actually need the exact same Alarm instance as the
-//                    // one from our calling component, because we won't mutate any of its
-//                    // fields. Since we only read values, we could just pass in the Alarm
-//                    // to the intent as a Parcelable.
-//                    AlarmCursor cursor = new AlarmsTableManager(AlarmRingtoneService.this).queryItem(id);
-//                    mAlarm = checkNotNull(cursor.getItem());
-//                }
-//            }).start();
-            if ((mAlarm = intent.getParcelableExtra(EXTRA_ITEM)) == null) {
-                throw new IllegalStateException("Cannot start AlarmRingtoneService without an Alarm");
-            }
-        } else {
+        // We can have this before super because this will only call through
+        // WHILE this Service has already been alive.
+        if (intent.getAction() != null) {
             if (ACTION_SNOOZE.equals(intent.getAction())) {
-                mAlarmController.snoozeAlarm(mAlarm);
+                mAlarmController.snoozeAlarm(getRingingObject());
             } else if (ACTION_DISMISS.equals(intent.getAction())) {
-                mAlarmController.cancelAlarm(mAlarm, false); // TODO do we really need to cancel the intent and alarm?
+                mAlarmController.cancelAlarm(getRingingObject(), false); // TODO do we really need to cancel the intent and alarm?
             } else {
                 throw new UnsupportedOperationException();
             }
@@ -78,7 +51,7 @@ public class AlarmRingtoneService extends RingtoneService<Alarm> {
     @Override
     protected void onAutoSilenced() {
         // TODO do we really need to cancel the alarm and intent?
-        mAlarmController.cancelAlarm(mAlarm, false);
+        mAlarmController.cancelAlarm(getRingingObject(), false);
         // Post notification that alarm was missed
         NotificationManager nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         Notification note = new NotificationCompat.Builder(this)
@@ -86,38 +59,37 @@ public class AlarmRingtoneService extends RingtoneService<Alarm> {
                 .setContentText(mNormalRingTime)
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .build();
-        nm.notify(TAG, mAlarm.intId(), note);
+        nm.notify(TAG, getRingingObject().intId(), note);
     }
 
     @Override
-    protected Ringtone getRingtone() {
-        Uri ringtone = Uri.parse(mAlarm.ringtone());
-        return RingtoneManager.getRingtone(this, ringtone);
+    protected Uri getRingtoneUri() {
+        return Uri.parse(getRingingObject().ringtone());
     }
 
     @Override
     protected Notification getForegroundNotification() {
-        String title = mAlarm.label().isEmpty()
+        String title = getRingingObject().label().isEmpty()
                 ? getString(R.string.alarm)
-                : mAlarm.label();
+                : getRingingObject().label();
         mNormalRingTime = formatTime(this, System.currentTimeMillis()); // now
         return new NotificationCompat.Builder(this)
                 // Required contents
                 .setSmallIcon(R.mipmap.ic_launcher) // TODO: alarm icon
                 .setContentTitle(title)
                 .setContentText(mNormalRingTime)
-                .addAction(R.mipmap.ic_launcher,
+                .addAction(R.mipmap.ic_launcher, // TODO: correct icon
                         getString(R.string.snooze),
-                        getPendingIntent(ACTION_SNOOZE, mAlarm))
-                .addAction(R.mipmap.ic_launcher,
+                        getPendingIntent(ACTION_SNOOZE, getRingingObject().getIntId()))
+                .addAction(R.mipmap.ic_launcher, // TODO: correct icon
                         getString(R.string.dismiss),
-                        getPendingIntent(ACTION_DISMISS, mAlarm))
+                        getPendingIntent(ACTION_DISMISS, getRingingObject().getIntId()))
                 .build();
     }
 
     @Override
     protected boolean doesVibrate() {
-        return mAlarm.vibrates();
+        return getRingingObject().vibrates();
     }
 
     @Override

@@ -193,4 +193,7 @@
     <string name="title_activity_create_timer">CreateTimerActivity</string>
 
     <string name="timer">Timer</string>
+    <string name="times_up">Time\'s up</string>
+    <string name="add_one_minute">Add 1 minute</string>
+    <string name="stop">Stop</string>
 </resources>

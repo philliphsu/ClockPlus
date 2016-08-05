@@ -181,7 +181,7 @@ public final class AlarmUtils {
     private static PendingIntent alarmIntent(Context context, Alarm alarm, boolean retrievePrevious) {
         // TODO: Use appropriate subclass instead
         Intent intent = new Intent(context, AlarmActivity.class)
-                .putExtra(AlarmActivity.EXTRA_ITEM, alarm);
+                .putExtra(AlarmActivity.EXTRA_RINGING_OBJECT, alarm);
         int flag = retrievePrevious ? FLAG_NO_CREATE : FLAG_CANCEL_CURRENT;
         PendingIntent pi = getActivity(context, alarm.intId(), intent, flag);
         // Even when we try to retrieve a previous instance that actually did exist,

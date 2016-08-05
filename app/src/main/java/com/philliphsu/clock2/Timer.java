@@ -1,5 +1,7 @@
 package com.philliphsu.clock2;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.os.SystemClock;
 
 import com.google.auto.value.AutoValue;
@@ -11,7 +13,7 @@ import java.util.concurrent.TimeUnit;
  * Created by Phillip Hsu on 7/25/2016.
  */
 @AutoValue
-public abstract class Timer extends ObjectWithId /*implements Parcelable*/ {
+public abstract class Timer extends ObjectWithId implements Parcelable {
     private static final long MINUTE = TimeUnit.MINUTES.toMillis(1);
 
     private long endTime;
@@ -129,17 +131,41 @@ public abstract class Timer extends ObjectWithId /*implements Parcelable*/ {
         return pauseTime;
     }
 
-//    @Override
-//    public int describeContents() {
-//        return 0;
-//    }
-//
-//    @Override
-//    public void writeToParcel(Parcel dest, int flags) {
-//        dest.writeInt(hour());
-//        dest.writeInt(minute());
-//        dest.writeInt(second());
-//        dest.writeString(group());
-//        dest.writeString(label());
-//    }
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(hour());
+        dest.writeInt(minute());
+        dest.writeInt(second());
+        dest.writeString(group());
+        dest.writeString(label());
+        dest.writeLong(getId());
+        dest.writeLong(endTime);
+        dest.writeLong(pauseTime);
+    }
+
+    public static final Creator<Timer> CREATOR = new Creator<Timer>() {
+        @Override
+        public Timer createFromParcel(Parcel source) {
+            return Timer.create(source);
+        }
+
+        @Override
+        public Timer[] newArray(int size) {
+            return new Timer[size];
+        }
+    };
+
+    private static Timer create(Parcel source) {
+        Timer t = Timer.create(source.readInt(), source.readInt(), source.readInt(),
+                source.readString(), source.readString());
+        t.setId(source.readLong());
+        t.endTime = source.readLong();
+        t.pauseTime = source.readLong();
+        return t;
+    }
 }

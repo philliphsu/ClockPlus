@@ -21,8 +21,8 @@ import butterknife.OnClick;
 public class TimerViewHolder extends BaseViewHolder<Timer> {
     private static final String TAG = "TimerViewHolder";
 
-//    private TimerController mController;
     private final AsyncTimersTableUpdateHandler mAsyncTimersTableUpdateHandler;
+    private TimerController mController;
 
     @Bind(R.id.label) TextView mLabel;
     @Bind(R.id.duration) CountdownChronometer mChronometer;
@@ -31,7 +31,6 @@ public class TimerViewHolder extends BaseViewHolder<Timer> {
     @Bind(R.id.start_pause) ImageButton mStartPause;
     @Bind(R.id.stop) ImageButton mStop;
 
-    // TODO: Controller param
     public TimerViewHolder(ViewGroup parent, OnListItemInteractionListener<Timer> listener,
                            AsyncTimersTableUpdateHandler asyncTimersTableUpdateHandler) {
         super(parent, R.layout.item_timer, listener);
@@ -41,32 +40,26 @@ public class TimerViewHolder extends BaseViewHolder<Timer> {
     @Override
     public void onBind(Timer timer) {
         super.onBind(timer);
+        // TOneverDO: create before super
+        mController = new TimerController(timer, mAsyncTimersTableUpdateHandler);
         bindLabel(timer.label());
-//        // We can't create the controller until this VH binds, because
-//        // the widgets only exist after this point.
-//        mController = new TimerController(timer, mChronometer, mAddOneMinute, mStartPause, mStop);
         bindChronometer(timer);
         bindButtonControls(timer);
     }
 
     @OnClick(R.id.start_pause)
     void startPause() {
-        TimerController.startPause(getItem());
-        // Persist value changes
-        update();
+        mController.startPause();
     }
 
     @OnClick(R.id.add_one_minute)
     void addOneMinute() {
-        getItem().addOneMinute();
-        // Persist end time increase
-        update();
+        mController.addOneMinute();
     }
 
     @OnClick(R.id.stop)
     void stop() {
-        getItem().stop();
-        update();
+        mController.stop();
     }
 
     private void bindLabel(String label) {
@@ -112,14 +105,5 @@ public class TimerViewHolder extends BaseViewHolder<Timer> {
         int visibility = timer.hasStarted() ? View.VISIBLE : View.INVISIBLE;
         mAddOneMinute.setVisibility(visibility);
         mStop.setVisibility(visibility);
-    }
-
-    private void update() {
-        Timer t = getItem();
-        mAsyncTimersTableUpdateHandler.asyncUpdate(
-                // Alternatively, use ViewHolder#getItemId() because we can forget
-                // to set the id on the object in BaseItemCursor#getItem(). We
-                // luckily remembered to this time!
-                t.getId(), t);
     }
 }

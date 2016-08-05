@@ -52,6 +52,7 @@ public final class AsyncTimersTableUpdateHandler extends AsyncDatabaseTableUpdat
     private PendingIntent createTimesUpIntent(Timer timer) {
         Intent intent = new Intent(getContext(), TimesUpActivity.class);
 //        intent.putExtra(TimesUpActivity.EXTRA_ITEM_ID, timer.getId());
+        intent.putExtra(TimesUpActivity.EXTRA_RINGING_OBJECT, timer);
         // There's no point to determining whether to retrieve a previous instance, because
         // we chose to ignore it since we had issues with NPEs. TODO: Perhaps these issues
         // were caused by you using the same reference variable for every Intent/PI that
@@ -63,7 +64,7 @@ public final class AsyncTimersTableUpdateHandler extends AsyncDatabaseTableUpdat
     private void scheduleAlarm(Timer timer) {
         AlarmManager am = (AlarmManager) getContext().getSystemService(Context.ALARM_SERVICE);
         am.setExact(AlarmManager.ELAPSED_REALTIME_WAKEUP, timer.endTime(), createTimesUpIntent(timer));
-        TimerNotificationService.showNotification(getContext(), timer.getId());
+        TimerNotificationService.showNotification(getContext(), timer);
     }
 
     private void cancelAlarm(Timer timer, boolean removeNotification) {
