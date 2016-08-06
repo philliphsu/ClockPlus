@@ -197,4 +197,7 @@
     <string name="add_one_minute">Add 1 minute</string>
     <string name="stop">Stop</string>
     <string name="timer_expired">Timer expired</string>
+
+    <string name="alarm_auto_silenced_text">You missed your alarm.</string>
+    <string name="timer_auto_silenced_text">Your timer expired.</string>
 </resources>

@@ -1,44 +1,75 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-             xmlns:tools="http://schemas.android.com/tools"
              android:layout_width="match_parent"
              android:layout_height="match_parent"
-             android:background="#0099cc"
-             tools:context=".ringtone.RingtoneActivity">
+             xmlns:app="http://schemas.android.com/apk/res-auto"
+             android:background="@color/colorPrimary">
 
-    <!-- The primary full-screen view. This can be replaced with whatever view
-         is needed to present your content, e.g. VideoView, SurfaceView,
-         TextureView, etc. -->
-    <TextView
+    <LinearLayout
+        android:id="@+id/header"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center"
-        android:keepScreenOn="true"
-        android:text="@string/dummy_content"
-        android:textColor="#33b5e5"
-        android:textSize="50sp"
-        android:textStyle="bold"/>
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/activity_vertical_margin"
+        android:orientation="vertical"
+        android:gravity="center_horizontal">
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/TextAppearance.AppCompat.Title.Inverse"
+            android:layout_marginBottom="@dimen/item_margin_between_elements"/>
+
+    </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_gravity="bottom"
-        android:padding="4dp">
+        android:orientation="vertical"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/auto_silenced_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:keepScreenOn="true"
+            android:gravity="center_horizontal"
+            style="@style/TextAppearance.AppCompat.Large.Inverse"
+            android:layout_marginBottom="8dp"/>
 
         <Button
-            android:id="@+id/btn_snooze"
-            android:layout_width="0dp"
+            android:id="@+id/ok"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Snooze"/>
-
-        <Button
-            android:id="@+id/btn_dismiss"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Dismiss"/>
+            android:text="@android:string/ok"
+            style="@style/Widget.AppCompat.Button.Colored"/>
 
     </LinearLayout>
+
+    <android.support.v7.widget.GridLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:layout_marginBottom="72dp"
+        app:columnCount="2">
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/btn_left"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_columnWeight="1"
+            app:layout_gravity="center"
+            app:elevation="0dp"/>
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/btn_right"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_columnWeight="1"
+            app:layout_gravity="center"
+            app:elevation="0dp"/>
+
+    </android.support.v7.widget.GridLayout>
 
 </FrameLayout>

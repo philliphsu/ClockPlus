@@ -8,6 +8,7 @@ import android.content.Intent;
 import com.philliphsu.clock2.alarms.ScrollHandler;
 import com.philliphsu.clock2.model.TimersTableManager;
 import com.philliphsu.clock2.timers.TimerNotificationService;
+import com.philliphsu.clock2.timers.TimerRingtoneService;
 import com.philliphsu.clock2.timers.TimesUpActivity;
 
 /**
@@ -77,5 +78,8 @@ public final class AsyncTimersTableUpdateHandler extends AsyncDatabaseTableUpdat
         if (removeNotification) {
             TimerNotificationService.cancelNotification(getContext(), timer.getId());
         }
+        // Won't do anything if not actually started
+        getContext().stopService(new Intent(getContext(), TimerRingtoneService.class));
+        // TODO: Do we need to finish TimesUpActivity?
     }
 }

@@ -5,12 +5,23 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Parcelable;
-import android.support.annotation.LayoutRes;
+import android.support.annotation.DrawableRes;
+import android.support.annotation.StringRes;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
+import com.philliphsu.clock2.R;
 import com.philliphsu.clock2.util.LocalBroadcastHelper;
+
+import butterknife.Bind;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
@@ -26,16 +37,48 @@ public abstract class RingtoneActivity<T extends Parcelable> extends AppCompatAc
     private static boolean sIsAlive = false;
     private T mRingingObject;
 
-    // TODO: Should we extend from BaseActivity instead?
-    @LayoutRes
-    public abstract int layoutResource();
+    @Bind(R.id.title) TextView mHeaderTitle;
+    @Bind(R.id.auto_silenced_text) TextView mAutoSilencedText;
+    @Bind(R.id.ok) Button mOkButton;
+    @Bind(R.id.btn_left) FloatingActionButton mLeftButton;
+    @Bind(R.id.btn_right) FloatingActionButton mRightButton;
 
     protected abstract Class<? extends RingtoneService> getRingtoneServiceClass();
+
+    protected abstract CharSequence getHeaderTitle();
+
+    /**
+     * Subclasses are responsible for adding their content view
+     * to the provided parent container.
+     */
+    protected abstract void getHeaderContent(ViewGroup parent);
+
+    @DrawableRes
+    protected abstract int getAutoSilencedDrawable();
+
+    @StringRes
+    protected abstract int getAutoSilencedText();
+
+    @DrawableRes
+    protected abstract int getLeftButtonDrawable();
+
+    @DrawableRes
+    protected abstract int getRightButtonDrawable();
+
+    @OnClick(R.id.btn_left)
+    protected abstract void onLeftButtonClick();
+
+    @OnClick(R.id.btn_right)
+    protected abstract void onRightButtonClick();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(layoutResource());
+        setContentView(R.layout.activity_ringtone);
+        ButterKnife.bind(this);
+
+        if ((mRingingObject = getIntent().getParcelableExtra(EXTRA_RINGING_OBJECT)) == null)
+            throw new IllegalStateException("Cannot start RingtoneActivity without a ringing object");
         sIsAlive = true;
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
@@ -43,9 +86,13 @@ public abstract class RingtoneActivity<T extends Parcelable> extends AppCompatAc
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
 
-        if ((mRingingObject = getIntent().getParcelableExtra(EXTRA_RINGING_OBJECT)) == null) {
-            throw new IllegalStateException("Cannot start RingtoneActivity without a ringing object");
-        }
+        mHeaderTitle.setText(getHeaderTitle()); // TOneverDO: call before assigning mRingingObject
+        getHeaderContent((LinearLayout) findViewById(R.id.header));
+        mAutoSilencedText.setCompoundDrawablesWithIntrinsicBounds(0, getAutoSilencedDrawable(), 0, 0);
+        mAutoSilencedText.setText(getAutoSilencedText());
+        mLeftButton.setImageResource(getLeftButtonDrawable());
+        mRightButton.setImageResource(getRightButtonDrawable());
+
         Intent intent = new Intent(this, getRingtoneServiceClass())
                 .putExtra(EXTRA_RINGING_OBJECT, mRingingObject);
         startService(intent);
