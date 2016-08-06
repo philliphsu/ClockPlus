@@ -8,6 +8,7 @@ import android.os.SystemClock;
 import android.support.v4.app.NotificationCompat;
 import android.view.ViewGroup;
 
+import com.philliphsu.clock2.AsyncTimersTableUpdateHandler;
 import com.philliphsu.clock2.R;
 import com.philliphsu.clock2.Timer;
 import com.philliphsu.clock2.ringtone.RingtoneActivity;
@@ -16,13 +17,17 @@ import com.philliphsu.clock2.ringtone.RingtoneService;
 public class TimesUpActivity extends RingtoneActivity<Timer> {
     private static final String TAG = "TimesUpActivity";
 
+    private TimerController mController;
     private NotificationManager mNotificationManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         stopService(new Intent(this, TimerNotificationService.class));
+        // TODO: Consider calling this in the service's onDestroy()
         TimerNotificationService.cancelNotification(this, getRingingObject().getId());
+        mController = new TimerController(getRingingObject(),
+                new AsyncTimersTableUpdateHandler(this, null));
         mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
     }
 
@@ -91,12 +96,14 @@ public class TimesUpActivity extends RingtoneActivity<Timer> {
 
     @Override
     protected void onLeftButtonClick() {
-
+        mController.addOneMinute();
+        stopAndFinish();
     }
 
     @Override
     protected void onRightButtonClick() {
-
+        mController.stop();
+        stopAndFinish();
     }
 
     // TODO: Consider changing the return type to Notification, and move the actual
