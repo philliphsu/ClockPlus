@@ -1,7 +1,6 @@
 package com.philliphsu.clock2.alarms;
 
 import android.app.Notification;
-import android.app.NotificationManager;
 import android.content.Intent;
 import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
@@ -20,7 +19,6 @@ public class AlarmRingtoneService extends RingtoneService<Alarm> {
     private static final String ACTION_SNOOZE = "com.philliphsu.clock2.ringtone.action.SNOOZE";
     private static final String ACTION_DISMISS = "com.philliphsu.clock2.ringtone.action.DISMISS";
 
-    private String mNormalRingTime;
     private AlarmController mAlarmController;
 
     @Override
@@ -52,14 +50,6 @@ public class AlarmRingtoneService extends RingtoneService<Alarm> {
     protected void onAutoSilenced() {
         // TODO do we really need to cancel the alarm and intent?
         mAlarmController.cancelAlarm(getRingingObject(), false);
-        // Post notification that alarm was missed
-        NotificationManager nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-        Notification note = new NotificationCompat.Builder(this)
-                .setContentTitle(getString(R.string.missed_alarm))
-                .setContentText(mNormalRingTime)
-                .setSmallIcon(R.mipmap.ic_launcher)
-                .build();
-        nm.notify(TAG, getRingingObject().getIntId(), note);
     }
 
     @Override
@@ -72,12 +62,11 @@ public class AlarmRingtoneService extends RingtoneService<Alarm> {
         String title = getRingingObject().label().isEmpty()
                 ? getString(R.string.alarm)
                 : getRingingObject().label();
-        mNormalRingTime = formatTime(this, System.currentTimeMillis()); // now
         return new NotificationCompat.Builder(this)
                 // Required contents
                 .setSmallIcon(R.mipmap.ic_launcher) // TODO: alarm icon
                 .setContentTitle(title)
-                .setContentText(mNormalRingTime)
+                .setContentText(formatTime(this, System.currentTimeMillis()))
                 .addAction(R.mipmap.ic_launcher, // TODO: correct icon
                         getString(R.string.snooze),
                         getPendingIntent(ACTION_SNOOZE, getRingingObject().getIntId()))

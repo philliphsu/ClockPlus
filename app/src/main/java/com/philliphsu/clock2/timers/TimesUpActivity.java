@@ -1,8 +1,11 @@
 package com.philliphsu.clock2.timers;
 
+import android.app.Notification;
+import android.app.NotificationManager;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.SystemClock;
+import android.support.v4.app.NotificationCompat;
 import android.view.ViewGroup;
 
 import com.philliphsu.clock2.R;
@@ -11,12 +14,22 @@ import com.philliphsu.clock2.ringtone.RingtoneActivity;
 import com.philliphsu.clock2.ringtone.RingtoneService;
 
 public class TimesUpActivity extends RingtoneActivity<Timer> {
+    private static final String TAG = "TimesUpActivity";
+
+    private NotificationManager mNotificationManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         stopService(new Intent(this, TimerNotificationService.class));
         TimerNotificationService.cancelNotification(this, getRingingObject().getId());
+        mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+    }
+
+    @Override
+    public void finish() {
+        super.finish();
+        mNotificationManager.cancel(TAG, getRingingObject().getIntId());
     }
 
     @Override
@@ -74,5 +87,18 @@ public class TimesUpActivity extends RingtoneActivity<Timer> {
     @Override
     protected void onRightButtonClick() {
 
+    }
+
+    // TODO: Consider changing the return type to Notification, and move the actual
+    // task of notifying to the base class.
+    @Override
+    protected void showAutoSilenced() {
+        super.showAutoSilenced();
+        Notification note = new NotificationCompat.Builder(this)
+                .setContentTitle(getString(R.string.timer_expired))
+                .setContentText(getRingingObject().label())
+                .setSmallIcon(R.mipmap.ic_launcher) // TODO: correct icon
+                .build();
+        mNotificationManager.notify(TAG, getRingingObject().getIntId(), note);
     }
 }

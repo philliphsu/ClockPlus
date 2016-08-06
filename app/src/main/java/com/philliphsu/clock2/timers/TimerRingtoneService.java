@@ -1,7 +1,6 @@
 package com.philliphsu.clock2.timers;
 
 import android.app.Notification;
-import android.app.NotificationManager;
 import android.content.Intent;
 import android.net.Uri;
 import android.provider.Settings;
@@ -51,14 +50,6 @@ public class TimerRingtoneService extends RingtoneService<Timer> {
     @Override
     protected void onAutoSilenced() {
         mController.stop();
-        // Post notification that alarm was missed
-        NotificationManager nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-        Notification note = new NotificationCompat.Builder(this)
-                .setContentTitle(getString(R.string.timer_expired))
-                .setContentText(getRingingObject().label())
-                .setSmallIcon(R.mipmap.ic_launcher) // TODO: correct icon
-                .build();
-        nm.notify(TAG, getRingingObject().getIntId(), note);
     }
 
     @Override

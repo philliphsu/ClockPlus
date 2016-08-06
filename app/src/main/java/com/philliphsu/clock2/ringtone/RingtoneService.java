@@ -52,9 +52,7 @@ public abstract class RingtoneService<T extends Parcelable> extends Service {
         @Override
         public void run() {
             onAutoSilenced();
-            // TODO: Consider not finishing the activity, but update
-            // its view to display that this ringing was missed?
-            finishActivity();
+            LocalBroadcastHelper.sendBroadcast(RingtoneService.this, RingtoneActivity.ACTION_SHOW_SILENCED);
             stopSelf();
         }
     };

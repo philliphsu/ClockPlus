@@ -1,5 +1,6 @@
 package com.philliphsu.clock2.ringtone;
 
+import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -9,6 +10,7 @@ import android.support.annotation.DrawableRes;
 import android.support.annotation.StringRes;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.GridLayout;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -33,13 +35,16 @@ public abstract class RingtoneActivity<T extends Parcelable> extends AppCompatAc
     // Shared with RingtoneService
     public static final String ACTION_FINISH = "com.philliphsu.clock2.ringtone.action.FINISH";
     public static final String EXTRA_RINGING_OBJECT = "com.philliphsu.clock2.ringtone.extra.RINGING_OBJECT";
+    public static final String ACTION_SHOW_SILENCED = "com.philliphsu.clock2.ringtone.action.SHOW_SILENCED";
 
     private static boolean sIsAlive = false;
     private T mRingingObject;
 
     @Bind(R.id.title) TextView mHeaderTitle;
+    @Bind(R.id.auto_silenced_container) LinearLayout mAutoSilencedContainer;
     @Bind(R.id.auto_silenced_text) TextView mAutoSilencedText;
     @Bind(R.id.ok) Button mOkButton;
+    @Bind(R.id.buttons_container) GridLayout mButtonsContainer;
     @Bind(R.id.btn_left) FloatingActionButton mLeftButton;
     @Bind(R.id.btn_right) FloatingActionButton mRightButton;
 
@@ -104,6 +109,7 @@ public abstract class RingtoneActivity<T extends Parcelable> extends AppCompatAc
         // TODO: Do we need this anymore? I think this broadcast was only sent from
         // EditAlarmActivity?
         LocalBroadcastHelper.registerReceiver(this, mFinishReceiver, ACTION_FINISH);
+        LocalBroadcastHelper.registerReceiver(this, mOnAutoSilenceReceiver, ACTION_SHOW_SILENCED);
     }
 
     @Override
@@ -112,11 +118,13 @@ public abstract class RingtoneActivity<T extends Parcelable> extends AppCompatAc
         // TODO: Do we need this anymore? I think this broadcast was only sent from
         // EditAlarmActivity?
         LocalBroadcastHelper.unregisterReceiver(this, mFinishReceiver);
+        LocalBroadcastHelper.unregisterReceiver(this, mOnAutoSilenceReceiver);
     }
 
     @Override
     protected void onNewIntent(Intent intent) {
         //super.onNewIntent(intent); // Not needed since no fragments hosted?
+
         // TODO: Do we need this anymore? I think the broadcast that calls through to
         // this was only sent from EditAlarmActivity?
 
@@ -162,6 +170,13 @@ public abstract class RingtoneActivity<T extends Parcelable> extends AppCompatAc
         sIsAlive = false;
     }
 
+    @Override
+    @OnClick(R.id.ok)
+    public void finish() {
+        super.finish();
+        NotificationManager nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+    }
+
     public static boolean isAlive() {
         return sIsAlive;
     }
@@ -179,12 +194,24 @@ public abstract class RingtoneActivity<T extends Parcelable> extends AppCompatAc
         return mRingingObject;
     }
 
+    protected void showAutoSilenced() {
+        mAutoSilencedContainer.setVisibility(View.VISIBLE);
+        mButtonsContainer.setVisibility(View.GONE);
+    }
+
     // TODO: Do we need this anymore? I think this broadcast was only sent from
     // EditAlarmActivity?
     private final BroadcastReceiver mFinishReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             stopAndFinish();
+        }
+    };
+
+    private final BroadcastReceiver mOnAutoSilenceReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            showAutoSilenced();
         }
     };
 }

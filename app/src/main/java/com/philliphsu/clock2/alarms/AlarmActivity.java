@@ -1,6 +1,9 @@
 package com.philliphsu.clock2.alarms;
 
+import android.app.Notification;
+import android.app.NotificationManager;
 import android.os.Bundle;
+import android.support.v4.app.NotificationCompat;
 import android.view.ViewGroup;
 
 import com.philliphsu.clock2.Alarm;
@@ -8,10 +11,13 @@ import com.philliphsu.clock2.R;
 import com.philliphsu.clock2.ringtone.RingtoneActivity;
 import com.philliphsu.clock2.ringtone.RingtoneService;
 import com.philliphsu.clock2.util.AlarmController;
+import com.philliphsu.clock2.util.DateFormatUtils;
 
 public class AlarmActivity extends RingtoneActivity<Alarm> {
+    private static final String TAG = "TimesUpActivity";
 
     private AlarmController mAlarmController;
+    private NotificationManager mNotificationManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -20,6 +26,13 @@ public class AlarmActivity extends RingtoneActivity<Alarm> {
         // TODO: If the upcoming alarm notification isn't present, verify other notifications aren't affected.
         // This could be the case if we're starting a new instance of this activity after leaving the first launch.
         mAlarmController.removeUpcomingAlarmNotification(getRingingObject());
+        mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+    }
+
+    @Override
+    public void finish() {
+        super.finish();
+        mNotificationManager.cancel(TAG, getRingingObject().getIntId());
     }
 
     @Override
@@ -74,5 +87,21 @@ public class AlarmActivity extends RingtoneActivity<Alarm> {
         // TODO do we really need to cancel the intent and alarm?
         mAlarmController.cancelAlarm(getRingingObject(), false);
         stopAndFinish();
+    }
+
+    // TODO: Consider changing the return type to Notification, and move the actual
+    // task of notifying to the base class.
+    @Override
+    protected void showAutoSilenced() {
+        super.showAutoSilenced();
+        // Post notification that alarm was missed
+        String alarmTime = DateFormatUtils.formatTime(this,
+                getRingingObject().hour(), getRingingObject().minutes());
+        Notification note = new NotificationCompat.Builder(this)
+                .setContentTitle(getString(R.string.missed_alarm))
+                .setContentText(alarmTime)
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .build();
+        mNotificationManager.notify(TAG, getRingingObject().getIntId(), note);
     }
 }
