@@ -63,6 +63,16 @@ public class AlarmActivity extends RingtoneActivity<Alarm> {
     }
 
     @Override
+    protected int getLeftButtonText() {
+        return R.string.snooze;
+    }
+
+    @Override
+    protected int getRightButtonText() {
+        return R.string.dismiss;
+    }
+
+    @Override
     protected int getLeftButtonDrawable() {
         // TODO: correct icon
         return R.drawable.ic_half_day_1_black_24dp;

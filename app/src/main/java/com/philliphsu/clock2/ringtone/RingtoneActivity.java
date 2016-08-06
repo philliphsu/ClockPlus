@@ -8,9 +8,7 @@ import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.StringRes;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.GridLayout;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -44,9 +42,9 @@ public abstract class RingtoneActivity<T extends Parcelable> extends AppCompatAc
     @Bind(R.id.auto_silenced_container) LinearLayout mAutoSilencedContainer;
     @Bind(R.id.auto_silenced_text) TextView mAutoSilencedText;
     @Bind(R.id.ok) Button mOkButton;
-    @Bind(R.id.buttons_container) GridLayout mButtonsContainer;
-    @Bind(R.id.btn_left) FloatingActionButton mLeftButton;
-    @Bind(R.id.btn_right) FloatingActionButton mRightButton;
+    @Bind(R.id.buttons_container) LinearLayout mButtonsContainer;
+    @Bind(R.id.btn_text_left) TextView mLeftButton;
+    @Bind(R.id.btn_text_right) TextView mRightButton;
 
     protected abstract Class<? extends RingtoneService> getRingtoneServiceClass();
 
@@ -63,6 +61,12 @@ public abstract class RingtoneActivity<T extends Parcelable> extends AppCompatAc
 
     @StringRes
     protected abstract int getAutoSilencedText();
+
+    @StringRes
+    protected abstract int getLeftButtonText();
+
+    @StringRes
+    protected abstract int getRightButtonText();
 
     @DrawableRes
     protected abstract int getLeftButtonDrawable();
@@ -95,8 +99,10 @@ public abstract class RingtoneActivity<T extends Parcelable> extends AppCompatAc
         getHeaderContent((LinearLayout) findViewById(R.id.header));
         mAutoSilencedText.setCompoundDrawablesWithIntrinsicBounds(0, getAutoSilencedDrawable(), 0, 0);
         mAutoSilencedText.setText(getAutoSilencedText());
-        mLeftButton.setImageResource(getLeftButtonDrawable());
-        mRightButton.setImageResource(getRightButtonDrawable());
+        mLeftButton.setText(getLeftButtonText());
+        mRightButton.setText(getRightButtonText());
+        mLeftButton.setCompoundDrawablesWithIntrinsicBounds(0, getLeftButtonDrawable(), 0, 0);
+        mRightButton.setCompoundDrawablesWithIntrinsicBounds(0, getRightButtonDrawable(), 0, 0);
 
         Intent intent = new Intent(this, getRingtoneServiceClass())
                 .putExtra(EXTRA_RINGING_OBJECT, mRingingObject);

@@ -68,6 +68,16 @@ public class TimesUpActivity extends RingtoneActivity<Timer> {
     }
 
     @Override
+    protected int getLeftButtonText() {
+        return R.string.add_one_minute;
+    }
+
+    @Override
+    protected int getRightButtonText() {
+        return R.string.stop;
+    }
+
+    @Override
     protected int getLeftButtonDrawable() {
         // TODO: correct icon
         return R.drawable.ic_half_day_1_black_24dp;
