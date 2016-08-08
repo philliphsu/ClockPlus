@@ -27,9 +27,9 @@ public final class TimersTable {
     
     public static final String COLUMN_END_TIME = "end_time";
     public static final String COLUMN_PAUSE_TIME = "pause_time";
+    public static final String COLUMN_DURATION = "duration";
 
-    public static final String SORT_ORDER =
-            COLUMN_HOUR + " ASC, "
+    public static final String SORT_ORDER = COLUMN_HOUR + " ASC, "
                     + COLUMN_MINUTE + " ASC, "
                     + COLUMN_SECOND + " ASC, "
                     // All else equal, newer timers first
@@ -44,7 +44,8 @@ public final class TimersTable {
                 + COLUMN_LABEL + " TEXT NOT NULL, "
 //                + COLUMN_GROUP + " TEXT NOT NULL, "
                 + COLUMN_END_TIME + " INTEGER NOT NULL, "
-                + COLUMN_PAUSE_TIME + " INTEGER NOT NULL);");
+                + COLUMN_PAUSE_TIME + " INTEGER NOT NULL, "
+                + COLUMN_DURATION + " INTEGER NOT NULL);");
     }
 
     public static void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {

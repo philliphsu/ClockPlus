@@ -26,6 +26,7 @@ public class TimerCursor extends BaseItemCursor<Timer> {
         t.setId(getLong(getColumnIndexOrThrow(TimersTable.COLUMN_ID)));
         t.setEndTime(getLong(getColumnIndexOrThrow(TimersTable.COLUMN_END_TIME)));
         t.setPauseTime(getLong(getColumnIndexOrThrow(TimersTable.COLUMN_PAUSE_TIME)));
+        t.setDuration(getLong(getColumnIndexOrThrow(TimersTable.COLUMN_DURATION)));
         return t;
     }
 }

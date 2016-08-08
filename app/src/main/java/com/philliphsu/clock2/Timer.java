@@ -18,6 +18,16 @@ public abstract class Timer extends ObjectWithId implements Parcelable {
 
     private long endTime;
     private long pauseTime;
+    private long duration;
+
+    // Using this crashes the app when we create a Timer and start it...
+    // timeRemaining() is returning a negative value... but it doesn't even
+    // consider duration()....?
+    // My guess is the hour, minute, and second getters are returning 0
+    // at this point...?
+//    private final long normalDuration = TimeUnit.HOURS.toMillis(hour())
+//            + TimeUnit.MINUTES.toMillis(minute())
+//            + TimeUnit.SECONDS.toMillis(second());
 
     public abstract int hour();
     public abstract int minute();
@@ -61,9 +71,12 @@ public abstract class Timer extends ObjectWithId implements Parcelable {
     }
 
     public long duration() {
-        return TimeUnit.HOURS.toMillis(hour())
-                + TimeUnit.MINUTES.toMillis(minute())
-                + TimeUnit.SECONDS.toMillis(second());
+        if (duration == 0) {
+            duration = TimeUnit.HOURS.toMillis(hour())
+                    + TimeUnit.MINUTES.toMillis(minute())
+                    + TimeUnit.SECONDS.toMillis(second());
+        }
+        return duration;
     }
 
     public void start() {
@@ -89,6 +102,7 @@ public abstract class Timer extends ObjectWithId implements Parcelable {
     public void stop() {
         endTime = 0;
         pauseTime = 0;
+        duration = 0;
     }
 
     public void addOneMinute() {
@@ -97,8 +111,17 @@ public abstract class Timer extends ObjectWithId implements Parcelable {
 //            throw new IllegalStateException("Cannot extend a timer that is not running");
         if (expired()) {
             endTime = SystemClock.elapsedRealtime() + MINUTE;
+            // If the timer's normal duration is >= MINUTE, then an extra run time of one minute
+            // will still be within the normal duration. Thus, the progress calculation does not
+            // need to change. For example, if the timer's normal duration is 2 minutes, an extra
+            // 1 minute run time is fully encapsulated within the 2 minute upper bound.
+            if (duration < MINUTE) {
+                // This scales the progress bar to a full minute.
+                duration = MINUTE;
+            }
         } else {
             endTime += MINUTE;
+            duration += MINUTE;
         }
     }
 
@@ -131,6 +154,13 @@ public abstract class Timer extends ObjectWithId implements Parcelable {
         return pauseTime;
     }
 
+    /**
+     * TO ONLY BE CALLED BY TIMERDATABASEHELPER.
+     */
+    public void setDuration(long duration) {
+        this.duration = duration;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -146,6 +176,7 @@ public abstract class Timer extends ObjectWithId implements Parcelable {
         dest.writeLong(getId());
         dest.writeLong(endTime);
         dest.writeLong(pauseTime);
+        dest.writeLong(duration);
     }
 
     public static final Creator<Timer> CREATOR = new Creator<Timer>() {
@@ -166,6 +197,7 @@ public abstract class Timer extends ObjectWithId implements Parcelable {
         t.setId(source.readLong());
         t.endTime = source.readLong();
         t.pauseTime = source.readLong();
+        t.duration = source.readLong();
         return t;
     }
 }

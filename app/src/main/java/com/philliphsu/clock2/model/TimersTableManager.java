@@ -53,6 +53,7 @@ public class TimersTableManager extends DatabaseTableManager<Timer> {
         Log.d(TAG, "endTime = " + timer.endTime() + ", pauseTime = " + timer.pauseTime());
         cv.put(TimersTable.COLUMN_END_TIME, timer.endTime());
         cv.put(TimersTable.COLUMN_PAUSE_TIME, timer.pauseTime());
+        cv.put(TimersTable.COLUMN_DURATION, timer.duration());
         return cv;
     }
 

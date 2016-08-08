@@ -1,5 +1,7 @@
 package com.philliphsu.clock2.timers;
 
+import android.animation.ObjectAnimator;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
@@ -20,9 +22,11 @@ import butterknife.OnClick;
  */
 public class TimerViewHolder extends BaseViewHolder<Timer> {
     private static final String TAG = "TimerViewHolder";
+    private static final int MAX_PROGRESS = 10000;
 
     private final AsyncTimersTableUpdateHandler mAsyncTimersTableUpdateHandler;
     private TimerController mController;
+    private ObjectAnimator mProgressAnimator;
 
     @Bind(R.id.label) TextView mLabel;
     @Bind(R.id.duration) CountdownChronometer mChronometer;
@@ -34,17 +38,20 @@ public class TimerViewHolder extends BaseViewHolder<Timer> {
     public TimerViewHolder(ViewGroup parent, OnListItemInteractionListener<Timer> listener,
                            AsyncTimersTableUpdateHandler asyncTimersTableUpdateHandler) {
         super(parent, R.layout.item_timer, listener);
+        Log.d(TAG, "New TimerViewHolder");
         mAsyncTimersTableUpdateHandler = asyncTimersTableUpdateHandler;
     }
 
     @Override
-    public void onBind(Timer timer) {
+    public void onBind(final Timer timer) {
         super.onBind(timer);
+        Log.d(TAG, "Binding TimerViewHolder");
         // TOneverDO: create before super
         mController = new TimerController(timer, mAsyncTimersTableUpdateHandler);
         bindLabel(timer.label());
         bindChronometer(timer);
         bindButtonControls(timer);
+        bindProgressBar(timer);
     }
 
     @OnClick(R.id.start_pause)
@@ -105,5 +112,43 @@ public class TimerViewHolder extends BaseViewHolder<Timer> {
         int visibility = timer.hasStarted() ? View.VISIBLE : View.INVISIBLE;
         mAddOneMinute.setVisibility(visibility);
         mStop.setVisibility(visibility);
+    }
+
+    private void bindProgressBar(Timer timer) {
+        mProgressBar.setMax(MAX_PROGRESS);
+        final long timeRemaining = timer.timeRemaining();
+        final int progress = (int) (MAX_PROGRESS * (double) timeRemaining / timer.duration());
+
+        // In case we're reusing an animator instance that could be running
+        if (mProgressAnimator != null && mProgressAnimator.isRunning()) {
+            mProgressAnimator.end();
+        }
+
+        if (!timer.isRunning()) {
+            mProgressBar.setProgress(progress);
+        } else {
+            mProgressAnimator = ObjectAnimator.ofInt(
+                    // The object that has the property we wish to animate
+                    mProgressBar,
+                    // The name of the property of the object that identifies which setter method
+                    // the animation will call to update its values. Here, a property name of
+                    // "progress" will result in a call to the function setProgress() in ProgressBar.
+                    // The docs for ObjectAnimator#setPropertyName() says that for best performance,
+                    // the setter method should take a float or int parameter, and its return type
+                    // should be void (both of which setProgress() satisfies).
+                    "progress",
+                    // The set of values to animate between. A single value implies that that value
+                    // is the one being animated to. Two values imply starting and ending values.
+                    // More than two values imply a starting value, values to animate through along
+                    // the way, and an ending value (these values will be distributed evenly across
+                    // the duration of the animation).
+                    progress, 0);
+            mProgressAnimator.setDuration(timeRemaining);
+            // The algorithm that calculates intermediate values between keyframes. We use linear
+            // interpolation so that the animation runs at constant speed.
+            mProgressAnimator.setInterpolator(null/*results in linear interpolation*/);
+            // This MUST be run on the UI thread.
+            mProgressAnimator.start();
+        }
     }
 }
