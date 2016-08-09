@@ -62,5 +62,9 @@
             android:title="@string/title_timer_ringtone"
             android:ringtoneType="alarm"
             android:defaultValue="content://settings/system/alarm_alert"/>
+        <SwitchPreference
+            android:key="@string/key_timer_vibrate"
+            android:title="@string/title_timer_vibrate"
+            android:defaultValue="false"/>
     </PreferenceCategory>
 </PreferenceScreen>

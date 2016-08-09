@@ -3,6 +3,7 @@ package com.philliphsu.clock2.timers;
 import android.app.Notification;
 import android.content.Intent;
 import android.net.Uri;
+import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.support.v4.app.NotificationCompat;
 
@@ -54,8 +55,9 @@ public class TimerRingtoneService extends RingtoneService<Timer> {
 
     @Override
     protected Uri getRingtoneUri() {
-        // TODO: Read Timer ringtone preference
-        return Settings.System.DEFAULT_ALARM_ALERT_URI;
+        String ringtone = PreferenceManager.getDefaultSharedPreferences(this).getString(
+                getString(R.string.key_timer_ringtone), Settings.System.ALARM_ALERT);
+        return Uri.parse(ringtone);
     }
 
     @Override
@@ -82,8 +84,8 @@ public class TimerRingtoneService extends RingtoneService<Timer> {
 
     @Override
     protected boolean doesVibrate() {
-        // TODO: Create new preference.
-        return false;
+        return PreferenceManager.getDefaultSharedPreferences(this).getBoolean(
+                getString(R.string.key_timer_vibrate), false);
     }
 
     @Override

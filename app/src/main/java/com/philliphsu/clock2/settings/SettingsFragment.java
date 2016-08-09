@@ -7,7 +7,6 @@ import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
-import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.RingtonePreference;
@@ -61,14 +60,10 @@ public class SettingsFragment extends PreferenceFragment implements SharedPrefer
         Preference pref = findPreference(key);
         // Setting a ListPreference's summary value to "%s" in XML automatically updates the
         // preference's summary to display the selected value.
-        if (!(pref instanceof ListPreference)) {
-            String summary = prefs.getString(key, "");
-            if (pref instanceof RingtonePreference) {
-                Uri ringtoneUri = Uri.parse(summary);
-                Ringtone ringtone = RingtoneManager.getRingtone(getActivity(), ringtoneUri);
-                summary = ringtone.getTitle(getActivity());
-            }
-            pref.setSummary(summary);
+        if (pref instanceof RingtonePreference) {
+            Uri ringtoneUri = Uri.parse(prefs.getString(key, ""));
+            Ringtone ringtone = RingtoneManager.getRingtone(getActivity(), ringtoneUri);
+            pref.setSummary(ringtone.getTitle(getActivity()));
         }
     }
 }

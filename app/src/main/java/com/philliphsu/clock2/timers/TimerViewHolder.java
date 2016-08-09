@@ -22,7 +22,7 @@ import butterknife.OnClick;
  */
 public class TimerViewHolder extends BaseViewHolder<Timer> {
     private static final String TAG = "TimerViewHolder";
-    private static final int MAX_PROGRESS = 10000;
+    private static final int MAX_PROGRESS = 100000;
 
     private final AsyncTimersTableUpdateHandler mAsyncTimersTableUpdateHandler;
     private TimerController mController;
