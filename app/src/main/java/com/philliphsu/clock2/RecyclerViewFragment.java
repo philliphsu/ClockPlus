@@ -64,12 +64,6 @@ public abstract class RecyclerViewFragment<
         return new LinearLayoutManager(getActivity());
     }
 
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        getLoaderManager().initLoader(0, null, this);
-    }
-
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -77,6 +71,14 @@ public abstract class RecyclerViewFragment<
         mList.setLayoutManager(getLayoutManager());
         mList.setAdapter(mAdapter = getAdapter());
         return view;
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        // http://stackoverflow.com/a/14632434/5055032
+        // A Loader's lifecycle is bound to its Activity, not its Fragment.
+        getLoaderManager().initLoader(0, null, this);
     }
 
     @Override

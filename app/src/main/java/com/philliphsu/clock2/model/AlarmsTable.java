@@ -68,7 +68,12 @@ public final class AlarmsTable {
 
     public static void onCreate(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE " + TABLE_ALARMS + " ("
-                + COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+                // https://sqlite.org/autoinc.html
+                // If the AUTOINCREMENT keyword appears after INTEGER PRIMARY KEY, that changes the
+                // automatic ROWID assignment algorithm to prevent the reuse of ROWIDs over the
+                // lifetime of the database. In other words, the purpose of AUTOINCREMENT is to
+                // prevent the reuse of ROWIDs from previously deleted rows.
+                + COLUMN_ID + " INTEGER PRIMARY KEY, "
                 + COLUMN_HOUR + " INTEGER NOT NULL, "
                 + COLUMN_MINUTES + " INTEGER NOT NULL, "
                 + COLUMN_LABEL + " TEXT, "

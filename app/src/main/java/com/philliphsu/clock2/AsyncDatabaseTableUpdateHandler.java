@@ -53,10 +53,23 @@ public abstract class AsyncDatabaseTableUpdateHandler<
         }.execute();
     }
 
+    public final void asyncClear() {
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... params) {
+                mTableManager.clear();
+                return null;
+            }
+        }.execute();
+    }
+
     protected final Context getContext() {
         return mAppContext;
     }
 
+    // TODO: Consider giving a base impl that returns our mTableManager field.
+    // Subclasses will check if this base impl is null before creating and returning
+    // a new instance of the TableManager.
     protected abstract TM getTableManager(Context context);
 
     protected abstract void onPostAsyncDelete(Integer result, T item);

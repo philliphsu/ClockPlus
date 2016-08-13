@@ -64,6 +64,17 @@ public abstract class Timer extends ObjectWithId implements Parcelable {
 
     public long timeRemaining() {
         if (!hasStarted())
+            // TODO: Consider returning duration instead? So we can simplify
+            // bindChronometer() in TimerVH to:
+            // if (isRunning())
+            //  ...
+            // else
+            //  chronom.setDuration(timeRemaining())
+            // ---
+            // Actually, I think we can also simplify it even further to just:
+            // chronom.setDuration(timeRemaining())
+            // if (isRunning)
+            //  chronom.start();
             return 0;
         return isRunning()
                 ? endTime - SystemClock.elapsedRealtime()

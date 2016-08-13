@@ -117,6 +117,14 @@ public abstract class DatabaseTableManager<T extends ObjectWithId> {
                 limit); // limit
     }
 
+    /**
+     * Deletes all rows in this table.
+     */
+    public final void clear() {
+        mDbHelper.getWritableDatabase().delete(getTableName(), null/*all rows*/, null);
+        notifyContentChanged();
+    }
+
     private void notifyContentChanged() {
         LocalBroadcastHelper.sendBroadcast(mAppContext, getOnContentChangeAction());
     }

@@ -4,6 +4,8 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import com.philliphsu.clock2.stopwatch.LapsTable;
+
 /**
  * Created by Phillip Hsu on 7/30/2016.
  */
@@ -31,11 +33,13 @@ public class ClockAppDatabaseHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         AlarmsTable.onCreate(db);
         TimersTable.onCreate(db);
+        LapsTable.onCreate(db);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         AlarmsTable.onUpgrade(db, oldVersion, newVersion);
         TimersTable.onUpgrade(db, oldVersion, newVersion);
+        LapsTable.onUpgrade(db, oldVersion, newVersion);
     }
 }

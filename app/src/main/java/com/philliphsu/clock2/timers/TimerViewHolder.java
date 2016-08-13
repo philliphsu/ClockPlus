@@ -13,6 +13,7 @@ import com.philliphsu.clock2.BaseViewHolder;
 import com.philliphsu.clock2.OnListItemInteractionListener;
 import com.philliphsu.clock2.R;
 import com.philliphsu.clock2.Timer;
+import com.philliphsu.clock2.util.ProgressBarUtils;
 
 import butterknife.Bind;
 import butterknife.OnClick;
@@ -85,6 +86,10 @@ public class TimerViewHolder extends BaseViewHolder<Timer> {
         // concurrent messages to its handler.
         mChronometer.stop();
 
+        // TODO: I think we can simplify all this to just:
+        // mChronometer.setDuration(timer.timeRemaining())
+        // if we make the modification to the method as
+        // described in the Timer class.
         if (!timer.hasStarted()) {
             // Set the initial text
             mChronometer.setDuration(timer.duration());
@@ -115,9 +120,8 @@ public class TimerViewHolder extends BaseViewHolder<Timer> {
     }
 
     private void bindProgressBar(Timer timer) {
-        mProgressBar.setMax(MAX_PROGRESS);
         final long timeRemaining = timer.timeRemaining();
-        final int progress = (int) (MAX_PROGRESS * (double) timeRemaining / timer.duration());
+        double ratio = (double) timeRemaining / timer.duration();
 
         // In case we're reusing an animator instance that could be running
         if (mProgressAnimator != null && mProgressAnimator.isRunning()) {
@@ -125,30 +129,13 @@ public class TimerViewHolder extends BaseViewHolder<Timer> {
         }
 
         if (!timer.isRunning()) {
-            mProgressBar.setProgress(progress);
+            // If our scale were 1, then casting ratio to an int will ALWAYS
+            // truncate down to zero.
+            mProgressBar.setMax(100);
+            mProgressBar.setProgress((int) (100 * ratio));
         } else {
-            mProgressAnimator = ObjectAnimator.ofInt(
-                    // The object that has the property we wish to animate
-                    mProgressBar,
-                    // The name of the property of the object that identifies which setter method
-                    // the animation will call to update its values. Here, a property name of
-                    // "progress" will result in a call to the function setProgress() in ProgressBar.
-                    // The docs for ObjectAnimator#setPropertyName() says that for best performance,
-                    // the setter method should take a float or int parameter, and its return type
-                    // should be void (both of which setProgress() satisfies).
-                    "progress",
-                    // The set of values to animate between. A single value implies that that value
-                    // is the one being animated to. Two values imply starting and ending values.
-                    // More than two values imply a starting value, values to animate through along
-                    // the way, and an ending value (these values will be distributed evenly across
-                    // the duration of the animation).
-                    progress, 0);
-            mProgressAnimator.setDuration(timeRemaining);
-            // The algorithm that calculates intermediate values between keyframes. We use linear
-            // interpolation so that the animation runs at constant speed.
-            mProgressAnimator.setInterpolator(null/*results in linear interpolation*/);
-            // This MUST be run on the UI thread.
-            mProgressAnimator.start();
+            mProgressAnimator = ProgressBarUtils.startNewAnimator(
+                    mProgressBar, ratio, timeRemaining);
         }
     }
 }
