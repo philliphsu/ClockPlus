@@ -10,6 +10,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -20,6 +21,8 @@ import com.philliphsu.clock2.alarms.AlarmsFragment;
 import com.philliphsu.clock2.settings.SettingsActivity;
 import com.philliphsu.clock2.stopwatch.StopwatchFragment;
 import com.philliphsu.clock2.timers.TimersFragment;
+
+import java.util.ArrayList;
 
 import butterknife.Bind;
 
@@ -191,16 +194,11 @@ public class MainActivity extends BaseActivity {
 //                // because we want the result to be handled in the Fragment, not in this Activity.
 //                // FragmentActivity does NOT deliver the result to the Fragment, i.e. your
 //                // Fragment's onActivityResult() will NOT be called.
-//                mSectionsPagerAdapter.getCurrentFragment()
+//                mSectionsPagerAdapter.getFragment()
 //                        .startActivityForResult(intent, AlarmsFragment.REQUEST_CREATE_ALARM);
 
-                // TODO: If the user switches between pages and is quick enough to hit the
-                // fab before the target page comes fully into view, the onFabClick()
-                // implementation of the previous page will be called. Perhaps do something
-                // with the current page from the ViewPager instead. E.g. monolithically handle
-                // each Fragment's fab click reaction in this activity.
-                Fragment f;
-                if ((f = mSectionsPagerAdapter.getCurrentFragment()) instanceof RecyclerViewFragment) {
+                Fragment f = mSectionsPagerAdapter.getFragment(mViewPager.getCurrentItem());
+                if (f instanceof RecyclerViewFragment) {
                     ((RecyclerViewFragment) f).onFabClick();
                 }
             }
@@ -278,8 +276,7 @@ public class MainActivity extends BaseActivity {
      * one of the sections/tabs/pages.
      */
     private static class SectionsPagerAdapter extends FragmentPagerAdapter {
-
-        private Fragment mCurrentFragment;
+        private final ArrayList<Fragment> mFragments = new ArrayList<>(getCount());
 
         public SectionsPagerAdapter(FragmentManager fm) {
             super(fm);
@@ -301,18 +298,17 @@ public class MainActivity extends BaseActivity {
         }
 
         @Override
-        public void setPrimaryItem(ViewGroup container, int position, Object object) {
-            super.setPrimaryItem(container, position, object);
-            if (mCurrentFragment != object) {
-                mCurrentFragment = (Fragment) object;
-            }
+        public Object instantiateItem(ViewGroup container, int position) {
+            Fragment fragment = (Fragment) super.instantiateItem(container, position);
+            mFragments.add(position, fragment);
+            Log.d(TAG, "Instantiated fragment " + fragment + " for position " + position + ". New size = " + mFragments.size());
+            return fragment;
         }
 
         @Override
         public void destroyItem(ViewGroup container, int position, Object object) {
-            if (mCurrentFragment == object) {
-                mCurrentFragment = null;
-            }
+            Fragment f = mFragments.remove(position);
+            Log.d(TAG, "Destroyed fragment " + f + " for position " + position + ". New size = " + mFragments.size());
             super.destroyItem(container, position, object);
         }
 
@@ -335,8 +331,10 @@ public class MainActivity extends BaseActivity {
             return null;
         }
 
-        public Fragment getCurrentFragment() {
-            return mCurrentFragment;
+        public Fragment getFragment(int position) {
+            Fragment f = mFragments.get(position);
+            Log.d(TAG, "Returning fragment " + f + " for position " + position);
+            return f;
         }
     }
 }

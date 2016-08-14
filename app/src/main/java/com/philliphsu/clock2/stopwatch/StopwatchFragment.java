@@ -161,9 +161,6 @@ public class StopwatchFragment extends RecyclerViewFragment<
             }
         } else {
             if (mStartTime == 0) {
-                // TODO: I'm strongly considering inserting the very first lap alone.
-                // We'll need to tell the adapter to just hide the corresponding VH
-                // until a second lap is added.
                 // addNewLap() won't call through unless chronometer is running, which
                 // we can't start until we compute mStartTime
                 mCurrentLap = new Lap();
