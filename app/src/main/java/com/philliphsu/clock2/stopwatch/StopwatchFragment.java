@@ -63,8 +63,6 @@ public class StopwatchFragment extends RecyclerViewFragment<
         mPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
         mStartTime = mPrefs.getLong(KEY_START_TIME, 0);
         mPauseTime = mPrefs.getLong(KEY_PAUSE_TIME, 0);
-        // TODO: Any better solutions?
-        mActivityFab = new WeakReference<>((FloatingActionButton) getActivity().findViewById(R.id.fab));
         Log.d(TAG, "mStartTime = " + mStartTime
                 + ", mPauseTime = " + mPauseTime);
     }
@@ -74,6 +72,11 @@ public class StopwatchFragment extends RecyclerViewFragment<
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         // TODO: Apply size span on chronom
         View view = super.onCreateView(inflater, container, savedInstanceState);
+        // TODO: Any better alternatives?
+        // TOneverDO: Move to onCreate(). It is not called again on device rotation, so we will
+        // have a null reference.
+        mActivityFab = new WeakReference<>((FloatingActionButton) getActivity().findViewById(R.id.fab));
+
         if (mStartTime > 0) {
             long base = mStartTime;
             if (mPauseTime > 0) {

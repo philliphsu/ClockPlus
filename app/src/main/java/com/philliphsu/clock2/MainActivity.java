@@ -10,7 +10,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
+import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -21,8 +21,6 @@ import com.philliphsu.clock2.alarms.AlarmsFragment;
 import com.philliphsu.clock2.settings.SettingsActivity;
 import com.philliphsu.clock2.stopwatch.StopwatchFragment;
 import com.philliphsu.clock2.timers.TimersFragment;
-
-import java.util.ArrayList;
 
 import butterknife.Bind;
 
@@ -52,9 +50,11 @@ public class MainActivity extends BaseActivity {
     @Bind(R.id.fab)
     FloatingActionButton mFab;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // TODO: On device rotation, if we were last on stopwatch page, restore the fab's translationX.
 
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
@@ -276,7 +276,10 @@ public class MainActivity extends BaseActivity {
      * one of the sections/tabs/pages.
      */
     private static class SectionsPagerAdapter extends FragmentPagerAdapter {
-        private final ArrayList<Fragment> mFragments = new ArrayList<>(getCount());
+        // We can't use an ArrayList because the structure reorganizes as elements are removed,
+        // so page indices won't stay in sync with list indices. SparseArray allows you to have
+        // gaps in your range of indices.
+        private final SparseArray<Fragment> mFragments = new SparseArray<>(getCount());
 
         public SectionsPagerAdapter(FragmentManager fm) {
             super(fm);
@@ -300,15 +303,13 @@ public class MainActivity extends BaseActivity {
         @Override
         public Object instantiateItem(ViewGroup container, int position) {
             Fragment fragment = (Fragment) super.instantiateItem(container, position);
-            mFragments.add(position, fragment);
-            Log.d(TAG, "Instantiated fragment " + fragment + " for position " + position + ". New size = " + mFragments.size());
+            mFragments.put(position, fragment);
             return fragment;
         }
 
         @Override
         public void destroyItem(ViewGroup container, int position, Object object) {
-            Fragment f = mFragments.remove(position);
-            Log.d(TAG, "Destroyed fragment " + f + " for position " + position + ". New size = " + mFragments.size());
+            mFragments.remove(position);
             super.destroyItem(container, position, object);
         }
 
@@ -332,9 +333,7 @@ public class MainActivity extends BaseActivity {
         }
 
         public Fragment getFragment(int position) {
-            Fragment f = mFragments.get(position);
-            Log.d(TAG, "Returning fragment " + f + " for position " + position);
-            return f;
+            return mFragments.get(position);
         }
     }
 }
