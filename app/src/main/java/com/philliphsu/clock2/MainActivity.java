@@ -1,6 +1,7 @@
 package com.philliphsu.clock2;
 
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
@@ -57,12 +58,63 @@ public class MainActivity extends BaseActivity {
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
         mViewPager.setAdapter(mSectionsPagerAdapter);
         mViewPager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
+            /**
+             * @param position Either the current page position if the offset is increasing,
+             *                 or the previous page position if it is decreasing.
+             * @param positionOffset If increasing from [0, 1), scrolling right and position = currentPagePosition
+             *                       If decreasing from (1, 0], scrolling left and position = (currentPagePosition - 1)
+             */
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+//                Log.d(TAG, String.format("pos = %d, posOffset = %f, posOffsetPixels = %d",
+//                        position, positionOffset, positionOffsetPixels));
+                int pageBeforeLast = mSectionsPagerAdapter.getCount() - 2;
+                if (position <= pageBeforeLast) {
+                    if (position < pageBeforeLast) {
+                        // When the scrolling is due to tab selection between multiple tabs apart,
+                        // this callback is called for each intermediate page, but each of those pages
+                        // will briefly register a sparsely decreasing range of positionOffsets, always
+                        // from (1, 0). As such, you would notice the FAB to jump back and forth between
+                        // x-positions as each intermediate page is scrolled through.
+                        // This is a visual optimization that ends the translation motion, immediately
+                        // returning the FAB to its target position.
+                        mFab.setTranslationX(0);
+                    } else {
+                        // Initially, the FAB's translationX property is zero because, at its original
+                        // position, it is not translated. setTranslationX() is relative to the view's
+                        // left position, at its original position; this left position is taken to be
+                        // the zero point of the coordinate system relative to this view. As your
+                        // translationX value is increasingly negative, the view is translated left.
+                        // But as translationX is decreasingly negative and down to zero, the view
+                        // is translated right, back to its original position.
+                        float translationX = positionOffsetPixels / -2f;
+                        // NOTE: You MUST scale your own additional pixel offsets by positionOffset,
+                        // or else the FAB will immediately translate by that many pixels, causing
+                        // jitter as you scroll.
+                        final int margin;
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                            // Since each side's margin is the same, any side's would do.
+                            margin = ((ViewGroup.MarginLayoutParams) mFab.getLayoutParams()).rightMargin;
+                        } else {
+                            // Pre-Lollipop has measurement issues with FAB margins. This is
+                            // probably as good as we can get to centering the FAB, without
+                            // hardcoding some small margin value.
+                            margin = 0;
+                        }
+                        // Translation is done relative to a view's left position; by adding
+                        // an offset of half the FAB's width, we effectively rebase the translation
+                        // relative to the view's center position.
+                        translationX += positionOffset * (mFab.getWidth() / 2f + margin);
+                        mFab.setTranslationX(translationX);
+                    }
+                }
+            }
+
             @Override
             public void onPageSelected(int position) {
-                if (position == mSectionsPagerAdapter.getCount() - 1) {
-                    mFab.hide();
-                } else {
-                    mFab.show();
+                if (position < mSectionsPagerAdapter.getCount() - 1) {
+                    // TODO: Plus icon. Consider caching the Drawable in a member variable.
+                    mFab.setImageResource(android.R.drawable.ic_dialog_email);
                 }
             }
 //            @Override

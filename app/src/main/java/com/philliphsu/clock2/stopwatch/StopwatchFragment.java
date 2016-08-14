@@ -12,12 +12,13 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
 import android.widget.ProgressBar;
 
 import com.philliphsu.clock2.R;
 import com.philliphsu.clock2.RecyclerViewFragment;
 import com.philliphsu.clock2.util.ProgressBarUtils;
+
+import java.lang.ref.WeakReference;
 
 import butterknife.Bind;
 import butterknife.OnClick;
@@ -43,11 +44,11 @@ public class StopwatchFragment extends RecyclerViewFragment<
     private AsyncLapsTableUpdateHandler mUpdateHandler;
     private ObjectAnimator mProgressAnimator;
     private SharedPreferences mPrefs;
+    private WeakReference<FloatingActionButton> mActivityFab;
 
     @Bind(R.id.chronometer) ChronometerWithMillis mChronometer;
-    @Bind(R.id.new_lap) ImageButton mNewLapButton;
-    @Bind(R.id.fab) FloatingActionButton mFab;
-    @Bind(R.id.stop) ImageButton mStopButton;
+    @Bind(R.id.new_lap) FloatingActionButton mNewLapButton;
+    @Bind(R.id.stop) FloatingActionButton mStopButton;
     @Bind(R.id.progress_bar) ProgressBar mProgressBar;
 
     /**
@@ -62,6 +63,8 @@ public class StopwatchFragment extends RecyclerViewFragment<
         mPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
         mStartTime = mPrefs.getLong(KEY_START_TIME, 0);
         mPauseTime = mPrefs.getLong(KEY_PAUSE_TIME, 0);
+        // TODO: Any better solutions?
+        mActivityFab = new WeakReference<>((FloatingActionButton) getActivity().findViewById(R.id.fab));
         Log.d(TAG, "mStartTime = " + mStartTime
                 + ", mPauseTime = " + mPauseTime);
     }
@@ -82,6 +85,8 @@ public class StopwatchFragment extends RecyclerViewFragment<
         if (mPrefs.getBoolean(KEY_CHRONOMETER_RUNNING, false)) {
             mChronometer.start();
         }
+        // Hides the mini fabs prematurely, so when we actually select this tab
+        // they don't show at all before hiding.
         updateButtonControls();
         return view;
     }
@@ -138,45 +143,8 @@ public class StopwatchFragment extends RecyclerViewFragment<
         }
     }
 
-    @Nullable
     @Override
-    protected LapsAdapter getAdapter() {
-        if (super.getAdapter() != null)
-            return super.getAdapter();
-        return new LapsAdapter();
-    }
-
-    @Override
-    protected int contentLayout() {
-        return R.layout.fragment_stopwatch;
-    }
-
-    @OnClick(R.id.new_lap)
-    void addNewLap() {
-        if (!mChronometer.isRunning()) {
-            Log.d(TAG, "Cannot add new lap");
-            return;
-        }
-        if (mCurrentLap != null) {
-            mCurrentLap.end(mChronometer.getText().toString());
-        }
-        mPreviousLap = mCurrentLap;
-        mCurrentLap = new Lap();
-        if (mPreviousLap != null) {
-//            if (getAdapter().getItemCount() == 0) {
-//                mUpdateHandler.asyncInsert(mPreviousLap);
-//            } else {
-                mUpdateHandler.asyncUpdate(mPreviousLap.getId(), mPreviousLap);
-//            }
-        }
-        mUpdateHandler.asyncInsert(mCurrentLap);
-        // This would end up being called twice: here, and in onLoadFinished(), because the
-        // table updates will prompt us to requery.
-//        startNewProgressBarAnimator();
-    }
-
-    @OnClick(R.id.fab)
-    void startPause() {
+    public void onFabClick() {
         if (mChronometer.isRunning()) {
             mPauseTime = SystemClock.elapsedRealtime();
             mChronometer.stop();
@@ -221,6 +189,65 @@ public class StopwatchFragment extends RecyclerViewFragment<
         savePrefs();
     }
 
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        // We get called multiple times, even when we're not yet visible.
+        // This can be called before onCreateView() so widgets could be null, esp. if you had
+        // navigated more than one page away before returning here. That means onDestroyView()
+        // was called previously.
+        // We will get called again when we actually have this page selected, and by that time
+        // onCreateView() will have been called. Wait until we're resumed to call through.
+        if (isVisibleToUser && isResumed()) {
+            // At this point, the only thing this does is change the fab icon
+            // TODO: allow duplicate code and manipulate the fab icon directly?
+            // TODO: There is noticeable latency between showing this tab and
+            // changing the icon. Consider writing a callback for this Fragment
+            // that MainActivity can call in its onPageChangeListener. We don't merely
+            // want to call such a callback in onPageSelected, because that is fired
+            // when we reach an idle state, so we'd experience the same latency issue.
+            // Rather, we should animate the icon change during onPageScrolled.
+            updateButtonControls();
+        }
+    }
+
+    @Nullable
+    @Override
+    protected LapsAdapter getAdapter() {
+        if (super.getAdapter() != null)
+            return super.getAdapter();
+        return new LapsAdapter();
+    }
+
+    @Override
+    protected int contentLayout() {
+        return R.layout.fragment_stopwatch;
+    }
+
+    @OnClick(R.id.new_lap)
+    void addNewLap() {
+        if (!mChronometer.isRunning()) {
+            Log.d(TAG, "Cannot add new lap");
+            return;
+        }
+        if (mCurrentLap != null) {
+            mCurrentLap.end(mChronometer.getText().toString());
+        }
+        mPreviousLap = mCurrentLap;
+        mCurrentLap = new Lap();
+        if (mPreviousLap != null) {
+//            if (getAdapter().getItemCount() == 0) {
+//                mUpdateHandler.asyncInsert(mPreviousLap);
+//            } else {
+                mUpdateHandler.asyncUpdate(mPreviousLap.getId(), mPreviousLap);
+//            }
+        }
+        mUpdateHandler.asyncInsert(mCurrentLap);
+        // This would end up being called twice: here, and in onLoadFinished(), because the
+        // table updates will prompt us to requery.
+//        startNewProgressBarAnimator();
+    }
+
     @OnClick(R.id.stop)
     void stop() {
         mChronometer.stop();
@@ -246,8 +273,10 @@ public class StopwatchFragment extends RecyclerViewFragment<
         int vis = started ? View.VISIBLE : View.INVISIBLE;
         mNewLapButton.setVisibility(vis);
         mStopButton.setVisibility(vis);
-        // TODO: pause and start icon, resp.
-        mFab.setImageResource(mChronometer.isRunning() ? 0 : 0);
+        if (isVisible()) { // avoid changing the icon prematurely, esp. when we're not on this tab
+            // TODO: pause and start icon, resp.
+            mActivityFab.get().setImageResource(mChronometer.isRunning() ? 0 : 0);
+        }
     }
 
     private void startNewProgressBarAnimator() {
@@ -272,11 +301,6 @@ public class StopwatchFragment extends RecyclerViewFragment<
     }
 
     // ======================= DO NOT IMPLEMENT ============================
-
-    @Override
-    public void onFabClick() {
-        // DO NOT THROW AN UNSUPPORTED OPERATION EXCEPTION.
-    }
 
     @Override
     protected void onScrolledToStableId(long id, int position) {
