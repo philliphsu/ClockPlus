@@ -45,22 +45,22 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/ic_half_day_1_black_24dp"
-            android:tint="@android:color/darker_gray"
+            android:tint="@android:color/white"
             app:layout_columnWeight="1"
             app:layout_gravity="center"
             app:fabSize="mini"
-            app:backgroundTint="@android:color/white"/>
+            app:backgroundTint="@color/colorPrimary"/>
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/stop"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_half_day_1_black_24dp"
-            android:tint="@android:color/darker_gray"
+            android:src="@drawable/ic_stop_24dp"
+            android:tint="@android:color/white"
             app:layout_columnWeight="1"
             app:layout_gravity="center"
             app:fabSize="mini"
-            app:backgroundTint="@android:color/white"/>
+            app:backgroundTint="@color/colorPrimary"/>
 
     </android.support.v7.widget.GridLayout>
 

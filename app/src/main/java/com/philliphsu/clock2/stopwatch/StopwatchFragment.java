@@ -2,11 +2,13 @@ package com.philliphsu.clock2.stopwatch;
 
 import android.animation.ObjectAnimator;
 import android.content.SharedPreferences;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.Loader;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -45,6 +47,8 @@ public class StopwatchFragment extends RecyclerViewFragment<
     private ObjectAnimator mProgressAnimator;
     private SharedPreferences mPrefs;
     private WeakReference<FloatingActionButton> mActivityFab;
+    private Drawable mStartDrawable;
+    private Drawable mPauseDrawable;
 
     @Bind(R.id.chronometer) ChronometerWithMillis mChronometer;
     @Bind(R.id.new_lap) FloatingActionButton mNewLapButton;
@@ -65,8 +69,13 @@ public class StopwatchFragment extends RecyclerViewFragment<
         mPauseTime = mPrefs.getLong(KEY_PAUSE_TIME, 0);
         Log.d(TAG, "mStartTime = " + mStartTime
                 + ", mPauseTime = " + mPauseTime);
+        // TODO: Will these be kept alive after onDestroyView()? If not, we should move these to
+        // onCreateView() or any other callback that is guaranteed to be called.
+        mStartDrawable = ContextCompat.getDrawable(getActivity(), R.drawable.ic_start_24dp);
+        mPauseDrawable = ContextCompat.getDrawable(getActivity(), R.drawable.ic_pause_24dp);
     }
 
+    // TODO: Restore progress bar animator on rotate
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -88,10 +97,23 @@ public class StopwatchFragment extends RecyclerViewFragment<
         if (mPrefs.getBoolean(KEY_CHRONOMETER_RUNNING, false)) {
             mChronometer.start();
         }
-        // Hides the mini fabs prematurely, so when we actually select this tab
-        // they don't show at all before hiding.
+        // Hides the mini fabs prematurely, so when we actually display this tab
+        // they won't show even briefly at all before hiding.
         updateButtonControls();
         return view;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        // FAB icon change won't happen when selecting this tab from multiple tabs away,
+        // because isResumed() and isVisible() both return false, respectively from
+        // setUserVisibleHint() and from updateButtonControls() when called by onCreateView().
+        // TODO: Since this is only called to change the FAB icon, just allow duplicate
+        // code and manipulate the FAB directly.
+        // TODO: This has the side effect of prematurely changing the icon for the
+        // page directly before this page.
+        updateButtonControls();
     }
 
     /**
@@ -199,6 +221,7 @@ public class StopwatchFragment extends RecyclerViewFragment<
         // We will get called again when we actually have this page selected, and by that time
         // onCreateView() will have been called. Wait until we're resumed to call through.
         if (isVisibleToUser && isResumed()) {
+            Log.d(TAG, "setUserVisibleHint called thru");
             // At this point, the only thing this does is change the fab icon
             // TODO: allow duplicate code and manipulate the fab icon directly?
             // TODO: There is noticeable latency between showing this tab and
@@ -274,8 +297,8 @@ public class StopwatchFragment extends RecyclerViewFragment<
         mNewLapButton.setVisibility(vis);
         mStopButton.setVisibility(vis);
         if (isVisible()) { // avoid changing the icon prematurely, esp. when we're not on this tab
-            // TODO: pause and start icon, resp.
-            mActivityFab.get().setImageResource(mChronometer.isRunning() ? 0 : 0);
+            Log.d(TAG, "Fab icon changing");
+            mActivityFab.get().setImageDrawable(mChronometer.isRunning() ? mPauseDrawable : mStartDrawable);
         }
     }
 

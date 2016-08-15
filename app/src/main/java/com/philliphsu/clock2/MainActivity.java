@@ -1,14 +1,15 @@
 package com.philliphsu.clock2;
 
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
@@ -36,13 +37,14 @@ public class MainActivity extends BaseActivity {
      * {@link android.support.v4.app.FragmentStatePagerAdapter}.
      */
     private SectionsPagerAdapter mSectionsPagerAdapter;
+    private Drawable mAddItemDrawable;
 
-    // For delaying fab.show() on SCROLL_STATE_SETTLING
-    private final Handler mHandler = new Handler();
-
-    private boolean mScrollStateDragging;
-    private int mPageDragging = -1; // TOneverDO: initial value >= 0
-    private boolean mDraggingPastEndBoundaries;
+//    // For delaying fab.show() on SCROLL_STATE_SETTLING
+//    private final Handler mHandler = new Handler();
+//
+//    private boolean mScrollStateDragging;
+//    private int mPageDragging = -1; // TOneverDO: initial value >= 0
+//    private boolean mDraggingPastEndBoundaries;
 
     @Bind(R.id.container)
     ViewPager mViewPager;
@@ -81,6 +83,8 @@ public class MainActivity extends BaseActivity {
                         // x-positions as each intermediate page is scrolled through.
                         // This is a visual optimization that ends the translation motion, immediately
                         // returning the FAB to its target position.
+                        // TODO: The animation visibly skips to the end. We could interpolate
+                        // intermediate x-positions if we cared to smooth it out.
                         mFab.setTranslationX(0);
                     } else {
                         // Initially, the FAB's translationX property is zero because, at its original
@@ -116,8 +120,7 @@ public class MainActivity extends BaseActivity {
             @Override
             public void onPageSelected(int position) {
                 if (position < mSectionsPagerAdapter.getCount() - 1) {
-                    // TODO: Plus icon. Consider caching the Drawable in a member variable.
-                    mFab.setImageResource(android.R.drawable.ic_dialog_email);
+                    mFab.setImageDrawable(mAddItemDrawable);
                 }
             }
 //            @Override
@@ -184,6 +187,10 @@ public class MainActivity extends BaseActivity {
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
+        // Using the resources is fine since tab icons will never change once they are set.
+        tabLayout.getTabAt(0).setIcon(R.drawable.ic_alarm_24dp);
+        tabLayout.getTabAt(1).setIcon(R.drawable.ic_timer_24dp);
+        tabLayout.getTabAt(2).setIcon(R.drawable.ic_stopwatch_24dp);
 
         // TODO: @OnCLick instead.
         mFab.setOnClickListener(new View.OnClickListener() {
@@ -203,6 +210,8 @@ public class MainActivity extends BaseActivity {
                 }
             }
         });
+
+        mAddItemDrawable = ContextCompat.getDrawable(this, R.drawable.ic_add_24dp);
     }
 
     @Override
@@ -319,18 +328,19 @@ public class MainActivity extends BaseActivity {
             return 3;
         }
 
-        @Override
-        public CharSequence getPageTitle(int position) {
-            switch (position) {
-                case 0:
-                    return "SECTION 1";
-                case 1:
-                    return "SECTION 2";
-                case 2:
-                    return "SECTION 3";
-            }
-            return null;
-        }
+        // TODO: If you wish to have text labels for your tabs, then implement this method.
+//        @Override
+//        public CharSequence getPageTitle(int position) {
+//            switch (position) {
+//                case 0:
+//                    return "SECTION 1";
+//                case 1:
+//                    return "SECTION 2";
+//                case 2:
+//                    return "SECTION 3";
+//            }
+//            return null;
+//        }
 
         public Fragment getFragment(int position) {
             return mFragments.get(position);
