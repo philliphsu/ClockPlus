@@ -74,14 +74,12 @@ public class AlarmActivity extends RingtoneActivity<Alarm> {
 
     @Override
     protected int getLeftButtonDrawable() {
-        // TODO: correct icon
-        return R.drawable.ic_half_day_1_black_24dp;
+        return R.drawable.ic_snooze_24dp;
     }
 
     @Override
     protected int getRightButtonDrawable() {
-        // TODO: correct icon
-        return R.drawable.ic_half_day_1_black_24dp;
+        return R.drawable.ic_dismiss_alarm_24dp;
     }
 
     @Override

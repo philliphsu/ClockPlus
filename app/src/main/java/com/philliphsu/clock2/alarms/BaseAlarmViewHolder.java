@@ -1,7 +1,9 @@
 package com.philliphsu.clock2.alarms;
 
+import android.graphics.drawable.Drawable;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.SwitchCompat;
 import android.text.format.DateFormat;
 import android.view.MotionEvent;
@@ -35,6 +37,9 @@ import static com.philliphsu.clock2.util.DateFormatUtils.formatTime;
 public abstract class BaseAlarmViewHolder extends BaseViewHolder<Alarm> {
 
     private final AlarmController mAlarmController;
+    // TODO: Should we use VectorDrawable type?
+    private final Drawable mDismissNowDrawable;
+    private final Drawable mCancelSnoozeDrawable;
 
     @Bind(R.id.time) TextView mTime;
     @Bind(R.id.on_off_switch) SwitchCompat mSwitch;
@@ -46,6 +51,10 @@ public abstract class BaseAlarmViewHolder extends BaseViewHolder<Alarm> {
                                AlarmController controller) {
         super(parent, layoutRes, listener);
         mAlarmController = controller;
+        // Because of VH binding, setting drawable resources on views would be bad for performance.
+        // Instead, we create and cache the Drawables once.
+        mDismissNowDrawable = ContextCompat.getDrawable(getContext(), R.drawable.ic_dismiss_alarm_24dp);
+        mCancelSnoozeDrawable = ContextCompat.getDrawable(getContext(), R.drawable.ic_cancel_snooze);
     }
 
     @Override
@@ -163,12 +172,18 @@ public abstract class BaseAlarmViewHolder extends BaseViewHolder<Alarm> {
 
     private void bindDismissButton(Alarm alarm) {
         int hoursBeforeUpcoming = AlarmUtils.hoursBeforeUpcoming(getContext());
-        boolean visible = alarm.isEnabled() && (alarm.ringsWithinHours(hoursBeforeUpcoming) || alarm.isSnoozed());
-        String buttonText = alarm.isSnoozed()
+        boolean upcoming = alarm.ringsWithinHours(hoursBeforeUpcoming);
+        boolean snoozed = alarm.isSnoozed();
+        boolean visible = alarm.isEnabled() && (upcoming || snoozed);
+        String buttonText = snoozed
                 ? getContext().getString(R.string.title_snoozing_until, formatTime(getContext(), alarm.snoozingUntil()))
                 : getContext().getString(R.string.dismiss_now);
         setVisibility(mDismissButton, visible);
         mDismissButton.setText(buttonText);
+        // Set drawable start
+        mDismissButton.setCompoundDrawablesRelativeWithIntrinsicBounds(
+                upcoming ? mDismissNowDrawable : mCancelSnoozeDrawable,
+                null, null, null);
     }
 
     private void bindLabel(String label) {

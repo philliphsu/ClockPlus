@@ -44,7 +44,7 @@
             android:id="@+id/new_lap"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/ic_half_day_1_black_24dp"
+            android:src="@drawable/ic_add_lap_24dp"
             android:tint="@android:color/white"
             android:visibility="invisible"
             app:layout_columnWeight="1"

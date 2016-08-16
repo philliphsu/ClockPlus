@@ -30,6 +30,13 @@
     then the sheet will show fully expanded; the contents are not stretched to match this height.
     This is large enough to accommodate most, if not all, of our layouts. -->
     <dimen name="peek_height_upper_limit">500dp</dimen>
+    
+    <!-- AlarmViewHolder -->
+    <dimen name="text_compound_drawable_padding">10dp</dimen>
+
+    <!-- Material Button -->
+    <dimen name="button_text_left_padding">16dp</dimen>
+    <dimen name="button_text_right_padding">16dp</dimen>
 
     <dimen name="text_size_body_1">14sp</dimen>
     <dimen name="text_size_body_2">14sp</dimen>
