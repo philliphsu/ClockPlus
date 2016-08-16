@@ -39,4 +39,15 @@ public abstract class BaseFragment extends Fragment {
         super.onDestroyView();
         ButterKnife.unbind(this); // Only for fragments!
     }
+
+    /**
+     * Callback invoked when this Fragment is part of a ViewPager and it has been
+     * selected, as indicated by {@link android.support.v4.view.ViewPager.OnPageChangeListener#onPageSelected(int)
+     * onPageSelected(int)}.
+     */
+    public void onPageSelected() {
+        // TODO: Consider making this abstract. The reason it wasn't abstract in the first place
+        // is not all Fragments in our ViewPager need to do things upon being selected. As such,
+        // those Fragments' classes would just end up stubbing this implementation.
+    }
 }

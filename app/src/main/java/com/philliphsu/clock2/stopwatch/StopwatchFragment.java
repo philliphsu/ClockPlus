@@ -99,21 +99,8 @@ public class StopwatchFragment extends RecyclerViewFragment<
         }
         // Hides the mini fabs prematurely, so when we actually display this tab
         // they won't show even briefly at all before hiding.
-        updateButtonControls();
+//        updateButtonControls();
         return view;
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        // FAB icon change won't happen when selecting this tab from multiple tabs away,
-        // because isResumed() and isVisible() both return false, respectively from
-        // setUserVisibleHint() and from updateButtonControls() when called by onCreateView().
-        // TODO: Since this is only called to change the FAB icon, just allow duplicate
-        // code and manipulate the FAB directly.
-        // TODO: This has the side effect of prematurely changing the icon for the
-        // page directly before this page.
-        updateButtonControls();
     }
 
     /**
@@ -212,26 +199,8 @@ public class StopwatchFragment extends RecyclerViewFragment<
     }
 
     @Override
-    public void setUserVisibleHint(boolean isVisibleToUser) {
-        super.setUserVisibleHint(isVisibleToUser);
-        // We get called multiple times, even when we're not yet visible.
-        // This can be called before onCreateView() so widgets could be null, esp. if you had
-        // navigated more than one page away before returning here. That means onDestroyView()
-        // was called previously.
-        // We will get called again when we actually have this page selected, and by that time
-        // onCreateView() will have been called. Wait until we're resumed to call through.
-        if (isVisibleToUser && isResumed()) {
-            Log.d(TAG, "setUserVisibleHint called thru");
-            // At this point, the only thing this does is change the fab icon
-            // TODO: allow duplicate code and manipulate the fab icon directly?
-            // TODO: There is noticeable latency between showing this tab and
-            // changing the icon. Consider writing a callback for this Fragment
-            // that MainActivity can call in its onPageChangeListener. We don't merely
-            // want to call such a callback in onPageSelected, because that is fired
-            // when we reach an idle state, so we'd experience the same latency issue.
-            // Rather, we should animate the icon change during onPageScrolled.
-            updateButtonControls();
-        }
+    public void onPageSelected() {
+        updateButtonControls();
     }
 
     @Nullable
@@ -296,8 +265,9 @@ public class StopwatchFragment extends RecyclerViewFragment<
         int vis = started ? View.VISIBLE : View.INVISIBLE;
         mNewLapButton.setVisibility(vis);
         mStopButton.setVisibility(vis);
+        // TODO: We no longer call this method in lifecycle events where we aren't actually
+        // resumed/visible, so we can remove this check.
         if (isVisible()) { // avoid changing the icon prematurely, esp. when we're not on this tab
-            Log.d(TAG, "Fab icon changing");
             mActivityFab.get().setImageDrawable(mChronometer.isRunning() ? mPauseDrawable : mStartDrawable);
         }
     }

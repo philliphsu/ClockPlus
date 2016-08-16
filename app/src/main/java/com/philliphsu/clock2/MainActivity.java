@@ -122,6 +122,10 @@ public class MainActivity extends BaseActivity {
                 if (position < mSectionsPagerAdapter.getCount() - 1) {
                     mFab.setImageDrawable(mAddItemDrawable);
                 }
+                Fragment f = mSectionsPagerAdapter.getFragment(mViewPager.getCurrentItem());
+                if (f instanceof BaseFragment) {
+                    ((BaseFragment) f).onPageSelected();
+                }
             }
 //            @Override
 //            public void onPageScrollStateChanged(int state) {
