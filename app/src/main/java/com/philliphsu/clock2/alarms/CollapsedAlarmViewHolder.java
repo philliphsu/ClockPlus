@@ -18,43 +18,36 @@ import static com.philliphsu.clock2.DaysOfWeek.NUM_DAYS;
 /**
  * Created by Phillip Hsu on 5/31/2016.
  */
-public class CollapsedAlarmViewHolder extends BaseAlarmViewHolder implements AlarmCountdown.OnTickListener {
+public class CollapsedAlarmViewHolder extends BaseAlarmViewHolder {
 
-    @Bind(R.id.countdown) AlarmCountdown mCountdown; // TODO: Make your own chronometer with minute precision.
+    @Bind(R.id.countdown) AlarmCountdown mCountdown;
     @Bind(R.id.recurring_days) TextView mDays; // TODO: use `new DateFormatSymbols().getShortWeekdays()` to set texts
 
     @Deprecated // TODO: Delete this, the only usage is from AlarmsAdapter (SortedList), which is not used anymore.
     public CollapsedAlarmViewHolder(ViewGroup parent, OnListItemInteractionListener<Alarm> listener) {
         super(parent, R.layout.item_collapsed_alarm, listener, null);
-        mCountdown.setOnTickListener(this);
     }
 
     public CollapsedAlarmViewHolder(ViewGroup parent, OnListItemInteractionListener<Alarm> listener,
                                     AlarmController alarmController) {
         super(parent, R.layout.item_collapsed_alarm, listener, alarmController);
-        mCountdown.setOnTickListener(this);
     }
 
     @Override
     public void onBind(Alarm alarm) {
         super.onBind(alarm);
         // TOneverDO: do custom binding before super call, or else NPEs.
-        bindCountdown(alarm.isEnabled(), alarm.ringsIn());
+        bindCountdown(alarm.isEnabled(), alarm.ringsAt());
         bindDays(alarm);
     }
 
-    @Override
-    public void onTick() {
-        mCountdown.showAsText(getAlarm().ringsIn());
-    }
-
-    private void bindCountdown(boolean enabled, long remainingTime) {
+    private void bindCountdown(boolean enabled, long ringsAt) {
         if (enabled) {
-            mCountdown.showAsText(remainingTime);
-            mCountdown.startTicking(true);
+            mCountdown.setBase(ringsAt);
+            mCountdown.start();
             mCountdown.setVisibility(VISIBLE);
         } else {
-            mCountdown.stopTicking();
+            mCountdown.stop();
             mCountdown.setVisibility(GONE);
         }
     }
