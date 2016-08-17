@@ -4,13 +4,12 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
+import android.widget.TextView;
 
 import com.philliphsu.clock2.R;
 
 import butterknife.Bind;
 import butterknife.OnClick;
-import butterknife.OnTouch;
 
 /**
  * Created by Phillip Hsu on 7/12/2016.
@@ -39,9 +38,9 @@ public class NumpadTimePickerDialog extends BaseTimePickerDialog
     private int[] mInputtedDigits;
 
     // Don't need to keep a reference to the dismiss ImageButton
-    @Bind(R.id.input_time) EditText mInputField;
+    @Bind(R.id.input_time) TextView mInputField;
     @Bind(R.id.number_grid) NumpadTimePicker mNumpad;
-    @Bind(R.id.focus_grabber) View mFocusGrabber;
+//    @Bind(R.id.focus_grabber) View mFocusGrabber;
 
     // TODO: We don't need to pass in an initial hour and minute for a new instance.
     @Deprecated
@@ -84,7 +83,7 @@ public class NumpadTimePickerDialog extends BaseTimePickerDialog
         mNumpad.setOnInputChangeListener(this);
         mNumpad.insertDigits(mInputtedDigits); // TOneverDO: before mNumpad.setOnInputChangeListener(this);
         // Show the cursor immediately
-        mInputField.requestFocus();
+//        mInputField.requestFocus();
         // TODO: Disabled color
         //updateInputText(""); // Primarily to disable 'OK'
         return view;
@@ -122,14 +121,14 @@ public class NumpadTimePickerDialog extends BaseTimePickerDialog
     @Override
     public void onInputDisabled() {
         // Steals the focus from the EditText
-        mFocusGrabber.requestFocus();
+//        mFocusGrabber.requestFocus();
     }
 
-    @OnTouch(R.id.input_time)
-    boolean captureTouchOnEditText() {
-        // Capture touch events on the EditText field, because we want it to do nothing.
-        return true;
-    }
+//    @OnTouch(R.id.input_time)
+//    boolean captureTouchOnEditText() {
+//        // Capture touch events on the EditText field, because we want it to do nothing.
+//        return true;
+//    }
 
     // The FAB is not defined directly in this dialog's layout, but rather in the layout
     // of the NumpadTimePicker. We can always reference a child of a ViewGroup that is
@@ -144,11 +143,11 @@ public class NumpadTimePickerDialog extends BaseTimePickerDialog
 
     private void updateInputText(String inputText) {
         TimeTextUtils.setText(inputText, mInputField);
-        // Move the cursor
-        mInputField.setSelection(mInputField.length());
-        if (mFocusGrabber.isFocused()) {
-            // Return focus to the EditText
-            mInputField.requestFocus();
-        }
+//        // Move the cursor
+//        mInputField.setSelection(mInputField.length());
+//        if (mFocusGrabber.isFocused()) {
+//            // Return focus to the EditText
+//            mInputField.requestFocus();
+//        }
     }
 }

@@ -64,7 +64,7 @@ public class ExpandedAlarmViewHolder extends BaseAlarmViewHolder {
         super.bindLabel(true, label);
     }
 
-    @OnClick(R.id.save)
+    @OnClick(R.id.ok)
     void save() {
         // TODO
     }

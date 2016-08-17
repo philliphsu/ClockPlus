@@ -35,14 +35,16 @@
          Leave off the namespace to reference a custom attribute.
          Here, we are referencing the "grid:" namespace -->
         <item name="layout_columnWeight">1</item>
-        <item name="layout_rowWeight">1</item>
+        <!--<item name="layout_rowWeight">1</item>-->
+        <item name="android:layout_height">@dimen/numeric_keypad_cell_height</item>
         <item name="android:background">?android:attr/selectableItemBackground</item>
         <item name="android:gravity">center</item>
     </style>
 
     <!-- TODO: Rename to GridLayout[Text/Button/TextView]? -->
     <style name="GridLayoutNumpadButton" parent="GridLayoutNumpadElement">
-        <item name="android:textSize">@dimen/grid_element_text_size</item>
+        <item name="android:textSize">@dimen/text_size_display_1</item>
+        <item name="android:fontFamily">sans-serif-light</item>
     </style>
 
     <!-- TODO: Replace and Delete -->
