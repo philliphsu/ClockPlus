@@ -23,7 +23,7 @@ public abstract class BaseTimePickerDialog extends BottomSheetDialogFragment {
      * The callback interface used to indicate the user is done filling in
      * the time (they clicked on the 'Set' button).
      */
-    interface OnTimeSetListener {
+    public interface OnTimeSetListener {
         /**
          * @param viewGroup The view associated with this listener.
          * @param hourOfDay The hour that was set.

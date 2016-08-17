@@ -2,18 +2,25 @@ package com.philliphsu.clock2.alarms;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.content.Loader;
+import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 
 import com.philliphsu.clock2.Alarm;
 import com.philliphsu.clock2.AsyncAlarmsTableUpdateHandler;
 import com.philliphsu.clock2.R;
 import com.philliphsu.clock2.RecyclerViewFragment;
-import com.philliphsu.clock2.editalarm.EditAlarmActivity;
+import com.philliphsu.clock2.editalarm.BaseTimePickerDialog;
+import com.philliphsu.clock2.editalarm.NumberGridTimePickerDialog;
+import com.philliphsu.clock2.editalarm.NumpadTimePickerDialog;
 import com.philliphsu.clock2.model.AlarmCursor;
 import com.philliphsu.clock2.model.AlarmsListCursorLoader;
 import com.philliphsu.clock2.util.AlarmController;
@@ -23,15 +30,24 @@ public class AlarmsFragment extends RecyclerViewFragment<
         Alarm,
         BaseAlarmViewHolder,
         AlarmCursor,
-        AlarmsCursorAdapter> implements ScrollHandler { // TODO: Move interface to base class
+        AlarmsCursorAdapter>
+    implements ScrollHandler, // TODO: Move interface to base class
+        BaseTimePickerDialog.OnTimeSetListener {
     private static final String TAG = "AlarmsFragment";
-    private static final int REQUEST_EDIT_ALARM = 0;
-    // Public because MainActivity needs to use it.
-    // TODO: private because we handle fab clicks in the fragment now
-    public static final int REQUEST_CREATE_ALARM = 1;
+    private static final String TAG_TIME_PICKER = "time_picker";
+
+    // TODO: Delete these constants. We no longer use EditAlarmActivity.
+//    @Deprecated
+//    private static final int REQUEST_EDIT_ALARM = 0;
+//    // Public because MainActivity needs to use it.
+//    // TODO: private because we handle fab clicks in the fragment now
+//    @Deprecated
+//    public static final int REQUEST_CREATE_ALARM = 1;
+
+    public static final int REQUEST_PICK_RINGTONE = 1;
 
 //    private AlarmsCursorAdapter mAdapter;
-    private AsyncAlarmsTableUpdateHandler mAsyncAlarmsTableUpdateHandler;
+    private AsyncAlarmsTableUpdateHandler mAsyncUpdateHandler;
     private AlarmController mAlarmController;
     private Handler mHandler = new Handler();
     private View mSnackbarAnchor;
@@ -64,7 +80,7 @@ public class AlarmsFragment extends RecyclerViewFragment<
         // See the Fragment lifecycle.
         mSnackbarAnchor = getActivity().findViewById(R.id.main_content);
         mAlarmController = new AlarmController(getActivity(), mSnackbarAnchor);
-        mAsyncAlarmsTableUpdateHandler = new AsyncAlarmsTableUpdateHandler(getActivity(),
+        mAsyncUpdateHandler = new AsyncAlarmsTableUpdateHandler(getActivity(),
                 mSnackbarAnchor, this, mAlarmController);
     }
 
@@ -90,8 +106,37 @@ public class AlarmsFragment extends RecyclerViewFragment<
 
     @Override
     public void onFabClick() {
-        Intent intent = new Intent(getActivity(), EditAlarmActivity.class);
-        startActivityForResult(intent, REQUEST_CREATE_ALARM);
+//        Intent intent = new Intent(getActivity(), EditAlarmActivity.class);
+//        startActivityForResult(intent, REQUEST_CREATE_ALARM);
+
+        // Close the keyboard first, or else our dialog will be screwed up.
+        // If not open, this does nothing.
+        // TODO: I don't think the keyboard can possibly be open in this Fragment?
+//        hideKeyboard(this); // This is only important for BottomSheetDialogs!
+
+        // Create a new instance each time we want to show the dialog.
+        // If we keep a reference to the dialog, we keep its previous state as well.
+        // So the next time we call show() on it, the input field will show the
+        // last inputted time.
+        BaseTimePickerDialog dialog = null;
+        String numpadStyle = getString(R.string.number_pad);
+        String gridStyle = getString(R.string.grid_selector);
+        String prefTimePickerStyle = PreferenceManager.getDefaultSharedPreferences(getActivity()).getString(
+                // key for the preference value to retrieve
+                getString(R.string.key_time_picker_style),
+                // default value
+                numpadStyle);
+        if (prefTimePickerStyle.equals(numpadStyle)) {
+            dialog = NumpadTimePickerDialog.newInstance(this);
+        } else if (prefTimePickerStyle.equals(gridStyle)) {
+            dialog = NumberGridTimePickerDialog.newInstance(
+                    this, // OnTimeSetListener
+                    0, // Initial hour of day
+                    0, // Initial minute
+                    DateFormat.is24HourFormat(getActivity()));
+        }
+        // DISREGARD THE LINT WARNING ABOUT DIALOG BEING NULL.
+        dialog.show(getFragmentManager(), TAG_TIME_PICKER);
     }
 
     @Nullable
@@ -113,39 +158,47 @@ public class AlarmsFragment extends RecyclerViewFragment<
         Log.d(TAG, "onActivityResult()");
         if (resultCode != Activity.RESULT_OK || data == null)
             return;
-        final Alarm alarm = data.getParcelableExtra(EditAlarmActivity.EXTRA_MODIFIED_ALARM);
-        if (alarm == null)
-            return;
-
-        // http://stackoverflow.com/a/27055512/5055032
-        // "RecyclerView does not run animations in the first layout
-        // pass after being attached." A workaround is to postpone
-        // the CRUD operation to the next frame. A delay of 300ms is
-        // short enough to not be noticeable, and long enough to
-        // give us the animation *most of the time*.
-        switch (requestCode) {
-            case REQUEST_CREATE_ALARM:
-                mHandler.postDelayed(
-                        new AsyncAddItemRunnable(mAsyncAlarmsTableUpdateHandler, alarm),
-                        300);
-                break;
-            case REQUEST_EDIT_ALARM:
-                if (data.getBooleanExtra(EditAlarmActivity.EXTRA_IS_DELETING, false)) {
-                    // TODO: Should we delay this too? It seems animations run
-                    // some of the time.
-                    mAsyncAlarmsTableUpdateHandler.asyncDelete(alarm);
-                } else {
-                    // TODO: Increase the delay, because update animation is
-                    // more elusive than insert.
-                    mHandler.postDelayed(
-                            new AsyncUpdateItemRunnable(mAsyncAlarmsTableUpdateHandler, alarm),
-                            300);
-                }
-                break;
-            default:
-                Log.i(TAG, "Could not handle request code " + requestCode);
-                break;
+        if (requestCode == REQUEST_PICK_RINGTONE) {
+            Uri uri = data.getParcelableExtra(RingtoneManager.EXTRA_RINGTONE_PICKED_URI);
+            Log.d(TAG, "Retrieved ringtone URI: " + uri);
+            // TODO: We'll have to create a new Alarm instance with this ringtone value
+            // because we don't have a setter method. Alternatively, write an independent
+            // SQL update statement updating COLUMN_RINGTONE.
         }
+
+//        final Alarm alarm = data.getParcelableExtra(EditAlarmActivity.EXTRA_MODIFIED_ALARM);
+//        if (alarm == null)
+//            return;
+//
+//        // http://stackoverflow.com/a/27055512/5055032
+//        // "RecyclerView does not run animations in the first layout
+//        // pass after being attached." A workaround is to postpone
+//        // the CRUD operation to the next frame. A delay of 300ms is
+//        // short enough to not be noticeable, and long enough to
+//        // give us the animation *most of the time*.
+//        switch (requestCode) {
+//            case REQUEST_CREATE_ALARM:
+//                mHandler.postDelayed(
+//                        new AsyncAddItemRunnable(mAsyncUpdateHandler, alarm),
+//                        300);
+//                break;
+//            case REQUEST_EDIT_ALARM:
+//                if (data.getBooleanExtra(EditAlarmActivity.EXTRA_IS_DELETING, false)) {
+//                    // TODO: Should we delay this too? It seems animations run
+//                    // some of the time.
+//                    mAsyncUpdateHandler.asyncDelete(alarm);
+//                } else {
+//                    // TODO: Increase the delay, because update animation is
+//                    // more elusive than insert.
+//                    mHandler.postDelayed(
+//                            new AsyncUpdateItemRunnable(mAsyncUpdateHandler, alarm),
+//                            300);
+//                }
+//                break;
+//            default:
+//                Log.i(TAG, "Could not handle request code " + requestCode);
+//                break;
+//        }
     }
 
     @Override
@@ -160,7 +213,7 @@ public class AlarmsFragment extends RecyclerViewFragment<
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////
-    // TODO: Just like with TimersCursorAdapter, we could pass in the mAsyncAlarmsTableUpdateHandler
+    // TODO: Just like with TimersCursorAdapter, we could pass in the mAsyncUpdateHandler
     // to the AlarmsCursorAdapter and call these on the save and delete button click bindings.
 
     @Override
@@ -168,7 +221,7 @@ public class AlarmsFragment extends RecyclerViewFragment<
     public void onListItemDeleted(final Alarm item) {
         // The corresponding VH will be automatically removed from view following
         // the requery, so we don't have to do anything to it.
-        mAsyncAlarmsTableUpdateHandler.asyncDelete(item);
+        mAsyncUpdateHandler.asyncDelete(item);
     }
 
     @Override
@@ -180,7 +233,7 @@ public class AlarmsFragment extends RecyclerViewFragment<
         // TODO: Implement editing in the expanded VH. Then verify that changes
         // while in that VH are saved and updated after the requery.
 //        getAdapter().collapse(position);
-        mAsyncAlarmsTableUpdateHandler.asyncUpdate(item.getId(), item);
+        mAsyncUpdateHandler.asyncUpdate(item.getId(), item);
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -195,6 +248,18 @@ public class AlarmsFragment extends RecyclerViewFragment<
             // at this point, so reset it.
             getAdapter().collapse(position);
         }
+    }
+
+    @Override
+    public void onTimeSet(ViewGroup viewGroup, int hourOfDay, int minute) {
+        // When we request the Builder, default values are provided for us,
+        // which is why we don't have to set the ringtone, label, etc.
+        Alarm alarm = Alarm.builder()
+                .hour(hourOfDay)
+                .minutes(minute)
+                .build();
+        alarm.setEnabled(true);
+        mAsyncUpdateHandler.asyncInsert(alarm);
     }
 
     /////////////////////////////////////////////////////////////////////////////////////

@@ -1,5 +1,7 @@
 package com.philliphsu.clock2.alarms;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.view.View;
@@ -23,7 +25,7 @@ import butterknife.OnClick;
  */
 public class ExpandedAlarmViewHolder extends BaseAlarmViewHolder {
 
-    @Bind(R.id.save) Button mSave;
+    @Bind(R.id.ok) Button mOk;
     @Bind(R.id.delete) Button mDelete;
     @Bind(R.id.ringtone) Button mRingtone;
     @Bind(R.id.vibrate) CheckBox mVibrate;
@@ -41,7 +43,7 @@ public class ExpandedAlarmViewHolder extends BaseAlarmViewHolder {
                 listener.onListItemDeleted(getAlarm());
             }
         });
-        mSave.setOnClickListener(new View.OnClickListener() {
+        mOk.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 listener.onListItemUpdate(getAlarm(), getAdapterPosition());
@@ -74,7 +76,18 @@ public class ExpandedAlarmViewHolder extends BaseAlarmViewHolder {
 
     @OnClick(R.id.ringtone)
     void showRingtonePickerDialog() {
-        // TODO
+        Intent intent = new Intent(RingtoneManager.ACTION_RINGTONE_PICKER);
+        intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE, RingtoneManager.TYPE_ALARM)
+                .putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_SILENT, false)
+                // The ringtone to show as selected when the dialog is opened
+                .putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, Uri.parse(getAlarm().ringtone()))
+                // Whether to show "Default" item in the list
+                .putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_DEFAULT, false);
+        // The ringtone that plays when default option is selected
+        //.putExtra(RingtoneManager.EXTRA_RINGTONE_DEFAULT_URI, DEFAULT_TONE);
+        // TODO: This is VERY BAD. Use a Controller/Presenter instead.
+        // The result will be delivered to MainActivity, and then delegated to AlarmsFragment.
+        ((Activity) getContext()).startActivityForResult(intent, AlarmsFragment.REQUEST_PICK_RINGTONE);
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////

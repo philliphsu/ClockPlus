@@ -52,6 +52,7 @@ import static com.philliphsu.clock2.util.Preconditions.checkNotNull;
  * The class would have the API for editing the alarm, so move all
  * the relevant helper methods from here to there.
  */
+@Deprecated
 public class EditAlarmActivity extends BaseActivity implements
         EditAlarmContract.View, // TODO: Remove @Override from the methods
         AlarmUtilsHelper,
@@ -517,7 +518,7 @@ public class EditAlarmActivity extends BaseActivity implements
                 // The ringtone to show as selected when the dialog is opened
                 .putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, mSelectedRingtoneUri)
                 // Whether to show "Default" item in the list
-                .putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_DEFAULT, false); // TODO: false?
+                .putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_DEFAULT, false);
         // The ringtone that plays when default option is selected
         //.putExtra(RingtoneManager.EXTRA_RINGTONE_DEFAULT_URI, DEFAULT_TONE);
         startActivityForResult(intent, REQUEST_PICK_RINGTONE);
