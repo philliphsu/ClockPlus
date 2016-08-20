@@ -22,10 +22,8 @@ import android.animation.PropertyValuesHolder;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.graphics.Color;
 import android.os.Build;
 import android.support.annotation.AttrRes;
-import android.support.v4.content.ContextCompat;
 import android.text.format.Time;
 import android.util.TypedValue;
 import android.view.View;
@@ -151,37 +149,45 @@ public class Utils {
      * @param context The context to use as reference for the color
      * @return the accent color of the current context
      */
-    // Source from MDTP
-    public static int getAccentColorFromThemeIfAvailable(Context context) {
-        TypedValue typedValue = new TypedValue();
-        // First, try the android:colorAccent
-        if (Build.VERSION.SDK_INT >= 21) {
-            context.getTheme().resolveAttribute(android.R.attr.colorAccent, typedValue, true);
-            return typedValue.data;
-        }
-        // Next, try colorAccent from support lib
-        int colorAccentResId = context.getResources().getIdentifier("colorAccent", "attr", context.getPackageName());
-        if (colorAccentResId != 0 && context.getTheme().resolveAttribute(colorAccentResId, typedValue, true)) {
-            return typedValue.data;
-        }
-
-        return ContextCompat.getColor(context, R.color.accent_color);
+    public static int getThemeAccentColor(Context context) {
+        // Source from MDTP
+//        TypedValue typedValue = new TypedValue();
+//        // First, try the android:colorAccent
+//        if (Build.VERSION.SDK_INT >= 21) {
+//            context.getTheme().resolveAttribute(android.R.attr.colorAccent, typedValue, true);
+//            return typedValue.data;
+//        }
+//        // Next, try colorAccent from support lib
+//        int colorAccentResId = context.getResources().getIdentifier("colorAccent", "attr", context.getPackageName());
+//        if (colorAccentResId != 0 && context.getTheme().resolveAttribute(colorAccentResId, typedValue, true)) {
+//            return typedValue.data;
+//        }
+//
+//        return ContextCompat.getColor(context, R.color.accent_color);
+        return getColorFromThemeAttr(context, R.attr.colorAccent);
     }
 
-    // See http://stackoverflow.com/a/4928826/5055032
-    public static int darkenColor(int color) {
-        float[] hsv = new float[3];
-        Color.colorToHSV(color, hsv);
-        hsv[2] *= 0.8f; // value component
-        return Color.HSVToColor(hsv);
+    public static int getTextColorPrimary(Context context) {
+        // http://stackoverflow.com/a/33839580/5055032
+        final TypedValue value = new TypedValue();
+        context.getTheme().resolveAttribute(android.R.attr.textColorPrimary, value, true);
+        TypedArray a = context.obtainStyledAttributes(value.data,
+                new int[] {android.R.attr.textColorPrimary});
+        final int color = a.getColor(0/*index*/, 0/*defValue*/);
+        a.recycle();
+        return color;
+        // Didn't work! Gave me white!
+//        return getColorFromThemeAttr(context, android.R.attr.textColorPrimary);
     }
 
-    // See http://stackoverflow.com/a/4928826/5055032
-    public static int lightenColor(int color) {
-        float[] hsv = new float[3];
-        Color.colorToHSV(color, hsv);
-        hsv[2] = 1.0f - 0.8f * (1.0f - hsv[2]);
-        return Color.HSVToColor(hsv);
+    /**
+     * @param resId The resource identifier of the desired theme attribute.
+     */
+    public static int getColorFromThemeAttr(Context context, int resId) {
+        // http://stackoverflow.com/a/28777489/5055032
+        final TypedValue value = new TypedValue();
+        context.getTheme().resolveAttribute(resId, value, true);
+        return value.data;
     }
 
     /**

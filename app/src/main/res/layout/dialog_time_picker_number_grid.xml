@@ -23,24 +23,24 @@
                 android:layout_gravity="center" />
         </FrameLayout>
 
-        <android.support.v7.widget.GridLayout
-            android:id="@+id/grid_layout"
+        <com.philliphsu.clock2.editalarm.GridSelectorLayout
+            android:id="@+id/time_picker"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/numpad_height"
+            android:layout_height="@dimen/number_grid_height"
             android:layout_below="@id/time_display_background"
-            app:columnCount="3"
-            android:layout_marginStart="@dimen/bottom_sheet_edge_margin"
-            android:layout_marginEnd="@dimen/bottom_sheet_edge_margin"
+            android:paddingStart="@dimen/bottom_sheet_edge_margin"
+            android:paddingEnd="@dimen/bottom_sheet_edge_margin"
             android:paddingBottom="@dimen/anchored_fab_vertical_space"/>
 
         <View
             android:id="@+id/divider"
             style="@style/Divider.Horizontal"
-            android:layout_below="@id/grid_layout"/>
+            android:layout_below="@id/time_picker"/>
 
         <LinearLayout
+            android:id="@+id/half_day_toggles"
             android:layout_width="match_parent"
-            android:layout_height="48dp"
+            android:layout_height="@dimen/half_day_button_bar_height"
             android:layout_below="@id/divider"
             android:orientation="horizontal">
 
@@ -56,8 +56,7 @@
                     android:layout_height="wrap_content"
                     android:gravity="center"
                     android:layout_gravity="center"
-                    style="@style/TextAppearance.AppCompat.Button"
-                    android:textSize="@dimen/half_day_text_size"/>
+                    style="@style/TextAppearance.AppCompat.Button"/>
 
             </FrameLayout>
 
@@ -73,8 +72,7 @@
                     android:layout_height="wrap_content"
                     android:gravity="center"
                     android:layout_gravity="center"
-                    style="@style/TextAppearance.AppCompat.Button"
-                    android:textSize="@dimen/half_day_text_size"/>
+                    style="@style/TextAppearance.AppCompat.Button"/>
 
             </FrameLayout>
 
@@ -82,6 +80,8 @@
 
     </RelativeLayout>
 
+    <!-- app:borderWidth="0dp"
+    Remove the stroke that is otherwise visible when long pressed -->
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"
         android:layout_width="wrap_content"

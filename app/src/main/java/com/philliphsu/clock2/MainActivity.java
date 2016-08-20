@@ -260,8 +260,11 @@ public class MainActivity extends BaseActivity {
         // has no reference to the AlarmsFragment, but it does have a reference to a
         // Context (which we can cast to Activity). Thus, ExpandedAlarmViewHolder
         // uses Activity#startActivityForResult().
-        mSectionsPagerAdapter.getFragment(mViewPager.getCurrentItem())
-                .onActivityResult(requestCode, resultCode, data);
+
+        // THIS WAS ACTUALLY A BAD IDEA, ESPECIALLY FOR TIMERSFRAGMENT. THIS ENDS UP ADDING
+        // DUPLICATE TIMERS.
+//        mSectionsPagerAdapter.getFragment(mViewPager.getCurrentItem())
+//                .onActivityResult(requestCode, resultCode, data);
     }
 
     @Override

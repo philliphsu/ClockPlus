@@ -7,7 +7,7 @@
         android:id="@+id/primary"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:fontFamily="sans-serif-light"
+        android:fontFamily="sans-serif-condensed-light"
         android:textSize="@dimen/number_grid_24_hour_item_primary_text_size"
         android:includeFontPadding="false"
         style="@style/TextAppearance.AppCompat"/>

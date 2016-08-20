@@ -111,7 +111,7 @@ public class NumbersGridView extends GridLayout {
                     @Override
                     public void onClick(View v) {
                         setNumbers(new int[] {0,5,10,15,20,25,30,35,40,45,50,55}, true);
-                        inflate(getContext(), R.layout.content_number_grid_minute_tuners, NumbersGridView.this);
+                        inflate(getContext(), R.layout.content_minutes_grid, NumbersGridView.this);
                     }
                 });
                 i++;
@@ -145,7 +145,7 @@ public class NumbersGridView extends GridLayout {
         boolean is24HourMode = DateFormat.is24HourFormat(getContext());
         int layout = is24HourMode
                 ? R.layout.content_24h_number_grid
-                : R.layout.content_number_grid;
+                : R.layout.content_hours_grid;
         inflate(getContext(), layout, this);
         if (!is24HourMode) {
             setNumbers(new int[] {1,2,3,4,5,6,7,8,9,10,11,12});

@@ -18,11 +18,10 @@ package com.philliphsu.clock2.editalarm;
 
 import android.animation.ObjectAnimator;
 import android.app.ActionBar.LayoutParams;
+import android.content.res.ColorStateList;
 import android.content.res.Resources;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v7.widget.GridLayout;
 import android.util.Log;
 import android.view.KeyCharacterMap;
 import android.view.KeyEvent;
@@ -36,6 +35,7 @@ import android.widget.TextView;
 
 import com.philliphsu.clock2.R;
 import com.philliphsu.clock2.aospdatetimepicker.Utils;
+import com.philliphsu.clock2.editalarm.GridSelectorLayout.OnValueSelectedListener;
 
 import java.text.DateFormatSymbols;
 import java.util.ArrayList;
@@ -53,8 +53,12 @@ import static com.philliphsu.clock2.util.ConversionUtils.dpToPx;
 
 /**
  * Dialog to set a time.
+ *
+ * A derivative of the AOSP datetimepicker TimePickerDialog class.
+ *
+ * TODO: Rename to GridSelectorTimePickerDialog
  */
-public class NumberGridTimePickerDialog extends BaseTimePickerDialog /*DialogFragment implements OnValueSelectedListener*/{
+public class NumberGridTimePickerDialog extends BaseTimePickerDialog implements OnValueSelectedListener {
     private static final String TAG = "TimePickerDialog";
 
     private static final String KEY_HOUR_OF_DAY = "hour_of_day";
@@ -68,15 +72,16 @@ public class NumberGridTimePickerDialog extends BaseTimePickerDialog /*DialogFra
     public static final int HOUR_INDEX = 0;
     public static final int MINUTE_INDEX = 1;
     // NOT a real index for the purpose of what's showing.
+    // TODO: Rename to HALF_DAY_INDEX?
     public static final int AMPM_INDEX = 2;
     // Also NOT a real index, just used for keyboard mode.
     public static final int ENABLE_PICKER_INDEX = 3;
     /**
-     * TODO: (Me) Use HALF_DAY_1 instead
+     * TODO: Use HALF_DAY_1 instead
      */
     public static final int AM = 0;
     /**
-     * TODO: (Me) Use HALF_DAY_2 instead
+     * TODO: Use HALF_DAY_2 instead
      */
     public static final int PM = 1;
 
@@ -93,7 +98,7 @@ public class NumberGridTimePickerDialog extends BaseTimePickerDialog /*DialogFra
     private TextView mMinuteSpaceView;
     private TextView mAmPmTextView;
     private View mAmPmHitspace;
-//    private RadialPickerLayout mTimePicker;
+    private GridSelectorLayout mTimePicker;
 
     private int mSelectedColor;
     private int mUnselectedColor;
@@ -123,27 +128,18 @@ public class NumberGridTimePickerDialog extends BaseTimePickerDialog /*DialogFra
     private String mSelectMinutes;
 
     // ====================================== MY STUFF =============================================
-    private static final int[] HOURS_12 = {1,2,3,4,5,6,7,8,9,10,11,12};
-    private static final int[] HOURS_24_HALF_DAY_1 = {0,1,2,3,4,5,6,7,8,9,10,11};
-    private static final int[] HOURS_24_HALF_DAY_2 = {12,13,14,15,16,17,18,19,20,21,22,23};
-    private static final int[] MINUTES = {0,5,10,15,20,25,30,35,40,45,50,55};
-    // The delay in ms before a OnLongClick on a TwentyFourHourGridItem defers to OnClick
-    private static final int LONG_CLICK_RESULT_LEEWAY = 150;
     // The padding in dp for the half day icon compound drawable
     public static final int HALF_DAY_ICON_PADDING = 8;
 
-    // TODO: Private?
     // Describes both AM/PM in the 12-hour clock and the half-days of the 24-hour clock.
+    // TODO: Use the *values* of AM and PM instead.
     public static final int HALF_DAY_1 = AM;
     public static final int HALF_DAY_2 = PM;
 
-    private int mCurrentIndex = HOUR_INDEX;
-    private int mSelectedHalfDay = HALF_DAY_1;
-    private int mSelectedHourOfDay;
-    private int mSelectedMinute;
-    private Handler mHandler;
-
-    @Bind(R.id.grid_layout) GridLayout mGridLayout;
+    // TODO: Consider moving these to GridSelectorLayout?
+    // TODO: Consider using findViewById() instead. This could be useful if you plan on
+    // releasing a library with this timepicker, because then we have no dependence on
+    // other third party libraries.
     @Bind(R.id.fab) FloatingActionButton mDoneButton;
     // These are currently defined as Buttons in the dialog's layout,
     // but we refer to them as TextViews to save an extra refactoring
@@ -156,212 +152,69 @@ public class NumberGridTimePickerDialog extends BaseTimePickerDialog /*DialogFra
         return R.layout.dialog_time_picker_number_grid;
     }
 
-    private void setNumberTexts() {
-        if (mCurrentIndex != HOUR_INDEX && mCurrentIndex != MINUTE_INDEX) {
-            Log.e(TAG, "TimePicker does not support view at index "+mCurrentIndex);
-            return;
-        }
-
-        // Set the appropriate texts on each view
-        for (int i = 0; i < mGridLayout.getChildCount(); i++) {
-            View v = mGridLayout.getChildAt(i);
-            if (mCurrentIndex == MINUTE_INDEX || mCurrentIndex == HOUR_INDEX && !mIs24HourMode) {
-                if (!(v instanceof TextView))
-                    return; // Reached the ImageButtons
-                TextView tv = (TextView) v;
-                tv.setText(mCurrentIndex == MINUTE_INDEX
-                        ? String.format("%02d", MINUTES[i])
-                        : String.valueOf(HOURS_12[i]));
-            } else if (mCurrentIndex == HOUR_INDEX && mIs24HourMode) {
-                TwentyFourHourGridItem item = (TwentyFourHourGridItem) v;
-                String s1 = String.format("%02d", HOURS_24_HALF_DAY_1[i]);
-                String s2 = String.valueOf(HOURS_24_HALF_DAY_2[i]);
-                if (mSelectedHalfDay == HALF_DAY_1) {
-                    item.setPrimaryText(s1);
-                    item.setSecondaryText(s2);
-                } else if (mSelectedHalfDay == HALF_DAY_2) {
-                    item.setPrimaryText(s2);
-                    item.setSecondaryText(s1);
-                } else {
-                    Log.e(TAG, "mSelectedHalfDay = " + mSelectedHalfDay + "?");
-                }
-            }
-        }
-    }
-
-    // TODO: boolean animate param???
-    private void setCurrentItemShowing(int index) {
-        if (index != HOUR_INDEX && index != MINUTE_INDEX) {
-            Log.e(TAG, "TimePicker does not support view at index "+index);
-            return;
-        }
-
-        int lastIndex = mCurrentIndex;
-        mCurrentIndex = index;
-
-        if (index != lastIndex) {
-            if (mIs24HourMode) {
-                // Hours layout and normal layout use different Views for their grid items,
-                // so we have to start fresh.
-                mGridLayout.removeAllViews();
-                int layout = index == HOUR_INDEX ? R.layout.content_24h_number_grid : R.layout.content_number_grid;
-                View.inflate(getActivity(), layout, mGridLayout);
-
-                // TOneverDO: call after inflating minute tuner buttons
-                setNumberTexts();
-                setClickListenersOnButtons();
-                //end TOneverDO
-            } else {
-                if (index == HOUR_INDEX) {
-                    // Remove the minute tuners
-                    mGridLayout.removeViews(mGridLayout.getChildCount() - 2, 2);
-                }
-                // We can reuse the existing child Views, just change the texts.
-                // They already have the click listener set.
-                setNumberTexts();
-            }
-
-            if (index == MINUTE_INDEX) {
-                createMinuteTuners();
-            }
-        }
-    }
-
-    private void setClickListenersOnButtons() {
-        for (int i = 0; i < mGridLayout.getChildCount(); i++) {
-            // TODO: Consider leaving out the minute tuner buttons
-            View v = mGridLayout.getChildAt(i);
-            v.setOnClickListener(mOnNumberClickListener);
-            if (v instanceof TwentyFourHourGridItem) {
-                v.setOnLongClickListener(mOn24HourItemLongClickListener);
-            }
-        }
-    }
-
     @OnClick({ R.id.half_day_toggle_1, R.id.half_day_toggle_2 })
     void onHalfDayToggleClick(View v) {
-        int halfDay = v == mLeftHalfDayToggle ? HALF_DAY_1 : HALF_DAY_2;
-        if (halfDay != mSelectedHalfDay) {
-            toggleHalfDay();
+        final int halfDay = v == mLeftHalfDayToggle ? HALF_DAY_1 : HALF_DAY_2;
+        if (halfDay != mTimePicker.getIsCurrentlyAmOrPm()) {
+//            if (currentHalfDay == HALF_DAY_1) {
+//                currentHalfDay = HALF_DAY_2;
+//            } else if (currentHalfDay == HALF_DAY_2) {
+//                currentHalfDay = HALF_DAY_1;
+//            }
+            updateAmPmDisplay(halfDay);
+            mTimePicker.setAmOrPm(halfDay);
         }
     }
 
-    private void toggleHalfDay() {
+//    private void toggleHalfDay() {
 //        int amOrPm = mTimePicker.getIsCurrentlyAmOrPm();
-        int amOrPm = mSelectedHalfDay;
-        // TODO: Use HALF_DAY_1 and 2 instead
-        if (amOrPm == AM) {
-            amOrPm = PM;
-        } else if (amOrPm == PM){
-            amOrPm = AM;
-        }
-        updateAmPmDisplay(amOrPm);
+//        // TODO: Use HALF_DAY_1 and 2 instead
+//        if (amOrPm == AM) {
+//            amOrPm = PM;
+//        } else if (amOrPm == PM){
+//            amOrPm = AM;
+//        }
+//        updateAmPmDisplay(amOrPm);
 //        mTimePicker.setAmOrPm(amOrPm);
-        mSelectedHalfDay = amOrPm;
+//        // TODO: Pretty sure we don't need this
+////        mSelectedHalfDay = amOrPm;
+//
+//        // TODO: Verify the corresponding TwentyFourHourGridItem retains its indicator
+//        // TODO: Don't use mSelectedHourOfDay anymore. Use mTimePicker.getHours()?
+//        if (amOrPm == HALF_DAY_1) {
+//            mSelectedHourOfDay %= 12;
+//        } else if (amOrPm == HALF_DAY_2) {
+//            mSelectedHourOfDay = (mSelectedHourOfDay % 12) + 12;
+//        }
+//        // Updates the header display
+//        onValueSelected(HOUR_INDEX, mSelectedHourOfDay, false);
+//    }
 
-        if (mIs24HourMode) {
-            if (mCurrentIndex == HOUR_INDEX) {
-                for (int i = 0; i < mGridLayout.getChildCount(); i++) {
-                    View v = mGridLayout.getChildAt(i);
-                    ((TwentyFourHourGridItem) v).swapTexts();
-                }
-            }
-        }
-
-        // TODO: Verify the corresponding TwentyFourHourGridItem retains its indicator
-        if (amOrPm == HALF_DAY_1) {
-            mSelectedHourOfDay %= 12;
-        } else if (amOrPm == HALF_DAY_2) {
-            mSelectedHourOfDay = (mSelectedHourOfDay % 12) + 12;
-        }
-        onValueSelected(HOUR_INDEX, mSelectedHourOfDay, false);
-    }
-
-    private void createMinuteTuners() {
-        // https://android-developers.blogspot.com/2009/03/android-layout-tricks-3-optimize-by.html
-        // "When inflating a layout starting with a <merge />, you *must* specify a parent ViewGroup
-        // and you must set attachToRoot to true (see the documentation of the LayoutInflater#inflate() method)"
-        // Note that by passing in a non-null parent, this will pass in true for attachToRoot.
-        View.inflate(getActivity(), R.layout.content_number_grid_minute_tuners, mGridLayout);
-        int childCount = mGridLayout.getChildCount();
-        // The tuner buttons are always the last two children in the grid
-        mGridLayout.getChildAt(childCount - 2).setOnClickListener(mOnDecrementMinuteListener);
-        mGridLayout.getChildAt(childCount - 1).setOnClickListener(mOnIncrementMinuteListener);
-    }
-
-    // TODO: Break this into two OnClickListeners instead--one for normal TextViews and
-    // the other for TwentyFourHourGridItem.
-    // TODO: Set the indicator
-    private final OnClickListener mOnNumberClickListener = new OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            String number;
-            if (v instanceof TextView) {
-                number = ((TextView) v).getText().toString();
-            } else if (v instanceof TwentyFourHourGridItem) {
-                number = ((TwentyFourHourGridItem) v).getPrimaryText().toString();
-            } else {
-                Log.e(TAG, "TimePicker does not support button type " + v.getClass().getName());
-                return;
-            }
-            int value = Integer.parseInt(number);
-            if (mCurrentIndex == HOUR_INDEX && !mIs24HourMode) {
-                if (value == 12 && mSelectedHalfDay == HALF_DAY_1) {
-                    value = 0;
-                } else if (value != 12 && mSelectedHalfDay == HALF_DAY_2) {
-                    value += 12;
-                }
-            }
-            onValueSelected(mCurrentIndex, value, true);
-        }
-    };
-
-    private final View.OnLongClickListener mOn24HourItemLongClickListener = new View.OnLongClickListener() {
-        @Override
-        public boolean onLongClick(final View v) {
-            // TODO: Do we need this if we already check this before setting the listener on the view?
-            if (!(v instanceof TwentyFourHourGridItem))
-                return false;
-            toggleHalfDay();
-            mOnNumberClickListener.onClick(v);
-            return true;
-        }
-    };
-
-    private final OnClickListener mOnIncrementMinuteListener = new OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            // Don't need to check for minute overflow, because setMinute()
-            // sets minute to 0 if we pass in 60
-            onValueSelected(MINUTE_INDEX, mSelectedMinute + 1, false);
-        }
-    };
-
-    private final OnClickListener mOnDecrementMinuteListener = new OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            int value = mSelectedMinute - 1;
-            if (value < 0)
-                value = 59;
-            onValueSelected(MINUTE_INDEX, value, false);
-        }
-    };
+//    private final OnClickListener mOnNumberClickListener = new OnClickListener() {
+//        @Override
+//        public void onClick(View v) {
+//            String number;
+//            if (v instanceof TextView) {
+//                number = ((TextView) v).getText().toString();
+//            } else if (v instanceof TwentyFourHourGridItem) {
+//                number = ((TwentyFourHourGridItem) v).getPrimaryText().toString();
+//            } else {
+//                Log.e(TAG, "TimePicker does not support button type " + v.getClass().getName());
+//                return;
+//            }
+//            int value = Integer.parseInt(number);
+//            if (mCurrentIndex == HOUR_INDEX && !mIs24HourMode) {
+//                if (value == 12 && mSelectedHalfDay == HALF_DAY_1) {
+//                    value = 0;
+//                } else if (value != 12 && mSelectedHalfDay == HALF_DAY_2) {
+//                    value += 12;
+//                }
+//            }
+//            onValueSelected(mCurrentIndex, value, true);
+//        }
+//    };
 
     // =============================================================================================
-
-//    /**
-//     * The callback interface used to indicate the user is done filling in
-//     * the time (they clicked on the 'Set' button).
-//     */
-//    public interface OnTimeSetListener {
-//
-//        /**
-//         * @param view The view associated with this listener.
-//         * @param hourOfDay The hour that was set.
-//         * @param minute The minute that was set.
-//         */
-//        void onTimeSet(RadialPickerLayout view, int hourOfDay, int minute);
-//    }
 
     public NumberGridTimePickerDialog() {
         // Empty constructor required for dialog fragment.
@@ -379,23 +232,6 @@ public class NumberGridTimePickerDialog extends BaseTimePickerDialog /*DialogFra
         return ret;
     }
 
-    /**
-     * @param timeFieldIndex The index representing the time field whose values, ranging from its natural
-     *                       lower and upper limits, will be presented as choices in the GridLayout
-     *                       contained in this dialog's layout. Must be one of {@link #HOUR_INDEX}
-     *                       or {@link #MINUTE_INDEX}. TODO: Why do we need this?
-     * @param initialHalfDay The half-day, a.k.a. AM/PM for 12-hour time, that this picker should be
-     *                       initialized to. Must be one of {@link #HALF_DAY_1} or {@link #HALF_DAY_2}.
-     *                       TODO: Why do we need this?
-     */
-    @Deprecated
-    public static NumberGridTimePickerDialog newInstance(int timeFieldIndex, int initialHalfDay) {
-        NumberGridTimePickerDialog dialog = new NumberGridTimePickerDialog();
-        dialog.mCurrentIndex = timeFieldIndex;
-        dialog.mSelectedHalfDay = initialHalfDay;
-        return dialog;
-    }
-
     public void initialize(OnTimeSetListener callback,
             int hourOfDay, int minute, boolean is24HourMode) {
         mCallback = callback; // TODO: Use setOnTimeSetListener() instead?
@@ -405,8 +241,6 @@ public class NumberGridTimePickerDialog extends BaseTimePickerDialog /*DialogFra
         mIs24HourMode = is24HourMode;
         mInKbMode = false;
         mThemeDark = false;
-
-        mSelectedHalfDay = hourOfDay < 12 ? HALF_DAY_1 : HALF_DAY_2;
     }
 
     /**
@@ -420,6 +254,7 @@ public class NumberGridTimePickerDialog extends BaseTimePickerDialog /*DialogFra
         return mThemeDark;
     }
 
+    // Defined as final in our base class.
 //    public void setOnTimeSetListener(OnTimeSetListener callback) {
 //        mCallback = callback;
 //    }
@@ -433,16 +268,13 @@ public class NumberGridTimePickerDialog extends BaseTimePickerDialog /*DialogFra
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // The Activity is created at this point
-//        mIs24HourMode = DateFormat.is24HourFormat(getActivity());
-        mHandler = new Handler();
         if (savedInstanceState != null && savedInstanceState.containsKey(KEY_HOUR_OF_DAY)
                     && savedInstanceState.containsKey(KEY_MINUTE)
                     && savedInstanceState.containsKey(KEY_IS_24_HOUR_VIEW)) {
             mInitialHourOfDay = savedInstanceState.getInt(KEY_HOUR_OF_DAY);
             mInitialMinute = savedInstanceState.getInt(KEY_MINUTE);
             mIs24HourMode = savedInstanceState.getBoolean(KEY_IS_24_HOUR_VIEW);
-//            mInKbMode = savedInstanceState.getBoolean(KEY_IN_KB_MODE);
+            mInKbMode = savedInstanceState.getBoolean(KEY_IN_KB_MODE);
             mThemeDark = savedInstanceState.getBoolean(KEY_DARK_THEME);
         }
     }
@@ -458,23 +290,16 @@ public class NumberGridTimePickerDialog extends BaseTimePickerDialog /*DialogFra
 
         View view = super.onCreateView(inflater, container, savedInstanceState);
 
-        // Inflate the buttons into the grid
-        int layout = mIs24HourMode ? R.layout.content_24h_number_grid : R.layout.content_number_grid;
-        View.inflate(getActivity(), layout, mGridLayout);
-        setNumberTexts();
-        setClickListenersOnButtons();
-        if (mCurrentIndex == MINUTE_INDEX) {
-            createMinuteTuners();
-        }
-
         Resources res = getResources();
         mHourPickerDescription = res.getString(R.string.hour_picker_description);
         mSelectHours = res.getString(R.string.select_hours);
         mMinutePickerDescription = res.getString(R.string.minute_picker_description);
         mSelectMinutes = res.getString(R.string.select_minutes);
-        mSelectedColor = res.getColor(mThemeDark? R.color.red : R.color.blue);
-        mUnselectedColor =
-                res.getColor(mThemeDark? android.R.color.white : R.color.numbers_text_color);
+//        mSelectedColor = res.getColor(mThemeDark? R.color.red : R.color.blue);
+//        mUnselectedColor =
+//                res.getColor(mThemeDark? android.R.color.white : R.color.numbers_text_color);
+        mSelectedColor = res.getColor(android.R.color.white);
+        mUnselectedColor = res.getColor(R.color.unselected_color);
 
         mHourView = (TextView) view.findViewById(R.id.hours);
 //        mHourView.setOnKeyListener(keyboardListener);
@@ -506,12 +331,11 @@ public class NumberGridTimePickerDialog extends BaseTimePickerDialog /*DialogFra
         }
 
 //        mHapticFeedbackController = new HapticFeedbackController(getActivity());
-
-//        mTimePicker = (RadialPickerLayout) view.findViewById(R.id.time_picker);
-//        mTimePicker.setOnValueSelectedListener(this);
+        mTimePicker = (GridSelectorLayout) view.findViewById(R.id.time_picker);
+        mTimePicker.setOnValueSelectedListener(this);
 //        mTimePicker.setOnKeyListener(keyboardListener);
-//        mTimePicker.initialize(getActivity(), mHapticFeedbackController, mInitialHourOfDay,
-//            mInitialMinute, mIs24HourMode);
+        mTimePicker.initialize(getActivity(), /*mHapticFeedbackController,*/ mInitialHourOfDay,
+            mInitialMinute, mIs24HourMode);
 
         int currentItemShowing = HOUR_INDEX;
         if (savedInstanceState != null &&
@@ -519,7 +343,7 @@ public class NumberGridTimePickerDialog extends BaseTimePickerDialog /*DialogFra
             currentItemShowing = savedInstanceState.getInt(KEY_CURRENT_ITEM_SHOWING);
         }
         setCurrentItemShowing(currentItemShowing, false, true, true);
-//        mTimePicker.invalidate();
+        mTimePicker.invalidate();
 
         mHourView.setOnClickListener(new OnClickListener() {
             @Override
@@ -537,6 +361,7 @@ public class NumberGridTimePickerDialog extends BaseTimePickerDialog /*DialogFra
         });
 
 //        mDoneButton = (TextView) view.findViewById(R.id.done_button);
+        // This is our FAB.
         mDoneButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -545,12 +370,8 @@ public class NumberGridTimePickerDialog extends BaseTimePickerDialog /*DialogFra
                 } else {
                     tryVibrate();
                 }
-                Log.i(TAG, String.format("Selected time is %02d:%02d", mSelectedHourOfDay, mSelectedMinute));
                 if (mCallback != null) {
-//                    mCallback.onTimeSet(mTimePicker, mTimePicker.getHours(), mTimePicker.getMinutes());
-                    // I don't think the listener actually uses the first param passed back,
-                    // so passing null is fine.
-                    mCallback.onTimeSet(null, mSelectedHourOfDay, mSelectedMinute);
+                    mCallback.onTimeSet(mTimePicker, mTimePicker.getHours(), mTimePicker.getMinutes());
                 }
                 dismiss();
             }
@@ -574,15 +395,14 @@ public class NumberGridTimePickerDialog extends BaseTimePickerDialog /*DialogFra
                 @Override
                 public void onClick(View v) {
                     tryVibrate();
-//                    int amOrPm = mTimePicker.getIsCurrentlyAmOrPm();
-//                    if (amOrPm == AM) {
-//                        amOrPm = PM;
-//                    } else if (amOrPm == PM){
-//                        amOrPm = AM;
-//                    }
-//                    updateAmPmDisplay(amOrPm);
-//                    mTimePicker.setAmOrPm(amOrPm);
-                    toggleHalfDay();
+                    int amOrPm = mTimePicker.getIsCurrentlyAmOrPm();
+                    if (amOrPm == AM) {
+                        amOrPm = PM;
+                    } else if (amOrPm == PM){
+                        amOrPm = AM;
+                    }
+                    updateAmPmDisplay(amOrPm);
+                    mTimePicker.setAmOrPm(amOrPm);
                 }
             });
         }
@@ -606,30 +426,44 @@ public class NumberGridTimePickerDialog extends BaseTimePickerDialog /*DialogFra
         }
 
         // Set the theme at the end so that the initialize()s above don't counteract the theme.
-//        mTimePicker.setTheme(getActivity().getApplicationContext(), mThemeDark);
+        mTimePicker.setTheme(getActivity().getApplicationContext(), mThemeDark);
         // Prepare some colors to use.
         int white = res.getColor(android.R.color.white);
-//        int circleBackground = res.getColor(R.color.circle_background);
-//        int line = res.getColor(R.color.line_background);
+        int circleBackground = res.getColor(R.color.circle_background);
+        int line = res.getColor(R.color.line_background);
         int timeDisplay = res.getColor(R.color.numbers_text_color);
+        // TODO: Port the AOSP timepicker files that contain these resources.
 //        ColorStateList doneTextColor = res.getColorStateList(R.color.done_text_color);
 //        int doneBackground = R.drawable.done_background_color;
 
         int darkGray = res.getColor(R.color.dark_gray);
-//        int lightGray = res.getColor(R.color.light_gray);
-//        int darkLine = res.getColor(R.color.line_dark);
+        int lightGray = res.getColor(R.color.light_gray);
+        int darkLine = res.getColor(R.color.line_dark);
+        // TODO: Port the AOSP timepicker files that contain these resources.
 //        ColorStateList darkDoneTextColor = res.getColorStateList(R.color.done_text_color_dark);
 //        int darkDoneBackground = R.drawable.done_background_color_dark;
 
+        // My colors
+        int accentColor = Utils.getThemeAccentColor(getContext());
+
         // Set the colors for each view based on the theme.
-        view.findViewById(R.id.time_display_background).setBackgroundColor(mThemeDark? darkGray : white);
-        view.findViewById(R.id.time_display).setBackgroundColor(mThemeDark? darkGray : white);
-        ((TextView) view.findViewById(R.id.separator)).setTextColor(mThemeDark? white : timeDisplay);
-        ((TextView) view.findViewById(R.id.ampm_label)).setTextColor(mThemeDark? white : timeDisplay);
+        view.findViewById(R.id.time_display_background).setBackgroundColor(mThemeDark? lightGray : accentColor);
+        view.findViewById(R.id.time_display).setBackgroundColor(mThemeDark? lightGray : accentColor);
+        ((TextView) view.findViewById(R.id.separator)).setTextColor(/*mThemeDark? white : timeDisplay*/mUnselectedColor);
+        ((TextView) view.findViewById(R.id.ampm_label)).setTextColor(/*mThemeDark? white : timeDisplay*/mUnselectedColor);
 //        view.findViewById(R.id.line).setBackgroundColor(mThemeDark? darkLine : line);
 //        mDoneButton.setTextColor(mThemeDark? darkDoneTextColor : doneTextColor);
-//        mTimePicker.setBackgroundColor(mThemeDark? lightGray : circleBackground);
+        // The AOSP timepicker originally uses these colors for the CircleView
+        mTimePicker.setBackgroundColor(mThemeDark? /*lightGray : circleBackground*/ darkGray : white);
 //        mDoneButton.setBackgroundResource(mThemeDark? darkDoneBackground : doneBackground);
+        // http://stackoverflow.com/a/32031019/5055032
+        // Color in normal state
+        mDoneButton.setBackgroundTintList(ColorStateList.valueOf(accentColor));
+        // Color in pressed state. A ripple expands outwards from the point of contact throughout
+        // the fab when it is long pressed.
+//        mDoneButton.setRippleColor(/*your color here*/);
+        view.findViewById(R.id.half_day_toggles).setBackgroundColor(mThemeDark? /*lightGray : circleBackground*/ darkGray : white);
+
         return view;
     }
 
@@ -652,11 +486,11 @@ public class NumberGridTimePickerDialog extends BaseTimePickerDialog /*DialogFra
     private void updateAmPmDisplay(int amOrPm) {
         if (amOrPm == AM) {
             mAmPmTextView.setText(mAmText);
-//            Utils.tryAccessibilityAnnounce(mTimePicker, mAmText);
+            Utils.tryAccessibilityAnnounce(mTimePicker, mAmText);
             mAmPmHitspace.setContentDescription(mAmText);
         } else if (amOrPm == PM){
             mAmPmTextView.setText(mPmText);
-//            Utils.tryAccessibilityAnnounce(mTimePicker, mPmText);
+            Utils.tryAccessibilityAnnounce(mTimePicker, mPmText);
             mAmPmHitspace.setContentDescription(mPmText);
         } else {
             mAmPmTextView.setText(mDoublePlaceholderText);
@@ -665,28 +499,23 @@ public class NumberGridTimePickerDialog extends BaseTimePickerDialog /*DialogFra
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-//        if (mTimePicker != null) {
-//            outState.putInt(KEY_HOUR_OF_DAY, mTimePicker.getHours());
-//            outState.putInt(KEY_MINUTE, mTimePicker.getMinutes());
-//            outState.putBoolean(KEY_IS_24_HOUR_VIEW, mIs24HourMode);
-//            outState.putInt(KEY_CURRENT_ITEM_SHOWING, mTimePicker.getCurrentItemShowing());
-//            outState.putBoolean(KEY_IN_KB_MODE, mInKbMode);
-//            if (mInKbMode) {
-//                outState.putIntegerArrayList(KEY_TYPED_TIMES, mTypedTimes);
-//            }
-//            outState.putBoolean(KEY_DARK_THEME, mThemeDark);
-//        }
-        outState.putInt(KEY_HOUR_OF_DAY, mSelectedHourOfDay);
-        outState.putInt(KEY_MINUTE, mSelectedMinute);
-        outState.putBoolean(KEY_IS_24_HOUR_VIEW, mIs24HourMode);
-        outState.putInt(KEY_CURRENT_ITEM_SHOWING, mCurrentIndex);
-        outState.putBoolean(KEY_DARK_THEME, mThemeDark);
+        if (mTimePicker != null) {
+            outState.putInt(KEY_HOUR_OF_DAY, mTimePicker.getHours());
+            outState.putInt(KEY_MINUTE, mTimePicker.getMinutes());
+            outState.putBoolean(KEY_IS_24_HOUR_VIEW, mIs24HourMode);
+            outState.putInt(KEY_CURRENT_ITEM_SHOWING, mTimePicker.getCurrentItemShowing());
+            outState.putBoolean(KEY_IN_KB_MODE, mInKbMode);
+            if (mInKbMode) {
+                outState.putIntegerArrayList(KEY_TYPED_TIMES, mTypedTimes);
+            }
+            outState.putBoolean(KEY_DARK_THEME, mThemeDark);
+        }
     }
 
-//    /**
-//     * Called by the picker for updating the header display.
-//     */
-//    @Override
+    /**
+     * Called by the picker for updating the header display.
+     */
+    @Override
     public void onValueSelected(int pickerIndex, int newValue, boolean autoAdvance) {
         if (pickerIndex == HOUR_INDEX) {
             setHour(newValue, false);
@@ -695,13 +524,13 @@ public class NumberGridTimePickerDialog extends BaseTimePickerDialog /*DialogFra
                 setCurrentItemShowing(MINUTE_INDEX, true, true, false);
                 announcement += ". " + mSelectMinutes;
             } else {
-//                mTimePicker.setContentDescription(mHourPickerDescription + ": " + newValue);
+                mTimePicker.setContentDescription(mHourPickerDescription + ": " + newValue);
             }
 
-//            Utils.tryAccessibilityAnnounce(mTimePicker, announcement);
+            Utils.tryAccessibilityAnnounce(mTimePicker, announcement);
         } else if (pickerIndex == MINUTE_INDEX){
             setMinute(newValue);
-//            mTimePicker.setContentDescription(mMinutePickerDescription + ": " + newValue);
+            mTimePicker.setContentDescription(mMinutePickerDescription + ": " + newValue);
         } else if (pickerIndex == AMPM_INDEX) {
             updateAmPmDisplay(newValue);
         } else if (pickerIndex == ENABLE_PICKER_INDEX) {
@@ -713,9 +542,6 @@ public class NumberGridTimePickerDialog extends BaseTimePickerDialog /*DialogFra
     }
 
     private void setHour(int value, boolean announce) {
-        // TOneverDO: Set after if-else block (modulo operation changes value!)
-        mSelectedHourOfDay = value;
-
         String format;
         if (mIs24HourMode) {
             format = "%02d";
@@ -731,7 +557,7 @@ public class NumberGridTimePickerDialog extends BaseTimePickerDialog /*DialogFra
         mHourView.setText(text);
         mHourSpaceView.setText(text);
         if (announce) {
-//            Utils.tryAccessibilityAnnounce(mTimePicker, text);
+            Utils.tryAccessibilityAnnounce(mTimePicker, text);
         }
     }
 
@@ -740,37 +566,33 @@ public class NumberGridTimePickerDialog extends BaseTimePickerDialog /*DialogFra
             value = 0;
         }
         CharSequence text = String.format(Locale.getDefault(), "%02d", value);
-//        Utils.tryAccessibilityAnnounce(mTimePicker, text);
+        Utils.tryAccessibilityAnnounce(mTimePicker, text);
         mMinuteView.setText(text);
         mMinuteSpaceView.setText(text);
-
-        // Setting this here is fine.
-        mSelectedMinute = value;
     }
 
     // Show either Hours or Minutes.
     private void setCurrentItemShowing(int index, boolean animateCircle, boolean delayLabelAnimate,
             boolean announce) {
-//        mTimePicker.setCurrentItemShowing(index, animateCircle);
-        setCurrentItemShowing(index);
+        mTimePicker.setCurrentItemShowing(index, animateCircle);
 
         TextView labelToAnimate;
         if (index == HOUR_INDEX) {
-//            int hours = mTimePicker.getHours();
-//            if (!mIs24HourMode) {
-//                hours = hours % 12;
-//            }
-//            mTimePicker.setContentDescription(mHourPickerDescription + ": " + hours);
-//            if (announce) {
-//                Utils.tryAccessibilityAnnounce(mTimePicker, mSelectHours);
-//            }
+            int hours = mTimePicker.getHours();
+            if (!mIs24HourMode) {
+                hours = hours % 12;
+            }
+            mTimePicker.setContentDescription(mHourPickerDescription + ": " + hours);
+            if (announce) {
+                Utils.tryAccessibilityAnnounce(mTimePicker, mSelectHours);
+            }
             labelToAnimate = mHourView;
         } else {
-//            int minutes = mTimePicker.getMinutes();
-//            mTimePicker.setContentDescription(mMinutePickerDescription + ": " + minutes);
-//            if (announce) {
-//                Utils.tryAccessibilityAnnounce(mTimePicker, mSelectMinutes);
-//            }
+            int minutes = mTimePicker.getMinutes();
+            mTimePicker.setContentDescription(mMinutePickerDescription + ": " + minutes);
+            if (announce) {
+                Utils.tryAccessibilityAnnounce(mTimePicker, mSelectMinutes);
+            }
             labelToAnimate = mMinuteView;
         }
 
