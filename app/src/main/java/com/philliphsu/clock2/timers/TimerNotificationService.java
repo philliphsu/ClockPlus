@@ -93,7 +93,7 @@ public class TimerNotificationService extends Service {
     private void showNotification() {
         // Base note
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
-                .setSmallIcon(R.drawable.ic_half_day_1_black_24dp) // TODO: correct icon
+                .setSmallIcon(R.drawable.ic_half_day_1_24dp) // TODO: correct icon
                 .setShowWhen(false)
                 .setOngoing(true);
         // TODO: Set content intent so that when clicked, we launch

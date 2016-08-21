@@ -54,7 +54,7 @@ public class AlarmActivity extends RingtoneActivity<Alarm> {
     @Override
     protected int getAutoSilencedDrawable() {
         // TODO: correct icon
-        return R.drawable.ic_half_day_1_black_24dp;
+        return R.drawable.ic_half_day_1_24dp;
     }
 
     @Override

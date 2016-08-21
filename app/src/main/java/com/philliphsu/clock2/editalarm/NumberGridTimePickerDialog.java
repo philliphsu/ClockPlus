@@ -22,6 +22,7 @@ import android.content.res.ColorStateList;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.KeyCharacterMap;
 import android.view.KeyEvent;
@@ -127,6 +128,9 @@ public class NumberGridTimePickerDialog extends BaseTimePickerDialog implements 
     private String mMinutePickerDescription;
     private String mSelectMinutes;
 
+    private int mHalfDayToggleSelectedColor;
+    private int mHalfDayToggleUnselectedColor;
+
     // ====================================== MY STUFF =============================================
     // The padding in dp for the half day icon compound drawable
     public static final int HALF_DAY_ICON_PADDING = 8;
@@ -163,6 +167,7 @@ public class NumberGridTimePickerDialog extends BaseTimePickerDialog implements 
 //            }
             updateAmPmDisplay(halfDay);
             mTimePicker.setAmOrPm(halfDay);
+            updateHalfDayTogglesState(halfDay);
         }
     }
 
@@ -319,11 +324,13 @@ public class NumberGridTimePickerDialog extends BaseTimePickerDialog implements 
             tv1.setText("00 - 11");
             // Intrinsic bounds meaning the drawable's own bounds? So 24dp box.
             tv1.setCompoundDrawablesWithIntrinsicBounds(
-                    R.drawable.ic_half_day_1_black_24dp, 0, 0, 0);
+                    mThemeDark? R.drawable.ic_half_day_1_dark_24dp : R.drawable.ic_half_day_1_24dp,
+                    0, 0, 0);
             tv1.setCompoundDrawablePadding((int) dpToPx(getActivity(), HALF_DAY_ICON_PADDING));
             tv2.setText("12 - 23");
             tv2.setCompoundDrawablesWithIntrinsicBounds(
-                    R.drawable.ic_half_day_2_black_24dp, 0, 0, 0);
+                    mThemeDark? R.drawable.ic_half_day_2_dark_24dp : R.drawable.ic_half_day_2_24dp,
+                    0, 0, 0);
             tv2.setCompoundDrawablePadding((int) dpToPx(getActivity(), HALF_DAY_ICON_PADDING));
         } else {
             tv1.setText(mAmText);
@@ -452,18 +459,33 @@ public class NumberGridTimePickerDialog extends BaseTimePickerDialog implements 
         ((TextView) view.findViewById(R.id.separator)).setTextColor(/*mThemeDark? white : timeDisplay*/mUnselectedColor);
         ((TextView) view.findViewById(R.id.ampm_label)).setTextColor(/*mThemeDark? white : timeDisplay*/mUnselectedColor);
 //        view.findViewById(R.id.line).setBackgroundColor(mThemeDark? darkLine : line);
+        // TODO: darkLine is 12% white, but it shows up like 100% white. We have replaced
+        // darkLine with lightGray for now. Figure out why and come back to replace
+        // lightGray with darkLine.
+        view.findViewById(R.id.divider).setBackgroundColor(mThemeDark? lightGray : line);
 //        mDoneButton.setTextColor(mThemeDark? darkDoneTextColor : doneTextColor);
         // The AOSP timepicker originally uses these colors for the CircleView
         mTimePicker.setBackgroundColor(mThemeDark? /*lightGray : circleBackground*/ darkGray : white);
 //        mDoneButton.setBackgroundResource(mThemeDark? darkDoneBackground : doneBackground);
+
+        // Set the color on the FAB
         // http://stackoverflow.com/a/32031019/5055032
         // Color in normal state
         mDoneButton.setBackgroundTintList(ColorStateList.valueOf(accentColor));
         // Color in pressed state. A ripple expands outwards from the point of contact throughout
         // the fab when it is long pressed.
 //        mDoneButton.setRippleColor(/*your color here*/);
-        view.findViewById(R.id.half_day_toggles).setBackgroundColor(mThemeDark? /*lightGray : circleBackground*/ darkGray : white);
 
+        // Set the color on the half-day toggles
+        view.findViewById(R.id.half_day_toggles).setBackgroundColor(mThemeDark? /*lightGray : circleBackground*/ darkGray : white);
+        mHalfDayToggleSelectedColor = accentColor;
+//        mHalfDayToggleUnselectedColor = Utils.getTextColorFromThemeAttr(getContext(),
+//                // The colors are in the correct order, which happens to be the reverse of the order
+//                // used in the NumbersGrids...
+//                mThemeDark? android.R.attr.textColorPrimaryInverse : android.R.attr.textColorPrimary);
+        mHalfDayToggleUnselectedColor = ContextCompat.getColor(getContext(),
+                mThemeDark? R.color.text_color_primary_dark : R.color.text_color_primary_light);
+        updateHalfDayTogglesState(mTimePicker.getIsCurrentlyAmOrPm());
         return view;
     }
 
@@ -494,6 +516,25 @@ public class NumberGridTimePickerDialog extends BaseTimePickerDialog implements 
             mAmPmHitspace.setContentDescription(mPmText);
         } else {
             mAmPmTextView.setText(mDoublePlaceholderText);
+        }
+    }
+
+    /**
+     * Update the indicator of the toggle buttons to show the given half-day as selected.
+     * @param halfDay the half-day that should be shown as selected
+     */
+    private void updateHalfDayTogglesState(int halfDay) {
+        TextView leftHalfDayToggle = (TextView) mLeftHalfDayToggle.getChildAt(0);
+        TextView rightHalfDayToggle = (TextView) mRightHalfDayToggle.getChildAt(0);
+        switch (halfDay) {
+            case HALF_DAY_1:
+                leftHalfDayToggle.setTextColor(mHalfDayToggleSelectedColor);
+                rightHalfDayToggle.setTextColor(mHalfDayToggleUnselectedColor);
+                break;
+            case HALF_DAY_2:
+                rightHalfDayToggle.setTextColor(mHalfDayToggleSelectedColor);
+                leftHalfDayToggle.setTextColor(mHalfDayToggleUnselectedColor);
+                break;
         }
     }
 
@@ -533,6 +574,7 @@ public class NumberGridTimePickerDialog extends BaseTimePickerDialog implements 
             mTimePicker.setContentDescription(mMinutePickerDescription + ": " + newValue);
         } else if (pickerIndex == AMPM_INDEX) {
             updateAmPmDisplay(newValue);
+            updateHalfDayTogglesState(newValue);
         } else if (pickerIndex == ENABLE_PICKER_INDEX) {
             if (!isTypedTimeFullyLegal()) {
                 mTypedTimes.clear();

@@ -167,12 +167,13 @@ public class Utils {
         return getColorFromThemeAttr(context, R.attr.colorAccent);
     }
 
-    public static int getTextColorPrimary(Context context) {
+    public static int getTextColorFromThemeAttr(Context context, int resid) {
         // http://stackoverflow.com/a/33839580/5055032
-        final TypedValue value = new TypedValue();
-        context.getTheme().resolveAttribute(android.R.attr.textColorPrimary, value, true);
-        TypedArray a = context.obtainStyledAttributes(value.data,
-                new int[] {android.R.attr.textColorPrimary});
+//        final TypedValue value = new TypedValue();
+//        context.getTheme().resolveAttribute(resid, value, true);
+//        TypedArray a = context.obtainStyledAttributes(value.data,
+//                new int[] {resid});
+        TypedArray a = context.getTheme().obtainStyledAttributes(new int[] {resid});
         final int color = a.getColor(0/*index*/, 0/*defValue*/);
         a.recycle();
         return color;

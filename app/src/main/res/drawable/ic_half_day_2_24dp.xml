@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- http://stackoverflow.com/a/8716798/5055032 -->
+<rotate xmlns:android="http://schemas.android.com/apk/res/android"
+    android:fromDegrees="180"
+    android:toDegrees="180"
+    android:pivotX="50%"
+    android:pivotY="50%"
+    android:drawable="@drawable/ic_half_day_1_24dp">
+</rotate>

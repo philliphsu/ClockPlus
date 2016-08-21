@@ -17,7 +17,7 @@
 <resources>
 
     <color name="circle_background">#f2f2f2</color>
-    <color name="line_background">#cccccc</color>
+    <color name="line_background">#1f000000</color> <!--12% black. Originally #cccccc-->
     <color name="ampm_text_color">#8c8c8c</color>
     <color name="done_text_color_normal">#000000</color>
     <color name="done_text_color_disabled">#cccccc</color>
@@ -38,13 +38,17 @@
     <!-- Colors for red theme -->
     <color name="red">#ff3333</color>
     <color name="red_focused">#853333</color>
-    <color name="light_gray">#424242</color> <!--Grey 800. Originally #404040-->
+    <color name="light_gray">#303030</color> <!--800 < Grey < 900. Originally #404040-->
     <color name="dark_gray">#212121</color> <!--Grey 900. Originally #363636-->
-    <color name="line_dark">#808080</color>
+    <color name="line_dark">#1fffffff</color> <!--12% white. Originally #808080-->
     <color name="done_text_color_dark_normal">#ffffff</color>
     <color name="done_text_color_dark_disabled">#888888</color>
     <color name="done_disabled_dark">#bfbfbf</color>
 
     <!--My stuff-->
-    <color name="unselected_color">#a2ffffff</color><!--63%-64% white-->
+    <color name="unselected_color">#80ffffff</color><!--50% white-->
+    <color name="text_color_primary_dark">#ffffffff</color> <!--100% white-->
+    <color name="text_color_primary_light">#de000000</color> <!--87% black-->
+    <color name="text_color_secondary_dark">#b3ffffff</color> <!--70% white-->
+    <color name="text_color_secondary_light">#8a000000</color> <!--54% black-->
 </resources>

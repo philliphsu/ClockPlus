@@ -34,7 +34,7 @@
             android:id="@+id/auto_silenced_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:drawableTop="@drawable/ic_half_day_1_black_24dp"
+            android:drawableTop="@drawable/ic_half_day_1_24dp"
             android:drawablePadding="8dp"
             android:text="@string/alarm_auto_silenced_text"
             style="@style/TextAppearance.AppCompat.Large.Inverse"

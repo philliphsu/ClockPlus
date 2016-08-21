@@ -5,5 +5,5 @@
     android:toDegrees="180"
     android:pivotX="50%"
     android:pivotY="50%"
-    android:drawable="@drawable/ic_half_day_1_black_24dp">
+    android:drawable="@drawable/ic_half_day_2_dark_24dp">
 </rotate>

@@ -182,13 +182,21 @@ public class GridSelectorLayout extends FrameLayout implements NumbersGrid.OnNum
 
     @Override
     public void onNumberSelected(int number) {
-        if (getCurrentItemShowing() == HOUR_INDEX && !mIs24HourMode) {
-            // Change the value before passing it through the callback
-            int amOrPm = getIsCurrentlyAmOrPm();
-            if (amOrPm == HALF_DAY_1 && number == 12) {
-                number = 0;
-            } else if (amOrPm == HALF_DAY_2 && number != 12) {
-                number += 12;
+        if (getCurrentItemShowing() == HOUR_INDEX) {
+            if (!mIs24HourMode) {
+                // Change the value before passing it through the callback
+                int amOrPm = getIsCurrentlyAmOrPm();
+                if (amOrPm == HALF_DAY_1 && number == 12) {
+                    number = 0;
+                } else if (amOrPm == HALF_DAY_2 && number != 12) {
+                    number += 12;
+                }
+            } else {
+                // Check if we would be changing half-days with the new value
+                if (mCurrentHoursOfDay < 12 && number >= 12 || mCurrentHoursOfDay >= 12 && number < 12) {
+                    int newHalfDay = getIsCurrentlyAmOrPm() == HALF_DAY_1 ? HALF_DAY_2 : HALF_DAY_1;
+                    mListener.onValueSelected(AMPM_INDEX, newHalfDay, false);
+                }
             }
         }
 

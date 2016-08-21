@@ -60,6 +60,14 @@ public class TwentyFourHourGridItem extends LinearLayout {
         setSecondaryText(primary);
     }
 
+    public TextView getPrimaryTextView() {
+        return (TextView) getChildAt(0);
+    }
+
+    public TextView getSecondaryTextView() {
+        return (TextView) getChildAt(1);
+    }
+
     private void init() {
         setOrientation(VERTICAL);
         setGravity(Gravity.CENTER);
