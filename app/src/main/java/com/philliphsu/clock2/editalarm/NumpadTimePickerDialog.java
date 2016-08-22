@@ -59,7 +59,7 @@ public class NumpadTimePickerDialog extends BaseTimePickerDialog
         NumpadTimePickerDialog ret = new NumpadTimePickerDialog();
         // TODO: Do these in initialize()
         ret.setOnTimeSetListener(callback);
-        ret.mThemeDark = false;
+        ret.mThemeDark = true;
         return ret;
     }
 

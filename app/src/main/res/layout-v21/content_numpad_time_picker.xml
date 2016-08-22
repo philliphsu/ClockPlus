@@ -22,7 +22,6 @@
         app:layout_column="1"
         app:srcCompat="@drawable/ic_done_24dp"
         app:borderWidth="0dp"
-        app:elevation="0dp"
         android:layout_marginBottom="@dimen/numeric_keypad_fab_bottom_margin"/>
 
     <ImageButton

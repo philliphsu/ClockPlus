@@ -1,21 +1,24 @@
 package com.philliphsu.clock2.editalarm;
 
+import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.support.annotation.IntDef;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.text.format.DateFormat;
 import android.util.AttributeSet;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.philliphsu.clock2.R;
 import com.philliphsu.clock2.aospdatetimepicker.Utils;
-import com.philliphsu.clock2.util.ConversionUtils;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -66,6 +69,9 @@ public class NumpadTimePicker extends GridLayoutNumpad {
     private int mFabDisabledColorDark;
     private int mFabDisabledColorLight;
 
+    @Nullable
+    private final ObjectAnimator mElevationAnimator;
+
     /**
      * Provides additional APIs to configure clients' display output.
      */
@@ -78,12 +84,22 @@ public class NumpadTimePicker extends GridLayoutNumpad {
     }
 
     public NumpadTimePicker(Context context) {
-        super(context);
-        init();
+        this(context, null);
     }
 
     public NumpadTimePicker(Context context, AttributeSet attrs) {
         super(context, attrs);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            mElevationAnimator = ObjectAnimator.ofFloat(mFab, "elevation",
+                    getResources().getDimension(R.dimen.fab_elevation))
+                    .setDuration(200);
+            mElevationAnimator.setInterpolator(new DecelerateInterpolator());
+        } else {
+            // Only animate the elevation for 21+ because changing elevation on pre-21
+            // shifts the FAB slightly up/down. For that reason, pre-21 has elevation
+            // permanently set to 0 (in XML).
+            mElevationAnimator = null;
+        }
         init();
     }
 
@@ -447,14 +463,27 @@ public class NumpadTimePicker extends GridLayoutNumpad {
         // correct accent color in XML. Also because I don't want to programmatically create a
         // ColorStateList.
         int color;
-        // TODO: Animate elevation property "compatElevation"
         if (mFab.isEnabled()) {
             color = mAccentColor;
-            mFab.setCompatElevation(ConversionUtils.dpToPx(getContext(), 6));
+            if (mElevationAnimator != null) {
+                mElevationAnimator.start();
+            }
         } else {
             color = mThemeDark? mFabDisabledColorDark : mFabDisabledColorLight;
-            mFab.setCompatElevation(0);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                if (mElevationAnimator != null && mElevationAnimator.isRunning()) {
+                    // Otherwise, eclipse will show.
+                    mElevationAnimator.end();
+                }
+                // No animation, otherwise we'll see eclipsing.
+                mFab.setElevation(0);
+            }
         }
+        // TODO: How can we animate the background color? There is a ObjectAnimator.ofArgb()
+        // method, but that uses color ints as values. What we'd really need is something like
+        // ColorStateLists as values. There is an ObjectAnimator.ofObject(), but I don't know
+        // how that works. There is also a ValueAnimator.ofInt(), which doesn't need a
+        // target object.
         mFab.setBackgroundTintList(ColorStateList.valueOf(color));
     }
 
