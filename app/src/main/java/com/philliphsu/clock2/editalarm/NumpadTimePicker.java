@@ -1,8 +1,12 @@
 package com.philliphsu.clock2.editalarm;
 
 import android.content.Context;
+import android.content.res.ColorStateList;
+import android.graphics.drawable.Drawable;
 import android.support.annotation.IntDef;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.graphics.drawable.DrawableCompat;
 import android.text.format.DateFormat;
 import android.util.AttributeSet;
 import android.widget.Button;
@@ -10,6 +14,8 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.philliphsu.clock2.R;
+import com.philliphsu.clock2.aospdatetimepicker.Utils;
+import com.philliphsu.clock2.util.ConversionUtils;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -55,6 +61,11 @@ public class NumpadTimePicker extends GridLayoutNumpad {
     @Bind(R.id.fab) FloatingActionButton mFab;
     @Bind(R.id.backspace) ImageButton mBackspace;
 
+    private boolean mThemeDark;
+    private int mAccentColor;
+    private int mFabDisabledColorDark;
+    private int mFabDisabledColorLight;
+
     /**
      * Provides additional APIs to configure clients' display output.
      */
@@ -75,7 +86,53 @@ public class NumpadTimePicker extends GridLayoutNumpad {
         super(context, attrs);
         init();
     }
-    
+
+    @Override
+    void setTheme(Context context, boolean themeDark) {
+        super.setTheme(context, themeDark);
+        mThemeDark = themeDark;
+
+        // So, we kept the 0-9 buttons as TextViews, but here we kept
+        // the alt buttons as actual Buttons...
+        for (Button b : mAltButtons) {
+            b.setTextColor(mColors);
+        }
+
+        // Get a mutable instance of the drawable, so we only affect this instance.
+        // This is especially useful when you need to modify properties of drawables loaded from
+        // resources. By default, all drawables instances loaded from the same resource share a
+        // common state; if you modify the state of one instance, all the other instances will
+        // receive the same modification.
+        // TODO: What is the VectorDrawable counterpart for this process?
+        Drawable backspaceDrawable = mBackspace.getDrawable().mutate();
+        // Wrap drawable so that it may be used for tinting across the different
+        // API levels, via the tinting methods in this class.
+        backspaceDrawable = DrawableCompat.wrap(backspaceDrawable);
+        // Prepare the tints
+        ColorStateList colorBackspace = ContextCompat.getColorStateList(context,
+                themeDark? R.color.icon_color_dark : R.color.icon_color);
+        DrawableCompat.setTintList(backspaceDrawable, colorBackspace);
+        mBackspace.setImageDrawable(backspaceDrawable);
+
+        // TODO: What is the VectorDrawable counterpart for this process?
+        Drawable iconDrawable = mFab.getDrawable().mutate();
+        iconDrawable = DrawableCompat.wrap(iconDrawable);
+        ColorStateList colorIcon = ContextCompat.getColorStateList(context,
+                themeDark? R.color.icon_color_dark : R.color.fab_icon_color);
+        DrawableCompat.setTintList(iconDrawable, colorIcon);
+        mFab.setImageDrawable(iconDrawable);
+
+        // this.getContext() ==> default teal accent color
+        // application context ==> white
+        // The Context that was passed in is NumpadTimePickerDialog.getContext() which
+        // is probably the host Activity. I have no idea what this.getContext() returns,
+        // but its probably some internal type that isn't tied to any of our application
+        // components.
+        mAccentColor = Utils.getThemeAccentColor(context);
+        // Make sure the dark theme disabled color shows up initially
+        updateFabState();
+    }
+
     @Override
     public int capacity() {
         return MAX_DIGITS;
@@ -255,6 +312,9 @@ public class NumpadTimePicker extends GridLayoutNumpad {
     }
 
     private void init() {
+        mFabDisabledColorDark = ContextCompat.getColor(getContext(), R.color.fab_disabled_dark);
+        mFabDisabledColorLight = ContextCompat.getColor(getContext(), R.color.fab_disabled_light);
+        // TODO: We should have the user pass in is24HourMode when they create an instance of the dialog.
         if (DateFormat.is24HourFormat(getContext())) {
             mAltButtons[0].setText(R.string.left_alt_24hr);
             mAltButtons[1].setText(R.string.right_alt_24hr);
@@ -383,6 +443,19 @@ public class NumpadTimePicker extends GridLayoutNumpad {
 
     private void updateFabState() {
         mFab.setEnabled(checkTimeValid());
+        // Workaround for mFab.setBackgroundTintList() because I don't know how to reference the
+        // correct accent color in XML. Also because I don't want to programmatically create a
+        // ColorStateList.
+        int color;
+        // TODO: Animate elevation property "compatElevation"
+        if (mFab.isEnabled()) {
+            color = mAccentColor;
+            mFab.setCompatElevation(ConversionUtils.dpToPx(getContext(), 6));
+        } else {
+            color = mThemeDark? mFabDisabledColorDark : mFabDisabledColorLight;
+            mFab.setCompatElevation(0);
+        }
+        mFab.setBackgroundTintList(ColorStateList.valueOf(color));
     }
 
     private void updateBackspaceState() {

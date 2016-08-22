@@ -14,6 +14,7 @@ import butterknife.ButterKnife;
  * Created by Phillip Hsu on 7/16/2016.
  */
 public abstract class BaseTimePickerDialog extends BottomSheetDialogFragment {
+    private static final String TAG = "BaseTimePickerDialog";
 
     // TODO: Consider private access, and then writing package/protected API that subclasses
     // can use to interface with this field.
@@ -53,8 +54,58 @@ public abstract class BaseTimePickerDialog extends BottomSheetDialogFragment {
 //        getDialog().getWindow().requestFeature(Window.FEATURE_NO_TITLE);
         final View view = inflater.inflate(contentLayout(), container, false);
         ButterKnife.bind(this, view);
+
+        // TODO: We could move this to onCreateDialog() if we cared.
+        //
+        // onShow() is called immediately as this DialogFragment is showing, so the
+        // FAB's animation will barely be noticeable.
+//        getDialog().setOnShowListener(new DialogInterface.OnShowListener() {
+//            @Override
+//            public void onShow(DialogInterface dialog) {
+//                Log.i(TAG, "onShow()");
+//                // Animate the FAB into view
+//                View v = view.findViewById(R.id.fab);
+//                if (v != null) {
+//                    FloatingActionButton fab = (FloatingActionButton) v;
+//                    fab.show();
+//                }
+//            }
+//        });
+
         return view;
     }
+
+//    @Override
+//    public void onResume() {
+//        super.onResume();
+//        final View view = getView();
+//        final BottomSheetBehavior behavior = BottomSheetBehavior.from((View) view.getParent());
+//        // Copy over the internal callback logic, and also implement our own
+//        //
+//        // This callback is set AFTER this Fragment has become visible, so is useless for what
+//        // you wanted to do (show the FAB during the settling phase).
+//        behavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
+//            @Override
+//            public void onStateChanged(@NonNull View bottomSheet, int newState) {
+//                Log.i(TAG, "onStateChanged(): " + newState);
+//                if (newState == BottomSheetBehavior.STATE_HIDDEN) {
+//                    dismiss();
+//                }
+//                // My logic below
+//                else if (newState == BottomSheetBehavior.STATE_SETTLING) {
+//                    View fab = view.findViewById(R.id.fab);
+//                    if (fab != null) {
+//                        ((FloatingActionButton) fab).show();
+//                    }
+//                }
+//            }
+//
+//            @Override
+//            public void onSlide(@NonNull View bottomSheet, float slideOffset) {
+//
+//            }
+//        });
+//    }
 
     @Override
     public void onDestroyView() {

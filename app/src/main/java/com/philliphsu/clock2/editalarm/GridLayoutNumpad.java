@@ -1,8 +1,10 @@
 package com.philliphsu.clock2.editalarm;
 
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.support.annotation.CallSuper;
 import android.support.annotation.LayoutRes;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.GridLayout;
 import android.util.AttributeSet;
 import android.view.View;
@@ -23,6 +25,10 @@ import butterknife.OnClick;
  * Unlike Numpad, this class only manages the logic for number button clicks
  * and not the backspace button. However, we do provide an API for removing
  * digits from the input.
+ *
+ * TODO: Is NumpadTimePicker the only subclass? If so, why do we need this
+ * superclass? If we move the contents of this class to NumpadTimePicker,
+ * the implementation of setTheme() would make more sense.
  */
 public abstract class GridLayoutNumpad extends GridLayout {
     // TODO: change to private?
@@ -32,6 +38,8 @@ public abstract class GridLayoutNumpad extends GridLayout {
     private int[] mInput;
     private int mCount = 0;
     private OnInputChangeListener mOnInputChangeListener;
+
+    ColorStateList mColors;
 
     @Bind({ R.id.zero, R.id.one, R.id.two, R.id.three, R.id.four,
             R.id.five, R.id.six, R.id.seven, R.id.eight, R.id.nine })
@@ -62,6 +70,24 @@ public abstract class GridLayoutNumpad extends GridLayout {
     public GridLayoutNumpad(Context context, AttributeSet attrs) {
         super(context, attrs);
         init();
+    }
+
+    void setTheme(Context context, boolean themeDark) {
+        // Since the Dialog class already set the background color of its entire view tree,
+        // our background is already colored. Why did we set it in the Dialog class? Because
+        // we use margins around the numpad, and if we had instead set the background on
+        // this numpad here, the margins will not be colored. Why not use padding instead
+        // of margins? It turns out we tried that--replacing each margin attribute
+        // with the padding counterpart--but we lost the pre-21 FAB inherent bottom margin.
+
+        // The buttons are actually of type Button, but we kept references
+        // to them as TextViews... which is fine since TextView is the superclass
+        // of Button.
+        mColors = ContextCompat.getColorStateList(context,
+                themeDark? R.color.numeric_keypad_button_text_dark : R.color.numeric_keypad_button_text);
+        for (TextView b : mButtons) {
+            b.setTextColor(mColors);
+        }
     }
 
     /**

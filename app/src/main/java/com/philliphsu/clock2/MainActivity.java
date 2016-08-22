@@ -52,6 +52,11 @@ public class MainActivity extends BaseActivity {
     @Bind(R.id.fab)
     FloatingActionButton mFab;
 
+//    // https://medium.com/@chrisbanes/appcompat-v23-2-age-of-the-vectors-91cbafa87c88#.141274xy8
+//    // This is needed to load vector drawables from 23.4.0
+//    static {
+//        AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
+//    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

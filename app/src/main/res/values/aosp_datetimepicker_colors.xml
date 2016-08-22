@@ -51,4 +51,17 @@
     <color name="text_color_primary_light">#de000000</color> <!--87% black-->
     <color name="text_color_secondary_dark">#b3ffffff</color> <!--70% white-->
     <color name="text_color_secondary_light">#8a000000</color> <!--54% black-->
+    <color name="text_color_disabled_dark">#80ffffff</color> <!--50% white TODO: same as unselected_color-->
+    <color name="text_color_disabled_light">#61000000</color> <!--38% black-->
+
+    <!-- Derived from Raised Button section of the guidelines. Make sure to set FAB elevation to 0dp! -->
+    <color name="fab_disabled_dark">#1fffffff</color> <!--12% white-->
+    <color name="fab_disabled_light">#1f000000</color> <!--12% black-->
+
+    <color name="icon_color_active_dark">#ffffffff</color> <!--100% white-->
+    <color name="icon_color_active_light">#8a000000</color> <!--54% black-->
+    <!-- TODO: This value is from the Icons page. The Colors page lists 50% white for "Icons and other elements". -->
+    <color name="icon_color_inactive_dark">#4dffffff</color> <!--30% white-->
+    <!-- TODO: This value is from the Icons page. The Colors page lists 38% black for "Icons and other elements". -->
+    <color name="icon_color_inactive_light">#42000000</color> <!--26% black-->
 </resources>

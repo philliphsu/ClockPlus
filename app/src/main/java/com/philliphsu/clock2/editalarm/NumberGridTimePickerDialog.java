@@ -470,6 +470,13 @@ public class NumberGridTimePickerDialog extends BaseTimePickerDialog implements 
 
         // Set the color on the FAB
         // http://stackoverflow.com/a/32031019/5055032
+        // *****************************************************************************************
+        // NOTE: IF YOU DECIDE TO MOVE THE FAB AND THE HALF DAY TOGGLES TO THE GRIDSELECTORLAYOUT
+        // CLASS, YOU SHOULD CHANGE THE CONTEXT PASSED TO GridSelectorLayout#setTheme() FROM THE
+        // APPLICATION CONTEXT TO THE LOCAL CONTEXT. OTHERWISE, IT WOULD NOT BE ABLE TO RETRIEVE
+        // THE CORRECT ACCENT COLOR. WE ALREADY FACED THIS ISSUE WITH THE NUMPADTIMEPICKERDIALOG.
+        // DO A CTRL+F FOR mTimePicker.setTheme FOR THE CODE IN DISCUSSION.
+        // *****************************************************************************************
         // Color in normal state
         mDoneButton.setBackgroundTintList(ColorStateList.valueOf(accentColor));
         // Color in pressed state. A ripple expands outwards from the point of contact throughout

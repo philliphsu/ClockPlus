@@ -10,6 +10,9 @@ android {
         targetSdkVersion 23
         versionCode 1
         versionName "1.0"
+        // Disabled for now because we're not ready to
+        // completely port over to vector drawables
+//        vectorDrawables.useSupportLibrary = true
     }
     buildTypes {
         release {

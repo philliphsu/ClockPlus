@@ -1,12 +1,14 @@
 package com.philliphsu.clock2.editalarm;
 
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.philliphsu.clock2.R;
+import com.philliphsu.clock2.aospdatetimepicker.Utils;
 
 import butterknife.Bind;
 import butterknife.OnClick;
@@ -36,6 +38,7 @@ public class NumpadTimePickerDialog extends BaseTimePickerDialog
      * depends on the dialog to save its state.
      */
     private int[] mInputtedDigits;
+    private boolean mThemeDark;
 
     // Don't need to keep a reference to the dismiss ImageButton
     @Bind(R.id.input_time) TextView mInputField;
@@ -54,7 +57,9 @@ public class NumpadTimePickerDialog extends BaseTimePickerDialog
     // TODO: is24HourMode param
     public static NumpadTimePickerDialog newInstance(OnTimeSetListener callback) {
         NumpadTimePickerDialog ret = new NumpadTimePickerDialog();
+        // TODO: Do these in initialize()
         ret.setOnTimeSetListener(callback);
+        ret.mThemeDark = false;
         return ret;
     }
 
@@ -65,6 +70,17 @@ public class NumpadTimePickerDialog extends BaseTimePickerDialog
         mInitialHourOfDay = hourOfDay;
         mInitialMinute = minute;
         mIs24HourMode = is24HourMode;
+    }
+
+    /**
+     * Set a dark or light theme. NOTE: this will only take effect for the next onCreateView.
+     */
+    public void setThemeDark(boolean dark) {
+        mThemeDark = dark;
+    }
+
+    public boolean isThemeDark() {
+        return mThemeDark;
     }
 
     @Override
@@ -84,8 +100,24 @@ public class NumpadTimePickerDialog extends BaseTimePickerDialog
         mNumpad.insertDigits(mInputtedDigits); // TOneverDO: before mNumpad.setOnInputChangeListener(this);
         // Show the cursor immediately
 //        mInputField.requestFocus();
-        // TODO: Disabled color
         //updateInputText(""); // Primarily to disable 'OK'
+
+        // Prepare colors
+        int accentColor = Utils.getThemeAccentColor(getContext());
+        int lightGray = ContextCompat.getColor(getContext(), R.color.light_gray);
+        int darkGray = ContextCompat.getColor(getContext(), R.color.dark_gray);
+        int white = ContextCompat.getColor(getContext(), android.R.color.white);
+
+        // Set background color of entire view
+        view.setBackgroundColor(mThemeDark? darkGray : white);
+
+        TextView inputTime = (TextView) view.findViewById(R.id.input_time);
+        inputTime.setBackgroundColor(mThemeDark? lightGray : accentColor);
+        inputTime.setTextColor(ContextCompat.getColor(getContext(), android.R.color.white));
+
+        mNumpad.setTheme(getContext()/*DO NOT GIVE THE APPLICATION CONTEXT, OR ELSE THE NUMPAD
+        CAN'T GET THE CORRECT ACCENT COLOR*/, mThemeDark);
+
         return view;
     }
 
