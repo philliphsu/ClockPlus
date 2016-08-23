@@ -3,13 +3,11 @@ package com.philliphsu.clock2.editalarm;
 import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.content.res.ColorStateList;
-import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.support.annotation.IntDef;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.graphics.drawable.DrawableCompat;
 import android.text.format.DateFormat;
 import android.util.AttributeSet;
 import android.view.animation.DecelerateInterpolator;
@@ -114,29 +112,13 @@ public class NumpadTimePicker extends GridLayoutNumpad {
             b.setTextColor(mColors);
         }
 
-        // Get a mutable instance of the drawable, so we only affect this instance.
-        // This is especially useful when you need to modify properties of drawables loaded from
-        // resources. By default, all drawables instances loaded from the same resource share a
-        // common state; if you modify the state of one instance, all the other instances will
-        // receive the same modification.
-        // TODO: What is the VectorDrawable counterpart for this process?
-        Drawable backspaceDrawable = mBackspace.getDrawable().mutate();
-        // Wrap drawable so that it may be used for tinting across the different
-        // API levels, via the tinting methods in this class.
-        backspaceDrawable = DrawableCompat.wrap(backspaceDrawable);
-        // Prepare the tints
         ColorStateList colorBackspace = ContextCompat.getColorStateList(context,
                 themeDark? R.color.icon_color_dark : R.color.icon_color);
-        DrawableCompat.setTintList(backspaceDrawable, colorBackspace);
-        mBackspace.setImageDrawable(backspaceDrawable);
+        Utils.setTintList(mBackspace, mBackspace.getDrawable(), colorBackspace);
 
-        // TODO: What is the VectorDrawable counterpart for this process?
-        Drawable iconDrawable = mFab.getDrawable().mutate();
-        iconDrawable = DrawableCompat.wrap(iconDrawable);
         ColorStateList colorIcon = ContextCompat.getColorStateList(context,
                 themeDark? R.color.icon_color_dark : R.color.fab_icon_color);
-        DrawableCompat.setTintList(iconDrawable, colorIcon);
-        mFab.setImageDrawable(iconDrawable);
+        Utils.setTintList(mFab, mFab.getDrawable(), colorIcon);
 
         // this.getContext() ==> default teal accent color
         // application context ==> white

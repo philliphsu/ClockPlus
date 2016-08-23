@@ -21,12 +21,21 @@ import android.animation.ObjectAnimator;
 import android.animation.PropertyValuesHolder;
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.support.annotation.AttrRes;
+import android.support.annotation.ColorInt;
+import android.support.annotation.DrawableRes;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.graphics.drawable.DrawableCompat;
 import android.text.format.Time;
 import android.util.TypedValue;
 import android.view.View;
+import android.widget.ImageView;
 
 import com.philliphsu.clock2.R;
 
@@ -189,6 +198,51 @@ public class Utils {
         final TypedValue value = new TypedValue();
         context.getTheme().resolveAttribute(resId, value, true);
         return value.data;
+    }
+
+    /**
+     * Mutates the given drawable, applies the specified tint list, and sets this tinted
+     * drawable on the target ImageView.
+     *
+     * @param target the ImageView that should have the tinted drawable set on
+     * @param drawable the drawable to tint
+     * @param tintList Color state list to use for tinting this drawable, or null to clear the tint
+     */
+    public static void setTintList(ImageView target, Drawable drawable, ColorStateList tintList) {
+        // TODO: What is the VectorDrawable counterpart for this process?
+        // Use a mutable instance of the drawable, so we only affect this instance.
+        // This is especially useful when you need to modify properties of drawables loaded from
+        // resources. By default, all drawables instances loaded from the same resource share a
+        // common state; if you modify the state of one instance, all the other instances will
+        // receive the same modification.
+        // Wrap drawable so that it may be used for tinting across the different
+        // API levels, via the tinting methods in this class.
+        drawable = DrawableCompat.wrap(drawable.mutate());
+        DrawableCompat.setTintList(drawable, tintList);
+        target.setImageDrawable(drawable);
+    }
+
+    /**
+     * Returns a tinted drawable from the given drawable resource, if {@code tintList != null}.
+     * Otherwise, no tint will be applied.
+     */
+    public static Drawable getTintedDrawable(@NonNull Context context,
+                                             @DrawableRes int drawableRes,
+                                             @Nullable ColorStateList tintList) {
+        Drawable d = DrawableCompat.wrap(ContextCompat.getDrawable(context, drawableRes).mutate());
+        DrawableCompat.setTintList(d, tintList);
+        return d;
+    }
+
+    /**
+     * Returns a tinted drawable from the given drawable resource and color resource.
+     */
+    public static Drawable getTintedDrawable(@NonNull Context context,
+                                             @DrawableRes int drawableRes,
+                                             @ColorInt int colorInt) {
+        Drawable d = DrawableCompat.wrap(ContextCompat.getDrawable(context, drawableRes).mutate());
+        DrawableCompat.setTint(d, colorInt);
+        return d;
     }
 
     /**

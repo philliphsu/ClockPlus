@@ -1,10 +1,12 @@
 package com.philliphsu.clock2.editalarm;
 
 import android.content.Context;
+import android.support.v4.content.ContextCompat;
 import android.view.View;
 import android.widget.ImageButton;
 
 import com.philliphsu.clock2.R;
+import com.philliphsu.clock2.aospdatetimepicker.Utils;
 
 /**
  * Created by Phillip Hsu on 8/17/2016.
@@ -52,8 +54,21 @@ public class MinutesGrid extends NumbersGrid {
     @Override
     void setTheme(Context context, boolean themeDark) {
         super.setTheme(context, themeDark);
-        mMinusButton.setImageResource(themeDark? R.drawable.ic_minus_circle_dark_24dp : R.drawable.ic_minus_circle_24dp);
-        mPlusButton.setImageResource(themeDark? R.drawable.ic_add_circle_dark_24dp : R.drawable.ic_add_circle_24dp);
+        if (themeDark) {
+            // Resources default to dark-themed color (#FFFFFF)
+            // If vector fill color is transparent, programmatically tinting will not work.
+            // Since dark-themed active icon color is fully opaque, use that color as the
+            // base color and tint at runtime as needed.
+            mMinusButton.setImageResource(R.drawable.ic_minus_circle_24dp);
+            mPlusButton.setImageResource(R.drawable.ic_add_circle_24dp);
+        } else {
+            // Tint drawables
+            final int colorActiveLight = ContextCompat.getColor(context, R.color.icon_color_active_light);
+            mMinusButton.setImageDrawable(Utils.getTintedDrawable(
+                    context, R.drawable.ic_minus_circle_24dp, colorActiveLight));
+            mPlusButton.setImageDrawable(Utils.getTintedDrawable(
+                    context, R.drawable.ic_add_circle_24dp, colorActiveLight));
+        }
     }
 
     /**

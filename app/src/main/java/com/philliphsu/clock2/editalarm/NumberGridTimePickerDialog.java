@@ -45,8 +45,6 @@ import java.util.Locale;
 import butterknife.Bind;
 import butterknife.OnClick;
 
-import static com.philliphsu.clock2.util.ConversionUtils.dpToPx;
-
 //import com.android.datetimepicker.HapticFeedbackController;
 //import com.android.datetimepicker.R;
 //import com.android.datetimepicker.Utils;
@@ -132,8 +130,6 @@ public class NumberGridTimePickerDialog extends BaseTimePickerDialog implements 
     private int mHalfDayToggleUnselectedColor;
 
     // ====================================== MY STUFF =============================================
-    // The padding in dp for the half day icon compound drawable
-    public static final int HALF_DAY_ICON_PADDING = 8;
 
     // Describes both AM/PM in the 12-hour clock and the half-days of the 24-hour clock.
     // TODO: Use the *values* of AM and PM instead.
@@ -245,7 +241,7 @@ public class NumberGridTimePickerDialog extends BaseTimePickerDialog implements 
         mInitialMinute = minute;
         mIs24HourMode = is24HourMode;
         mInKbMode = false;
-        mThemeDark = false;
+        mThemeDark = true;
     }
 
     /**
@@ -321,17 +317,20 @@ public class NumberGridTimePickerDialog extends BaseTimePickerDialog implements 
         TextView tv1 = (TextView) mLeftHalfDayToggle.getChildAt(0);
         TextView tv2 = (TextView) mRightHalfDayToggle.getChildAt(0);
         if (mIs24HourMode) {
+            final int iconPadding = getResources().getDimensionPixelSize(R.dimen.half_day_icon_padding);
             tv1.setText("00 - 11");
             // Intrinsic bounds meaning the drawable's own bounds? So 24dp box.
+            // We need different drawable resources for each case, not a single one that we
+            // just tint differently, because the orientation of each one is different.
             tv1.setCompoundDrawablesWithIntrinsicBounds(
                     mThemeDark? R.drawable.ic_half_day_1_dark_24dp : R.drawable.ic_half_day_1_24dp,
                     0, 0, 0);
-            tv1.setCompoundDrawablePadding((int) dpToPx(getActivity(), HALF_DAY_ICON_PADDING));
+            tv1.setCompoundDrawablePadding(iconPadding);
             tv2.setText("12 - 23");
             tv2.setCompoundDrawablesWithIntrinsicBounds(
                     mThemeDark? R.drawable.ic_half_day_2_dark_24dp : R.drawable.ic_half_day_2_24dp,
                     0, 0, 0);
-            tv2.setCompoundDrawablePadding((int) dpToPx(getActivity(), HALF_DAY_ICON_PADDING));
+            tv2.setCompoundDrawablePadding(iconPadding);
         } else {
             tv1.setText(mAmText);
             tv2.setText(mPmText);
