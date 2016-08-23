@@ -241,7 +241,7 @@ public class NumberGridTimePickerDialog extends BaseTimePickerDialog implements 
         mInitialMinute = minute;
         mIs24HourMode = is24HourMode;
         mInKbMode = false;
-        mThemeDark = true;
+        mThemeDark = false;
     }
 
     /**
@@ -453,18 +453,17 @@ public class NumberGridTimePickerDialog extends BaseTimePickerDialog implements 
         int accentColor = Utils.getThemeAccentColor(getContext());
 
         // Set the colors for each view based on the theme.
+        view.setBackgroundColor(mThemeDark? darkGray : white);
         view.findViewById(R.id.time_display_background).setBackgroundColor(mThemeDark? lightGray : accentColor);
         view.findViewById(R.id.time_display).setBackgroundColor(mThemeDark? lightGray : accentColor);
         ((TextView) view.findViewById(R.id.separator)).setTextColor(/*mThemeDark? white : timeDisplay*/mUnselectedColor);
         ((TextView) view.findViewById(R.id.ampm_label)).setTextColor(/*mThemeDark? white : timeDisplay*/mUnselectedColor);
 //        view.findViewById(R.id.line).setBackgroundColor(mThemeDark? darkLine : line);
-        // TODO: darkLine is 12% white, but it shows up like 100% white. We have replaced
-        // darkLine with lightGray for now. Figure out why and come back to replace
-        // lightGray with darkLine.
-        view.findViewById(R.id.divider).setBackgroundColor(mThemeDark? lightGray : line);
+        view.findViewById(R.id.divider).setBackgroundColor(mThemeDark? darkLine : line);
 //        mDoneButton.setTextColor(mThemeDark? darkDoneTextColor : doneTextColor);
         // The AOSP timepicker originally uses these colors for the CircleView
-        mTimePicker.setBackgroundColor(mThemeDark? /*lightGray : circleBackground*/ darkGray : white);
+        // We already set the correct background color of the entire view tree.
+//        mTimePicker.setBackgroundColor(mThemeDark? /*lightGray : circleBackground*/ darkGray : white);
 //        mDoneButton.setBackgroundResource(mThemeDark? darkDoneBackground : doneBackground);
 
         // Set the color on the FAB
@@ -483,7 +482,8 @@ public class NumberGridTimePickerDialog extends BaseTimePickerDialog implements 
 //        mDoneButton.setRippleColor(/*your color here*/);
 
         // Set the color on the half-day toggles
-        view.findViewById(R.id.half_day_toggles).setBackgroundColor(mThemeDark? /*lightGray : circleBackground*/ darkGray : white);
+        // We already set the correct background color of the entire view tree.
+//        view.findViewById(R.id.half_day_toggles).setBackgroundColor(mThemeDark? /*lightGray : circleBackground*/ darkGray : white);
         mHalfDayToggleSelectedColor = accentColor;
 //        mHalfDayToggleUnselectedColor = Utils.getTextColorFromThemeAttr(getContext(),
 //                // The colors are in the correct order, which happens to be the reverse of the order

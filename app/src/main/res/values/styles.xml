@@ -85,6 +85,7 @@
         <item name="layout_gravity">center</item>
     </style>
 
+    <!-- TODO: Consider making a dark themed Divider too. -->
     <style name="Divider">
         <!-- Won't be visible in a bottom sheet dialog... -->
         <!--<item name="android:background">?android:attr/listDivider</item>-->
