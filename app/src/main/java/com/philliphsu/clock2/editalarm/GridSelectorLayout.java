@@ -20,20 +20,27 @@ import android.content.Context;
 import android.os.Handler;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.widget.FrameLayout;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
+import android.widget.ViewAnimator;
 
 /**
  * Created by Phillip Hsu on 8/17/2016.
  *
  * A derivative of the AOSP datetimepicker RadialPickerLayout class.
+ * The animations used here are taken from the DatePickerDialog class.
+ *
+ * A ViewAnimator is a subclass of FrameLayout.
  */
-public class GridSelectorLayout extends FrameLayout implements NumbersGrid.OnNumberSelectedListener {
+public class GridSelectorLayout extends ViewAnimator implements NumbersGrid.OnNumberSelectedListener {
     private static final String TAG = "GridSelectorLayout";
 
     // Delay before auto-advancing the page, in ms.
     // TODO: If we animate the page change, then we don't need this delay. This was
     // my own logic, not ported from AOSP timepicker.
     public static final int ADVANCE_PAGE_DELAY = 150;
+
+    private static final int ANIMATION_DURATION = 300;
 
     private static final int HOUR_INDEX = NumberGridTimePickerDialog.HOUR_INDEX;
     private static final int MINUTE_INDEX = NumberGridTimePickerDialog.MINUTE_INDEX;
@@ -54,12 +61,21 @@ public class GridSelectorLayout extends FrameLayout implements NumbersGrid.OnNum
     private MinutesGrid mMinutesGrid;
     private final Handler mHandler = new Handler();
 
+    private final Animation mInAnimation;
+    private final Animation mOutAnimation;
+
     public interface OnValueSelectedListener {
         void onValueSelected(int pickerIndex, int newValue, boolean autoAdvance);
     }
 
     public GridSelectorLayout(Context context, AttributeSet attrs) {
         super(context, attrs);
+        // Taken from AOSP DatePickerDialog class
+        // TODO: They look terrible on our views. Create new animations.
+        mInAnimation = new AlphaAnimation(0.0f, 1.0f);
+        mInAnimation.setDuration(ANIMATION_DURATION);
+        mOutAnimation = new AlphaAnimation(1.0f, 0.0f);
+        mOutAnimation.setDuration(ANIMATION_DURATION);
     }
 
     // TODO: Why do we need a Context param? RadialPickerLayout does it too.
@@ -69,6 +85,10 @@ public class GridSelectorLayout extends FrameLayout implements NumbersGrid.OnNum
             return;
         }
 
+        // *****************************************************************************************
+        // * TODO: Should we move this block to the Dialog class? This is pretty similar
+        // * to what AOSP's DatePickerDialog class does. I don't immediately see any
+        // * code that REALLY needs to be done in this class instead.
         mIs24HourMode = is24HourMode;
         if (is24HourMode) {
             m24HoursGrid = new TwentyFourHoursGrid(context);
@@ -81,6 +101,12 @@ public class GridSelectorLayout extends FrameLayout implements NumbersGrid.OnNum
         }
         mMinutesGrid = new MinutesGrid(context);
         mMinutesGrid.initialize(this/*OnNumberSelectedListener*/);
+        addView(mMinutesGrid);
+
+        setInAnimation(mInAnimation);
+        setOutAnimation(mOutAnimation);
+
+        // *****************************************************************************************
 
         // Initialize the currently-selected hour and minute.
         setValueForItem(HOUR_INDEX, initialHoursOfDay);
@@ -165,11 +191,9 @@ public class GridSelectorLayout extends FrameLayout implements NumbersGrid.OnNum
         mCurrentItemShowing = index;
 
         if (index != lastIndex) {
-            removeViewAt(0); // We could also call removeAllViews(), since we only have one child.
-            // We already verified that the index is either HOUR_INDEX or MINUTE_INDEX
-            addView(index == HOUR_INDEX ?
-                    (mIs24HourMode ? m24HoursGrid : mHoursGrid)
-                    : mMinutesGrid);
+            setInAnimation(animate? mInAnimation : null);
+            setOutAnimation(animate? mOutAnimation : null);
+            setDisplayedChild(index);
         }
     }
 
@@ -182,6 +206,10 @@ public class GridSelectorLayout extends FrameLayout implements NumbersGrid.OnNum
 
     @Override
     public void onNumberSelected(int number) {
+        // Flag set to true if this onNumberSelected() event was caused by
+        // long clicking in a TwentyFourHoursGrid.
+        boolean fakeHourItemShowing = false;
+
         if (getCurrentItemShowing() == HOUR_INDEX) {
             if (!mIs24HourMode) {
                 // Change the value before passing it through the callback
@@ -192,27 +220,32 @@ public class GridSelectorLayout extends FrameLayout implements NumbersGrid.OnNum
                     number += 12;
                 }
             } else {
-                // Check if we would be changing half-days with the new value
+                // Check if we would be changing half-days with the new value.
+                // This can happen if this selection occurred with a long click.
                 if (mCurrentHoursOfDay < 12 && number >= 12 || mCurrentHoursOfDay >= 12 && number < 12) {
                     int newHalfDay = getIsCurrentlyAmOrPm() == HALF_DAY_1 ? HALF_DAY_2 : HALF_DAY_1;
+                    // Update the half-day toggles states
                     mListener.onValueSelected(AMPM_INDEX, newHalfDay, false);
+                    // Advance the index prematurely to bypass the animation that would otherwise
+                    // be forced on us if we let the listener autoAdvance us.
+                    setCurrentItemShowing(MINUTE_INDEX, false/*animate?*/);
+                    // We need to "trick" the listener to think we're still on HOUR_INDEX.
+                    // When the listener gets the onValueSelected() callback,
+                    // it needs to call our setCurrentItemShowing() with MINUTE_INDEX a second time,
+                    // so it ends up doing nothing. (Recall that the new index must be different from the
+                    // last index for setCurrentItemShowing() to actually change the current item
+                    // showing.) This has the effect of "tricking" the listener to update its
+                    // own states relevant to the HOUR_INDEX, without having it actually autoAdvance
+                    // and forcing an animation on us.
+                    fakeHourItemShowing = true;
                 }
             }
         }
 
-//            final int value = number;
-//            mHandler.postDelayed(new Runnable() {
-//                @Override
-//                public void run() {
-//                    mListener.onValueSelected(HOUR_INDEX, value, true);
-//                }
-//            }, ADVANCE_PAGE_DELAY);
-//            mListener.onValueSelected(HOUR_INDEX, value, true);
-//        } else {
-//            mListener.onValueSelected(getCurrentItemShowing(), number, false);
-//        }
-        setValueForItem(getCurrentItemShowing(), number);
-        mListener.onValueSelected(getCurrentItemShowing(), number,
+        final int currentItemShowing = fakeHourItemShowing? HOUR_INDEX : getCurrentItemShowing();
+
+        setValueForItem(currentItemShowing, number);
+        mListener.onValueSelected(currentItemShowing, number,
                 true/*autoAdvance, not considered for MINUTE_INDEX*/);
     }
 
