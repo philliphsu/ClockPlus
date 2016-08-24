@@ -43,7 +43,7 @@
 
     <!-- TODO: Rename to GridLayout[Text/Button/TextView]? -->
     <style name="GridLayoutNumpadButton" parent="GridLayoutNumpadElement">
-        <item name="android:textSize">@dimen/text_size_display_1</item>
+        <item name="android:textSize">@dimen/grid_element_text_size</item>
         <item name="android:fontFamily">sans-serif-light</item>
         <item name="android:textColor">?android:attr/textColorPrimary</item>
     </style>

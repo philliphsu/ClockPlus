@@ -7,13 +7,13 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:layout_height="@dimen/dialog_height"
+        android:orientation="horizontal">
 
         <FrameLayout
             android:id="@+id/time_display_background"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_width="@dimen/left_side_width"
+            android:layout_height="match_parent"
             android:background="@android:color/white" >
             <include
                 layout="@layout/time_header_label"
@@ -24,27 +24,29 @@
 
         <com.philliphsu.clock2.editalarm.GridSelectorLayout
             android:id="@+id/time_picker"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/number_grid_height"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
             android:layout_marginTop="@dimen/bottom_sheet_vertical_space"
             android:layout_marginStart="@dimen/bottom_sheet_edge_margin"
-            android:layout_marginEnd="@dimen/bottom_sheet_edge_margin"
-            android:paddingBottom="@dimen/anchored_fab_vertical_space"/>
+            android:paddingEnd="@dimen/anchored_fab_vertical_space"
+            android:layout_marginBottom="@dimen/bottom_sheet_vertical_space"/>
 
         <View
             android:id="@+id/divider"
-            style="@style/Divider.Horizontal"/>
+            style="@style/Divider.Vertical"/>
 
+        <!--TODO: Be wary of this vertical LL with weighted children.-->
         <LinearLayout
             android:id="@+id/half_day_toggles"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/half_day_button_bar_height"
-            android:orientation="horizontal">
+            android:layout_width="@dimen/half_day_button_bar_height"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
             <FrameLayout 
                 android:id="@+id/half_day_toggle_1"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
                 android:layout_weight="1"
                 android:background="?android:attr/selectableItemBackground">
 
@@ -59,8 +61,8 @@
 
             <FrameLayout
                 android:id="@+id/half_day_toggle_2"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
                 android:layout_weight="1"
                 android:background="?android:attr/selectableItemBackground">
 
@@ -85,6 +87,6 @@
         android:layout_height="wrap_content"
         android:src="@drawable/ic_done_24dp"
         app:layout_anchor="@id/divider"
-        app:layout_anchorGravity="center_horizontal"/>
+        app:layout_anchorGravity="center_vertical"/>
 
 </android.support.design.widget.CoordinatorLayout>

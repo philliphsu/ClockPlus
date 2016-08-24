@@ -12,9 +12,8 @@
     <dimen name="app_bar_height">180dp</dimen>
     <dimen name="text_margin">16dp</dimen>
 
-    <dimen name="grid_element_text_size">28sp</dimen>
+    <dimen name="grid_element_text_size">34sp</dimen>
     <dimen name="grid_element_touch_target">40dp</dimen>
-    <dimen name="half_day_text_size">17sp</dimen>
 
     <!-- NumpadTimePickerDialog -->
     <dimen name="numpad_height">300dp</dimen> <!-- TODO: Deprecated -->
@@ -26,7 +25,7 @@
 
     <!-- NumberGridTimePickerDialog -->
     <dimen name="number_grid_height">308dp</dimen> <!-- 5 * (number_grid_minute_cell_height) + half-FAB height bottom padding -->
-    <dimen name="number_grid_hour_cell_height">70dp</dimen> <!-- 4 * 70 + 28 = 308 -->
+    <dimen name="number_grid_hour_cell_height">70dp</dimen> <!-- 4 * 70 == 5 * (number_grid_minute_cell_height) -->
     <dimen name="number_grid_minute_cell_height">56dp</dimen>
     <dimen name="half_day_button_bar_height">48dp</dimen>
     <dimen name="number_grid_24_hour_item_primary_text_size">30sp</dimen>

@@ -161,9 +161,8 @@ public class NumberGridTimePickerDialog extends BaseTimePickerDialog implements 
 //            } else if (currentHalfDay == HALF_DAY_2) {
 //                currentHalfDay = HALF_DAY_1;
 //            }
-            updateAmPmDisplay(halfDay);
+            updateHalfDay(halfDay);
             mTimePicker.setAmOrPm(halfDay);
-            updateHalfDayTogglesState(halfDay);
         }
     }
 
@@ -396,7 +395,6 @@ public class NumberGridTimePickerDialog extends BaseTimePickerDialog implements 
             separatorView.setLayoutParams(paramsSeparator);
         } else {
             mAmPmTextView.setVisibility(View.VISIBLE);
-            updateAmPmDisplay(mInitialHourOfDay < 12? AM : PM);
             mAmPmHitspace.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -407,7 +405,7 @@ public class NumberGridTimePickerDialog extends BaseTimePickerDialog implements 
                     } else if (amOrPm == PM){
                         amOrPm = AM;
                     }
-                    updateAmPmDisplay(amOrPm);
+                    updateHalfDay(amOrPm);
                     mTimePicker.setAmOrPm(amOrPm);
                 }
             });
@@ -491,7 +489,9 @@ public class NumberGridTimePickerDialog extends BaseTimePickerDialog implements 
 //                mThemeDark? android.R.attr.textColorPrimaryInverse : android.R.attr.textColorPrimary);
         mHalfDayToggleUnselectedColor = ContextCompat.getColor(getContext(),
                 mThemeDark? R.color.text_color_primary_dark : R.color.text_color_primary_light);
-        updateHalfDayTogglesState(mTimePicker.getIsCurrentlyAmOrPm());
+
+        // Update the half day at the end when the state colors have been initialized
+        updateHalfDay(mInitialHourOfDay < 12? AM : PM);
         return view;
     }
 
@@ -509,6 +509,11 @@ public class NumberGridTimePickerDialog extends BaseTimePickerDialog implements 
 
     public void tryVibrate() {
 //        mHapticFeedbackController.tryVibrate();
+    }
+
+    private void updateHalfDay(int halfDay) {
+        updateAmPmDisplay(halfDay);
+        updateHalfDayTogglesState(halfDay);
     }
 
     private void updateAmPmDisplay(int amOrPm) {
@@ -579,8 +584,7 @@ public class NumberGridTimePickerDialog extends BaseTimePickerDialog implements 
             setMinute(newValue);
             mTimePicker.setContentDescription(mMinutePickerDescription + ": " + newValue);
         } else if (pickerIndex == AMPM_INDEX) {
-            updateAmPmDisplay(newValue);
-            updateHalfDayTogglesState(newValue);
+            updateHalfDay(newValue);
         } else if (pickerIndex == ENABLE_PICKER_INDEX) {
             if (!isTypedTimeFullyLegal()) {
                 mTypedTimes.clear();
