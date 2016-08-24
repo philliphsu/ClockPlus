@@ -19,6 +19,7 @@ package com.philliphsu.clock2.editalarm;
 import android.animation.ObjectAnimator;
 import android.app.ActionBar.LayoutParams;
 import android.content.res.ColorStateList;
+import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -318,17 +319,29 @@ public class NumberGridTimePickerDialog extends BaseTimePickerDialog implements 
         if (mIs24HourMode) {
             final int iconPadding = getResources().getDimensionPixelSize(R.dimen.half_day_icon_padding);
             tv1.setText("00 - 11");
-            // Intrinsic bounds meaning the drawable's own bounds? So 24dp box.
+            tv2.setText("12 - 23");
             // We need different drawable resources for each case, not a single one that we
             // just tint differently, because the orientation of each one is different.
-            tv1.setCompoundDrawablesWithIntrinsicBounds(
-                    mThemeDark? R.drawable.ic_half_day_1_dark_24dp : R.drawable.ic_half_day_1_24dp,
-                    0, 0, 0);
+            final int icon1 = mThemeDark? R.drawable.ic_half_day_1_dark_24dp : R.drawable.ic_half_day_1_24dp;
+            final int icon2 = mThemeDark? R.drawable.ic_half_day_2_dark_24dp : R.drawable.ic_half_day_2_24dp;
+            // Determine the direction the icons should be in
+            int left1 = 0, left2 = 0, top1 = 0, top2 = 0;
+            switch (getResources().getConfiguration().orientation) {
+                case Configuration.ORIENTATION_PORTRAIT:
+                    left1 = icon1;
+                    left2 = icon2;
+                    top1 = top2 = 0;
+                    break;
+                case Configuration.ORIENTATION_LANDSCAPE:
+                    left1 = left2 = 0;
+                    top1 = icon1;
+                    top2 = icon2;
+                    break;
+            }
+            // Intrinsic bounds means the drawable's own bounds? So 24dp box.
+            tv1.setCompoundDrawablesWithIntrinsicBounds(left1, top1, 0, 0);
+            tv2.setCompoundDrawablesWithIntrinsicBounds(left2, top2, 0, 0);
             tv1.setCompoundDrawablePadding(iconPadding);
-            tv2.setText("12 - 23");
-            tv2.setCompoundDrawablesWithIntrinsicBounds(
-                    mThemeDark? R.drawable.ic_half_day_2_dark_24dp : R.drawable.ic_half_day_2_24dp,
-                    0, 0, 0);
             tv2.setCompoundDrawablePadding(iconPadding);
         } else {
             tv1.setText(mAmText);

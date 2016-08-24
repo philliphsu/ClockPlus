@@ -16,7 +16,7 @@
     <dimen name="number_grid_minute_cell_height">44dp</dimen>
     <!--TODO: Change the height suffix to size or dimen, because this is used as a width in landscape and a height in portrait. -->
     <dimen name="half_day_button_bar_height">64dp</dimen>
-    <dimen name="number_grid_24_hour_item_primary_text_size">30sp</dimen>
+    <dimen name="number_grid_24_hour_item_primary_text_size">26sp</dimen>
     <dimen name="number_grid_minute_text_size">20sp</dimen>
 
 </resources>

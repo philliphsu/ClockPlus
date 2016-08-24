@@ -1,6 +1,7 @@
 package com.philliphsu.clock2.editalarm;
 
 import android.content.Context;
+import android.content.res.Configuration;
 import android.content.res.TypedArray;
 import android.util.AttributeSet;
 import android.view.Gravity;
@@ -69,7 +70,9 @@ public class TwentyFourHourGridItem extends LinearLayout {
     }
 
     private void init() {
-        setOrientation(VERTICAL);
+        final int orientation = getResources().getConfiguration().orientation;
+        setOrientation(orientation == Configuration.ORIENTATION_PORTRAIT ?
+                VERTICAL : /*LANDSCAPE*/HORIZONTAL);
         setGravity(Gravity.CENTER);
         inflate(getContext(), R.layout.content_24h_grid_item, this);
         ButterKnife.bind(this);
