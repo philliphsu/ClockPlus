@@ -2,10 +2,11 @@
 <!-- TOneverDO: Use LinearLayout as root container when the
 dialog is a DialogFragment (or a subclass of), or else LWM
 doesn't work. -->
-<RelativeLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
 
     <TextView
         android:id="@+id/input_time"
@@ -28,4 +29,4 @@ doesn't work. -->
         android:layout_marginStart="@dimen/bottom_sheet_edge_margin"
         android:layout_marginEnd="@dimen/bottom_sheet_edge_margin"/>
 
-</RelativeLayout>
+</LinearLayout>
