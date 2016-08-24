@@ -24,7 +24,6 @@ doesn't work. -->
         android:id="@+id/number_grid"
         android:layout_width="match_parent"
         android:layout_height="@dimen/numeric_keypad_height"
-        android:layout_below="@id/input_time"
         android:layout_marginTop="@dimen/bottom_sheet_vertical_space"
         android:layout_marginStart="@dimen/bottom_sheet_edge_margin"
         android:layout_marginEnd="@dimen/bottom_sheet_edge_margin"/>
