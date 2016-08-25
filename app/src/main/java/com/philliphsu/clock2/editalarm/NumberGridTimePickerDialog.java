@@ -503,6 +503,9 @@ public class NumberGridTimePickerDialog extends BaseTimePickerDialog implements 
         mHalfDayToggleUnselectedColor = ContextCompat.getColor(getContext(),
                 mThemeDark? R.color.text_color_primary_dark : R.color.text_color_primary_light);
 
+        Utils.setColorControlHighlight(mLeftHalfDayToggle, accentColor);
+        Utils.setColorControlHighlight(mRightHalfDayToggle, accentColor);
+
         // Update the half day at the end when the state colors have been initialized
         updateHalfDay(mInitialHourOfDay < 12? AM : PM);
         return view;

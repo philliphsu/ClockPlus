@@ -11,6 +11,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.philliphsu.clock2.R;
+import com.philliphsu.clock2.aospdatetimepicker.Utils;
 
 import java.util.Arrays;
 
@@ -39,7 +40,8 @@ public abstract class GridLayoutNumpad extends GridLayout {
     private int mCount = 0;
     private OnInputChangeListener mOnInputChangeListener;
 
-    ColorStateList mColors;
+    private ColorStateList mTextColors;
+    int mAccentColor;
 
     @Bind({ R.id.zero, R.id.one, R.id.two, R.id.three, R.id.four,
             R.id.five, R.id.six, R.id.seven, R.id.eight, R.id.nine })
@@ -63,8 +65,7 @@ public abstract class GridLayoutNumpad extends GridLayout {
     }
 
     public GridLayoutNumpad(Context context) {
-        super(context);
-        init();
+        this(context, null);
     }
 
     public GridLayoutNumpad(Context context, AttributeSet attrs) {
@@ -83,11 +84,27 @@ public abstract class GridLayoutNumpad extends GridLayout {
         // The buttons are actually of type Button, but we kept references
         // to them as TextViews... which is fine since TextView is the superclass
         // of Button.
-        mColors = ContextCompat.getColorStateList(context,
-                themeDark? R.color.numeric_keypad_button_text_dark : R.color.numeric_keypad_button_text);
+        mTextColors = ContextCompat.getColorStateList(context, themeDark?
+                R.color.numeric_keypad_button_text_dark : R.color.numeric_keypad_button_text);
+
+        // AFAIK, the only way to get the user's accent color is programmatically,
+        // because it is uniquely defined in their app's theme. It is not possible
+        // for us to reference that via XML (i.e. with ?colorAccent or similar),
+        // which happens at compile time.
+        // TOneverDO: Use any other Context to retrieve the accent color. We must use
+        // the Context param passed to us, because we know this context to be
+        // NumpadTimePickerDialog.getContext(), which is equivalent to
+        // NumpadTimePickerDialog.getActivity(). It is from that Activity where we
+        // get its theme's colorAccent.
+        mAccentColor = Utils.getThemeAccentColor(context);
         for (TextView b : mButtons) {
-            b.setTextColor(mColors);
+            setTextColor(b);
+            Utils.setColorControlHighlight(b, mAccentColor);
         }
+    }
+
+    void setTextColor(TextView view) {
+        view.setTextColor(mTextColors);
     }
 
     /**

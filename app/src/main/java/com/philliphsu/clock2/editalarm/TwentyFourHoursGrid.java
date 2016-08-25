@@ -5,6 +5,7 @@ import android.support.v4.content.ContextCompat;
 import android.view.View;
 
 import com.philliphsu.clock2.R;
+import com.philliphsu.clock2.aospdatetimepicker.Utils;
 
 /**
  * Created by Phillip Hsu on 8/17/2016.
@@ -84,6 +85,7 @@ public class TwentyFourHoursGrid extends NumbersGrid implements View.OnLongClick
                 R.color.text_color_secondary_dark : R.color.text_color_secondary_light);
         for (int i = 0; i < getChildCount(); i++) {
             TwentyFourHourGridItem item = (TwentyFourHourGridItem) getChildAt(i);
+            Utils.setColorControlHighlight(item, mSelectedTextColor/*colorAccent*/);
             item.getPrimaryTextView().setTextColor(mDefaultTextColor);
             item.getSecondaryTextView().setTextColor(mSecondaryTextColor);
         }

@@ -22,7 +22,7 @@ public abstract class NumbersGrid extends GridLayout implements View.OnClickList
     OnNumberSelectedListener mSelectionListener;
     View mLastSelectedView;
 
-    private final int mSelectedTextColor;
+    final int mSelectedTextColor;
     // TODO: The half-day buttons in the dialog's layout also need to use this color.
     // Consider moving this to either the Dialog class, or move the buttons and the FAB
     // to the GridSelectorLayout class and then move these to GridSelectorLayout.
@@ -48,6 +48,10 @@ public abstract class NumbersGrid extends GridLayout implements View.OnClickList
         mIsInitialized = false;
 //        mDefaultTextColor = Utils.getTextColorFromThemeAttr(context, android.R.attr.textColorPrimary);
         mDefaultTextColor = ContextCompat.getColor(context, R.color.text_color_primary_light);
+        // The reason we can use the Context passed here and get the correct accent color
+        // is that this NumbersGrid is programmatically created by the GridSelectorLayout in
+        // its initialize(), and the Context passed in there is from
+        // NumberGridTimePickerDialog.getActivity().
         mSelectedTextColor = Utils.getThemeAccentColor(context);
         // Show the first button as default selected
         setIndicator(getChildAt(indexOfDefaultValue()));
@@ -142,6 +146,7 @@ public abstract class NumbersGrid extends GridLayout implements View.OnClickList
                 R.color.text_color_primary_dark : R.color.text_color_primary_light);
         for (int i = 0; i < getChildCount(); i++) {
             View v = getChildAt(i);
+            Utils.setColorControlHighlight(v, mSelectedTextColor/*colorAccent*/);
             // Filter out views that aren't number buttons
             if (canRegisterClickListener(v)) {
                 ((TextView) v).setTextColor(mDefaultTextColor);

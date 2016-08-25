@@ -20,10 +20,12 @@ import android.animation.Keyframe;
 import android.animation.ObjectAnimator;
 import android.animation.PropertyValuesHolder;
 import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.RippleDrawable;
 import android.os.Build;
 import android.support.annotation.AttrRes;
 import android.support.annotation.ColorInt;
@@ -54,7 +56,6 @@ public class Utils {
     public static final int SELECTED_ALPHA_THEME_DARK = 255;
     // Alpha level for fully opaque.
     public static final int FULL_ALPHA = 255;
-
 
     static final String SHARED_PREFS_NAME = "com.android.calendar_preferences";
 
@@ -243,6 +244,20 @@ public class Utils {
         Drawable d = DrawableCompat.wrap(ContextCompat.getDrawable(context, drawableRes).mutate());
         DrawableCompat.setTint(d, colorInt);
         return d;
+    }
+
+    /**
+     * Sets the color on the {@code view}'s RippleDrawable background,
+     * if its background was set to {@code android.R.attr.selectableItemBackground} or
+     * {@code android.R.attr.selectableItemBackgroundBorderless}.
+     * @param view the view that should have its highlight color changed
+     */
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    public static void setColorControlHighlight(@NonNull View view, @ColorInt int color) {
+        Drawable selectableItemBackground = view.getBackground();
+        if (selectableItemBackground instanceof RippleDrawable) {
+            ((RippleDrawable) selectableItemBackground).setColor(ColorStateList.valueOf(color));
+        }
     }
 
     /**

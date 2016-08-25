@@ -63,7 +63,6 @@ public class NumpadTimePicker extends GridLayoutNumpad {
     @Bind(R.id.backspace) ImageButton mBackspace;
 
     private boolean mThemeDark;
-    private int mAccentColor;
     private int mFabDisabledColorDark;
     private int mFabDisabledColorLight;
 
@@ -105,12 +104,20 @@ public class NumpadTimePicker extends GridLayoutNumpad {
     void setTheme(Context context, boolean themeDark) {
         super.setTheme(context, themeDark);
         mThemeDark = themeDark;
+        // this.getContext() ==> default teal accent color
+        // application context ==> white
+        // The Context that was passed in is NumpadTimePickerDialog.getContext() which
+        // is probably the host Activity. I have no idea what this.getContext() returns,
+        // but its probably some internal type that isn't tied to any of our application
+        // components.
 
         // So, we kept the 0-9 buttons as TextViews, but here we kept
         // the alt buttons as actual Buttons...
         for (Button b : mAltButtons) {
-            b.setTextColor(mColors);
+            setTextColor(b);
+            Utils.setColorControlHighlight(b, mAccentColor);
         }
+        Utils.setColorControlHighlight(mBackspace, mAccentColor);
 
         ColorStateList colorBackspace = ContextCompat.getColorStateList(context,
                 themeDark? R.color.icon_color_dark : R.color.icon_color);
@@ -120,13 +127,6 @@ public class NumpadTimePicker extends GridLayoutNumpad {
                 themeDark? R.color.icon_color_dark : R.color.fab_icon_color);
         Utils.setTintList(mFab, mFab.getDrawable(), colorIcon);
 
-        // this.getContext() ==> default teal accent color
-        // application context ==> white
-        // The Context that was passed in is NumpadTimePickerDialog.getContext() which
-        // is probably the host Activity. I have no idea what this.getContext() returns,
-        // but its probably some internal type that isn't tied to any of our application
-        // components.
-        mAccentColor = Utils.getThemeAccentColor(context);
         // Make sure the dark theme disabled color shows up initially
         updateFabState();
     }
