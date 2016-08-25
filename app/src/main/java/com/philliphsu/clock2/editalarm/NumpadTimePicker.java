@@ -440,7 +440,10 @@ public class NumpadTimePicker extends GridLayoutNumpad {
     }
 
     private void updateFabState() {
+        final boolean lastEnabled = mFab.isEnabled();
         mFab.setEnabled(checkTimeValid());
+        if (lastEnabled == mFab.isEnabled())
+            return;
         // Workaround for mFab.setBackgroundTintList() because I don't know how to reference the
         // correct accent color in XML. Also because I don't want to programmatically create a
         // ColorStateList.
