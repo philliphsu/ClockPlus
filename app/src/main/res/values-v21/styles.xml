@@ -6,4 +6,15 @@
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
     </style>
+
+    <style name="GridLayoutNumpadElement">
+        <!-- http://stackoverflow.com/a/6868308/5055032
+         Leave off the namespace to reference a custom attribute.
+         Here, we are referencing the "grid:" namespace -->
+        <item name="layout_columnWeight">1</item>
+        <!--<item name="layout_rowWeight">1</item>-->
+        <item name="android:layout_height">@dimen/numeric_keypad_cell_height</item>
+        <item name="android:background">?android:attr/selectableItemBackgroundBorderless</item>
+        <item name="android:gravity">center</item>
+    </style>
 </resources>

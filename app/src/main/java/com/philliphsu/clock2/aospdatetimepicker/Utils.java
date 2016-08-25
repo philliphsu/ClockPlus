@@ -20,10 +20,10 @@ import android.animation.Keyframe;
 import android.animation.ObjectAnimator;
 import android.animation.PropertyValuesHolder;
 import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
+import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.RippleDrawable;
 import android.os.Build;
@@ -247,16 +247,24 @@ public class Utils {
     }
 
     /**
-     * Sets the color on the {@code view}'s RippleDrawable background,
-     * if its background was set to {@code android.R.attr.selectableItemBackground} or
-     * {@code android.R.attr.selectableItemBackgroundBorderless}.
+     * Sets the color on the {@code view}'s {@code selectableItemBackground} or the
+     * borderless variant, whichever was set as the background.
      * @param view the view that should have its highlight color changed
      */
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     public static void setColorControlHighlight(@NonNull View view, @ColorInt int color) {
         Drawable selectableItemBackground = view.getBackground();
-        if (selectableItemBackground instanceof RippleDrawable) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP
+                && selectableItemBackground instanceof RippleDrawable) {
             ((RippleDrawable) selectableItemBackground).setColor(ColorStateList.valueOf(color));
+        } else {
+            // Draws the color (src) onto the background (dest) *in the same plane*.
+            // That means the color is not overlapping (i.e. on a higher z-plane, covering)
+            // the background. That would be done with SRC_OVER.
+            // The DrawableCompat tinting APIs *could* be a viable alternative, if you
+            // call setTintMode(). Previous attempts using those APIs failed without
+            // the tint mode. However, those APIs have the overhead of mutating and wrapping
+            // the drawable.
+            selectableItemBackground.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
         }
     }
 
