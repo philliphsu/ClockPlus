@@ -22,13 +22,18 @@
                 android:layout_gravity="center" />
         </FrameLayout>
 
+        <!--TOneverDO: Change marginTop to paddingTop without also adding the
+         padding amount to the height. -->
+        <!--TOneverDO: Change paddingBottom to marginBottom without also subtracting the
+         margin amount from the height. -->
+        <!--TODO: As a library, we probably also want to paddingLeft/Right-->
         <com.philliphsu.clock2.editalarm.GridSelectorLayout
             android:id="@+id/time_picker"
             android:layout_width="match_parent"
             android:layout_height="@dimen/number_grid_height"
             android:layout_marginTop="@dimen/bottom_sheet_vertical_space"
-            android:layout_marginStart="@dimen/bottom_sheet_edge_margin"
-            android:layout_marginEnd="@dimen/bottom_sheet_edge_margin"
+            android:paddingStart="@dimen/bottom_sheet_edge_margin"
+            android:paddingEnd="@dimen/bottom_sheet_edge_margin"
             android:paddingBottom="@dimen/anchored_fab_vertical_space"/>
 
         <View

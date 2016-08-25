@@ -27,10 +27,10 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:layout_marginTop="@dimen/bottom_sheet_vertical_space"
+            android:paddingTop="@dimen/bottom_sheet_vertical_space"
             android:layout_marginStart="@dimen/bottom_sheet_edge_margin"
             android:paddingEnd="@dimen/anchored_fab_vertical_space"
-            android:layout_marginBottom="@dimen/bottom_sheet_vertical_space"/>
+            android:paddingBottom="@dimen/bottom_sheet_vertical_space"/>
 
         <View
             android:id="@+id/divider"
