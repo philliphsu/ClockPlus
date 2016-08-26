@@ -44,10 +44,10 @@ public class NumpadTimePicker extends GridLayoutNumpad {
     private static final int BASE_10 = 10;
 
     // AmPmStates
-    private static final int UNSPECIFIED = -1;
-    private static final int AM = 0;
-    private static final int PM = 1;
-    private static final int HRS_24 = 2;
+    static final int UNSPECIFIED = -1;
+    static final int AM = 0;
+    static final int PM = 1;
+    static final int HRS_24 = 2;
 
     @IntDef({ UNSPECIFIED, AM, PM, HRS_24 }) // Specifies the accepted constants
     @Retention(RetentionPolicy.SOURCE) // Usages do not need to be recorded in .class files
@@ -307,6 +307,34 @@ public class NumpadTimePicker extends GridLayoutNumpad {
 
     public String getTime() {
         return mFormattedInput.toString();
+    }
+    
+    @AmPmState
+    int getAmPmState() {
+        return mAmPmState;
+    }
+
+    // Because the annotation and its associated enum constants are marked private, the only real
+    // use for this method is to restore state across rotation after saving the value from
+    // #getAmPmState(). We can't directly pass in one of those accepted constants.
+    void setAmPmState(@AmPmState int amPmState) {
+//        mAmPmState = amPmState;
+        switch (amPmState) {
+            case AM:
+            case PM:
+                // mAmPmState is set for us
+                onAltButtonClick(mAltButtons[amPmState]);
+                break;
+            case HRS_24:
+                // Restoring the digits, if they make a valid time, should have already
+                // restored the mAmPmState to this value for us. If they don't make a
+                // valid time, then we refrain from setting it.
+                break;
+            case UNSPECIFIED:
+                // We should already be set to this value initially, but it can't hurt?
+                mAmPmState = amPmState;
+                break;
+        }
     }
 
     private void init() {
