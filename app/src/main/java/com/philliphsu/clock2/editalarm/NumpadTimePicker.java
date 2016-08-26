@@ -408,6 +408,7 @@ public class NumpadTimePicker extends GridLayoutNumpad {
         int len = mFormattedInput.length();
         mFormattedInput.delete(len - 1, len);
         if (count() == 3) {
+            int value = getInput();
             // Move the colon from its 4-digit position to its 3-digit position,
             // unless doing so gives an invalid time.
             // e.g. 17:55 becomes 1:75, which is invalid.
@@ -417,14 +418,19 @@ public class NumpadTimePicker extends GridLayoutNumpad {
             // in the 24-hour clock can only go up to 15:5[0-9] or be within the range
             // [20:00, 23:59] if they are to remain valid when they become three digits.
             // The is24HourFormat() check is therefore unnecessary.
-            int value = getInput();
             if (value <= 155 || value >= 200 && value <= 235) {
                 mFormattedInput.deleteCharAt(mFormattedInput.indexOf(":"));
                 mFormattedInput.insert(1, ":");
+            } else {
+                // previously [16:00, 19:59]
+                mAmPmState = UNSPECIFIED;
             }
         } else if (count() == 2) {
             // Remove the colon
             mFormattedInput.deleteCharAt(mFormattedInput.indexOf(":"));
+            // No time can be valid with only 2 digits in either system.
+            // I don't think we actually need this, but it can't hurt?
+            mAmPmState = UNSPECIFIED;
         }
     }
 
