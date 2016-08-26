@@ -476,20 +476,26 @@ public class NumpadTimePicker extends GridLayoutNumpad {
     private void updateFabState() {
         final boolean lastEnabled = mFab.isEnabled();
         mFab.setEnabled(checkTimeValid());
-        if (lastEnabled == mFab.isEnabled())
-            return;
+        // If the fab was last enabled and we rotate, this check will prevent us from
+        // restoring the color; it will instead show up opaque white with an eclipse.
+        // Why isn't the FAB initialized to enabled == false when it is recreated?
+        // The FAB class probably saves its own state.
+//        if (lastEnabled == mFab.isEnabled())
+//            return;
+
         // Workaround for mFab.setBackgroundTintList() because I don't know how to reference the
         // correct accent color in XML. Also because I don't want to programmatically create a
         // ColorStateList.
         int color;
         if (mFab.isEnabled()) {
             color = mAccentColor;
-            if (mElevationAnimator != null) {
+            // If FAB was last enabled, then don't run the anim again.
+            if (mElevationAnimator != null && !lastEnabled) {
                 mElevationAnimator.start();
             }
         } else {
             color = mThemeDark? mFabDisabledColorDark : mFabDisabledColorLight;
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            if (lastEnabled && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 if (mElevationAnimator != null && mElevationAnimator.isRunning()) {
                     // Otherwise, eclipse will show.
                     mElevationAnimator.end();
