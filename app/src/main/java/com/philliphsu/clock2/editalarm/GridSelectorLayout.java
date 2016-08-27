@@ -93,6 +93,10 @@ public class GridSelectorLayout extends ViewAnimator implements NumbersGrid.OnNu
         if (is24HourMode) {
             m24HoursGrid = new TwentyFourHoursGrid(context);
             m24HoursGrid.initialize(this/*OnNumberSelectedListener*/);
+            if (initialHoursOfDay >= 12) {
+                // 24 hour grid is always initialized with 00-11 in the primary position
+                m24HoursGrid.swapTexts();
+            }
             addView(m24HoursGrid);
         } else {
             mHoursGrid = new HoursGrid(context);
