@@ -150,6 +150,8 @@ public abstract class NumbersGrid extends GridLayout implements View.OnClickList
         for (int i = 0; i < getChildCount(); i++) {
             View v = getChildAt(i);
             // TODO: We can move this to the ctor, because this isn't dependent on the theme.
+            // The only issue is we would have to write another for loop iterating through all
+            // the buttons... but that is just prematurely worrying about optimizations..
             Utils.setColorControlHighlight(v, mSelectedTextColor/*colorAccent*/);
             // Filter out views that aren't number buttons
             if (canRegisterClickListener(v)) {

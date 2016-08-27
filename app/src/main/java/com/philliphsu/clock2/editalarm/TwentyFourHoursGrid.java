@@ -20,7 +20,6 @@ public class TwentyFourHoursGrid extends NumbersGrid implements View.OnLongClick
         for (int i = 0; i < getChildCount(); i++) {
             getChildAt(i).setOnLongClickListener(this);
         }
-//        mSecondaryTextColor = Utils.getTextColorFromThemeAttr(context, android.R.attr.textColorSecondary);
         mSecondaryTextColor = ContextCompat.getColor(context, R.color.text_color_secondary_light);
     }
 
@@ -36,12 +35,7 @@ public class TwentyFourHoursGrid extends NumbersGrid implements View.OnLongClick
 
     @Override
     public void onClick(View v) {
-        // We already verified that this view can have a click listener registered on.
-        // See canRegisterClickListener().
-        TwentyFourHourGridItem item = (TwentyFourHourGridItem) v;
-        clearIndicator(); // TODO: Remove?
-        setIndicator(v);
-        int newVal = Integer.parseInt(item.getPrimaryText().toString());
+        final int newVal = valueOf(v);
         setSelection(newVal);
         mSelectionListener.onNumberSelected(newVal);
     }
@@ -49,14 +43,22 @@ public class TwentyFourHoursGrid extends NumbersGrid implements View.OnLongClick
     @Override
     public boolean onLongClick(View v) {
         TwentyFourHourGridItem item = (TwentyFourHourGridItem) v;
+        // Unfortunately, we can't use #valueOf() for this because we want the secondary value.
         int newVal = Integer.parseInt(item.getSecondaryText().toString());
-        setSelection(newVal);
         mSelectionListener.onNumberSelected(newVal);
-        clearIndicator(); // TODO: Remove?
+        // TOneverDO: Call before firing the onNumberSelected() callback, because we want the
+        // dialog to advance to the next index WITHOUT seeing the text swapping.
         swapTexts();
         // TOneverDO: Call before swapping texts, because setIndicator() uses the primary TextView.
-        setIndicator(v);
+        setSelection(newVal);
         return true; // Consume the long click
+    }
+
+    @Override
+    public void setSelection(int value) {
+        super.setSelection(value);
+        // The value is within [0, 23], but we have only 12 buttons.
+        setIndicator(getChildAt(value % 12));
     }
 
     @Override
@@ -67,30 +69,23 @@ public class TwentyFourHoursGrid extends NumbersGrid implements View.OnLongClick
 
     @Override
     void setTheme(Context context, boolean themeDark) {
-//        mDefaultTextColor = Utils.getTextColorFromThemeAttr(context, themeDark?
-//                // You may think the order should be switched, but this is in fact the correct order.
-//                // I'm guessing this is sensitive to the background color?
-//                android.R.attr.textColorPrimary : android.R.attr.textColorPrimaryInverse);
         mDefaultTextColor = ContextCompat.getColor(context, themeDark?
                 R.color.text_color_primary_dark : R.color.text_color_primary_light);
-        // https://www.reddit.com/r/androiddev/comments/2jpeqd/dealing_with_themematerial_vs_themeholo/
-        // For pre-21, textColorPrimary == textColorSecondary. Use textColorTertiary instead.
-        // For 21 and above, textColorSecondary == textColorTertiary == pre-21 textColorTertiary.
-        // Therefore, use textColorTertiary for both.
-//        mSecondaryTextColor = Utils.getTextColorFromThemeAttr(context, themeDark?
-//                // You may think the order should be switched, but this is in fact the correct order.
-//                // I'm guessing this is sensitive to the background color?
-//                android.R.attr.textColorSecondary : android.R.attr.textColorSecondaryInverse);
         mSecondaryTextColor = ContextCompat.getColor(context, themeDark?
                 R.color.text_color_secondary_dark : R.color.text_color_secondary_light);
         for (int i = 0; i < getChildCount(); i++) {
             TwentyFourHourGridItem item = (TwentyFourHourGridItem) getChildAt(i);
+            // TODO: We could move this to the ctor, in the superclass. If so, then this class
+            // doesn't need to worry about setting the highlight.
             Utils.setColorControlHighlight(item, mSelectedTextColor/*colorAccent*/);
-            item.getPrimaryTextView().setTextColor(mDefaultTextColor);
+            // Filter out the current selection.
+            if (getSelection() != valueOf(item)) {
+                item.getPrimaryTextView().setTextColor(mDefaultTextColor);
+                // The indicator can only be set on the primary text, which is why we don't need
+                // the secondary text here.
+            }
             item.getSecondaryTextView().setTextColor(mSecondaryTextColor);
         }
-        // Set the indicator again
-        setIndicator(getChildAt(indexOfDefaultValue())); // TODO: We don't need this anymore.
     }
 
     public void swapTexts() {
@@ -98,5 +93,10 @@ public class TwentyFourHoursGrid extends NumbersGrid implements View.OnLongClick
             View v = getChildAt(i);
             ((TwentyFourHourGridItem) v).swapTexts();
         }
+    }
+
+    @Override
+    protected int valueOf(View button) {
+        return Integer.parseInt(((TwentyFourHourGridItem) button).getPrimaryText().toString());
     }
 }
