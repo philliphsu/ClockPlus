@@ -46,15 +46,15 @@ public abstract class NumbersGrid extends GridLayout implements View.OnClickList
         // our subclasses' buttons, if any.
         registerClickListeners();
         mIsInitialized = false;
-//        mDefaultTextColor = Utils.getTextColorFromThemeAttr(context, android.R.attr.textColorPrimary);
         mDefaultTextColor = ContextCompat.getColor(context, R.color.text_color_primary_light);
         // The reason we can use the Context passed here and get the correct accent color
         // is that this NumbersGrid is programmatically created by the GridSelectorLayout in
         // its initialize(), and the Context passed in there is from
         // NumberGridTimePickerDialog.getActivity().
         mSelectedTextColor = Utils.getThemeAccentColor(context);
-        // Show the first button as default selected
-        setIndicator(getChildAt(indexOfDefaultValue()));
+        final View defaultSelectedView = getChildAt(indexOfDefaultValue());
+        mSelection = valueOf(defaultSelectedView);
+        setIndicator(defaultSelectedView);
     }
 
     public void initialize(OnNumberSelectedListener listener) {
@@ -81,10 +81,8 @@ public abstract class NumbersGrid extends GridLayout implements View.OnClickList
      */
     @Override
     public void onClick(View v) {
-        TextView tv = (TextView) v;
-        clearIndicator(); // Does nothing if there was no indicator last selected
         setIndicator(v);
-        mSelection = Integer.parseInt(tv.getText().toString());
+        mSelection = valueOf(v);
         mSelectionListener.onNumberSelected(mSelection);
     }
 
@@ -108,6 +106,7 @@ public abstract class NumbersGrid extends GridLayout implements View.OnClickList
      * @param view the clicked number button
      */
     protected void setIndicator(View view) {
+        clearIndicator(); // Does nothing if there was no indicator last selected
         TextView tv = (TextView) view;
         tv.setTextColor(mSelectedTextColor);
         mLastSelectedView = view;
@@ -138,22 +137,21 @@ public abstract class NumbersGrid extends GridLayout implements View.OnClickList
      * as determined by {@link #canRegisterClickListener(View)}.
      */
     void setTheme(Context context, boolean themeDark) {
-//        mDefaultTextColor = Utils.getTextColorFromThemeAttr(context, themeDark?
-//                // You may think the order should be switched, but this is in fact the correct order.
-//                // I'm guessing this is sensitive to the background color?
-//                android.R.attr.textColorPrimary : android.R.attr.textColorPrimaryInverse);
         mDefaultTextColor = ContextCompat.getColor(context, themeDark?
                 R.color.text_color_primary_dark : R.color.text_color_primary_light);
         for (int i = 0; i < getChildCount(); i++) {
             View v = getChildAt(i);
+            // TODO: We can move this to the ctor, because this isn't dependent on the theme.
             Utils.setColorControlHighlight(v, mSelectedTextColor/*colorAccent*/);
             // Filter out views that aren't number buttons
             if (canRegisterClickListener(v)) {
-                ((TextView) v).setTextColor(mDefaultTextColor);
+                final TextView tv = (TextView) v;
+                // Filter out the current selection
+                if (mSelection != valueOf(tv)) {
+                    tv.setTextColor(mDefaultTextColor);
+                }
             }
         }
-        // Set the indicator again
-        setIndicator(getChildAt(indexOfDefaultValue()));
     }
 
     /**
@@ -168,5 +166,12 @@ public abstract class NumbersGrid extends GridLayout implements View.OnClickList
             v.setOnClickListener(this);
             i++;
         }
+    }
+
+    /**
+     * Parses the number held by the button into an integer.
+     */
+    private static int valueOf(View button) {
+        return Integer.parseInt(((TextView) button).getText().toString());
     }
 }

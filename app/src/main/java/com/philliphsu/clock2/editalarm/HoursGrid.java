@@ -14,6 +14,14 @@ public class HoursGrid extends NumbersGrid {
     }
 
     @Override
+    public void setSelection(int value) {
+        super.setSelection(value);
+        // We expect value to be within [1, 12]. The position in the grid where
+        // value is located is thus (value - 1).
+        setIndicator(getChildAt(value - 1));
+    }
+
+    @Override
     protected int contentLayout() {
         return R.layout.content_hours_grid;
     }

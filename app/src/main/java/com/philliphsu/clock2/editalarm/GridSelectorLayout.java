@@ -112,18 +112,6 @@ public class GridSelectorLayout extends ViewAnimator implements NumbersGrid.OnNu
         setValueForItem(HOUR_INDEX, initialHoursOfDay);
         setValueForItem(MINUTE_INDEX, initialMinutes);
 
-        // Record the selected values in the number grids.
-        if (!is24HourMode) {
-            initialHoursOfDay = initialHoursOfDay % 12;
-            if (initialHoursOfDay == 0) {
-                initialHoursOfDay = 12;
-            }
-            mHoursGrid.setSelection(initialHoursOfDay);
-        } else {
-            m24HoursGrid.setSelection(initialHoursOfDay);
-        }
-        mMinutesGrid.setSelection(initialMinutes);
-
         mTimeInitialized = true;
     }
 
@@ -131,7 +119,6 @@ public class GridSelectorLayout extends ViewAnimator implements NumbersGrid.OnNu
         // TODO: This logic needs to be in the Dialog class, since the am/pm view is contained there.
 //        mAmPmView.setTheme(context, themeDark);
 
-        // TODO: These aren't doing much currently, if at all.
         if (m24HoursGrid != null) {
             m24HoursGrid.setTheme(context, themeDark);
         } else if (mHoursGrid != null) {
@@ -141,25 +128,8 @@ public class GridSelectorLayout extends ViewAnimator implements NumbersGrid.OnNu
     }
 
     public void setTime(int hours, int minutes) {
-        setItem(HOUR_INDEX, hours);
-        setItem(MINUTE_INDEX, minutes);
-    }
-
-    /**
-     * Set either the hour or the minute. Will set the internal value, and set the selection.
-     */
-    private void setItem(int index, int value) {
-        if (index == HOUR_INDEX) {
-            setValueForItem(HOUR_INDEX, value);
-            if (mIs24HourMode) {
-                m24HoursGrid.setSelection(value);
-            } else {
-                mHoursGrid.setSelection(value);
-            }
-        } else if (index == MINUTE_INDEX) {
-            setValueForItem(MINUTE_INDEX, value);
-            mMinutesGrid.setSelection(value);
-        }
+        setValueForItem(HOUR_INDEX, hours);
+        setValueForItem(MINUTE_INDEX, minutes);
     }
 
     public void setOnValueSelectedListener(OnValueSelectedListener listener) {
@@ -301,16 +271,32 @@ public class GridSelectorLayout extends ViewAnimator implements NumbersGrid.OnNu
      * Set the internal value for the hour, minute, or AM/PM.
      */
     private void setValueForItem(int index, int value) {
+        Log.d(TAG, String.format("setValueForItem(%d, %d)", index, value));
         if (index == HOUR_INDEX) {
             mCurrentHoursOfDay = value;
+            setHourGridSelection(value);
         } else if (index == MINUTE_INDEX){
             mCurrentMinutes = value;
+            mMinutesGrid.setSelection(value);
         } else if (index == AMPM_INDEX) {
             if (value == HALF_DAY_1) {
                 mCurrentHoursOfDay = mCurrentHoursOfDay % 12;
             } else if (value == HALF_DAY_2) {
                 mCurrentHoursOfDay = (mCurrentHoursOfDay % 12) + 12;
             }
+            setHourGridSelection(mCurrentHoursOfDay);
+        }
+    }
+
+    private void setHourGridSelection(int value) {
+        if (mIs24HourMode) {
+            m24HoursGrid.setSelection(value);
+        } else {
+            value = value % 12;
+            if (value == 0) {
+                value = 12;
+            }
+            mHoursGrid.setSelection(value);
         }
     }
 }

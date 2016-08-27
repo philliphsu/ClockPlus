@@ -39,7 +39,7 @@ public class TwentyFourHoursGrid extends NumbersGrid implements View.OnLongClick
         // We already verified that this view can have a click listener registered on.
         // See canRegisterClickListener().
         TwentyFourHourGridItem item = (TwentyFourHourGridItem) v;
-        clearIndicator();
+        clearIndicator(); // TODO: Remove?
         setIndicator(v);
         int newVal = Integer.parseInt(item.getPrimaryText().toString());
         setSelection(newVal);
@@ -52,7 +52,7 @@ public class TwentyFourHoursGrid extends NumbersGrid implements View.OnLongClick
         int newVal = Integer.parseInt(item.getSecondaryText().toString());
         setSelection(newVal);
         mSelectionListener.onNumberSelected(newVal);
-        clearIndicator();
+        clearIndicator(); // TODO: Remove?
         swapTexts();
         // TOneverDO: Call before swapping texts, because setIndicator() uses the primary TextView.
         setIndicator(v);
@@ -90,7 +90,7 @@ public class TwentyFourHoursGrid extends NumbersGrid implements View.OnLongClick
             item.getSecondaryTextView().setTextColor(mSecondaryTextColor);
         }
         // Set the indicator again
-        setIndicator(getChildAt(indexOfDefaultValue()));
+        setIndicator(getChildAt(indexOfDefaultValue())); // TODO: We don't need this anymore.
     }
 
     public void swapTexts() {

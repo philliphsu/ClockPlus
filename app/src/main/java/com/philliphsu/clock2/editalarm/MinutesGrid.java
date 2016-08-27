@@ -28,7 +28,7 @@ public class MinutesGrid extends NumbersGrid {
                 int value = getSelection() - 1;
                 if (value < 0)
                     value = 59;
-                setIndicator(value);
+                setIndicator(value); // TODO: Remove when you move this logic to setSelection()
                 setSelection(value);
                 mSelectionListener.onNumberSelected(value);
             }
@@ -39,7 +39,7 @@ public class MinutesGrid extends NumbersGrid {
                 int value = getSelection() + 1;
                 if (value == 60)
                     value = 0;
-                setIndicator(value);
+                setIndicator(value); // TODO: Remove when you move this logic to setSelection()
                 setSelection(value);
                 mSelectionListener.onNumberSelected(value);
             }
@@ -75,8 +75,9 @@ public class MinutesGrid extends NumbersGrid {
      * Helper method for minute tuners to set the indicator.
      * @param value the new value set by the minute tuners
      */
+    // TODO: Move this logic to setSelection()
     private void setIndicator(int value) {
-        clearIndicator();
+        clearIndicator(); // TODO: Remove?
         if (value % 5 == 0) {
             // The new value is one of the predetermined minute values
             int positionOfValue = value / 5;
