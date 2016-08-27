@@ -28,7 +28,6 @@ public class MinutesGrid extends NumbersGrid {
                 int value = getSelection() - 1;
                 if (value < 0)
                     value = 59;
-                setIndicator(value); // TODO: Remove when you move this logic to setSelection()
                 setSelection(value);
                 mSelectionListener.onNumberSelected(value);
             }
@@ -39,11 +38,22 @@ public class MinutesGrid extends NumbersGrid {
                 int value = getSelection() + 1;
                 if (value == 60)
                     value = 0;
-                setIndicator(value); // TODO: Remove when you move this logic to setSelection()
                 setSelection(value);
                 mSelectionListener.onNumberSelected(value);
             }
         });
+    }
+
+    @Override
+    public void setSelection(int value) {
+        super.setSelection(value);
+        if (value % 5 == 0) {
+            // The new value is one of the predetermined minute values
+            int positionOfValue = value / 5;
+            setIndicator(getChildAt(positionOfValue));
+        } else {
+            clearIndicator();
+        }
     }
 
     @Override
@@ -68,20 +78,6 @@ public class MinutesGrid extends NumbersGrid {
                     context, R.drawable.ic_minus_circle_24dp, colorActiveLight));
             mPlusButton.setImageDrawable(Utils.getTintedDrawable(
                     context, R.drawable.ic_add_circle_24dp, colorActiveLight));
-        }
-    }
-
-    /**
-     * Helper method for minute tuners to set the indicator.
-     * @param value the new value set by the minute tuners
-     */
-    // TODO: Move this logic to setSelection()
-    private void setIndicator(int value) {
-        clearIndicator(); // TODO: Remove?
-        if (value % 5 == 0) {
-            // The new value is one of the predetermined minute values
-            int positionOfValue = value / 5;
-            setIndicator(getChildAt(positionOfValue));
         }
     }
 }

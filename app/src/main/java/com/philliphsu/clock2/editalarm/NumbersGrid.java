@@ -133,6 +133,14 @@ public abstract class NumbersGrid extends GridLayout implements View.OnClickList
     }
 
     /**
+     * @return the number held by the button parsed into an integer. The base implementation
+     * assumes the view is of type TextView.
+     */
+    protected int valueOf(View button) {
+        return Integer.parseInt(((TextView) button).getText().toString());
+    }
+
+    /**
      * The default implementation sets the appropriate text color on all of the number buttons
      * as determined by {@link #canRegisterClickListener(View)}.
      */
@@ -166,12 +174,5 @@ public abstract class NumbersGrid extends GridLayout implements View.OnClickList
             v.setOnClickListener(this);
             i++;
         }
-    }
-
-    /**
-     * Parses the number held by the button into an integer.
-     */
-    private static int valueOf(View button) {
-        return Integer.parseInt(((TextView) button).getText().toString());
     }
 }
