@@ -5,7 +5,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
-import android.widget.ProgressBar;
+import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.philliphsu.clock2.AsyncTimersTableUpdateHandler;
@@ -17,6 +17,7 @@ import com.philliphsu.clock2.util.ProgressBarUtils;
 
 import butterknife.Bind;
 import butterknife.OnClick;
+import butterknife.OnTouch;
 
 /**
  * Created by Phillip Hsu on 7/25/2016.
@@ -31,7 +32,7 @@ public class TimerViewHolder extends BaseViewHolder<Timer> {
 
     @Bind(R.id.label) TextView mLabel;
     @Bind(R.id.duration) CountdownChronometer mChronometer;
-    @Bind(R.id.progress_bar) ProgressBar mProgressBar;
+    @Bind(R.id.seek_bar) SeekBar mSeekBar;
     @Bind(R.id.add_one_minute) ImageButton mAddOneMinute;
     @Bind(R.id.start_pause) ImageButton mStartPause;
     @Bind(R.id.stop) ImageButton mStop;
@@ -68,6 +69,11 @@ public class TimerViewHolder extends BaseViewHolder<Timer> {
     @OnClick(R.id.stop)
     void stop() {
         mController.stop();
+    }
+
+    @OnTouch(R.id.seek_bar)
+    boolean captureTouchOnSeekBar() {
+        return true; // Do nothing when the user touches the seek bar
     }
 
     private void bindLabel(String label) {
@@ -131,11 +137,15 @@ public class TimerViewHolder extends BaseViewHolder<Timer> {
         if (!timer.isRunning()) {
             // If our scale were 1, then casting ratio to an int will ALWAYS
             // truncate down to zero.
-            mProgressBar.setMax(100);
-            mProgressBar.setProgress((int) (100 * ratio));
+            mSeekBar.setMax(100);
+            final int progress = (int) (100 * ratio);
+            mSeekBar.setProgress(progress);
+//            mSeekBar.getThumb().mutate().setAlpha(progress == 0 ? 0 : 255);
         } else {
+//            mSeekBar.getThumb().mutate().setAlpha(255);
             mProgressAnimator = ProgressBarUtils.startNewAnimator(
-                    mProgressBar, ratio, timeRemaining);
+                    mSeekBar, ratio, timeRemaining);
         }
+        mSeekBar.getThumb().mutate().setAlpha(timeRemaining <= 0 ? 0 : 255);
     }
 }
