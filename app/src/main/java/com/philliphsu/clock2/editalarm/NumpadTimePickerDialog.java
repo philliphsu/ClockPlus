@@ -170,6 +170,7 @@ public class NumpadTimePickerDialog extends BaseTimePickerDialog
     void confirmSelection() {
         if (!mNumpad.checkTimeValid())
             return;
+//        Log.d(TAG, String.format("Time set: %d:%02d", mNumpad.getHour(), mNumpad.getMinute()));
         mCallback.onTimeSet(mNumpad, mNumpad.getHour(), mNumpad.getMinute());
         dismiss();
     }

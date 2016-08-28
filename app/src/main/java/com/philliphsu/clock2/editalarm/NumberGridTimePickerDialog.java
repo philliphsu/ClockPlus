@@ -389,6 +389,7 @@ public class NumberGridTimePickerDialog extends BaseTimePickerDialog implements 
                     tryVibrate();
                 }
                 if (mCallback != null) {
+//                    Log.d(TAG, String.format("Time set: %d:%02d", mTimePicker.getHours(), mTimePicker.getMinutes()));
                     mCallback.onTimeSet(mTimePicker, mTimePicker.getHours(), mTimePicker.getMinutes());
                 }
                 dismiss();

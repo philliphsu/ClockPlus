@@ -275,7 +275,7 @@ public class GridSelectorLayout extends ViewAnimator implements NumbersGrid.OnNu
      * Set the internal value for the hour, minute, or AM/PM.
      */
     private void setValueForItem(int index, int value) {
-        Log.d(TAG, String.format("setValueForItem(%d, %d)", index, value));
+//        Log.d(TAG, String.format("setValueForItem(%d, %d)", index, value));
         if (index == HOUR_INDEX) {
             mCurrentHoursOfDay = value;
             setHourGridSelection(value);
