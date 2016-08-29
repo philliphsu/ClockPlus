@@ -76,16 +76,11 @@ public class StopwatchFragment extends RecyclerViewFragment<
         mPauseDrawable = ContextCompat.getDrawable(getActivity(), R.drawable.ic_pause_24dp);
     }
 
-    // TODO: Restore progress bar animator on rotate
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        // TODO: Apply size span on chronom
+        Log.d(TAG, "onCreateView()");
         View view = super.onCreateView(inflater, container, savedInstanceState);
-        // TODO: Any better alternatives?
-        // TOneverDO: Move to onCreate(). It is not called again on device rotation, so we will
-        // have a null reference.
-        mActivityFab = new WeakReference<>((FloatingActionButton) getActivity().findViewById(R.id.fab));
 
         mChronometer.setApplySizeSpan(true);
         if (mStartTime > 0) {
@@ -96,16 +91,35 @@ public class StopwatchFragment extends RecyclerViewFragment<
             }
             mChronometer.setBase(base);
         }
-        if (wasChronometerRunning()) {
+        if (isStopwatchRunning()) {
             mChronometer.start();
             // Note: mChronometer.isRunning() will return false at this point and
             // in other upcoming lifecycle methods because it is not yet visible
             // (i.e. mVisible == false).
         }
-        // Hides the mini fabs prematurely, so when we actually display this tab
-        // they won't show even briefly at all before hiding.
-//        updateButtonControls();
+        // The primary reason we call this is to show the mini FABs after rotate,
+        // if the stopwatch is running. If the stopwatch is stopped, then this
+        // would have hidden the mini FABs, if not for us already setting its
+        // visibility to invisible in XML. We haven't initialized the WeakReference to
+        // our Activity's FAB yet, so this call does nothing with the FAB.
+        updateMiniFabs();
         return view;
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        // TODO: Any better alternatives?
+        // TOneverDO: Move to onCreate(). When the device rotates, onCreate() _is_ called,
+        // but trying to find the FAB in the Activity's layout will fail, and we would get back
+        // a null reference. This is probably because this Fragment's onCreate() is called
+        // BEFORE the Activity's onCreate.
+        mActivityFab = new WeakReference<>((FloatingActionButton) getActivity().findViewById(R.id.fab));
+        if (savedInstanceState != null) {
+            // This is a pretty good indication that we just rotated.
+//            updateMiniFabs(); // TODO: Do we need this?
+            updateFab();
+        }
     }
 
     /**
@@ -166,7 +180,7 @@ public class StopwatchFragment extends RecyclerViewFragment<
             //
             // NOTE: If we just recreated ourselves due to rotation, mChronometer.isRunning() == false,
             // because it is not yet visible (i.e. mVisible == false).
-            if (mChronometer.isRunning() || wasChronometerRunning()) {
+            if (isStopwatchRunning()) {
                 startNewProgressBarAnimator();
             } else {
                 // I verified the bar was visible already without this, so we probably don't need this,
@@ -218,13 +232,13 @@ public class StopwatchFragment extends RecyclerViewFragment<
 //                mProgressAnimator.resume();
 //            }
         }
-        updateButtonControls();
+        updateAllFabs();
         savePrefs();
     }
 
     @Override
     public void onPageSelected() {
-        updateButtonControls();
+        updateAllFabs();
     }
 
     @Nullable
@@ -284,19 +298,35 @@ public class StopwatchFragment extends RecyclerViewFragment<
             mProgressAnimator.end();
         }
         mProgressAnimator = null;
-        updateButtonControls();
         savePrefs();
+        // TOneverDO: Precede savePrefs(), or else we don't save false to KEY_CHRONOMETER_RUNNING
+        /// and updateFab will update the wrong icon.
+        updateAllFabs();
     }
 
-    private void updateButtonControls() {
+    private void updateAllFabs() {
+        updateMiniFabs();
+        updateFab();
+    }
+
+    private void updateMiniFabs() {
         boolean started = mStartTime > 0;
         int vis = started ? View.VISIBLE : View.INVISIBLE;
         mNewLapButton.setVisibility(vis);
         mStopButton.setVisibility(vis);
-        // TODO: We no longer call this method in lifecycle events where we aren't actually
-        // resumed/visible, so we can remove this check.
-        if (isVisible()) { // avoid changing the icon prematurely, esp. when we're not on this tab
-            mActivityFab.get().setImageDrawable(mChronometer.isRunning() ? mPauseDrawable : mStartDrawable);
+    }
+
+    private void updateFab() {
+        // Avoid changing the icon in premature cases.
+        // isVisible() is good for filtering out calls to this method when this Fragment
+        // isn't actually visible to the user; however, a side effect is it also filters
+        // out calls to this method when this Fragment is rotated.
+        // isMenuVisible() is good for the rotation case; however, a side effect is when you
+        // rotate on page 1 and scroll to page 2, the icon prematurely changes. Fortunately,
+        // for every page change after that, the icon no longer prematurely changes.
+        // TODO: If you can live with that, then move on.
+        if ((isVisible() || isMenuVisible()) && mActivityFab != null) {
+            mActivityFab.get().setImageDrawable(isStopwatchRunning() ? mPauseDrawable : mStartDrawable);
         }
     }
 
@@ -369,9 +399,14 @@ public class StopwatchFragment extends RecyclerViewFragment<
                 .apply();
     }
 
-    private boolean wasChronometerRunning() {
-        return mPrefs.getBoolean(KEY_CHRONOMETER_RUNNING, false);
+    /**
+     * @return the state of the stopwatch when we're in a resumed and visible state,
+     * or when we're going through a rotation
+     */
+    private boolean isStopwatchRunning() {
+        return mChronometer.isRunning() || mPrefs.getBoolean(KEY_CHRONOMETER_RUNNING, false);
     }
+
     // ======================= DO NOT IMPLEMENT ============================
 
     @Override
