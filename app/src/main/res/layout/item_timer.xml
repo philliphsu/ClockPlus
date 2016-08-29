@@ -33,9 +33,8 @@
         <!--TODO: Consider removing this bottom margin, because the seekbar
         is rendering with HUGE top and bottom padding already. -->
 
-        <!-- Cannot be touch controlled -->
         <!--The default style has padding start and end, so we remove both-->
-        <SeekBar
+        <com.philliphsu.clock2.UntouchableSeekBar
             android:id="@+id/seek_bar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

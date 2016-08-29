@@ -21,7 +21,11 @@ import android.content.Context;
 import android.os.Handler;
 import android.os.Message;
 import android.os.SystemClock;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.TextUtils;
 import android.text.format.DateUtils;
+import android.text.style.RelativeSizeSpan;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.widget.TextView;
@@ -64,6 +68,9 @@ public class ChronometerWithMillis extends TextView {
     private StringBuilder mFormatBuilder;
     private OnChronometerTickListener mOnChronometerTickListener;
     private StringBuilder mRecycle = new StringBuilder(8);
+    private boolean mApplySizeSpan;
+
+    private static final RelativeSizeSpan SIZE_SPAN = new RelativeSizeSpan(0.5f);
 
     private static final int TICK_WHAT = 2;
 
@@ -223,6 +230,11 @@ public class ChronometerWithMillis extends TextView {
         return mRunning;
     }
 
+    public void setApplySizeSpan(boolean applySizeSpan) {
+        mApplySizeSpan = applySizeSpan;
+        init(); // update text again
+    }
+
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
@@ -272,7 +284,14 @@ public class ChronometerWithMillis extends TextView {
                 // It looks like Google's Clock app strictly uses .
                 ".%02d", // The . before % is not a format specifier
                 centiseconds);
-        setText(text.concat(centisecondsText));
+        if (mApplySizeSpan) {
+            SpannableString span = new SpannableString(centisecondsText);
+            span.setSpan(SIZE_SPAN, 0, centisecondsText.length(),
+                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            setText(TextUtils.concat(text, span), BufferType.SPANNABLE);
+        } else {
+            setText(text.concat(centisecondsText));
+        }
     }
 
     private void updateRunning() {

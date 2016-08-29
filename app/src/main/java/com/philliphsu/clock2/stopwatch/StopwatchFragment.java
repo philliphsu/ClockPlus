@@ -87,6 +87,7 @@ public class StopwatchFragment extends RecyclerViewFragment<
         // have a null reference.
         mActivityFab = new WeakReference<>((FloatingActionButton) getActivity().findViewById(R.id.fab));
 
+        mChronometer.setApplySizeSpan(true);
         if (mStartTime > 0) {
             long base = mStartTime;
             if (mPauseTime > 0) {
@@ -95,8 +96,11 @@ public class StopwatchFragment extends RecyclerViewFragment<
             }
             mChronometer.setBase(base);
         }
-        if (mPrefs.getBoolean(KEY_CHRONOMETER_RUNNING, false)) {
+        if (wasChronometerRunning()) {
             mChronometer.start();
+            // Note: mChronometer.isRunning() will return false at this point and
+            // in other upcoming lifecycle methods because it is not yet visible
+            // (i.e. mVisible == false).
         }
         // Hides the mini fabs prematurely, so when we actually display this tab
         // they won't show even briefly at all before hiding.
@@ -115,6 +119,13 @@ public class StopwatchFragment extends RecyclerViewFragment<
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        // Every view that was in our tree is dereferenced for us.
+        // The reason we can control the animator here is because members
+        // are not dereferenced here, as evidenced by mStartTime and mPauseTime
+        // retaining their values.
+        if (mProgressAnimator != null) {
+            mProgressAnimator.removeAllListeners();
+        }
         Log.d(TAG, "onDestroyView()");
         Log.d(TAG, "mStartTime = " + mStartTime
                 + ", mPauseTime = " + mPauseTime);
@@ -127,17 +138,18 @@ public class StopwatchFragment extends RecyclerViewFragment<
 
     @Override
     public void onLoadFinished(Loader<LapCursor> loader, LapCursor data) {
+        Log.d(TAG, "onLoadFinished()");
         super.onLoadFinished(loader, data);
         // TODO: Will manipulating the cursor's position here affect the current
         // position in the adapter? Should we make a defensive copy and manipulate
         // that copy instead?
         if (data.moveToFirst()) {
             mCurrentLap = data.getItem();
-            Log.d(TAG, "Current lap ID = " + mCurrentLap.getId());
+//            Log.d(TAG, "Current lap ID = " + mCurrentLap.getId());
         }
         if (data.moveToNext()) {
             mPreviousLap = data.getItem();
-            Log.d(TAG, "Previous lap ID = " + mPreviousLap.getId());
+//            Log.d(TAG, "Previous lap ID = " + mPreviousLap.getId());
         }
         if (mCurrentLap != null && mPreviousLap != null) {
             // We really only want to start a new animator when the NEWLY RETRIEVED current
@@ -151,7 +163,10 @@ public class StopwatchFragment extends RecyclerViewFragment<
             // have different values for, e.g., t1 and pauseTime.
             //
             // Therefore, we'll just always end the previous animator and start a new one.
-            if (mChronometer.isRunning()) {
+            //
+            // NOTE: If we just recreated ourselves due to rotation, mChronometer.isRunning() == false,
+            // because it is not yet visible (i.e. mVisible == false).
+            if (mChronometer.isRunning() || wasChronometerRunning()) {
                 startNewProgressBarAnimator();
             } else {
                 // I verified the bar was visible already without this, so we probably don't need this,
@@ -299,41 +314,39 @@ public class StopwatchFragment extends RecyclerViewFragment<
         mSeekBar.setVisibility(View.VISIBLE);
         mProgressAnimator = ProgressBarUtils.startNewAnimator(
                 mSeekBar, getCurrentLapProgressRatio(), timeRemaining);
-        mProgressAnimator.addListener(mAnimatorListener);
-    }
+        mProgressAnimator.addListener(new Animator.AnimatorListener() {
+            private boolean cancelled;
 
-    private final Animator.AnimatorListener mAnimatorListener = new Animator.AnimatorListener() {
-        private boolean cancelled;
+            @Override
+            public void onAnimationStart(Animator animation) {
 
-        @Override
-        public void onAnimationStart(Animator animation) {
-
-        }
-
-        @Override
-        public void onAnimationEnd(Animator animation) {
-            // Pausing the stopwatch (and the current lap) uses Animator.cancel(), which will
-            // not only fire onAnimationCancel(Animator), but also onAnimationEnd(Animator).
-            // We should only let this call through when actually Animator.end() was called,
-            // and that happens when we stop() the stopwatch.
-            // If we didn't have this check, we'd be hiding the SeekBar every time we pause
-            // a lap.
-            if (!cancelled) {
-                mSeekBar.setVisibility(View.INVISIBLE);
             }
-            cancelled = false;
-        }
 
-        @Override
-        public void onAnimationCancel(Animator animation) {
-            cancelled = true;
-        }
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                // Pausing the stopwatch (and the current lap) uses Animator.cancel(), which will
+                // not only fire onAnimationCancel(Animator), but also onAnimationEnd(Animator).
+                // We should only let this call through when actually Animator.end() was called,
+                // and that happens when we stop() the stopwatch.
+                // If we didn't have this check, we'd be hiding the SeekBar every time we pause
+                // a lap.
+                if (!cancelled) {
+                    mSeekBar.setVisibility(View.INVISIBLE);
+                }
+                cancelled = false;
+            }
 
-        @Override
-        public void onAnimationRepeat(Animator animation) {
+            @Override
+            public void onAnimationCancel(Animator animation) {
+                cancelled = true;
+            }
 
-        }
-    };
+            @Override
+            public void onAnimationRepeat(Animator animation) {
+
+            }
+        });
+    }
 
     private double getCurrentLapProgressRatio() {
         if (mPreviousLap == null)
@@ -356,6 +369,9 @@ public class StopwatchFragment extends RecyclerViewFragment<
                 .apply();
     }
 
+    private boolean wasChronometerRunning() {
+        return mPrefs.getBoolean(KEY_CHRONOMETER_RUNNING, false);
+    }
     // ======================= DO NOT IMPLEMENT ============================
 
     @Override

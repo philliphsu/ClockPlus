@@ -17,14 +17,12 @@ import com.philliphsu.clock2.util.ProgressBarUtils;
 
 import butterknife.Bind;
 import butterknife.OnClick;
-import butterknife.OnTouch;
 
 /**
  * Created by Phillip Hsu on 7/25/2016.
  */
 public class TimerViewHolder extends BaseViewHolder<Timer> {
     private static final String TAG = "TimerViewHolder";
-    private static final int MAX_PROGRESS = 100000;
 
     private final AsyncTimersTableUpdateHandler mAsyncTimersTableUpdateHandler;
     private TimerController mController;
@@ -69,11 +67,6 @@ public class TimerViewHolder extends BaseViewHolder<Timer> {
     @OnClick(R.id.stop)
     void stop() {
         mController.stop();
-    }
-
-    @OnTouch(R.id.seek_bar)
-    boolean captureTouchOnSeekBar() {
-        return true; // Do nothing when the user touches the seek bar
     }
 
     private void bindLabel(String label) {
@@ -137,9 +130,10 @@ public class TimerViewHolder extends BaseViewHolder<Timer> {
         if (!timer.isRunning()) {
             // If our scale were 1, then casting ratio to an int will ALWAYS
             // truncate down to zero.
-            mSeekBar.setMax(100);
-            final int progress = (int) (100 * ratio);
-            mSeekBar.setProgress(progress);
+//            mSeekBar.setMax(100);
+//            final int progress = (int) (100 * ratio);
+//            mSeekBar.setProgress(progress);
+            ProgressBarUtils.setProgress(mSeekBar, ratio);
 //            mSeekBar.getThumb().mutate().setAlpha(progress == 0 ? 0 : 255);
         } else {
 //            mSeekBar.getThumb().mutate().setAlpha(255);
