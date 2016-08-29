@@ -7,7 +7,7 @@ import android.widget.ProgressBar;
  * Created by Phillip Hsu on 8/10/2016.
  */
 public class ProgressBarUtils {
-    private static final int MAX_PROGRESS = 100000;
+    private static final int MAX_PROGRESS = 1000000;
 
     /**
      * Constructs and starts a new countdown ObjectAnimator with the given properties.
@@ -15,9 +15,9 @@ public class ProgressBarUtils {
      *              by {@link #MAX_PROGRESS}. A ratio of 1 means the bar is full.
      * @return the created ObjectAnimator for holding a reference to
      */
-    public static ObjectAnimator startNewAnimator(final ProgressBar bar, final double ratio, final long duration) {
+    public static ObjectAnimator startNewAnimator(ProgressBar bar, double ratio, long duration) {
         bar.setMax(MAX_PROGRESS);
-        final int progress = (int) (MAX_PROGRESS * ratio);
+        final int progress = scaleRatio(ratio);
         ObjectAnimator animator = ObjectAnimator.ofInt(
                 // The object that has the property we wish to animate
                 bar,
@@ -44,5 +44,18 @@ public class ProgressBarUtils {
         // This MUST be run on the UI thread.
         animator.start();
         return animator;
+    }
+
+    /**
+     * Wrapper around {@link ProgressBar#setProgress(int) setProgress(int)} that keeps {@code bar}'s
+     * max in sync with the animation's progress scale factor.
+     */
+    public static void setProgress(ProgressBar bar, double ratio) {
+        bar.setMax(MAX_PROGRESS);
+        bar.setProgress(scaleRatio(ratio));
+    }
+
+    private static int scaleRatio(double ratio) {
+        return (int) (MAX_PROGRESS * ratio);
     }
 }

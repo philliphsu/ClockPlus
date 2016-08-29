@@ -1,5 +1,6 @@
 package com.philliphsu.clock2.stopwatch;
 
+import android.animation.Animator;
 import android.animation.ObjectAnimator;
 import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
@@ -14,7 +15,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ProgressBar;
+import android.widget.SeekBar;
 
 import com.philliphsu.clock2.R;
 import com.philliphsu.clock2.RecyclerViewFragment;
@@ -53,7 +54,7 @@ public class StopwatchFragment extends RecyclerViewFragment<
     @Bind(R.id.chronometer) ChronometerWithMillis mChronometer;
     @Bind(R.id.new_lap) FloatingActionButton mNewLapButton;
     @Bind(R.id.stop) FloatingActionButton mStopButton;
-    @Bind(R.id.progress_bar) ProgressBar mProgressBar;
+    @Bind(R.id.seek_bar) SeekBar mSeekBar;
 
     /**
      * This is called only when a new instance of this Fragment is being created,
@@ -138,7 +139,7 @@ public class StopwatchFragment extends RecyclerViewFragment<
             mPreviousLap = data.getItem();
             Log.d(TAG, "Previous lap ID = " + mPreviousLap.getId());
         }
-        if (mChronometer.isRunning() && mCurrentLap != null && mPreviousLap != null) {
+        if (mCurrentLap != null && mPreviousLap != null) {
             // We really only want to start a new animator when the NEWLY RETRIEVED current
             // and previous laps are different (i.e. different laps, NOT merely different instances)
             // from the CURRENT current and previous laps, as referenced by mCurrentLap and mPreviousLap.
@@ -150,8 +151,16 @@ public class StopwatchFragment extends RecyclerViewFragment<
             // have different values for, e.g., t1 and pauseTime.
             //
             // Therefore, we'll just always end the previous animator and start a new one.
-            // TODO: We may as well move the contents of this method here, since we're the only caller.
-            startNewProgressBarAnimator();
+            if (mChronometer.isRunning()) {
+                startNewProgressBarAnimator();
+            } else {
+                // I verified the bar was visible already without this, so we probably don't need this,
+                // but it's just a safety measure..
+                mSeekBar.setVisibility(View.VISIBLE);
+                ProgressBarUtils.setProgress(mSeekBar, getCurrentLapProgressRatio());
+            }
+        } else {
+            mSeekBar.setVisibility(View.INVISIBLE);
         }
     }
 
@@ -244,8 +253,12 @@ public class StopwatchFragment extends RecyclerViewFragment<
     void stop() {
         mChronometer.stop();
         mChronometer.setBase(SystemClock.elapsedRealtime());
+        // ----------------------------------------------------------------------
+        // TOneverDO: Precede these with mProgressAnimator.end(), otherwise our
+        // Animator.onAnimationEnd() callback won't hide SeekBar in time.
         mStartTime = 0;
         mPauseTime = 0;
+        // ----------------------------------------------------------------------
         mCurrentLap = null;
         mPreviousLap = null;
         mUpdateHandler.asyncClear(); // Clear laps
@@ -273,17 +286,67 @@ public class StopwatchFragment extends RecyclerViewFragment<
     }
 
     private void startNewProgressBarAnimator() {
+        final long timeRemaining = remainingTimeBetweenLaps();
+        if (timeRemaining <= 0) {
+            mSeekBar.setVisibility(View.INVISIBLE);
+            return;
+        }
         if (mProgressAnimator != null) {
             mProgressAnimator.end();
         }
-        long timeRemaining = mPreviousLap.elapsed() - mCurrentLap.elapsed();
-        if (timeRemaining <= 0)
-            return;
+        // This can't go in the onAnimationStart() callback because the listener is added
+        // AFTER ProgressBarUtils.startNewAnimator() starts the animation.
+        mSeekBar.setVisibility(View.VISIBLE);
+        mProgressAnimator = ProgressBarUtils.startNewAnimator(
+                mSeekBar, getCurrentLapProgressRatio(), timeRemaining);
+        mProgressAnimator.addListener(mAnimatorListener);
+    }
+
+    private final Animator.AnimatorListener mAnimatorListener = new Animator.AnimatorListener() {
+        private boolean cancelled;
+
+        @Override
+        public void onAnimationStart(Animator animation) {
+
+        }
+
+        @Override
+        public void onAnimationEnd(Animator animation) {
+            // Pausing the stopwatch (and the current lap) uses Animator.cancel(), which will
+            // not only fire onAnimationCancel(Animator), but also onAnimationEnd(Animator).
+            // We should only let this call through when actually Animator.end() was called,
+            // and that happens when we stop() the stopwatch.
+            // If we didn't have this check, we'd be hiding the SeekBar every time we pause
+            // a lap.
+            if (!cancelled) {
+                mSeekBar.setVisibility(View.INVISIBLE);
+            }
+            cancelled = false;
+        }
+
+        @Override
+        public void onAnimationCancel(Animator animation) {
+            cancelled = true;
+        }
+
+        @Override
+        public void onAnimationRepeat(Animator animation) {
+
+        }
+    };
+
+    private double getCurrentLapProgressRatio() {
+        if (mPreviousLap == null)
+            return 0;
         // The cast is necessary, or else we'd have integer division between two longs and we'd
         // always get zero since the numerator will always be less than the denominator.
-        double ratioTimeRemaining = timeRemaining / (double) mPreviousLap.elapsed();
-        mProgressAnimator = ProgressBarUtils.startNewAnimator(
-                mProgressBar, ratioTimeRemaining, timeRemaining);
+        return remainingTimeBetweenLaps() / (double) mPreviousLap.elapsed();
+    }
+
+    private long remainingTimeBetweenLaps() {
+        if (mCurrentLap == null || mPreviousLap == null)
+            return 0;
+        return mPreviousLap.elapsed() - mCurrentLap.elapsed();
     }
 
     private void savePrefs() {
