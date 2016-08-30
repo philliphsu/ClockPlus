@@ -11,6 +11,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -59,9 +60,25 @@ public class MainActivity extends BaseActivity {
 //    }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // TODO: On device rotation, if we were last on stopwatch page, restore the fab's translationX.
+        final View rootView = ((ViewGroup) findViewById(android.R.id.content)).getChildAt(0);
+        // http://stackoverflow.com/a/24035591/5055032
+        // http://stackoverflow.com/a/3948036/5055032
+        // The views in our layout have begun drawing.
+        // There is no lifecycle callback that tells us when our layout finishes drawing;
+        // in my own test, drawing still isn't finished by onResume().
+        // Post a message in the UI events queue to be executed after drawing is complete,
+        // so that we may get their dimensions.
+        rootView.post(new Runnable() {
+            @Override
+            public void run() {
+                if (mViewPager.getCurrentItem() == mSectionsPagerAdapter.getCount() - 1) {
+                    // Restore the FAB's translationX from a previous configuration.
+                    mFab.setTranslationX(mViewPager.getWidth() / -2f + getFabPixelOffsetForXTranslation());
+                }
+            }
+        });
 
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
@@ -76,8 +93,8 @@ public class MainActivity extends BaseActivity {
              */
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-//                Log.d(TAG, String.format("pos = %d, posOffset = %f, posOffsetPixels = %d",
-//                        position, positionOffset, positionOffsetPixels));
+                Log.d(TAG, String.format("pos = %d, posOffset = %f, posOffsetPixels = %d",
+                        position, positionOffset, positionOffsetPixels));
                 int pageBeforeLast = mSectionsPagerAdapter.getCount() - 2;
                 if (position <= pageBeforeLast) {
                     if (position < pageBeforeLast) {
@@ -101,22 +118,9 @@ public class MainActivity extends BaseActivity {
                         // is translated right, back to its original position.
                         float translationX = positionOffsetPixels / -2f;
                         // NOTE: You MUST scale your own additional pixel offsets by positionOffset,
-                        // or else the FAB will immediately translate by that many pixels, causing
-                        // jitter as you scroll.
-                        final int margin;
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                            // Since each side's margin is the same, any side's would do.
-                            margin = ((ViewGroup.MarginLayoutParams) mFab.getLayoutParams()).rightMargin;
-                        } else {
-                            // Pre-Lollipop has measurement issues with FAB margins. This is
-                            // probably as good as we can get to centering the FAB, without
-                            // hardcoding some small margin value.
-                            margin = 0;
-                        }
-                        // Translation is done relative to a view's left position; by adding
-                        // an offset of half the FAB's width, we effectively rebase the translation
-                        // relative to the view's center position.
-                        translationX += positionOffset * (mFab.getWidth() / 2f + margin);
+                        // or else the FAB will immediately translate by that many pixels, appearing
+                        // to skip/jump.
+                        translationX += positionOffset * getFabPixelOffsetForXTranslation();
                         mFab.setTranslationX(translationX);
                     }
                 }
@@ -124,10 +128,15 @@ public class MainActivity extends BaseActivity {
 
             @Override
             public void onPageSelected(int position) {
+                Log.d(TAG, "onPageSelected");
                 if (position < mSectionsPagerAdapter.getCount() - 1) {
                     mFab.setImageDrawable(mAddItemDrawable);
                 }
                 Fragment f = mSectionsPagerAdapter.getFragment(mViewPager.getCurrentItem());
+                // NOTE: This callback is fired after a rotation, right after onStart().
+                // Unfortunately, the FragmentManager handling the rotation has yet to
+                // tell our adapter to re-instantiate the Fragments, so our collection
+                // of fragments is empty. You MUST keep this check so we don't cause a NPE.
                 if (f instanceof BaseFragment) {
                     ((BaseFragment) f).onPageSelected();
                 }
@@ -301,6 +310,28 @@ public class MainActivity extends BaseActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    /**
+     * @return the positive offset in pixels required to rebase an X-translation of the FAB
+     * relative to its center position. An X-translation normally is done relative to a view's
+     * left position.
+     */
+    private float getFabPixelOffsetForXTranslation() {
+        final int margin;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            // Since each side's margin is the same, any side's would do.
+            margin = ((ViewGroup.MarginLayoutParams) mFab.getLayoutParams()).rightMargin;
+        } else {
+            // Pre-Lollipop has measurement issues with FAB margins. This is
+            // probably as good as we can get to centering the FAB, without
+            // hardcoding some small margin value.
+            margin = 0;
+        }
+        // X-translation is done relative to a view's left position; by adding
+        // an offset of half the FAB's width, we effectively rebase the translation
+        // relative to the view's center position.
+        return mFab.getWidth() / 2f + margin;
     }
 
     /**

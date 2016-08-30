@@ -109,15 +109,30 @@ public class StopwatchFragment extends RecyclerViewFragment<
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        // TODO: Any better alternatives?
         // TOneverDO: Move to onCreate(). When the device rotates, onCreate() _is_ called,
         // but trying to find the FAB in the Activity's layout will fail, and we would get back
         // a null reference. This is probably because this Fragment's onCreate() is called
         // BEFORE the Activity's onCreate.
+        // TODO: Any better alternatives to control the Activity's FAB from here?
         mActivityFab = new WeakReference<>((FloatingActionButton) getActivity().findViewById(R.id.fab));
-        if (savedInstanceState != null) {
+        // There is no documentation for isMenuVisible(), so what exactly does it do?
+        // My guess is it checks for the Fragment's options menu. But we never initialize this
+        // Fragment with setHasOptionsMenu(), let alone we don't actually inflate a menu in here.
+        // My guess is when this Fragment becomes actually visible, it "hooks" onto the menu
+        // options "internal API" and inflates its menu in there if it has one.
+        //
+        // To us, this just makes for a very good visibility check.
+        if (savedInstanceState != null && isMenuVisible()) {
             // This is a pretty good indication that we just rotated.
-//            updateMiniFabs(); // TODO: Do we need this?
+            // isMenuVisible() filters out the case when you rotate on page 1 and scroll
+            // to page 2, the icon will prematurely change; that happens because at page 2,
+            // this Fragment will be instantiated for the first time for the current configuration,
+            // and so the lifecycle from onCreate() to onActivityCreated() occurs. As such,
+            // we will have a non-null savedInstanceState and this would call through.
+            //
+            // The reason when you open up the app for the first time and scrolling to page 2
+            // doesn't prematurely change the icon is the savedInstanceState is null, and so
+            // this call would be filtered out sufficiently just from the first check.
             updateFab();
         }
     }
@@ -232,8 +247,10 @@ public class StopwatchFragment extends RecyclerViewFragment<
 //                mProgressAnimator.resume();
 //            }
         }
-        updateAllFabs();
         savePrefs();
+        // TOneverDO: Precede savePrefs(), or else we don't save false to KEY_CHRONOMETER_RUNNING
+        /// and updateFab will update the wrong icon.
+        updateAllFabs();
     }
 
     @Override
@@ -306,7 +323,15 @@ public class StopwatchFragment extends RecyclerViewFragment<
 
     private void updateAllFabs() {
         updateMiniFabs();
-        updateFab();
+        // TODO: If we're calling this method, then chances are we are visible.
+        // You can verify this yourself by finding all usages.
+        // isVisible() is good for filtering out calls to this method when this Fragment
+        // isn't actually visible to the user; however, a side effect is it also filters
+        // out calls to this method when this Fragment is rotated. Fortunately, we don't
+        // make any calls to this method after a rotation.
+        if (isVisible()) {
+            updateFab();
+        }
     }
 
     private void updateMiniFabs() {
@@ -317,17 +342,7 @@ public class StopwatchFragment extends RecyclerViewFragment<
     }
 
     private void updateFab() {
-        // Avoid changing the icon in premature cases.
-        // isVisible() is good for filtering out calls to this method when this Fragment
-        // isn't actually visible to the user; however, a side effect is it also filters
-        // out calls to this method when this Fragment is rotated.
-        // isMenuVisible() is good for the rotation case; however, a side effect is when you
-        // rotate on page 1 and scroll to page 2, the icon prematurely changes. Fortunately,
-        // for every page change after that, the icon no longer prematurely changes.
-        // TODO: If you can live with that, then move on.
-        if ((isVisible() || isMenuVisible()) && mActivityFab != null) {
-            mActivityFab.get().setImageDrawable(isStopwatchRunning() ? mPauseDrawable : mStartDrawable);
-        }
+        mActivityFab.get().setImageDrawable(isStopwatchRunning() ? mPauseDrawable : mStartDrawable);
     }
 
     private void startNewProgressBarAnimator() {
