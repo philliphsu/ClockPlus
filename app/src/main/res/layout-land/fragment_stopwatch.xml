@@ -26,11 +26,15 @@
                 android:textSize="@dimen/text_size_display_3"
                 style="@style/TextAppearance.AppCompat.Inverse"/>
 
-            <include layout="@layout/fragment_recycler_view"
-                     android:layout_width="0dp"
-                     android:layout_weight="1"
-                     android:layout_height="match_parent"
-                     android:layout_marginTop="8dp"/>
+            <!-- Unfortunately, we can't reuse fragment_recycler_view
+               - due to different padding requirements here. -->
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/list"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="match_parent"
+                android:scrollbars="vertical"
+                android:paddingTop="8dp"/>
 
         </LinearLayout>
 
