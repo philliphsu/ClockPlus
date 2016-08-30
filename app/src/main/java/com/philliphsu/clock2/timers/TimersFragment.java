@@ -4,18 +4,26 @@ package com.philliphsu.clock2.timers;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.content.Loader;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 
 import com.philliphsu.clock2.AsyncTimersTableUpdateHandler;
+import com.philliphsu.clock2.R;
 import com.philliphsu.clock2.RecyclerViewFragment;
 import com.philliphsu.clock2.Timer;
 import com.philliphsu.clock2.edittimer.EditTimerActivity;
 import com.philliphsu.clock2.model.TimerCursor;
 import com.philliphsu.clock2.model.TimersListCursorLoader;
+
+import static butterknife.ButterKnife.findById;
+import static com.philliphsu.clock2.util.ConfigurationUtils.getOrientation;
 
 public class TimersFragment extends RecyclerViewFragment<
         Timer,
@@ -32,6 +40,24 @@ public class TimersFragment extends RecyclerViewFragment<
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mAsyncTimersTableUpdateHandler = new AsyncTimersTableUpdateHandler(getActivity(), this);
+    }
+
+    @Nullable
+    @Override
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        View view = super.onCreateView(inflater, container, savedInstanceState);
+        final Resources r = getResources();
+        RecyclerView list = findById(view, R.id.list);
+        int cardViewMargin = r.getDimensionPixelSize(R.dimen.cardview_margin);
+        switch (getOrientation(r)) {
+            case Configuration.ORIENTATION_LANDSCAPE:
+                list.setPaddingRelative(cardViewMargin/*start*/, cardViewMargin/*top*/, 0, 0);
+                break;
+            case Configuration.ORIENTATION_PORTRAIT:
+                list.setPaddingRelative(0, 0, 0, cardViewMargin);
+                break;
+        }
+        return view;
     }
 
     @Override
@@ -74,7 +100,7 @@ public class TimersFragment extends RecyclerViewFragment<
 
     @Override
     protected RecyclerView.LayoutManager getLayoutManager() {
-        switch (getResources().getConfiguration().orientation) {
+        switch (getOrientation(getResources())) {
             case Configuration.ORIENTATION_LANDSCAPE:
                 return new GridLayoutManager(getActivity(), LANDSCAPE_LAYOUT_COLUMNS);
             default:

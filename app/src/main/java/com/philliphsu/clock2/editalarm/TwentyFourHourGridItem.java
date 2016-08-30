@@ -9,6 +9,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.philliphsu.clock2.R;
+import com.philliphsu.clock2.util.ConfigurationUtils;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -70,7 +71,8 @@ public class TwentyFourHourGridItem extends LinearLayout {
     }
 
     private void init() {
-        final int orientation = getResources().getConfiguration().orientation;
+        // TODO: Why isn't ALT-ENTER giving us an option to static import this method?
+        final int orientation = ConfigurationUtils.getOrientation(getResources());
         setOrientation(orientation == Configuration.ORIENTATION_PORTRAIT ?
                 VERTICAL : /*LANDSCAPE*/HORIZONTAL);
         setGravity(Gravity.CENTER);

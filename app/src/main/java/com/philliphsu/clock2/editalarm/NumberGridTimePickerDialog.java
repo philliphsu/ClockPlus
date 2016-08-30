@@ -46,6 +46,8 @@ import java.util.Locale;
 import butterknife.Bind;
 import butterknife.OnClick;
 
+import static com.philliphsu.clock2.util.ConfigurationUtils.getOrientation;
+
 //import com.android.datetimepicker.HapticFeedbackController;
 //import com.android.datetimepicker.R;
 //import com.android.datetimepicker.Utils;
@@ -326,7 +328,7 @@ public class NumberGridTimePickerDialog extends BaseTimePickerDialog implements 
             final int icon2 = mThemeDark? R.drawable.ic_half_day_2_dark_24dp : R.drawable.ic_half_day_2_24dp;
             // Determine the direction the icons should be in
             int left1 = 0, left2 = 0, top1 = 0, top2 = 0;
-            switch (getResources().getConfiguration().orientation) {
+            switch (getOrientation(getResources())) {
                 case Configuration.ORIENTATION_PORTRAIT:
                     left1 = icon1;
                     left2 = icon2;
