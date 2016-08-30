@@ -3,9 +3,12 @@ package com.philliphsu.clock2.timers;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.content.Loader;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 
 import com.philliphsu.clock2.AsyncTimersTableUpdateHandler;
 import com.philliphsu.clock2.RecyclerViewFragment;
@@ -19,6 +22,8 @@ public class TimersFragment extends RecyclerViewFragment<
         TimerViewHolder,
         TimerCursor,
         TimersCursorAdapter> {
+    private static final int LANDSCAPE_LAYOUT_COLUMNS = 2;
+
     public static final int REQUEST_CREATE_TIMER = 0;
 
     private AsyncTimersTableUpdateHandler mAsyncTimersTableUpdateHandler;
@@ -65,6 +70,16 @@ public class TimersFragment extends RecyclerViewFragment<
         // the reference variable will be pointing to an actual object. This assignment "propagates"
         // to all references to mAsyncTimersTableUpdateHandler.
         return new TimersCursorAdapter(this, mAsyncTimersTableUpdateHandler);
+    }
+
+    @Override
+    protected RecyclerView.LayoutManager getLayoutManager() {
+        switch (getResources().getConfiguration().orientation) {
+            case Configuration.ORIENTATION_LANDSCAPE:
+                return new GridLayoutManager(getActivity(), LANDSCAPE_LAYOUT_COLUMNS);
+            default:
+                return super.getLayoutManager();
+        }
     }
 
     @Override
