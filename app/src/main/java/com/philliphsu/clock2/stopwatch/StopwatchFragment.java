@@ -200,7 +200,8 @@ public class StopwatchFragment extends RecyclerViewFragment<
             } else {
                 // I verified the bar was visible already without this, so we probably don't need this,
                 // but it's just a safety measure..
-                mSeekBar.setVisibility(View.VISIBLE);
+                // ACTUALLY NOT A SAFETY MEASURE!
+//                mSeekBar.setVisibility(View.VISIBLE);
                 ProgressBarUtils.setProgress(mSeekBar, getCurrentLapProgressRatio());
             }
         } else {
