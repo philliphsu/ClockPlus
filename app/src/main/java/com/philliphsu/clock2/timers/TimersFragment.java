@@ -30,6 +30,8 @@ public class TimersFragment extends RecyclerViewFragment<
         TimerViewHolder,
         TimerCursor,
         TimersCursorAdapter> {
+    // TODO: Different number of columns for different display densities, instead of landscape.
+    // Use smallest width qualifiers. I can imagine 3 or 4 columns for a large enough tablet in landscape.
     private static final int LANDSCAPE_LAYOUT_COLUMNS = 2;
 
     public static final int REQUEST_CREATE_TIMER = 0;
@@ -47,15 +49,10 @@ public class TimersFragment extends RecyclerViewFragment<
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = super.onCreateView(inflater, container, savedInstanceState);
         final Resources r = getResources();
-        RecyclerView list = findById(view, R.id.list);
-        int cardViewMargin = r.getDimensionPixelSize(R.dimen.cardview_margin);
-        switch (getOrientation(r)) {
-            case Configuration.ORIENTATION_LANDSCAPE:
-                list.setPaddingRelative(cardViewMargin/*start*/, cardViewMargin/*top*/, 0, list.getPaddingBottom());
-                break;
-            case Configuration.ORIENTATION_PORTRAIT:
-//                list.setPaddingRelative(0, 0, 0, cardViewMargin);
-                break;
+        if (getOrientation(r) == Configuration.ORIENTATION_LANDSCAPE) {
+            RecyclerView list = findById(view, R.id.list);
+            int cardViewMargin = r.getDimensionPixelSize(R.dimen.cardview_margin);
+            list.setPaddingRelative(cardViewMargin/*start*/, cardViewMargin/*top*/, 0, list.getPaddingBottom());
         }
         return view;
     }

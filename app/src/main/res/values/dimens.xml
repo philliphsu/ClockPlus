@@ -53,6 +53,10 @@
     <dimen name="cardview_action_icon_margin">8dp</dimen>
     <dimen name="cardview_action_icon_size">48dp</dimen>
 
+    <!-- StopwatchFragment -->
+    <dimen name="laps_container_margin_top">8dp</dimen>
+    <dimen name="chronometer_padding">16dp</dimen>
+
     <dimen name="text_size_body_1">14sp</dimen>
     <dimen name="text_size_body_2">14sp</dimen>
     <dimen name="text_size_button">14sp</dimen>

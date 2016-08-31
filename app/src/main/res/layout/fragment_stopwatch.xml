@@ -14,7 +14,7 @@
             android:id="@+id/chronometer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="16dp"
+            android:padding="@dimen/chronometer_padding"
             android:background="@color/colorPrimary"
             android:gravity="center_horizontal"
             android:textSize="@dimen/text_size_display_3"
@@ -23,7 +23,7 @@
         <include layout="@layout/fragment_recycler_view"
                  android:layout_width="match_parent"
                  android:layout_height="match_parent"
-                 android:layout_marginTop="8dp"/>
+                 android:layout_marginTop="@dimen/laps_container_margin_top"/>
 
     </LinearLayout>
 
@@ -36,10 +36,9 @@
         android:paddingStart="0dp"
         android:paddingEnd="0dp"/>
 
-    <!-- TODO: dimen resource for height -->
     <android.support.v7.widget.GridLayout
         android:layout_width="match_parent"
-        android:layout_height="88dp"
+        android:layout_height="@dimen/fab_total_height"
         android:layout_gravity="bottom"
         app:columnCount="2">
 

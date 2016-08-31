@@ -20,7 +20,6 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:padding="16dp"
                 android:background="@color/colorPrimary"
                 android:gravity="center"
                 android:textSize="@dimen/text_size_display_3"
@@ -30,15 +29,14 @@
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="match_parent"
-                android:layout_marginTop="8dp"/>
+                android:layout_marginTop="@dimen/laps_container_margin_top"/>
 
         </LinearLayout>
 
-        <!-- TODO: dimen resource for height -->
         <android.support.v7.widget.GridLayout
             android:id="@id/mini_fab_layout"
             android:layout_width="match_parent"
-            android:layout_height="88dp"
+            android:layout_height="@dimen/fab_total_height"
             android:layout_alignParentBottom="true"
             app:columnCount="2">
 
