@@ -17,7 +17,7 @@
             android:layout_centerHorizontal="true"
             android:text="Label"
             android:textSize="@dimen/text_size_medium"
-            android:layout_marginTop="@dimen/item_margin_between_elements"
+            android:layout_marginTop="@dimen/item_padding_top"
             android:layout_marginBottom="@dimen/item_margin_between_elements"/>
 
         <com.philliphsu.clock2.timers.CountdownChronometer
