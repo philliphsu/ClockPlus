@@ -25,4 +25,12 @@
         android:layout_height="48dp"
         android:layout_gravity="center_vertical"/>
 
+    <!-- A mock TextView from which the current Theme's text colors
+     can be retrieved. -->
+    <TextView
+        android:id="@+id/colors_source"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        style="@style/TextAppearance.AppCompat"/>
+
 </LinearLayout>

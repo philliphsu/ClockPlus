@@ -1,11 +1,13 @@
 package com.philliphsu.clock2.alarms;
 
+import android.content.res.ColorStateList;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.SwitchCompat;
 import android.text.format.DateFormat;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,6 +37,7 @@ import static com.philliphsu.clock2.util.DateFormatUtils.formatTime;
  * Created by Phillip Hsu on 7/31/2016.
  */
 public abstract class BaseAlarmViewHolder extends BaseViewHolder<Alarm> {
+    private static final String TAG = "BaseAlarmViewHolder";
 
     private final AlarmController mAlarmController;
     // TODO: Should we use VectorDrawable type?
@@ -60,7 +63,7 @@ public abstract class BaseAlarmViewHolder extends BaseViewHolder<Alarm> {
     @Override
     public void onBind(Alarm alarm) {
         super.onBind(alarm);
-        bindTime(new Date(alarm.ringsAt()));
+        bindTime(alarm);
         bindSwitch(alarm.isEnabled());
         bindDismissButton(alarm);
         bindLabel(alarm.label());
@@ -157,13 +160,29 @@ public abstract class BaseAlarmViewHolder extends BaseViewHolder<Alarm> {
         }
     }
 
-    private void bindTime(Date date) {
-        String time = DateFormat.getTimeFormat(getContext()).format(date);
+    @OnClick(R.id.time)
+    void openTimePicker() {
+        Log.d(TAG, "Time clicked!");
+    }
+
+    private void bindTime(Alarm alarm) {
+        String time = DateFormat.getTimeFormat(getContext()).format(new Date(alarm.ringsAt()));
         if (DateFormat.is24HourFormat(getContext())) {
             mTime.setText(time);
         } else {
             TimeTextUtils.setText(time, mTime);
         }
+
+        // Use a mock TextView to get our colors, because its ColorStateList is never
+        // mutated for the lifetime of this ViewHolder (even when reused).
+        // This solution is robust against dark/light theme changes, whereas using
+        // color resources is not.
+        TextView colorsSource = (TextView) itemView.findViewById(R.id.colors_source);
+        ColorStateList colors = colorsSource.getTextColors();
+        int def = colors.getDefaultColor();
+        int disabled = colors.getColorForState(new int[] {-android.R.attr.state_enabled}, def);
+        // We only have two states, so we don't care about losing the other state colors.
+        mTime.setTextColor(alarm.isEnabled() ? def : disabled);
     }
 
     private void bindSwitch(boolean enabled) {
