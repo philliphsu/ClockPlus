@@ -97,10 +97,10 @@
     <!-- TODO: Consider making a dark themed Divider too. -->
     <style name="Divider">
         <!-- Won't be visible in a bottom sheet dialog... -->
-        <!--<item name="android:background">?android:attr/listDivider</item>-->
+        <item name="android:background">?android:attr/listDivider</item>
         <!-- Extracted from the drawable pointed to by the attr. Visible in bottom sheet. -->
-        <item name="android:background">#1f000000</item> <!-- 12% black -->
-        <item name="android:tint">?android:attr/colorForeground</item>
+        <!--<item name="android:background">#1f000000</item> &lt;!&ndash; 12% black &ndash;&gt;-->
+        <!--<item name="android:tint">?android:attr/colorForeground</item>-->
     </style>
 
     <style name="Divider.Horizontal">
