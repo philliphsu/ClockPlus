@@ -13,10 +13,13 @@
     </style>
 
     <style name="AppTheme.Dark" parent="Theme.AppCompat.NoActionBar">
-        <item name="colorPrimary">@color/light_gray</item>
+        <item name="colorPrimary">@color/dark_gray</item>
         <item name="colorPrimaryDark">@color/dark_gray</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <!-- TODO: This doesn't work for BottomSheetDialogs. Verify this works for other types of dialogs. -->
+        <!--<item name="dialogTheme">@style/AppCompatDialogTheme.Dark</item>-->
         <item name="alertDialogTheme">@style/AppCompatAlertDialogStyle.Dark</item>
+        <!--TODO: Dark theme-->
         <item name="bottomSheetDialogTheme">@style/BottomSheetDialogTheme</item>
     </style>
 
@@ -94,13 +97,10 @@
         <item name="layout_gravity">center</item>
     </style>
 
-    <!-- TODO: Consider making a dark themed Divider too. -->
     <style name="Divider">
-        <!-- Won't be visible in a bottom sheet dialog... -->
+        <!-- This is robust against dark/light theme changes. -->
+        <!-- Normally not visible in bottom sheets; workaround is to manually change the background color of the divider-->
         <item name="android:background">?android:attr/listDivider</item>
-        <!-- Extracted from the drawable pointed to by the attr. Visible in bottom sheet. -->
-        <!--<item name="android:background">#1f000000</item> &lt;!&ndash; 12% black &ndash;&gt;-->
-        <!--<item name="android:tint">?android:attr/colorForeground</item>-->
     </style>
 
     <style name="Divider.Horizontal">
@@ -123,6 +123,10 @@
 
     <!-- Style for AppCompatDialog from the v7 support library -->
     <style name="AppCompatDialogTheme" parent="Theme.AppCompat.Light.Dialog">
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
+
+    <style name="AppCompatDialogTheme.Dark" parent="Theme.AppCompat.Dialog">
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
