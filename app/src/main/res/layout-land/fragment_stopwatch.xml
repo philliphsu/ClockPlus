@@ -25,10 +25,16 @@
                 android:textSize="@dimen/text_size_display_3"
                 style="@style/TextAppearance.AppCompat.Inverse"/>
 
-            <include layout="@layout/fragment_recycler_view"
+            <!--
+              - Unfortunately, we can't include fragment_recycler_view
+              - because we don't want the bottom padding
+             -->
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/list"
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="match_parent"
+                android:scrollbars="vertical"
                 android:layout_marginTop="@dimen/laps_container_margin_top"/>
 
         </LinearLayout>
