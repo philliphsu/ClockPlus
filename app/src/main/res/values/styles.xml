@@ -12,6 +12,14 @@
         <item name="bottomSheetDialogTheme">@style/BottomSheetDialogTheme</item>
     </style>
 
+    <style name="AppTheme.Dark" parent="Theme.AppCompat.NoActionBar">
+        <item name="colorPrimary">@color/light_gray</item>
+        <item name="colorPrimaryDark">@color/dark_gray</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="alertDialogTheme">@style/AppCompatAlertDialogStyle.Dark</item>
+        <item name="bottomSheetDialogTheme">@style/BottomSheetDialogTheme</item>
+    </style>
+
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar"/>
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light"/>
@@ -122,9 +130,14 @@
         <!-- Trying to use the colorAccent attribute (whether from ?android:attr or ?attr) WILL CRASH.-->
         <item name="colorAccent">@color/colorAccent</item>
     </style>
+    <style name="AppCompatAlertDialogStyle.Dark" parent="Theme.AppCompat.Dialog.Alert">
+        <!-- Trying to use the colorAccent attribute (whether from ?android:attr or ?attr) WILL CRASH.-->
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
 
     <style name="BottomSheetDialogTheme" parent="Theme.Design.Light.BottomSheetDialog">
         <item name="bottomSheetStyle">@style/ModalStyle</item>
+        <!--TODO: See if defining a colorAccent item works.-->
     </style>
 
     <style name="ModalStyle" parent="Widget.Design.BottomSheet.Modal">
