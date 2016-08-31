@@ -4,12 +4,14 @@ import android.app.Activity;
 import android.content.Intent;
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ToggleButton;
 
+import com.philliphsu.clock2.AddLabelDialog;
 import com.philliphsu.clock2.Alarm;
 import com.philliphsu.clock2.DaysOfWeek;
 import com.philliphsu.clock2.OnListItemInteractionListener;
@@ -88,6 +90,20 @@ public class ExpandedAlarmViewHolder extends BaseAlarmViewHolder {
         // TODO: This is VERY BAD. Use a Controller/Presenter instead.
         // The result will be delivered to MainActivity, and then delegated to AlarmsFragment.
         ((Activity) getContext()).startActivityForResult(intent, AlarmsFragment.REQUEST_PICK_RINGTONE);
+    }
+
+    @OnClick(R.id.label) // The label view is in our superclass, but we can reference it.
+    void openLabelEditor() {
+        AddLabelDialog dialog = AddLabelDialog.newInstance(new AddLabelDialog.OnLabelSetListener() {
+            @Override
+            public void onLabelSet(String label) {
+                mLabel.setText(label);
+                // TODO: persist change. Use TimerController and its update()
+            }
+        }, mLabel.getText());
+        // TODO: This is bad! Use a Controller instead!
+        AppCompatActivity act = (AppCompatActivity) getContext();
+        dialog.show(act.getSupportFragmentManager(), "TAG");
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////
