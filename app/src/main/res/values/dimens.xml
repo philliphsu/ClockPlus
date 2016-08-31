@@ -11,6 +11,7 @@
     <dimen name="alarm_time_text_size">48sp</dimen>
     <dimen name="app_bar_height">180dp</dimen>
     <dimen name="text_margin">16dp</dimen>
+    <dimen name="fab_total_height">88dp</dimen>
 
     <dimen name="grid_element_text_size">34sp</dimen>
     <dimen name="grid_element_touch_target">40dp</dimen>

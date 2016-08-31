@@ -51,10 +51,10 @@ public class TimersFragment extends RecyclerViewFragment<
         int cardViewMargin = r.getDimensionPixelSize(R.dimen.cardview_margin);
         switch (getOrientation(r)) {
             case Configuration.ORIENTATION_LANDSCAPE:
-                list.setPaddingRelative(cardViewMargin/*start*/, cardViewMargin/*top*/, 0, 0);
+                list.setPaddingRelative(cardViewMargin/*start*/, cardViewMargin/*top*/, 0, list.getPaddingBottom());
                 break;
             case Configuration.ORIENTATION_PORTRAIT:
-                list.setPaddingRelative(0, 0, 0, cardViewMargin);
+//                list.setPaddingRelative(0, 0, 0, cardViewMargin);
                 break;
         }
         return view;
