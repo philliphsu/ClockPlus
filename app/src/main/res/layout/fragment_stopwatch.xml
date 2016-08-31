@@ -15,7 +15,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="@dimen/chronometer_padding"
-            android:background="@color/colorPrimary"
+            android:background="?attr/colorPrimary"
             android:gravity="center_horizontal"
             android:textSize="@dimen/text_size_display_3"
             style="@style/TextAppearance.AppCompat.Inverse"/>
@@ -52,7 +52,7 @@
             app:layout_columnWeight="1"
             app:layout_gravity="center"
             app:fabSize="mini"
-            app:backgroundTint="@color/colorPrimary"/>
+            app:backgroundTint="?attr/colorPrimary"/>
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/stop"
@@ -64,7 +64,7 @@
             app:layout_columnWeight="1"
             app:layout_gravity="center"
             app:fabSize="mini"
-            app:backgroundTint="@color/colorPrimary"/>
+            app:backgroundTint="?attr/colorPrimary"/>
 
     </android.support.v7.widget.GridLayout>
 
