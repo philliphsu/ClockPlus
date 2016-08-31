@@ -7,7 +7,8 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
         <!-- TODO: This doesn't work for BottomSheetDialogs. Verify this works for other types of dialogs. -->
-        <item name="dialogTheme">@style/AppCompatDialogTheme</item>
+        <!--<item name="dialogTheme">@style/AppCompatDialogTheme</item>-->
+        <item name="alertDialogTheme">@style/AppCompatAlertDialogStyle</item>
         <item name="bottomSheetDialogTheme">@style/BottomSheetDialogTheme</item>
     </style>
 
@@ -114,9 +115,14 @@
 
     <!-- Style for AppCompatDialog from the v7 support library -->
     <style name="AppCompatDialogTheme" parent="Theme.AppCompat.Light.Dialog">
-        <item name="colorAccent">?android:attr/colorAccent</item>
+        <item name="colorAccent">@color/colorAccent</item>
     </style>
-    
+
+    <style name="AppCompatAlertDialogStyle" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <!-- Trying to use the colorAccent attribute (whether from ?android:attr or ?attr) WILL CRASH.-->
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
+
     <style name="BottomSheetDialogTheme" parent="Theme.Design.Light.BottomSheetDialog">
         <item name="bottomSheetStyle">@style/ModalStyle</item>
     </style>

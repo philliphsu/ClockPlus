@@ -57,7 +57,7 @@ public class AddLabelDialog extends AppCompatDialogFragment {
         int spacingLeft = getResources().getDimensionPixelSize(R.dimen.item_padding_start);
         int spacingRight = getResources().getDimensionPixelSize(R.dimen.item_padding_end);
 
-        final AlertDialog alert = new AlertDialog.Builder(getActivity(), getTheme())
+        final AlertDialog alert = new AlertDialog.Builder(getActivity())
                 .setTitle(R.string.label)
                 .setView(mEditText, spacingLeft, 0, spacingRight, 0)
                 .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
