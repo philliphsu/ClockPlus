@@ -73,7 +73,13 @@ public class TimerViewHolder extends BaseViewHolder<Timer> {
 
     @OnClick(R.id.label)
     void openLabelEditor() {
-        AddLabelDialog dialog = AddLabelDialog.newInstance(mLabel.getText());
+        AddLabelDialog dialog = AddLabelDialog.newInstance(new AddLabelDialog.OnLabelSetListener() {
+            @Override
+            public void onLabelSet(CharSequence label) {
+                mLabel.setText(label);
+                // TODO: persist change. Use TimerController and its update()
+            }
+        }, mLabel.getText());
         // TODO: This is bad! Use a Controller instead!
         AppCompatActivity act = (AppCompatActivity) getContext();
         dialog.show(act.getSupportFragmentManager(), "TAG");

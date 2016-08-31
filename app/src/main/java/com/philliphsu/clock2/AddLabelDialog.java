@@ -28,8 +28,9 @@ public class AddLabelDialog extends AppCompatDialogFragment {
     /**
      * @param text the initial text
      */
-    public static AddLabelDialog newInstance(CharSequence text) {
+    public static AddLabelDialog newInstance(OnLabelSetListener l, CharSequence text) {
         AddLabelDialog dialog = new AddLabelDialog();
+        dialog.mOnLabelSetListener = l;
         dialog.mInitialText = text;
         return dialog;
     }
@@ -60,9 +61,5 @@ public class AddLabelDialog extends AppCompatDialogFragment {
                     }
                 })
                 .create();
-    }
-
-    public void setOnLabelSetListener(OnLabelSetListener onLabelSetListener) {
-        mOnLabelSetListener = onLabelSetListener;
     }
 }
