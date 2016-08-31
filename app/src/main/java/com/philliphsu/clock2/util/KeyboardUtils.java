@@ -19,4 +19,12 @@ public class KeyboardUtils {
         }
     }
 
+    /**
+     * @param c The Context to retrieve the system's input method service
+     * @param v The currently focused view, which would like to receive soft keyboard input.
+     */
+    public static void showKeyboard(Context c, View v) {
+        InputMethodManager imm = (InputMethodManager) c.getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.showSoftInput(v, InputMethodManager.SHOW_IMPLICIT);
+    }
 }

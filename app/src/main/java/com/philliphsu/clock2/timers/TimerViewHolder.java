@@ -75,7 +75,7 @@ public class TimerViewHolder extends BaseViewHolder<Timer> {
     void openLabelEditor() {
         AddLabelDialog dialog = AddLabelDialog.newInstance(new AddLabelDialog.OnLabelSetListener() {
             @Override
-            public void onLabelSet(CharSequence label) {
+            public void onLabelSet(String label) {
                 mLabel.setText(label);
                 // TODO: persist change. Use TimerController and its update()
             }
