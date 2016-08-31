@@ -200,4 +200,6 @@
 
     <string name="alarm_auto_silenced_text">You missed your alarm.</string>
     <string name="timer_auto_silenced_text">Your timer expired.</string>
+
+    <string name="label">Label</string>
 </resources>

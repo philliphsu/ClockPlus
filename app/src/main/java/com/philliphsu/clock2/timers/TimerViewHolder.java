@@ -1,6 +1,7 @@
 package com.philliphsu.clock2.timers;
 
 import android.animation.ObjectAnimator;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,6 +9,7 @@ import android.widget.ImageButton;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import com.philliphsu.clock2.AddLabelDialog;
 import com.philliphsu.clock2.AsyncTimersTableUpdateHandler;
 import com.philliphsu.clock2.BaseViewHolder;
 import com.philliphsu.clock2.OnListItemInteractionListener;
@@ -67,6 +69,14 @@ public class TimerViewHolder extends BaseViewHolder<Timer> {
     @OnClick(R.id.stop)
     void stop() {
         mController.stop();
+    }
+
+    @OnClick(R.id.label)
+    void openLabelEditor() {
+        AddLabelDialog dialog = AddLabelDialog.newInstance(mLabel.getText());
+        // TODO: This is bad! Use a Controller instead!
+        AppCompatActivity act = (AppCompatActivity) getContext();
+        dialog.show(act.getSupportFragmentManager(), "TAG");
     }
 
     private void bindLabel(String label) {

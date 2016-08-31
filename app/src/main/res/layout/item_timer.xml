@@ -16,7 +16,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
-            android:text="Label"
+            android:hint="@string/label"
             android:textSize="@dimen/text_size_medium"
             android:layout_marginTop="@dimen/item_padding_top"
             android:layout_marginBottom="@dimen/item_margin_between_elements"/>
