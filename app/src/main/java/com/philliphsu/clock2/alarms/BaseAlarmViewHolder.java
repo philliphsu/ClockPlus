@@ -182,7 +182,13 @@ public abstract class BaseAlarmViewHolder extends BaseViewHolder<Alarm> {
         int def = colors.getDefaultColor();
         // Too light
 //        int disabled = colors.getColorForState(new int[] {-android.R.attr.state_enabled}, def);
+        // Material guidelines say text hints and disabled text should have the same color.
         int disabled = colorsSource.getCurrentHintTextColor();
+        // However, digging around in the system's textColorHint for 21+ says its 50% black for our
+        // light theme. I'd like to follow what the guidelines says, but I want code that is robust
+        // against theme changes. Alternatively, override the attribute values to what you want
+        // in both your dark and light themes...
+//        int disabled = ContextCompat.getColor(getContext(), R.color.text_color_disabled_light);
         // We only have two states, so we don't care about losing the other state colors.
         mTime.setTextColor(alarm.isEnabled() ? def : disabled);
     }

@@ -69,6 +69,8 @@ public class ExpandedAlarmViewHolder extends BaseAlarmViewHolder {
                 /*item 1*/{/*states*/android.R.attr.state_checked},
                 /*item 2*/{/*states*/}
         };
+        // TODO: Phase out Utils.getColorFromThemeAttr because it doesn't work for text colors.
+        // WHereas getTextColorFromThemeAttr works for both regular colors and text colors.
         int[] colors = {
                 /*item 1*/Utils.getTextColorFromThemeAttr(getContext(), R.attr.colorAccent),
                 /*item 2*/Utils.getTextColorFromThemeAttr(getContext(), android.R.attr.textColorHint)
