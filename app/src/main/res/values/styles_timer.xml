@@ -9,6 +9,7 @@
         <item name="android:layout_height">wrap_content</item>
         <item name="android:fontFamily">sans-serif-light</item>
         <item name="android:layout_centerHorizontal">true</item>
+        <item name="android:textColor">?android:attr/textColorPrimary</item>
     </style>
     <style name="TimerSeekBar" parent="BaseSeekBar">
         <item name="android:splitTrack">false</item> <!--TODO: Move to v21?-->
