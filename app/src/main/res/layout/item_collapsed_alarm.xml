@@ -24,6 +24,7 @@
         <TextView
             android:id="@+id/label"
             style="@style/BaseLabel"
+            android:hint=""
             android:textStyle="bold"
             android:layout_below="@id/time_layout"
             android:layout_marginBottom="@dimen/item_margin_between_elements"/>
