@@ -3,8 +3,11 @@ package com.philliphsu.clock2.alarms;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.res.ColorStateList;
+import android.content.res.TypedArray;
+import android.graphics.drawable.Drawable;
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -159,6 +162,16 @@ public class ExpandedAlarmViewHolder extends BaseAlarmViewHolder {
     }
 
     private void bindRingtone(String ringtone) {
+        // TODO: Write a Utils method for this.
+        TypedArray a = getContext().getTheme().obtainStyledAttributes(new int[] {R.attr.themedIconTint});
+        ColorStateList iconTint = a.getColorStateList(0);
+        a.recycle();
+
+        Drawable ringtoneIcon = mRingtone.getCompoundDrawablesRelative()[0/*start*/];
+        ringtoneIcon = DrawableCompat.wrap(ringtoneIcon.mutate());
+        DrawableCompat.setTintList(ringtoneIcon, iconTint);
+        mRingtone.setCompoundDrawablesRelativeWithIntrinsicBounds(ringtoneIcon, null, null, null);
+
         // Initializing to Settings.System.DEFAULT_ALARM_ALERT_URI will show
         // "Default ringtone (Name)" on the button text, and won't show the
         // selection on the dialog when first opened. (unless you choose to show
