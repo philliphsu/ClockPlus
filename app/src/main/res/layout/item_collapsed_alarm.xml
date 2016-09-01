@@ -23,11 +23,8 @@
 
         <TextView
             android:id="@+id/label"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?textAppearanceListItem"
+            style="@style/BaseLabel"
             android:textStyle="bold"
-            android:text="Label"
             android:layout_below="@id/time_layout"
             android:layout_marginBottom="@dimen/item_margin_between_elements"/>
 
@@ -35,8 +32,7 @@
             android:id="@+id/countdown"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="?textAppearanceListItem"
-            android:text="in %dh %dm"
+            android:textSize="@dimen/text_size_subhead"
             android:layout_marginStart="@dimen/item_margin_between_elements"
             android:layout_below="@id/time_layout"
             android:layout_toEndOf="@id/label"/>

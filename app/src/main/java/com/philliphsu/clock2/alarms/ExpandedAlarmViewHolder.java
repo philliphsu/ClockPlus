@@ -2,9 +2,11 @@ package com.philliphsu.clock2.alarms;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -16,6 +18,7 @@ import com.philliphsu.clock2.Alarm;
 import com.philliphsu.clock2.DaysOfWeek;
 import com.philliphsu.clock2.OnListItemInteractionListener;
 import com.philliphsu.clock2.R;
+import com.philliphsu.clock2.aospdatetimepicker.Utils;
 import com.philliphsu.clock2.util.AlarmController;
 
 import butterknife.Bind;
@@ -34,6 +37,8 @@ public class ExpandedAlarmViewHolder extends BaseAlarmViewHolder {
     @Bind({R.id.day0, R.id.day1, R.id.day2, R.id.day3, R.id.day4, R.id.day5, R.id.day6})
     ToggleButton[] mDays;
 
+    private final ColorStateList mDayToggleColors;
+
     public ExpandedAlarmViewHolder(ViewGroup parent, final OnListItemInteractionListener<Alarm> listener,
                                    AlarmController controller) {
         super(parent, R.layout.item_expanded_alarm, listener, controller);
@@ -51,6 +56,24 @@ public class ExpandedAlarmViewHolder extends BaseAlarmViewHolder {
                 listener.onListItemUpdate(getAlarm(), getAdapterPosition());
             }
         });
+
+        // https://code.google.com/p/android/issues/detail?id=177282
+        // https://stackoverflow.com/questions/15673449/is-it-confirmed-that-i-cannot-use-themed-color-attribute-in-color-state-list-res
+        // Programmatically create the ColorStateList for our day toggles using themed color
+        // attributes, "since prior to M you can't create a themed ColorStateList from XML but you
+        // can from code." (quote from google)
+        // The first array level is analogous to an XML node defining an item with a state list.
+        // The second level lists all the states considered by the item from the first level.
+        // An empty list of states represents the default stateless item.
+        int[][] states = {
+                /*item 1*/{/*states*/android.R.attr.state_checked},
+                /*item 2*/{/*states*/}
+        };
+        int[] colors = {
+                /*item 1*/Utils.getTextColorFromThemeAttr(getContext(), R.attr.colorAccent),
+                /*item 2*/Utils.getTextColorFromThemeAttr(getContext(), android.R.attr.textColorHint)
+        };
+        mDayToggleColors = new ColorStateList(states, colors);
     }
 
     @Override
@@ -118,11 +141,13 @@ public class ExpandedAlarmViewHolder extends BaseAlarmViewHolder {
     @OnCheckedChanged({ R.id.day0, R.id.day1, R.id.day2, R.id.day3, R.id.day4, R.id.day5, R.id.day6 })
     void onDayToggled() {
         // TODO
+        Log.d("yooo", "Hello!");
     }
     ///////////////////////////////////////////////////////////////////////////////////////////
 
     private void bindDays(Alarm alarm) {
         for (int i = 0; i < mDays.length; i++) {
+            mDays[i].setTextColor(mDayToggleColors);
             int weekDay = DaysOfWeek.getInstance(getContext()).weekDayAt(i);
             String label = DaysOfWeek.getLabel(weekDay);
             mDays[i].setTextOn(label);

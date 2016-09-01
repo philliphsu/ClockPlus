@@ -60,6 +60,10 @@
     <!-- TimerViewHolder -->
     <dimen name="add_one_minute_text_size">18dp</dimen>
 
+    <!--ExpandedAlarmViewHolder-->
+    <dimen name="expanded_alarm_elevation">2dp</dimen> <!--TODO: Increase for v21-->
+    <dimen name="label_height">48dp</dimen>
+
     <dimen name="text_size_body_1">14sp</dimen>
     <dimen name="text_size_body_2">14sp</dimen>
     <dimen name="text_size_button">14sp</dimen>

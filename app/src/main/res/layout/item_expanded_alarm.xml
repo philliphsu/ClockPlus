@@ -17,12 +17,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    app:cardElevation="2dp"
+    app:cardElevation="@dimen/expanded_alarm_elevation"
     app:cardCornerRadius="0dp"
     android:foreground="?selectableItemBackground"
     android:clickable="true"
-    android:layout_marginTop="8dp"
-    android:layout_marginBottom="8dp">
+    android:layout_marginTop="@dimen/cardview_margin"
+    android:layout_marginBottom="@dimen/cardview_margin">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -47,88 +47,40 @@
 
                 <ToggleButton
                     android:id="@+id/day0"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:textAllCaps="true"
-                    android:textStyle="bold"
-                    android:background="?selectableItemBackground"
-                    android:textColor="@color/toggle_alarm_days"/>
+                    style="@style/AlarmDayToggle"/>
 
                 <ToggleButton
                     android:id="@+id/day1"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:textAllCaps="true"
-                    android:textStyle="bold"
-                    android:background="?selectableItemBackground"
-                    android:textColor="@color/toggle_alarm_days"
-                    />
+                    style="@style/AlarmDayToggle"/>
 
                 <ToggleButton
                     android:id="@+id/day2"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:textAllCaps="true"
-                    android:textStyle="bold"
-                    android:background="?selectableItemBackground"
-                    android:textColor="@color/toggle_alarm_days"
-                    />
+                    style="@style/AlarmDayToggle"/>
 
                 <ToggleButton
                     android:id="@+id/day3"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:textAllCaps="true"
-                    android:textStyle="bold"
-                    android:background="?selectableItemBackground"
-                    android:textColor="@color/toggle_alarm_days"
-                    />
+                    style="@style/AlarmDayToggle"/>
 
                 <ToggleButton
                     android:id="@+id/day4"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:textAllCaps="true"
-                    android:textStyle="bold"
-                    android:background="?selectableItemBackground"
-                    android:textColor="@color/toggle_alarm_days"
-                    />
+                    style="@style/AlarmDayToggle"/>
 
                 <ToggleButton
                     android:id="@+id/day5"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:textAllCaps="true"
-                    android:textStyle="bold"
-                    android:background="?selectableItemBackground"
-                    android:textColor="@color/toggle_alarm_days"
-                    />
+                    style="@style/AlarmDayToggle"/>
 
                 <ToggleButton
                     android:id="@+id/day6"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:textAllCaps="true"
-                    android:textStyle="bold"
-                    android:background="?selectableItemBackground"
-                    android:textColor="@color/toggle_alarm_days"
-                    />
+                    style="@style/AlarmDayToggle"/>
 
             </LinearLayout>
 
             <TextView
                 android:id="@+id/label"
+                style="@style/BaseLabel"
                 android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:hint="Add label"
-                android:layout_marginBottom="8dp"
+                android:layout_height="@dimen/label_height"
+                android:layout_marginBottom="@dimen/item_margin_between_elements"
                 android:background="?android:attr/selectableItemBackground"
                 android:gravity="center_vertical"/>
 
@@ -136,7 +88,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:layout_marginBottom="8dp">
+                android:layout_marginBottom="@dimen/item_margin_between_elements">
 
                 <Button
                     android:id="@+id/ringtone"
@@ -147,10 +99,11 @@
                     android:text="Ringtone"
                     android:gravity="center_vertical"
                     android:textAppearance="@style/TextAppearance.AppCompat"
-                    android:textSize="18sp"
+                    android:textSize="@dimen/text_size_medium"
                     android:drawableStart="@drawable/ic_ringtone_black_24dp"
                     android:drawablePadding="@dimen/text_compound_drawable_padding"/>
 
+                <!--TODO: See CheckableImageButton-->
                 <CheckBox
                     android:id="@id/vibrate"
                     android:layout_width="wrap_content"
