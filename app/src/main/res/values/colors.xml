@@ -4,5 +4,7 @@
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color> <!--Alternatives: Red 700 #D32F2F-->
 
-    <color name="black_overlay">#66000000</color>
+    <color name="colorPrimaryInverse">@color/dark_gray</color> <!--TODO-->
+    <color name="colorPrimaryDarkInverse">@color/dark_gray</color> <!--TODO-->
+    <color name="colorAccentInverse">@color/colorAccent</color> <!--TODO-->
 </resources>

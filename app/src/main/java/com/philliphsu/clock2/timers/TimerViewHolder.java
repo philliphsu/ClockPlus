@@ -1,6 +1,8 @@
 package com.philliphsu.clock2.timers;
 
 import android.animation.ObjectAnimator;
+import android.graphics.drawable.Drawable;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -29,6 +31,8 @@ public class TimerViewHolder extends BaseViewHolder<Timer> {
     private final AsyncTimersTableUpdateHandler mAsyncTimersTableUpdateHandler;
     private TimerController mController;
     private ObjectAnimator mProgressAnimator;
+    private final Drawable mStartIcon;
+    private final Drawable mPauseIcon;
 
     @Bind(R.id.label) TextView mLabel;
     @Bind(R.id.duration) CountdownChronometer mChronometer;
@@ -42,6 +46,8 @@ public class TimerViewHolder extends BaseViewHolder<Timer> {
         super(parent, R.layout.item_timer, listener);
         Log.d(TAG, "New TimerViewHolder");
         mAsyncTimersTableUpdateHandler = asyncTimersTableUpdateHandler;
+        mStartIcon = ContextCompat.getDrawable(getContext(), R.drawable.ic_start_24dp);
+        mPauseIcon = ContextCompat.getDrawable(getContext(), R.drawable.ic_pause_24dp);
     }
 
     @Override
@@ -127,8 +133,7 @@ public class TimerViewHolder extends BaseViewHolder<Timer> {
     }
 
     private void bindButtonControls(Timer timer) {
-        // TODO: Pause and start icons, resp.
-//        mStartPause.setImageResource(timer.isRunning() ? 0 : 0);
+        mStartPause.setImageDrawable(timer.isRunning() ? mPauseIcon : mStartIcon);
         int visibility = timer.hasStarted() ? View.VISIBLE : View.INVISIBLE;
         mAddOneMinute.setVisibility(visibility);
         mStop.setVisibility(visibility);

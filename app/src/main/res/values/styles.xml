@@ -14,12 +14,9 @@
     </style>
 
     <style name="AppTheme.Dark" parent="Theme.AppCompat.NoActionBar">
-        <!--TODO: Define colorPrimaryInverse in colors.xml-->
-        <item name="colorPrimary">@color/dark_gray</item>
-        <!-- TODO: Define colorPrimaryDarkInverse in colors.xml -->
-        <item name="colorPrimaryDark">@color/dark_gray</item>
-        <!-- TODO: Define colorAccentInverse in colors.xml -->
-        <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorPrimary">@color/colorPrimaryInverse</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDarkInverse</item>
+        <item name="colorAccent">@color/colorAccentInverse</item>
         <!-- TODO: This doesn't work for BottomSheetDialogs. Verify this works for other types of dialogs. -->
         <!--<item name="dialogTheme">@style/AppCompatDialogTheme.Dark</item>-->
         <item name="alertDialogTheme">@style/AppCompatAlertDialogStyle.Dark</item>
