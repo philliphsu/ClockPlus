@@ -157,44 +157,20 @@
         <item name="behavior_peekHeight">@dimen/peek_height_upper_limit</item>
     </style>
 
-    <style name="TimerLabel" parent="TextAppearance.AppCompat.Subhead">
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_centerHorizontal">true</item>
-        <item name="android:hint">@string/label</item>
-        <item name="android:ellipsize">end</item>
-        <item name="android:maxLines">1</item>
-        <item name="android:padding">@dimen/cardview_margin</item>
-    </style>
-    <style name="TimerCountdown" parent="TextAppearance.AppCompat.Display2">
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:fontFamily">sans-serif-light</item>
-        <item name="android:layout_centerHorizontal">true</item>
-    </style>
+    <!--Style for SeekBar that spans full width-->
     <style name="BaseSeekBar">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:paddingStart">0dp</item>
         <item name="android:paddingEnd">0dp</item>
     </style>
-    <style name="TimerSeekBar" parent="BaseSeekBar">
-        <item name="android:splitTrack">false</item> <!--TODO: Move to v21-->
-    </style>
-    <style name="TimerAction">
-        <item name="android:layout_width">@dimen/cardview_action_icon_size</item>
-        <item name="android:layout_height">@dimen/cardview_action_icon_size</item>
-        <item name="android:background">?selectableItemBackground</item>
-        <item name="android:tint">?attr/themedIconTint</item>
-        <item name="android:layout_marginStart">@dimen/cardview_action_icon_margin</item>
-        <item name="android:layout_marginEnd">@dimen/cardview_action_icon_margin</item>
-        <item name="android:layout_marginBottom">@dimen/cardview_action_icon_margin</item>
-    </style>
-    <style name="TimerAction.AddOneMinute">
-        <item name="android:gravity">center</item>
-        <item name="android:text">@string/add_one_minute_icon_text</item>
-        <item name="android:textSize">@dimen/add_one_minute_text_size</item>
-        <item name="android:textColor">?attr/themedIconTint</item>
-        <item name="android:textStyle">bold</item>
+
+    <!--Style for a button that opens an AddLabelDialog-->
+    <style name="BaseLabel" parent="TextAppearance.AppCompat.Subhead">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:hint">@string/label</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:maxLines">1</item>
     </style>
 </resources>

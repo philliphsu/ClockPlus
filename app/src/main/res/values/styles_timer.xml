@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="TimerLabel" parent="BaseLabel">
+        <item name="android:layout_centerHorizontal">true</item>
+        <item name="android:padding">@dimen/cardview_margin</item>
+    </style>
+    <style name="TimerCountdown" parent="TextAppearance.AppCompat.Display2">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:fontFamily">sans-serif-light</item>
+        <item name="android:layout_centerHorizontal">true</item>
+    </style>
+    <style name="TimerSeekBar" parent="BaseSeekBar">
+        <item name="android:splitTrack">false</item> <!--TODO: Move to v21?-->
+    </style>
+    <style name="TimerAction">
+        <item name="android:layout_width">@dimen/cardview_action_icon_size</item>
+        <item name="android:layout_height">@dimen/cardview_action_icon_size</item>
+        <item name="android:background">?selectableItemBackground</item>
+        <item name="android:tint">?attr/themedIconTint</item>
+        <item name="android:layout_marginStart">@dimen/cardview_action_icon_margin</item>
+        <item name="android:layout_marginEnd">@dimen/cardview_action_icon_margin</item>
+        <item name="android:layout_marginBottom">@dimen/cardview_action_icon_margin</item>
+    </style>
+    <style name="TimerAction.AddOneMinute">
+        <item name="android:gravity">center</item>
+        <item name="android:text">@string/add_one_minute_icon_text</item>
+        <item name="android:textSize">@dimen/add_one_minute_text_size</item>
+        <item name="android:textColor">?attr/themedIconTint</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+</resources>
