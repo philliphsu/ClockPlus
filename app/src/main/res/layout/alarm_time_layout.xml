@@ -10,9 +10,9 @@
         android:id="@+id/time"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="1:20"
         style="@style/TextAppearance.AppCompat"
-        android:textSize="@dimen/alarm_time_text_size"/>
+        android:textSize="@dimen/text_size_display_3"
+        android:fontFamily="sans-serif-thin"/>
 
     <Space
         android:layout_width="0dp"

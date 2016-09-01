@@ -31,7 +31,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/label"
             android:layout_centerHorizontal="true"
-            android:fontFamily="sans-serif-light"
+            android:fontFamily="sans-serif-thin"
             android:textSize="@dimen/text_size_display_2"/>
 
         <!--The default style has padding start and end, so we remove both-->
