@@ -18,8 +18,12 @@
             android:layout_centerHorizontal="true"
             android:hint="@string/label"
             android:textSize="@dimen/text_size_medium"
-            android:layout_marginTop="@dimen/item_padding_top"
-            android:layout_marginBottom="@dimen/item_margin_between_elements"/>
+            android:maxLines="1"
+            android:ellipsize="end"
+            android:paddingStart="@dimen/cardview_margin"
+            android:paddingEnd="@dimen/cardview_margin"
+            android:paddingTop="@dimen/item_padding_top"
+            android:paddingBottom="@dimen/item_padding_bottom"/>
 
         <com.philliphsu.clock2.timers.CountdownChronometer
             android:id="@+id/duration"
@@ -27,10 +31,8 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/label"
             android:layout_centerHorizontal="true"
-            android:textSize="@dimen/text_size_display_2"
-            android:layout_marginBottom="@dimen/item_margin_between_elements"/>
-        <!--TODO: Consider removing this bottom margin, because the seekbar
-        is rendering with HUGE top and bottom padding already. -->
+            android:fontFamily="sans-serif-light"
+            android:textSize="@dimen/text_size_display_2"/>
 
         <!--The default style has padding start and end, so we remove both-->
         <com.philliphsu.clock2.UntouchableSeekBar
