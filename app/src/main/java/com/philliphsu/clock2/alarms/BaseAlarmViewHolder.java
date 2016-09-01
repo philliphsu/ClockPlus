@@ -180,7 +180,9 @@ public abstract class BaseAlarmViewHolder extends BaseViewHolder<Alarm> {
         TextView colorsSource = (TextView) itemView.findViewById(R.id.colors_source);
         ColorStateList colors = colorsSource.getTextColors();
         int def = colors.getDefaultColor();
-        int disabled = colors.getColorForState(new int[] {-android.R.attr.state_enabled}, def);
+        // Too light
+//        int disabled = colors.getColorForState(new int[] {-android.R.attr.state_enabled}, def);
+        int disabled = colorsSource.getCurrentHintTextColor();
         // We only have two states, so we don't care about losing the other state colors.
         mTime.setTextColor(alarm.isEnabled() ? def : disabled);
     }

@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         style="@style/TextAppearance.AppCompat"
         android:textSize="@dimen/text_size_display_3"
-        android:fontFamily="sans-serif-thin"/>
+        android:fontFamily="sans-serif-light"/>
 
     <Space
         android:layout_width="0dp"
