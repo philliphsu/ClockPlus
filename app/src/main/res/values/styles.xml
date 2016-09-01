@@ -2,7 +2,6 @@
 
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
-        <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
@@ -11,6 +10,7 @@
         <item name="alertDialogTheme">@style/AppCompatAlertDialogStyle</item>
         <item name="bottomSheetDialogTheme">@style/BottomSheetDialogTheme</item>
         <item name="themedIconTint">@color/icon_color</item>
+        <item name="android:textColorHint">@color/text_color_disabled_light</item>
     </style>
 
     <style name="AppTheme.Dark" parent="Theme.AppCompat.NoActionBar">
@@ -23,6 +23,7 @@
         <!--TODO: Dark theme-->
         <item name="bottomSheetDialogTheme">@style/BottomSheetDialogTheme</item>
         <item name="themedIconTint">@color/icon_color_dark</item>
+        <item name="android:textColorHint">@color/text_color_disabled_dark</item>
     </style>
 
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar"/>

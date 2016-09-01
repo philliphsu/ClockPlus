@@ -4,7 +4,8 @@
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color> <!--Alternatives: Red 700 #D32F2F-->
 
-    <color name="colorPrimaryInverse">@color/dark_gray</color> <!--TODO-->
-    <color name="colorPrimaryDarkInverse">@color/dark_gray</color> <!--TODO-->
-    <color name="colorAccentInverse">@color/colorAccent</color> <!--TODO-->
+    <!--TODO: Use color int instead? This resource is defined in aosp_datetimepicker_colors file. -->
+    <color name="colorPrimaryInverse">@color/dark_gray</color>
+    <color name="colorPrimaryDarkInverse">@android:color/black</color>
+    <color name="colorAccentInverse">#FF80AB</color>
 </resources>
