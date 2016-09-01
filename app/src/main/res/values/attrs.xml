@@ -14,4 +14,6 @@
         <attr name="secondaryText" format="string"/>
     </declare-styleable>
 
+    <attr name="themedIconTint" format="reference|color"/>
+    
 </resources>

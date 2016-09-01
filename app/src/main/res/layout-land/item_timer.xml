@@ -19,10 +19,7 @@
             android:textSize="@dimen/text_size_medium"
             android:maxLines="1"
             android:ellipsize="end"
-            android:paddingStart="@dimen/cardview_margin"
-            android:paddingEnd="@dimen/cardview_margin"
-            android:paddingTop="@dimen/item_padding_top"
-            android:paddingBottom="@dimen/item_padding_bottom"/>
+            android:padding="@dimen/cardview_margin"/>
 
         <com.philliphsu.clock2.timers.CountdownChronometer
             android:id="@+id/duration"
@@ -43,13 +40,19 @@
             android:paddingEnd="0dp"
             android:splitTrack="false"/>
 
-        <ImageButton
+        <!-- Fake icon, so use dp for textSize -->
+        <TextView
             android:id="@+id/add_one_minute"
             android:layout_width="@dimen/cardview_action_icon_size"
             android:layout_height="@dimen/cardview_action_icon_size"
             android:src="@drawable/ic_half_day_1_24dp"
             android:background="?selectableItemBackground"
             android:layout_below="@id/seek_bar"
+            android:gravity="center"
+            android:text="@string/add_one_minute_icon_text"
+            android:textSize="@dimen/add_one_minute_text_size"
+            android:textColor="?attr/themedIconTint"
+            android:textStyle="bold"
             android:layout_alignParentStart="true"
             android:layout_marginStart="@dimen/cardview_action_icon_margin"/>
 
@@ -57,8 +60,9 @@
             android:id="@+id/start_pause"
             android:layout_width="@dimen/cardview_action_icon_size"
             android:layout_height="@dimen/cardview_action_icon_size"
-            android:src="@drawable/ic_half_day_1_24dp"
+            android:src="@drawable/ic_start_24dp"
             android:background="?selectableItemBackground"
+            android:tint="?attr/themedIconTint"
             android:layout_below="@id/seek_bar"
             android:layout_centerHorizontal="true"/>
 
@@ -66,8 +70,9 @@
             android:id="@+id/stop"
             android:layout_width="@dimen/cardview_action_icon_size"
             android:layout_height="@dimen/cardview_action_icon_size"
-            android:src="@drawable/ic_half_day_1_24dp"
+            android:src="@drawable/ic_stop_24dp"
             android:background="?selectableItemBackground"
+            android:tint="?attr/themedIconTint"
             android:layout_below="@id/seek_bar"
             android:layout_alignParentEnd="true"
             android:layout_marginEnd="@dimen/cardview_action_icon_margin"/>

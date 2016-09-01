@@ -33,7 +33,7 @@ public class TimerViewHolder extends BaseViewHolder<Timer> {
     @Bind(R.id.label) TextView mLabel;
     @Bind(R.id.duration) CountdownChronometer mChronometer;
     @Bind(R.id.seek_bar) SeekBar mSeekBar;
-    @Bind(R.id.add_one_minute) ImageButton mAddOneMinute;
+    @Bind(R.id.add_one_minute) TextView mAddOneMinute;
     @Bind(R.id.start_pause) ImageButton mStartPause;
     @Bind(R.id.stop) ImageButton mStop;
 
