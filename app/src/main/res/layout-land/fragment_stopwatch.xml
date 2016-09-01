@@ -23,7 +23,7 @@
                 android:background="?attr/colorPrimary"
                 android:gravity="center"
                 android:textSize="@dimen/text_size_display_3"
-                style="@style/TextAppearance.AppCompat.Inverse"/>
+                android:theme="@style/AppTheme.TextOverlay"/>
 
             <!--
               - Unfortunately, we can't include fragment_recycler_view

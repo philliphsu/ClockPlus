@@ -18,7 +18,7 @@
             android:background="?attr/colorPrimary"
             android:gravity="center_horizontal"
             android:textSize="@dimen/text_size_display_3"
-            style="@style/TextAppearance.AppCompat.Inverse"/>
+            android:theme="@style/AppTheme.TextOverlay"/>
 
         <include layout="@layout/fragment_recycler_view"
                  android:layout_width="match_parent"
