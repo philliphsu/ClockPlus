@@ -15,11 +15,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="@dimen/chronometer_padding"
-            android:background="?attr/colorPrimary"
-            android:gravity="center_horizontal"
-            android:textSize="@dimen/text_size_display_3"
-            android:fontFamily="sans-serif-thin"
-            android:theme="@style/AppTheme.TextOverlay"/>
+            style="@style/Stopwatch"/>
 
         <include layout="@layout/fragment_recycler_view"
                  android:layout_width="match_parent"
@@ -30,13 +26,12 @@
 
     <com.philliphsu.clock2.UntouchableSeekBar
         android:id="@+id/seek_bar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
         app:layout_anchor="@id/chronometer"
         app:layout_anchorGravity="bottom"
-        android:paddingStart="0dp"
-        android:paddingEnd="0dp"/>
+        style="@style/BaseSeekBar"/>
 
+    <!--TODO: If we are changing the style of the mini FABS often,
+    then create a style resource for them. -->
     <android.support.v7.widget.GridLayout
         android:layout_width="match_parent"
         android:layout_height="@dimen/fab_total_height"
