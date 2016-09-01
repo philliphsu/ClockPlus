@@ -3,6 +3,7 @@ package com.philliphsu.clock2.alarms;
 import android.app.Notification;
 import android.content.Intent;
 import android.net.Uri;
+import android.provider.Settings;
 import android.support.v4.app.NotificationCompat;
 
 import com.philliphsu.clock2.Alarm;
@@ -54,7 +55,12 @@ public class AlarmRingtoneService extends RingtoneService<Alarm> {
 
     @Override
     protected Uri getRingtoneUri() {
-        return Uri.parse(getRingingObject().ringtone());
+        String ringtone = getRingingObject().ringtone();
+        // can't be null...
+        if (ringtone.isEmpty()) {
+            return Settings.System.DEFAULT_ALARM_ALERT_URI;
+        }
+        return Uri.parse(ringtone);
     }
 
     @Override
