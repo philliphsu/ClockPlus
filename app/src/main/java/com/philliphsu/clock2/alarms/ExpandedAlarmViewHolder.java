@@ -3,7 +3,6 @@ package com.philliphsu.clock2.alarms;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.res.ColorStateList;
-import android.content.res.TypedArray;
 import android.graphics.drawable.Drawable;
 import android.media.RingtoneManager;
 import android.net.Uri;
@@ -162,14 +161,11 @@ public class ExpandedAlarmViewHolder extends BaseAlarmViewHolder {
     }
 
     private void bindRingtone(String ringtone) {
-        // TODO: Write a Utils method for this.
-        TypedArray a = getContext().getTheme().obtainStyledAttributes(new int[] {R.attr.themedIconTint});
-        ColorStateList iconTint = a.getColorStateList(0);
-        a.recycle();
+        int iconTint = Utils.getTextColorFromThemeAttr(getContext(), R.attr.themedIconTint);
 
         Drawable ringtoneIcon = mRingtone.getCompoundDrawablesRelative()[0/*start*/];
         ringtoneIcon = DrawableCompat.wrap(ringtoneIcon.mutate());
-        DrawableCompat.setTintList(ringtoneIcon, iconTint);
+        DrawableCompat.setTint(ringtoneIcon, iconTint);
         mRingtone.setCompoundDrawablesRelativeWithIntrinsicBounds(ringtoneIcon, null, null, null);
 
         // Initializing to Settings.System.DEFAULT_ALARM_ALERT_URI will show

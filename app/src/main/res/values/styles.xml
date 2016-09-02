@@ -9,7 +9,11 @@
         <!--<item name="dialogTheme">@style/AppCompatDialogTheme</item>-->
         <item name="alertDialogTheme">@style/AppCompatAlertDialogStyle</item>
         <item name="bottomSheetDialogTheme">@style/BottomSheetDialogTheme</item>
-        <item name="themedIconTint">@color/icon_color</item>
+        <!--The icons that need to be tinted with this attribute will only ever be in
+         the active state, so we don't need to use @color/icon_color ColorStateList resource.
+         Secondly, using a ColorStateList resource via XML for the tint attribute of an ImageView
+         is not supported below 21. -->
+        <item name="themedIconTint">@color/icon_color_active_light</item>
         <item name="android:textColorHint">@color/text_color_disabled_light</item>
     </style>
 
@@ -22,7 +26,11 @@
         <item name="alertDialogTheme">@style/AppCompatAlertDialogStyle.Dark</item>
         <!--TODO: Dark theme-->
         <item name="bottomSheetDialogTheme">@style/BottomSheetDialogTheme</item>
-        <item name="themedIconTint">@color/icon_color_dark</item>
+        <!--The icons that need to be tinted with this attribute will only ever be in
+         the active state, so we don't need to use @color/icon_color_dark ColorStateList resource
+         Secondly, using a ColorStateList resource via XML for the tint attribute of an ImageView
+         is not supported below 21.-->
+        <item name="themedIconTint">@color/icon_color_active_dark</item>
         <item name="android:textColorHint">@color/text_color_disabled_dark</item>
     </style>
 

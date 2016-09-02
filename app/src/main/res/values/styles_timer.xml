@@ -18,10 +18,13 @@
         <item name="android:layout_width">@dimen/cardview_action_icon_size</item>
         <item name="android:layout_height">@dimen/cardview_action_icon_size</item>
         <item name="android:background">?selectableItemBackground</item>
-        <item name="android:tint">?attr/themedIconTint</item>
         <item name="android:layout_marginStart">@dimen/cardview_action_icon_margin</item>
         <item name="android:layout_marginEnd">@dimen/cardview_action_icon_margin</item>
         <item name="android:layout_marginBottom">@dimen/cardview_action_icon_margin</item>
+        <!--https://code.google.com/p/android/issues/detail?id=18220-->
+        <!--"... there is no support for color state list in the ImageView tint attribute
+        prior to API 21." ImageButton is a subclass of ImageView.-->
+        <item name="android:tint">?attr/themedIconTint</item>
     </style>
     <style name="TimerAction.AddOneMinute">
         <item name="android:gravity">center</item>
