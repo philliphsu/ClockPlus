@@ -84,7 +84,7 @@ public class ExpandedAlarmViewHolder extends BaseAlarmViewHolder {
     public void onBind(Alarm alarm) {
         super.onBind(alarm);
         bindDays(alarm);
-        bindRingtone(alarm.ringtone());
+        bindRingtone();
         bindVibrate(alarm.vibrates());
     }
 
@@ -109,7 +109,7 @@ public class ExpandedAlarmViewHolder extends BaseAlarmViewHolder {
         intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE, RingtoneManager.TYPE_ALARM)
                 .putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_SILENT, false)
                 // The ringtone to show as selected when the dialog is opened
-                .putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, Uri.parse(getAlarm().ringtone()))
+                .putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, getSelectedRingtoneUri())
                 // Whether to show "Default" item in the list
                 .putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_DEFAULT, false);
         // The ringtone that plays when default option is selected
@@ -160,7 +160,7 @@ public class ExpandedAlarmViewHolder extends BaseAlarmViewHolder {
         }
     }
 
-    private void bindRingtone(String ringtone) {
+    private void bindRingtone() {
         int iconTint = Utils.getTextColorFromThemeAttr(getContext(), R.attr.themedIconTint);
 
         Drawable ringtoneIcon = mRingtone.getCompoundDrawablesRelative()[0/*start*/];
@@ -168,25 +168,29 @@ public class ExpandedAlarmViewHolder extends BaseAlarmViewHolder {
         DrawableCompat.setTint(ringtoneIcon, iconTint);
         mRingtone.setCompoundDrawablesRelativeWithIntrinsicBounds(ringtoneIcon, null, null, null);
 
-        // Initializing to Settings.System.DEFAULT_ALARM_ALERT_URI will show
-        // "Default ringtone (Name)" on the button text, and won't show the
-        // selection on the dialog when first opened. (unless you choose to show
-        // the default item in the intent extra?)
-        // Compare with getDefaultUri(int), which returns the symbolic URI instead of the
-        // actual sound URI. For TYPE_ALARM, this actually returns the same constant.
-        Uri mSelectedRingtoneUri; // TODO: This was actually an instance variable in EditAlarmActivity.
-        if (null == ringtone || ringtone.isEmpty()) {
-            mSelectedRingtoneUri = RingtoneManager.getActualDefaultRingtoneUri(
-                    getContext(), RingtoneManager.TYPE_ALARM);
-        } else {
-            mSelectedRingtoneUri = Uri.parse(ringtone);
-        }
         String title = RingtoneManager.getRingtone(getContext(),
-                mSelectedRingtoneUri).getTitle(getContext());
+                getSelectedRingtoneUri()).getTitle(getContext());
         mRingtone.setText(title);
     }
 
     private void bindVibrate(boolean vibrates) {
         mVibrate.setChecked(vibrates);
+    }
+
+    private Uri getSelectedRingtoneUri() {
+        // If showing an item for "Default" (@see EXTRA_RINGTONE_SHOW_DEFAULT), this can be one
+        // of DEFAULT_RINGTONE_URI, DEFAULT_NOTIFICATION_URI, or DEFAULT_ALARM_ALERT_URI to have the
+        // "Default" item checked.
+        //
+        // Otherwise, use RingtoneManager.getActualDefaultRingtoneUri() to get the "actual sound URI".
+        //
+        // Do not use RingtoneManager.getDefaultUri(), because that just returns one of
+        // DEFAULT_RINGTONE_URI, DEFAULT_NOTIFICATION_URI, or DEFAULT_ALARM_ALERT_URI
+        // depending on the type requested (i.e. what the docs calls "symbolic URI
+        // which will resolved to the actual sound when played").
+        String ringtone = getAlarm().ringtone();
+        return ringtone.isEmpty() ?
+                RingtoneManager.getActualDefaultRingtoneUri(getContext(), RingtoneManager.TYPE_ALARM)
+                : Uri.parse(ringtone);
     }
 }
