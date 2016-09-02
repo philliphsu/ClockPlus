@@ -3,6 +3,8 @@ package com.philliphsu.clock2.ringtone;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
 import android.media.AudioManager;
 import android.media.Ringtone;
@@ -57,17 +59,16 @@ public abstract class RingtoneService<T extends Parcelable> extends Service {
         }
     };
 
-    // Pretty sure this won't ever get called anymore... b/c EditAlarmActivity, the only component
-    // that sends such a broadcast, is deprecated.
-//    private final BroadcastReceiver mNotifyMissedReceiver = new BroadcastReceiver() {
-//        @Override
-//        public void onReceive(Context context, Intent intent) {
-//            // TODO: Do we need to call mAlarmController.cancelAlarm()?
-//            onAutoSilenced();
-//            stopSelf();
-//            // Activity finishes itself
-//        }
-//    };
+//    // Pretty sure this won't ever get called anymore... b/c EditAlarmActivity, the only component
+//    // that sends such a broadcast, is deprecated.
+    private final BroadcastReceiver mNotifyMissedReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            onAutoSilenced();
+            stopSelf();
+            // Activity finishes itself
+        }
+    };
 
     /**
      * Callback invoked when this Service is stopping and the corresponding
@@ -137,7 +138,7 @@ public abstract class RingtoneService<T extends Parcelable> extends Service {
         super.onCreate();
         // Pretty sure this won't ever get called anymore... b/c EditAlarmActivity, the only component
         // that sends such a broadcast, is deprecated.
-//        LocalBroadcastHelper.registerReceiver(this, mNotifyMissedReceiver, ACTION_NOTIFY_MISSED);
+        LocalBroadcastHelper.registerReceiver(this, mNotifyMissedReceiver, ACTION_NOTIFY_MISSED);
     }
 
     @Override
@@ -152,7 +153,7 @@ public abstract class RingtoneService<T extends Parcelable> extends Service {
         stopForeground(true);
         // Pretty sure this won't ever get called anymore... b/c EditAlarmActivity, the only component
         // that sends such a broadcast, is deprecated.
-//        LocalBroadcastHelper.unregisterReceiver(this, mNotifyMissedReceiver);
+        LocalBroadcastHelper.unregisterReceiver(this, mNotifyMissedReceiver);
     }
 
     @Override

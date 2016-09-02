@@ -2,6 +2,7 @@ package com.philliphsu.clock2.alarms;
 
 import android.app.Notification;
 import android.app.NotificationManager;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.view.ViewGroup;
@@ -32,7 +33,23 @@ public class AlarmActivity extends RingtoneActivity<Alarm> {
     @Override
     public void finish() {
         super.finish();
+        // If the presently ringing alarm is about to be superseded by a successive alarm,
+        // this, unfortunately, will cancel the missed alarm notification for the presently
+        // ringing alarm.
+        //
+        // A workaround is to override onNewIntent() and post the missed alarm notification again,
+        // AFTER calling through to its base implementation, because it calls finish().
         mNotificationManager.cancel(TAG, getRingingObject().getIntId());
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        // -------------- TOneverDO: precede super ---------------
+        // Even though the base implementation calls finish() on this instance and starts a new
+        // instance, this instance will still be alive with all of its member state intact at
+        // this point. So this notification will still refer to the Alarm that was just missed.
+        postMissedAlarmNote();
     }
 
     @Override
@@ -102,7 +119,10 @@ public class AlarmActivity extends RingtoneActivity<Alarm> {
     @Override
     protected void showAutoSilenced() {
         super.showAutoSilenced();
-        // Post notification that alarm was missed
+        postMissedAlarmNote();
+    }
+
+    private void postMissedAlarmNote() {
         String alarmTime = DateFormatUtils.formatTime(this,
                 getRingingObject().hour(), getRingingObject().minutes());
         Notification note = new NotificationCompat.Builder(this)

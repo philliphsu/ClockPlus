@@ -1,6 +1,5 @@
 package com.philliphsu.clock2.ringtone;
 
-import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -130,10 +129,6 @@ public abstract class RingtoneActivity<T extends Parcelable> extends AppCompatAc
     @Override
     protected void onNewIntent(Intent intent) {
         //super.onNewIntent(intent); // Not needed since no fragments hosted?
-
-        // TODO: Do we need this anymore? I think the broadcast that calls through to
-        // this was only sent from EditAlarmActivity?
-
         // Notifies alarm missed and stops the service
         LocalBroadcastHelper.sendBroadcast(this, RingtoneService.ACTION_NOTIFY_MISSED);
         finish();
@@ -180,7 +175,6 @@ public abstract class RingtoneActivity<T extends Parcelable> extends AppCompatAc
     @OnClick(R.id.ok)
     public void finish() {
         super.finish();
-        NotificationManager nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
     }
 
     public static boolean isAlive() {
