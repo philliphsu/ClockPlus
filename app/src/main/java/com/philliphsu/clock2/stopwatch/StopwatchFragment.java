@@ -259,11 +259,8 @@ public class StopwatchFragment extends RecyclerViewFragment<
         updateAllFabs();
     }
 
-    @Nullable
     @Override
-    protected LapsAdapter getAdapter() {
-        if (super.getAdapter() != null)
-            return super.getAdapter();
+    protected LapsAdapter onCreateAdapter(Bundle savedInstanceState) {
         return new LapsAdapter();
     }
 

@@ -47,11 +47,18 @@ public abstract class RecyclerViewFragment<
     protected abstract void onScrolledToStableId(long id, int position);
 
     /**
-     * @return the adapter to set on the RecyclerView. SUBCLASSES MUST OVERRIDE THIS, BECAUSE THE
-     * DEFAULT IMPLEMENTATION WILL ALWAYS RETURN AN UNINITIALIZED ADAPTER INSTANCE.
+     * @return the adapter to set on the RecyclerView. Called in onCreateView().
+     * @param savedInstanceState the same Bundle used to save out and restore state for this Fragment
+     *                           when the configuration is changed. Implementors may find this useful
+     *                           if their ViewHolder type(s) require saving and restoring state across
+     *                           configurations.
      */
-    @Nullable
-    protected A getAdapter() {
+    protected abstract A onCreateAdapter(Bundle savedInstanceState);
+
+    /**
+     * @return the adapter instance created from {@link #onCreateAdapter(Bundle)}
+     */
+    protected final A getAdapter() {
         return mAdapter;
     }
 
@@ -69,7 +76,7 @@ public abstract class RecyclerViewFragment<
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = super.onCreateView(inflater, container, savedInstanceState);
         mList.setLayoutManager(getLayoutManager());
-        mList.setAdapter(mAdapter = getAdapter());
+        mList.setAdapter(mAdapter = onCreateAdapter(savedInstanceState));
         return view;
     }
 

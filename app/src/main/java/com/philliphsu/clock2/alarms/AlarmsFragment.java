@@ -6,7 +6,6 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.annotation.Nullable;
 import android.support.v4.content.Loader;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -136,11 +135,8 @@ public class AlarmsFragment extends RecyclerViewFragment<
         dialog.show(getFragmentManager(), TAG_TIME_PICKER);
     }
 
-    @Nullable
     @Override
-    protected AlarmsCursorAdapter getAdapter() {
-        if (super.getAdapter() != null)
-            return super.getAdapter();
+    protected AlarmsCursorAdapter onCreateAdapter(Bundle savedInstanceState) {
         // Create a new adapter. This is called before we can initialize mAlarmController,
         // so right now it is null. However, after super.onCreate() returns, it is initialized, and
         // the reference variable will be pointing to an actual object. This assignment "propagates"
@@ -262,7 +258,43 @@ public class AlarmsFragment extends RecyclerViewFragment<
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putInt(KEY_EXPANDED_POSITION, getAdapter().getExpandedPosition());
+        /*
+         * From Fragment#onSaveInstanceState():
+         *   - This is called "at any time before onDestroy()".
+         *   - "This corresponds to Activity.onSaveInstanceState(Bundle) and most of the discussion
+         *     there applies here as well".
+         * From Activity#onSaveInstanceState():
+         *   - "If called, this method will occur before {@link #onStop}
+         *     [which follows onPause() in the lifecycle].  There are
+         *     no guarantees about whether it will occur before or after {@link #onPause}."
+         *
+         * isResumed() is true "for the duration of onResume() and onPause()".
+         * From the results of a few trials, this never seemed to call through, so i'm assuming
+         * isResumed() returned false every time.
+         */
+        if (/*isResumed() && */getAdapter() != null) {
+            // Normally when we scroll far enough away from this Fragment, *its view* will be
+            // destroyed, i.e. the maximum point in its lifecycle is onDestroyView(). However,
+            // if the configuration changes, onDestroy() is called through, and then this Fragment
+            // and all of its members will be destroyed. This is not
+            // a problem if the page in which the configuration changed is this page, because
+            // the Fragment will be recreated from onCreate() to onResume(), and any
+            // member initialization between those points occurs as usual.
+            //
+            // However, when the page in which the configuration changed
+            // is far enough away from this Fragment, there IS a problem. The Fragment
+            // *at that page* is recreated, but this Fragment will NOT be; the ViewPager's
+            // adapter will not reinstantiate this Fragment because it exceeds the
+            // offscreen page limit relative to the initial page in the new configuration.
+            //
+            // As such, we should only save state if this Fragment's members (i.e. its RecyclerView.Adapter)
+            // are not destroyed
+            // because that indicates the Fragment is both registered in the adapter AND is within the offscreen
+            // page limit, so its members have been initialized (recall that a Fragment in a ViewPager
+            // does not actually need to be visible to the user for onCreateView() to onResume() to
+            // be called through).
+            outState.putInt(KEY_EXPANDED_POSITION, getAdapter().getExpandedPosition());
+        }
     }
 
     /////////////////////////////////////////////////////////////////////////////////////
