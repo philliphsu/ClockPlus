@@ -198,7 +198,9 @@ public abstract class BaseAlarmViewHolder extends BaseViewHolder<Alarm> {
 
     @OnClick(R.id.time)
     void openTimePicker() {
-        BaseTimePickerDialog dialog = TimePickerHelper.newDialog(getContext(), newOnTimeSetListener());
+        Alarm alarm = getAlarm();
+        BaseTimePickerDialog dialog = TimePickerHelper.newDialog(getContext(),
+                newOnTimeSetListener(), alarm.hour(), alarm.minutes());
         dialog.show(mFragmentManager, AlarmsFragment.TAG_TIME_PICKER);
     }
 

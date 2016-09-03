@@ -131,7 +131,7 @@ public class AlarmsFragment extends RecyclerViewFragment<
         // If we keep a reference to the dialog, we keep its previous state as well.
         // So the next time we call show() on it, the input field will show the
         // last inputted time.
-        BaseTimePickerDialog dialog = TimePickerHelper.newDialog(getActivity(), this);
+        BaseTimePickerDialog dialog = TimePickerHelper.newDialog(getActivity(), this, 0, 0);
         // DISREGARD THE LINT WARNING ABOUT DIALOG BEING NULL.
         dialog.show(getFragmentManager(), TAG_TIME_PICKER);
     }

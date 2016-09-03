@@ -13,7 +13,8 @@ import com.philliphsu.clock2.R;
  */
 public final class TimePickerHelper {
     
-    public static BaseTimePickerDialog newDialog(Context context, BaseTimePickerDialog.OnTimeSetListener l) {
+    public static BaseTimePickerDialog newDialog(Context context, BaseTimePickerDialog.OnTimeSetListener l,
+                                                 int initialHourOfDay, int initialMinute) {
         BaseTimePickerDialog dialog = null;
         String numpadStyle = context.getString(R.string.number_pad);
         String gridStyle = context.getString(R.string.grid_selector);
@@ -26,9 +27,9 @@ public final class TimePickerHelper {
             dialog = NumpadTimePickerDialog.newInstance(l);
         } else if (prefTimePickerStyle.equals(gridStyle)) {
             dialog = NumberGridTimePickerDialog.newInstance(
-                    l, // OnTimeSetListener
-                    0, // Initial hour of day
-                    0, // Initial minute
+                    l,
+                    initialHourOfDay,
+                    initialMinute,
                     DateFormat.is24HourFormat(context));
         }
         // We don't have a default case, because we don't need one; prefTimePickerStyle

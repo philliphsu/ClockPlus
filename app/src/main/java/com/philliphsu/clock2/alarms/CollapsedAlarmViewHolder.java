@@ -98,4 +98,11 @@ public class CollapsedAlarmViewHolder extends BaseAlarmViewHolder {
     void openLabelEditor() {
         // DO NOT IMPLEMENT
     }
+
+    @Override
+    void openTimePicker() {
+        super.openTimePicker();
+        // Pretend we also clicked the itemView, so we get expanded.
+        onClick(itemView);
+    }
 }
