@@ -38,8 +38,9 @@ public class AlarmsCursorAdapter extends BaseCursorAdapter<Alarm, BaseAlarmViewH
 
     @Override
     public int getItemViewType(int position) {
-        final long stableId = getItemId(position);
-        return stableId != RecyclerView.NO_ID && stableId == mExpandedId
+//        final long stableId = getItemId(position);
+        return /*stableId != RecyclerView.NO_ID && stableId == mExpandedId*/
+                position == mExpandedPosition
                 ? VIEW_TYPE_EXPANDED : VIEW_TYPE_COLLAPSED;
     }
 
@@ -81,5 +82,9 @@ public class AlarmsCursorAdapter extends BaseCursorAdapter<Alarm, BaseAlarmViewH
         mExpandedId = RecyclerView.NO_ID;
         mExpandedPosition = RecyclerView.NO_POSITION;
         notifyItemChanged(position);
+    }
+
+    public int getExpandedPosition() {
+        return mExpandedPosition;
     }
 }

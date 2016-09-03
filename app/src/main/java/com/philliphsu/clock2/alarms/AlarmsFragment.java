@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.content.Loader;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,6 +35,8 @@ public class AlarmsFragment extends RecyclerViewFragment<
 
     static final String TAG_TIME_PICKER = "time_picker";
 
+    private static final String KEY_EXPANDED_POSITION = "expanded_position";
+
     // TODO: Delete these constants. We no longer use EditAlarmActivity.
 //    @Deprecated
 //    private static final int REQUEST_EDIT_ALARM = 0;
@@ -49,6 +52,8 @@ public class AlarmsFragment extends RecyclerViewFragment<
     private AlarmController mAlarmController;
     private Handler mHandler = new Handler();
     private View mSnackbarAnchor;
+
+    private int mExpandedPosition = RecyclerView.NO_POSITION;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -72,6 +77,13 @@ public class AlarmsFragment extends RecyclerViewFragment<
 
         if (getArguments() != null) {
             // TODO Read arguments
+        }
+
+        if (savedInstanceState != null) {
+            // Restore the value of the last expanded position here.
+            // We cannot tell the adapter to expand this item until onLoadFinished()
+            // is called.
+            mExpandedPosition = savedInstanceState.getInt(KEY_EXPANDED_POSITION, RecyclerView.NO_POSITION);
         }
 
         // Will succeed because the activity is created at this point.
@@ -100,6 +112,9 @@ public class AlarmsFragment extends RecyclerViewFragment<
         super.onLoadFinished(loader, data);
         // TODO: If this was a content change due to an update, verify that
         // we scroll to the updated alarm if its sort order changes.
+
+        // Does nothing If there is no expanded position.
+        getAdapter().expand(mExpandedPosition);
     }
 
     @Override
@@ -242,6 +257,12 @@ public class AlarmsFragment extends RecyclerViewFragment<
                 .build();
         alarm.setEnabled(true);
         mAsyncUpdateHandler.asyncInsert(alarm);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt(KEY_EXPANDED_POSITION, getAdapter().getExpandedPosition());
     }
 
     /////////////////////////////////////////////////////////////////////////////////////
