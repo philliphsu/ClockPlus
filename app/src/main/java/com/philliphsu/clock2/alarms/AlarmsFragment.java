@@ -6,10 +6,8 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.content.Loader;
-import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,8 +17,7 @@ import com.philliphsu.clock2.AsyncAlarmsTableUpdateHandler;
 import com.philliphsu.clock2.R;
 import com.philliphsu.clock2.RecyclerViewFragment;
 import com.philliphsu.clock2.editalarm.BaseTimePickerDialog;
-import com.philliphsu.clock2.editalarm.NumberGridTimePickerDialog;
-import com.philliphsu.clock2.editalarm.NumpadTimePickerDialog;
+import com.philliphsu.clock2.editalarm.TimePickerHelper;
 import com.philliphsu.clock2.model.AlarmCursor;
 import com.philliphsu.clock2.model.AlarmsListCursorLoader;
 import com.philliphsu.clock2.util.AlarmController;
@@ -34,7 +31,8 @@ public class AlarmsFragment extends RecyclerViewFragment<
     implements ScrollHandler, // TODO: Move interface to base class
         BaseTimePickerDialog.OnTimeSetListener {
     private static final String TAG = "AlarmsFragment";
-    private static final String TAG_TIME_PICKER = "time_picker";
+
+    static final String TAG_TIME_PICKER = "time_picker";
 
     // TODO: Delete these constants. We no longer use EditAlarmActivity.
 //    @Deprecated
@@ -118,23 +116,7 @@ public class AlarmsFragment extends RecyclerViewFragment<
         // If we keep a reference to the dialog, we keep its previous state as well.
         // So the next time we call show() on it, the input field will show the
         // last inputted time.
-        BaseTimePickerDialog dialog = null;
-        String numpadStyle = getString(R.string.number_pad);
-        String gridStyle = getString(R.string.grid_selector);
-        String prefTimePickerStyle = PreferenceManager.getDefaultSharedPreferences(getActivity()).getString(
-                // key for the preference value to retrieve
-                getString(R.string.key_time_picker_style),
-                // default value
-                numpadStyle);
-        if (prefTimePickerStyle.equals(numpadStyle)) {
-            dialog = NumpadTimePickerDialog.newInstance(this);
-        } else if (prefTimePickerStyle.equals(gridStyle)) {
-            dialog = NumberGridTimePickerDialog.newInstance(
-                    this, // OnTimeSetListener
-                    0, // Initial hour of day
-                    0, // Initial minute
-                    DateFormat.is24HourFormat(getActivity()));
-        }
+        BaseTimePickerDialog dialog = TimePickerHelper.newDialog(getActivity(), this);
         // DISREGARD THE LINT WARNING ABOUT DIALOG BEING NULL.
         dialog.show(getFragmentManager(), TAG_TIME_PICKER);
     }

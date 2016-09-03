@@ -89,4 +89,8 @@ public class AddLabelDialog extends AppCompatDialogFragment {
         });
         return alert;
     }
+
+    public void setOnLabelSetListener(OnLabelSetListener l) {
+        mOnLabelSetListener = l;
+    }
 }

@@ -4,7 +4,9 @@ import android.content.res.ColorStateList;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SwitchCompat;
 import android.text.format.DateFormat;
 import android.util.Log;
@@ -14,10 +16,14 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.philliphsu.clock2.AddLabelDialog;
 import com.philliphsu.clock2.Alarm;
 import com.philliphsu.clock2.BaseViewHolder;
 import com.philliphsu.clock2.OnListItemInteractionListener;
 import com.philliphsu.clock2.R;
+import com.philliphsu.clock2.editalarm.BaseTimePickerDialog;
+import com.philliphsu.clock2.editalarm.BaseTimePickerDialog.OnTimeSetListener;
+import com.philliphsu.clock2.editalarm.TimePickerHelper;
 import com.philliphsu.clock2.editalarm.TimeTextUtils;
 import com.philliphsu.clock2.util.AlarmController;
 import com.philliphsu.clock2.util.AlarmUtils;
@@ -38,11 +44,20 @@ import static com.philliphsu.clock2.util.DateFormatUtils.formatTime;
  */
 public abstract class BaseAlarmViewHolder extends BaseViewHolder<Alarm> {
     private static final String TAG = "BaseAlarmViewHolder";
+    private static final String TAG_ADD_LABEL_DIALOG = "add_label_dialog";
 
     private final AlarmController mAlarmController;
     // TODO: Should we use VectorDrawable type?
     private final Drawable mDismissNowDrawable;
     private final Drawable mCancelSnoozeDrawable;
+    private final FragmentManager mFragmentManager;
+
+    // These should only be changed from the OnTimeSet callback.
+    // If we had initialized these in onBind(), they would be reset to their original values
+    // from the Alarm each time the ViewHolder binds.
+    // A value of -1 indicates that the Alarm's time has not been changed.
+    int mSelectedHourOfDay = -1;
+    int mSelectedMinute = -1;
 
     @Bind(R.id.time) TextView mTime;
     @Bind(R.id.on_off_switch) SwitchCompat mSwitch;
@@ -58,6 +73,27 @@ public abstract class BaseAlarmViewHolder extends BaseViewHolder<Alarm> {
         // Instead, we create and cache the Drawables once.
         mDismissNowDrawable = ContextCompat.getDrawable(getContext(), R.drawable.ic_dismiss_alarm_24dp);
         mCancelSnoozeDrawable = ContextCompat.getDrawable(getContext(), R.drawable.ic_cancel_snooze);
+
+        // TODO: This is bad! Use a Controller/Presenter instead...
+        // or simply pass in an instance of FragmentManager to the ctor.
+        AppCompatActivity act = (AppCompatActivity) getContext();
+        mFragmentManager = act.getSupportFragmentManager();
+
+        // Are we recreating this because of a rotation?
+        // If so, try finding any dialog that was last shown in our backstack,
+        // and restore the callback.
+        BaseTimePickerDialog picker = (BaseTimePickerDialog)
+                mFragmentManager.findFragmentByTag(AlarmsFragment.TAG_TIME_PICKER);
+        if (picker != null) {
+            Log.i(TAG, "Restoring time picker callback");
+            picker.setOnTimeSetListener(newOnTimeSetListener());
+        }
+        AddLabelDialog labelDialog = (AddLabelDialog)
+                mFragmentManager.findFragmentByTag(TAG_ADD_LABEL_DIALOG);
+        if (labelDialog != null) {
+            Log.i(TAG, "Restoring add label callback");
+            labelDialog.setOnLabelSetListener(newOnLabelSetListener());
+        }
     }
 
     @Override
@@ -149,7 +185,7 @@ public abstract class BaseAlarmViewHolder extends BaseViewHolder<Alarm> {
             Alarm alarm = getAlarm();
             alarm.setEnabled(checked);
             if (alarm.isEnabled()) {
-                // TODO: On Moto X, upcoming notification doesn't post immediately
+                // TODO: On 21+, upcoming notification doesn't post immediately
                 mAlarmController.scheduleAlarm(alarm, true);
                 mAlarmController.save(alarm);
             } else {
@@ -162,7 +198,14 @@ public abstract class BaseAlarmViewHolder extends BaseViewHolder<Alarm> {
 
     @OnClick(R.id.time)
     void openTimePicker() {
-        Log.d(TAG, "Time clicked!");
+        BaseTimePickerDialog dialog = TimePickerHelper.newDialog(getContext(), newOnTimeSetListener());
+        dialog.show(mFragmentManager, AlarmsFragment.TAG_TIME_PICKER);
+    }
+
+    @OnClick(R.id.label)
+    void openLabelEditor() {
+        AddLabelDialog dialog = AddLabelDialog.newInstance(newOnLabelSetListener(), mLabel.getText());
+        dialog.show(mFragmentManager, TAG_ADD_LABEL_DIALOG);
     }
 
     private void bindTime(Alarm alarm) {
@@ -216,5 +259,38 @@ public abstract class BaseAlarmViewHolder extends BaseViewHolder<Alarm> {
     private void bindLabel(String label) {
         boolean visible = label.length() > 0;
         bindLabel(visible, label);
+    }
+
+    private AddLabelDialog.OnLabelSetListener newOnLabelSetListener() {
+        // Create a new listener per request. This is primarily used for
+        // setting the dialog callback again after a rotation.
+        //
+        // If we saved a reference to a listener, it would be tied to
+        // its ViewHolder instance. ViewHolders are reused, so we
+        // could accidentally leak this reference to other Alarm items
+        // in the list.
+        return new AddLabelDialog.OnLabelSetListener() {
+            @Override
+            public void onLabelSet(String label) {
+                mLabel.setText(label);
+            }
+        };
+    }
+
+    private OnTimeSetListener newOnTimeSetListener() {
+        // Create a new listener per request. This is primarily used for
+        // setting the dialog callback again after a rotation.
+        //
+        // If we saved a reference to a listener, it would be tied to
+        // its ViewHolder instance. ViewHolders are reused, so we
+        // could accidentally leak this reference to other Alarm items
+        // in the list.
+        return new OnTimeSetListener() {
+            @Override
+            public void onTimeSet(ViewGroup viewGroup, int hourOfDay, int minute) {
+                mSelectedHourOfDay = hourOfDay;
+                mSelectedMinute = minute;
+            }
+        };
     }
 }

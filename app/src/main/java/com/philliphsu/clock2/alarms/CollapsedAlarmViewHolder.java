@@ -93,4 +93,9 @@ public class CollapsedAlarmViewHolder extends BaseAlarmViewHolder {
         setVisibility(mDays, visible);
         mDays.setText(text);
     }
+
+    @Override
+    void openLabelEditor() {
+        // DO NOT IMPLEMENT
+    }
 }

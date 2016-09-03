@@ -7,7 +7,6 @@ import android.graphics.drawable.Drawable;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.support.v4.graphics.drawable.DrawableCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,7 +14,6 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ToggleButton;
 
-import com.philliphsu.clock2.AddLabelDialog;
 import com.philliphsu.clock2.Alarm;
 import com.philliphsu.clock2.DaysOfWeek;
 import com.philliphsu.clock2.OnListItemInteractionListener;
@@ -26,6 +24,9 @@ import com.philliphsu.clock2.util.AlarmController;
 import butterknife.Bind;
 import butterknife.OnCheckedChanged;
 import butterknife.OnClick;
+
+import static com.philliphsu.clock2.DaysOfWeek.SATURDAY;
+import static com.philliphsu.clock2.DaysOfWeek.SUNDAY;
 
 /**
  * Created by Phillip Hsu on 7/31/2016.
@@ -64,8 +65,14 @@ public class ExpandedAlarmViewHolder extends BaseAlarmViewHolder {
                         .ringtone(""/*TODO*/)
                         .vibrates(mVibrate.isChecked())
                         .build();
-                Log.d(TAG, "New alarm: " + newAlarm);
                 oldAlarm.copyMutableFieldsTo(newAlarm);
+                // ----------------------------------------------
+                // TOneverDO: precede copyMutableFieldsTo()
+                newAlarm.setEnabled(mSwitch.isChecked());
+                for (int i = SUNDAY; i <= SATURDAY; i++) {
+                    newAlarm.setRecurring(i, isRecurringDay(i));
+                }
+                // ----------------------------------------------
                 listener.onListItemUpdate(newAlarm, getAdapterPosition());
             }
         });
@@ -130,20 +137,6 @@ public class ExpandedAlarmViewHolder extends BaseAlarmViewHolder {
         ((Activity) getContext()).startActivityForResult(intent, AlarmsFragment.REQUEST_PICK_RINGTONE);
     }
 
-    @OnClick(R.id.label) // The label view is in our superclass, but we can reference it.
-    void openLabelEditor() {
-        AddLabelDialog dialog = AddLabelDialog.newInstance(new AddLabelDialog.OnLabelSetListener() {
-            @Override
-            public void onLabelSet(String label) {
-                mLabel.setText(label);
-                // TODO: persist change. Use TimerController and its update()
-            }
-        }, mLabel.getText());
-        // TODO: This is bad! Use a Controller instead!
-        AppCompatActivity act = (AppCompatActivity) getContext();
-        dialog.show(act.getSupportFragmentManager(), "TAG");
-    }
-
     ///////////////////////////////////////////////////////////////////////////////////////////
     // We didn't have to write code like this in EditAlarmActivity, because we never committed
     // any changes until the user explicitly clicked save. We have to do this here now because
@@ -203,5 +196,12 @@ public class ExpandedAlarmViewHolder extends BaseAlarmViewHolder {
         return ringtone.isEmpty() ?
                 RingtoneManager.getActualDefaultRingtoneUri(getContext(), RingtoneManager.TYPE_ALARM)
                 : Uri.parse(ringtone);
+    }
+
+    private boolean isRecurringDay(int weekDay) {
+        // What position in the week is this day located at?
+        int pos = DaysOfWeek.getInstance(getContext()).positionOf(weekDay);
+        // Return the state of this day according to its button
+        return mDays[pos].isChecked();
     }
 }
