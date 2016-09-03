@@ -48,15 +48,11 @@ public abstract class RecyclerViewFragment<
 
     /**
      * @return the adapter to set on the RecyclerView. Called in onCreateView().
-     * @param savedInstanceState the same Bundle used to save out and restore state for this Fragment
-     *                           when the configuration is changed. Implementors may find this useful
-     *                           if their ViewHolder type(s) require saving and restoring state across
-     *                           configurations.
      */
-    protected abstract A onCreateAdapter(Bundle savedInstanceState);
+    protected abstract A onCreateAdapter();
 
     /**
-     * @return the adapter instance created from {@link #onCreateAdapter(Bundle)}
+     * @return the adapter instance created from {@link #onCreateAdapter()}
      */
     protected final A getAdapter() {
         return mAdapter;
@@ -76,7 +72,7 @@ public abstract class RecyclerViewFragment<
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = super.onCreateView(inflater, container, savedInstanceState);
         mList.setLayoutManager(getLayoutManager());
-        mList.setAdapter(mAdapter = onCreateAdapter(savedInstanceState));
+        mList.setAdapter(mAdapter = onCreateAdapter());
         return view;
     }
 

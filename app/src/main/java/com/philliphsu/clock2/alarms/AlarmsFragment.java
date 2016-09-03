@@ -136,7 +136,7 @@ public class AlarmsFragment extends RecyclerViewFragment<
     }
 
     @Override
-    protected AlarmsCursorAdapter onCreateAdapter(Bundle savedInstanceState) {
+    protected AlarmsCursorAdapter onCreateAdapter() {
         // Create a new adapter. This is called before we can initialize mAlarmController,
         // so right now it is null. However, after super.onCreate() returns, it is initialized, and
         // the reference variable will be pointing to an actual object. This assignment "propagates"

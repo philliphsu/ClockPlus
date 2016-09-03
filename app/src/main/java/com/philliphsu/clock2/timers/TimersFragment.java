@@ -84,7 +84,7 @@ public class TimersFragment extends RecyclerViewFragment<
     }
 
     @Override
-    protected TimersCursorAdapter onCreateAdapter(Bundle savedInstanceState) {
+    protected TimersCursorAdapter onCreateAdapter() {
         // Create a new adapter. This is called before we can initialize mAsyncTimersTableUpdateHandler,
         // so right now it is null. However, after super.onCreate() returns, it is initialized, and
         // the reference variable will be pointing to an actual object. This assignment "propagates"

@@ -260,7 +260,7 @@ public class StopwatchFragment extends RecyclerViewFragment<
     }
 
     @Override
-    protected LapsAdapter onCreateAdapter(Bundle savedInstanceState) {
+    protected LapsAdapter onCreateAdapter() {
         return new LapsAdapter();
     }
 
