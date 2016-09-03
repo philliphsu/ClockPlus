@@ -45,6 +45,14 @@ public abstract class Alarm extends ObjectWithId implements JsonSerializable, Pa
         throw new UnsupportedOperationException();
     }
 
+    public void copyMutableFieldsTo(Alarm target) {
+        target.setId(this.getId());
+        target.snoozingUntilMillis = this.snoozingUntilMillis;
+        target.enabled = this.enabled;
+        System.arraycopy(this.recurringDays, 0, target.recurringDays, 0, NUM_DAYS);
+        target.ignoreUpcomingRingTime = this.ignoreUpcomingRingTime;
+    }
+
     public static Builder builder() {
         // Unfortunately, default values must be provided for generated Builders.
         // Fields that were not set when build() is called will throw an exception.

@@ -31,6 +31,7 @@ import butterknife.OnClick;
  * Created by Phillip Hsu on 7/31/2016.
  */
 public class ExpandedAlarmViewHolder extends BaseAlarmViewHolder {
+    private static final String TAG = "ExpandedAlarmViewHolder";
 
     @Bind(R.id.ok) Button mOk;
     @Bind(R.id.delete) Button mDelete;
@@ -55,7 +56,17 @@ public class ExpandedAlarmViewHolder extends BaseAlarmViewHolder {
         mOk.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                listener.onListItemUpdate(getAlarm(), getAdapterPosition());
+                final Alarm oldAlarm = getAlarm();
+                Alarm newAlarm = Alarm.builder()
+                        .hour(oldAlarm.hour()/*TODO*/)
+                        .minutes(oldAlarm.minutes()/*TODO*/)
+                        .label(mLabel.getText().toString())
+                        .ringtone(""/*TODO*/)
+                        .vibrates(mVibrate.isChecked())
+                        .build();
+                Log.d(TAG, "New alarm: " + newAlarm);
+                oldAlarm.copyMutableFieldsTo(newAlarm);
+                listener.onListItemUpdate(newAlarm, getAdapterPosition());
             }
         });
 
