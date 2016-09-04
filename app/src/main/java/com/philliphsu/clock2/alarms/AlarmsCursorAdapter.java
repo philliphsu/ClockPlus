@@ -38,9 +38,9 @@ public class AlarmsCursorAdapter extends BaseCursorAdapter<Alarm, BaseAlarmViewH
 
     @Override
     public int getItemViewType(int position) {
-//        final long stableId = getItemId(position);
-        return /*stableId != RecyclerView.NO_ID && stableId == mExpandedId*/
-                position == mExpandedPosition
+        final long stableId = getItemId(position);
+        return stableId != RecyclerView.NO_ID && stableId == mExpandedId
+//                position == mExpandedPosition
                 ? VIEW_TYPE_EXPANDED : VIEW_TYPE_COLLAPSED;
     }
 
@@ -50,10 +50,11 @@ public class AlarmsCursorAdapter extends BaseCursorAdapter<Alarm, BaseAlarmViewH
 //    }
 
     public boolean expand(int position) {
-        final long stableId = getItemId(position);
-        if (mExpandedId == stableId) {
+        if (position == RecyclerView.NO_POSITION)
             return false;
-        }
+        final long stableId = getItemId(position);
+        if (stableId == RecyclerView.NO_ID || mExpandedId == stableId)
+            return false;
         mExpandedId = stableId;
         // If we can call this, the item is in view, so we don't need to scroll to it?
 //        mScrollHandler.smoothScrollTo(position);

@@ -54,26 +54,13 @@ public class ExpandedAlarmViewHolder extends BaseAlarmViewHolder {
                 listener.onListItemDeleted(getAlarm());
             }
         });
+
+        // TODO: We can now do method binding instead, because our superclass provides an API
+        // to retrieve the interaction listener.
         mOk.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final Alarm oldAlarm = getAlarm();
-                Alarm newAlarm = Alarm.builder()
-                        .hour(oldAlarm.hour()/*TODO*/)
-                        .minutes(oldAlarm.minutes()/*TODO*/)
-                        .label(mLabel.getText().toString())
-                        .ringtone(""/*TODO*/)
-                        .vibrates(mVibrate.isChecked())
-                        .build();
-                oldAlarm.copyMutableFieldsTo(newAlarm);
-                // ----------------------------------------------
-                // TOneverDO: precede copyMutableFieldsTo()
-                newAlarm.setEnabled(mSwitch.isChecked());
-                for (int i = SUNDAY; i <= SATURDAY; i++) {
-                    newAlarm.setRecurring(i, isRecurringDay(i));
-                }
-                // ----------------------------------------------
-                listener.onListItemUpdate(newAlarm, getAdapterPosition());
+                createNewAlarmAndWriteToDb();
             }
         });
 
@@ -203,5 +190,25 @@ public class ExpandedAlarmViewHolder extends BaseAlarmViewHolder {
         int pos = DaysOfWeek.getInstance(getContext()).positionOf(weekDay);
         // Return the state of this day according to its button
         return mDays[pos].isChecked();
+    }
+
+    private void createNewAlarmAndWriteToDb() {
+        final Alarm oldAlarm = getAlarm();
+        Alarm newAlarm = Alarm.builder()
+                .hour(oldAlarm.hour()/*TODO*/)
+                .minutes(oldAlarm.minutes()/*TODO*/)
+                .label(mLabel.getText().toString())
+                .ringtone(""/*TODO*/)
+                .vibrates(mVibrate.isChecked())
+                .build();
+        oldAlarm.copyMutableFieldsTo(newAlarm);
+        // ----------------------------------------------
+        // TOneverDO: precede copyMutableFieldsTo()
+        newAlarm.setEnabled(mSwitch.isChecked());
+        for (int i = SUNDAY; i <= SATURDAY; i++) {
+            newAlarm.setRecurring(i, isRecurringDay(i));
+        }
+        // ----------------------------------------------
+        getInteractionListener().onListItemUpdate(newAlarm, getAdapterPosition());
     }
 }
