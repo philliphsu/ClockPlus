@@ -17,6 +17,13 @@ import android.support.v7.app.AlertDialog;
  * (1) this dialog matches the current theme,
  * (2) the selected ringtone URI is delivered via the {@link OnRingtoneSelectedListener
  * OnRingtoneSelectedListener} callback.
+ * <p></p>
+ * TODO: If a ringtone was playing and the configuration changes, the ringtone is destroyed.
+ * Restore the playing ringtone (seamlessly, without the stutter that comes from restarting).
+ * Setting setRetainInstance(true) in onCreate() made our app crash (error said attempted to
+ * access closed Cursor).
+ * We might need to play the ringtone from a Service instead, so we won't have to worry about
+ * the ringtone being destroyed on rotation.
  */
 public class RingtonePickerDialog extends BaseAlertDialogFragment {
     private static final String TAG = "RingtonePickerDialog";

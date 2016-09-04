@@ -23,14 +23,12 @@ import com.philliphsu.clock2.util.AlarmController;
 import butterknife.Bind;
 import butterknife.OnClick;
 
-import static com.philliphsu.clock2.DaysOfWeek.SATURDAY;
-import static com.philliphsu.clock2.DaysOfWeek.SUNDAY;
-
 /**
  * Created by Phillip Hsu on 7/31/2016.
  */
 public class ExpandedAlarmViewHolder extends BaseAlarmViewHolder {
     private static final String TAG = "ExpandedAlarmViewHolder";
+    private static final String TAG_RINGTONE_PICKER = "ringtone_picker";
 
     @Bind(R.id.ok) Button mOk;
     @Bind(R.id.delete) Button mDelete;
@@ -87,6 +85,13 @@ public class ExpandedAlarmViewHolder extends BaseAlarmViewHolder {
                 /*item 2*/Utils.getTextColorFromThemeAttr(getContext(), android.R.attr.textColorHint)
         };
         mDayToggleColors = new ColorStateList(states, colors);
+
+        RingtonePickerDialog picker = (RingtonePickerDialog)
+                mFragmentManager.findFragmentByTag(TAG_RINGTONE_PICKER);
+        if (picker != null) {
+            Log.i(TAG, "Restoring ringtone picker callback");
+            picker.setOnRingtoneSelectedListener(newOnRingtoneSelectedListener());
+        }
     }
 
     @Override
@@ -126,13 +131,9 @@ public class ExpandedAlarmViewHolder extends BaseAlarmViewHolder {
 //        // TODO: This is VERY BAD. Use a Controller/Presenter instead.
 //        // The result will be delivered to MainActivity, and then delegated to AlarmsFragment.
 //        ((Activity) getContext()).startActivityForResult(intent, AlarmsFragment.REQUEST_PICK_RINGTONE);
-        RingtonePickerDialog dialog = RingtonePickerDialog.newInstance(new RingtonePickerDialog.OnRingtoneSelectedListener() {
-            @Override
-            public void onRingtoneSelected(Uri ringtoneUri) {
-                Log.d(TAG, "Selected ringtone: " + ringtoneUri);
-            }
-        }, getSelectedRingtoneUri());
-        dialog.show(mFragmentManager, "TAG");
+        RingtonePickerDialog dialog = RingtonePickerDialog.newInstance(
+                newOnRingtoneSelectedListener(), getSelectedRingtoneUri());
+        dialog.show(mFragmentManager, TAG_RINGTONE_PICKER);
     }
 
     @OnClick(R.id.vibrate)
@@ -206,25 +207,18 @@ public class ExpandedAlarmViewHolder extends BaseAlarmViewHolder {
                 : Uri.parse(ringtone);
     }
 
-    private boolean isRecurringDay(int weekDay) {
-        // What position in the week is this day located at?
-        int pos = DaysOfWeek.getInstance(getContext()).positionOf(weekDay);
-        // Return the state of this day according to its button
-        return mDays[pos].isChecked();
-    }
-
-    private void createNewAlarmAndWriteToDb() {
-        final Alarm oldAlarm = getAlarm();
-        Alarm newAlarm = Alarm.builder()
-                .ringtone(""/*TODO*/)
-                .build();
-        oldAlarm.copyMutableFieldsTo(newAlarm);
-        // ----------------------------------------------
-        // TOneverDO: precede copyMutableFieldsTo()
-        newAlarm.setEnabled(mSwitch.isChecked());
-        for (int i = SUNDAY; i <= SATURDAY; i++) {
-            newAlarm.setRecurring(i, isRecurringDay(i));
-        }
-        // ----------------------------------------------
+    private RingtonePickerDialog.OnRingtoneSelectedListener newOnRingtoneSelectedListener() {
+        return new RingtonePickerDialog.OnRingtoneSelectedListener() {
+            @Override
+            public void onRingtoneSelected(Uri ringtoneUri) {
+                Log.d(TAG, "Selected ringtone: " + ringtoneUri.toString());
+                final Alarm oldAlarm = getAlarm();
+                Alarm newAlarm = oldAlarm.toBuilder()
+                        .ringtone(ringtoneUri.toString())
+                        .build();
+                oldAlarm.copyMutableFieldsTo(newAlarm);
+                mAlarmController.save(newAlarm);
+            }
+        };
     }
 }
