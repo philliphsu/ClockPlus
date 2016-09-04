@@ -129,8 +129,13 @@ public class ExpandedAlarmViewHolder extends BaseAlarmViewHolder {
     // any changes until the user explicitly clicked save. We have to do this here now because
     // we should commit changes as they are made.
     @OnCheckedChanged(R.id.vibrate)
-    void onVibrateToggled() {
-        // TODO
+    void onVibrateToggled(boolean checked) {
+        final Alarm oldAlarm = getAlarm();
+        Alarm newAlarm = oldAlarm.toBuilder()
+                .vibrates(checked)
+                .build();
+        oldAlarm.copyMutableFieldsTo(newAlarm);
+        mAlarmController.save(newAlarm);
     }
 
     @OnCheckedChanged({ R.id.day0, R.id.day1, R.id.day2, R.id.day3, R.id.day4, R.id.day5, R.id.day6 })
@@ -197,7 +202,6 @@ public class ExpandedAlarmViewHolder extends BaseAlarmViewHolder {
         Alarm newAlarm = Alarm.builder()
                 .hour(oldAlarm.hour()/*TODO*/)
                 .minutes(oldAlarm.minutes()/*TODO*/)
-                .label(mLabel.getText().toString())
                 .ringtone(""/*TODO*/)
                 .vibrates(mVibrate.isChecked())
                 .build();

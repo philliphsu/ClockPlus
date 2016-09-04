@@ -46,7 +46,9 @@ public abstract class BaseAlarmViewHolder extends BaseViewHolder<Alarm> {
     private static final String TAG = "BaseAlarmViewHolder";
     private static final String TAG_ADD_LABEL_DIALOG = "add_label_dialog";
 
-    private final AlarmController mAlarmController;
+    // Visible for subclasses.
+    final AlarmController mAlarmController;
+
     // TODO: Should we use VectorDrawable type?
     private final Drawable mDismissNowDrawable;
     private final Drawable mCancelSnoozeDrawable;
@@ -307,6 +309,7 @@ public abstract class BaseAlarmViewHolder extends BaseViewHolder<Alarm> {
         };
     }
 
+    @Deprecated
     protected final OnListItemInteractionListener<Alarm> getInteractionListener() {
         return mInteractionListener;
     }
