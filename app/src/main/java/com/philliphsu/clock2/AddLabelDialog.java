@@ -7,6 +7,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatDialogFragment;
+import android.support.v7.widget.AppCompatEditText;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 
@@ -47,7 +48,7 @@ public class AddLabelDialog extends AppCompatDialogFragment {
     @NonNull
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        mEditText = new EditText(getActivity());
+        mEditText = new AppCompatEditText(getActivity());
         // Views must have IDs set to automatically save instance state
         mEditText.setId(R.id.label);
         mEditText.setText(mInitialText);
