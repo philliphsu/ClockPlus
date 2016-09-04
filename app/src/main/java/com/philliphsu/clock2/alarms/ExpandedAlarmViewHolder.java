@@ -12,7 +12,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.ToggleButton;
 
 import com.philliphsu.clock2.Alarm;
@@ -130,10 +129,6 @@ public class ExpandedAlarmViewHolder extends BaseAlarmViewHolder {
         ((Activity) getContext()).startActivityForResult(intent, AlarmsFragment.REQUEST_PICK_RINGTONE);
     }
 
-    ///////////////////////////////////////////////////////////////////////////////////////////
-    // We didn't have to write code like this in EditAlarmActivity, because we never committed
-    // any changes until the user explicitly clicked save. We have to do this here now because
-    // we should commit changes as they are made.
     @OnCheckedChanged(R.id.vibrate)
     void onVibrateToggled(boolean checked) {
         final Alarm oldAlarm = getAlarm();
@@ -144,22 +139,21 @@ public class ExpandedAlarmViewHolder extends BaseAlarmViewHolder {
         mAlarmController.save(newAlarm);
     }
 
-    @OnCheckedChanged({ R.id.day0, R.id.day1, R.id.day2, R.id.day3, R.id.day4, R.id.day5, R.id.day6 })
-    void onDayToggled(CompoundButton buttonView, boolean isChecked) {
+    @OnClick({ R.id.day0, R.id.day1, R.id.day2, R.id.day3, R.id.day4, R.id.day5, R.id.day6 })
+    void onDayToggled(ToggleButton view) {
         final Alarm oldAlarm = getAlarm();
         Alarm newAlarm = oldAlarm.toBuilder().build();
         oldAlarm.copyMutableFieldsTo(newAlarm);
         // ---------------------------------------------------------------------------------
         // TOneverDO: precede copyMutableFieldsTo()
-        int position = ((ViewGroup) buttonView.getParent()).indexOfChild(buttonView);
+        int position = ((ViewGroup) view.getParent()).indexOfChild(view);
         int weekDayAtPosition = DaysOfWeek.getInstance(getContext()).weekDayAt(position);
         Log.d(TAG, "Day toggle #" + position + " checked changed. This is weekday #"
                 + weekDayAtPosition + " relative to a week starting on Sunday");
-        newAlarm.setRecurring(weekDayAtPosition, isChecked);
+        newAlarm.setRecurring(weekDayAtPosition, view.isChecked());
         // ---------------------------------------------------------------------------------
         mAlarmController.save(newAlarm);
     }
-    ///////////////////////////////////////////////////////////////////////////////////////////
 
     private void bindDays(Alarm alarm) {
         for (int i = 0; i < mDays.length; i++) {
