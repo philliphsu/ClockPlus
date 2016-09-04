@@ -48,6 +48,8 @@ public class AddLabelDialog extends AppCompatDialogFragment {
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         mEditText = new EditText(getActivity());
+        // Views must have IDs set to automatically save instance state
+        mEditText.setId(R.id.label);
         mEditText.setText(mInitialText);
         mEditText.setInputType(
                 EditorInfo.TYPE_CLASS_TEXT // Needed or else we won't get automatic spacing between words
