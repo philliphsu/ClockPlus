@@ -54,13 +54,6 @@ public abstract class BaseAlarmViewHolder extends BaseViewHolder<Alarm> {
     private final Drawable mCancelSnoozeDrawable;
     private final FragmentManager mFragmentManager;
 
-    // These should only be changed from the OnTimeSet callback.
-    // If we had initialized these in onBind(), they would be reset to their original values
-    // from the Alarm each time the ViewHolder binds.
-    // A value of -1 indicates that the Alarm's time has not been changed.
-    int mSelectedHourOfDay = -1;
-    int mSelectedMinute = -1;
-
     @Bind(R.id.time) TextView mTime;
     @Bind(R.id.on_off_switch) SwitchCompat mSwitch;
     @Bind(R.id.label) TextView mLabel;
@@ -297,8 +290,17 @@ public abstract class BaseAlarmViewHolder extends BaseViewHolder<Alarm> {
         return new OnTimeSetListener() {
             @Override
             public void onTimeSet(ViewGroup viewGroup, int hourOfDay, int minute) {
-                mSelectedHourOfDay = hourOfDay;
-                mSelectedMinute = minute;
+                final Alarm oldAlarm = getAlarm();
+                // I don't think we need this; scheduling a new alarm that is considered
+                // equal to a previous alarm will overwrite the previous alarm.
+//                mAlarmController.cancelAlarm(oldAlarm, false);
+                Alarm newAlarm = oldAlarm.toBuilder()
+                        .hour(hourOfDay)
+                        .minutes(minute)
+                        .build();
+                oldAlarm.copyMutableFieldsTo(newAlarm);
+                mAlarmController.scheduleAlarm(newAlarm, true);
+                mAlarmController.save(newAlarm);
             }
         };
     }
