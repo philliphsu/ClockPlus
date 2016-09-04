@@ -22,7 +22,6 @@ import com.philliphsu.clock2.aospdatetimepicker.Utils;
 import com.philliphsu.clock2.util.AlarmController;
 
 import butterknife.Bind;
-import butterknife.OnCheckedChanged;
 import butterknife.OnClick;
 
 import static com.philliphsu.clock2.DaysOfWeek.SATURDAY;
@@ -129,11 +128,11 @@ public class ExpandedAlarmViewHolder extends BaseAlarmViewHolder {
         ((Activity) getContext()).startActivityForResult(intent, AlarmsFragment.REQUEST_PICK_RINGTONE);
     }
 
-    @OnCheckedChanged(R.id.vibrate)
-    void onVibrateToggled(boolean checked) {
+    @OnClick(R.id.vibrate)
+    void onVibrateToggled() {
         final Alarm oldAlarm = getAlarm();
         Alarm newAlarm = oldAlarm.toBuilder()
-                .vibrates(checked)
+                .vibrates(mVibrate.isChecked())
                 .build();
         oldAlarm.copyMutableFieldsTo(newAlarm);
         mAlarmController.save(newAlarm);
