@@ -114,6 +114,8 @@ public class AlarmsFragment extends RecyclerViewFragment<
 
         // Does nothing If there is no expanded position.
         getAdapter().expand(mExpandedPosition);
+        // We shouldn't continue to keep a reference to this, so clear it.
+        mExpandedPosition = RecyclerView.NO_POSITION;
     }
 
     @Override

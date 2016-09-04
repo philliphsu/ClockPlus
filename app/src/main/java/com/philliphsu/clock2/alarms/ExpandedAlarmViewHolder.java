@@ -53,18 +53,19 @@ public class ExpandedAlarmViewHolder extends BaseAlarmViewHolder {
                 listener.onListItemDeleted(getAlarm());
             }
         });
-
-        // TODO: We can now do method binding instead, because our superclass provides an API
-        // to retrieve the interaction listener.
         mOk.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // Since changes are persisted as soon as they are made, there's really
-                // nothing we have to persist here. This just lets the listener know
-                // we should collapse this VH.
-                // TODO: Verify that the VH is collapsed.
-                // Alternatively, I think we can just performClick() on the itemView.
-                listener.onListItemUpdate(getAlarm(), getAdapterPosition());
+                // nothing we have to persist here. Let the listener know we should
+                // collapse this VH.
+                // While this works, it also makes an update to the DB and thus reschedules
+                // the alarm, so the snackbar will show up as well. We want to avoid that..
+//                listener.onListItemUpdate(getAlarm(), getAdapterPosition());
+                // TODO: This only works because we know what the implementation looks like..
+                // This is bad because we just made the proper function of this dependent
+                // on the implementation.
+                listener.onListItemClick(getAlarm(), getAdapterPosition());
             }
         });
 
@@ -209,8 +210,6 @@ public class ExpandedAlarmViewHolder extends BaseAlarmViewHolder {
     private void createNewAlarmAndWriteToDb() {
         final Alarm oldAlarm = getAlarm();
         Alarm newAlarm = Alarm.builder()
-                .hour(oldAlarm.hour()/*TODO*/)
-                .minutes(oldAlarm.minutes()/*TODO*/)
                 .ringtone(""/*TODO*/)
                 .build();
         oldAlarm.copyMutableFieldsTo(newAlarm);
