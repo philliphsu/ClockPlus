@@ -219,10 +219,21 @@ public final class AlarmController {
         return pi;
     }
 
-    private void showSnackbar(String message) {
+    private void showSnackbar(final String message) {
         // Is the window containing this anchor currently focused?
-        if (mSnackbarAnchor != null && mSnackbarAnchor.hasWindowFocus()) {
-            Snackbar.make(mSnackbarAnchor, message, Snackbar.LENGTH_LONG).show();
+//        Log.d(TAG, "Anchor has window focus? " + mSnackbarAnchor.hasWindowFocus());
+        if (mSnackbarAnchor != null /*&& mSnackbarAnchor.hasWindowFocus()*/) {
+            // Queue the message on the view's message loop, so the message
+            // gets processed once the view gets attached to the window.
+            // This executes on the UI thread, just like not queueing it will,
+            // but the difference here is we wait for the view to be attached
+            // to the window (if not already) before executing the runnable code.
+            mSnackbarAnchor.post(new Runnable() {
+                @Override
+                public void run() {
+                    Snackbar.make(mSnackbarAnchor, message, Snackbar.LENGTH_LONG).show();
+                }
+            });
         }
     }
 }
