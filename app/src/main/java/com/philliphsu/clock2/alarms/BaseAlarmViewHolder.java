@@ -54,10 +54,6 @@ public abstract class BaseAlarmViewHolder extends BaseViewHolder<Alarm> {
     private final Drawable mCancelSnoozeDrawable;
     private final FragmentManager mFragmentManager;
 
-    // So far, Alarms are the only VH type that requires saving a reference to the listener,
-    // so that they may do extra stuff with it.
-    private final OnListItemInteractionListener<Alarm> mInteractionListener;
-
     // These should only be changed from the OnTimeSet callback.
     // If we had initialized these in onBind(), they would be reset to their original values
     // from the Alarm each time the ViewHolder binds.
@@ -84,8 +80,6 @@ public abstract class BaseAlarmViewHolder extends BaseViewHolder<Alarm> {
         // or simply pass in an instance of FragmentManager to the ctor.
         AppCompatActivity act = (AppCompatActivity) getContext();
         mFragmentManager = act.getSupportFragmentManager();
-
-        mInteractionListener = listener;
 
         // Are we recreating this because of a rotation?
         // If so, try finding any dialog that was last shown in our backstack,
@@ -307,10 +301,5 @@ public abstract class BaseAlarmViewHolder extends BaseViewHolder<Alarm> {
                 mSelectedMinute = minute;
             }
         };
-    }
-
-    @Deprecated
-    protected final OnListItemInteractionListener<Alarm> getInteractionListener() {
-        return mInteractionListener;
     }
 }

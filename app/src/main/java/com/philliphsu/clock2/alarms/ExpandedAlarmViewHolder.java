@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.ToggleButton;
 
 import com.philliphsu.clock2.Alarm;
@@ -60,7 +61,12 @@ public class ExpandedAlarmViewHolder extends BaseAlarmViewHolder {
         mOk.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                createNewAlarmAndWriteToDb();
+                // Since changes are persisted as soon as they are made, there's really
+                // nothing we have to persist here. This just lets the listener know
+                // we should collapse this VH.
+                // TODO: Verify that the VH is collapsed.
+                // Alternatively, I think we can just performClick() on the itemView.
+                listener.onListItemUpdate(getAlarm(), getAdapterPosition());
             }
         });
 
@@ -139,9 +145,19 @@ public class ExpandedAlarmViewHolder extends BaseAlarmViewHolder {
     }
 
     @OnCheckedChanged({ R.id.day0, R.id.day1, R.id.day2, R.id.day3, R.id.day4, R.id.day5, R.id.day6 })
-    void onDayToggled() {
-        // TODO
-        Log.d("yooo", "Hello!");
+    void onDayToggled(CompoundButton buttonView, boolean isChecked) {
+        final Alarm oldAlarm = getAlarm();
+        Alarm newAlarm = oldAlarm.toBuilder().build();
+        oldAlarm.copyMutableFieldsTo(newAlarm);
+        // ---------------------------------------------------------------------------------
+        // TOneverDO: precede copyMutableFieldsTo()
+        int position = ((ViewGroup) buttonView.getParent()).indexOfChild(buttonView);
+        int weekDayAtPosition = DaysOfWeek.getInstance(getContext()).weekDayAt(position);
+        Log.d(TAG, "Day toggle #" + position + " checked changed. This is weekday #"
+                + weekDayAtPosition + " relative to a week starting on Sunday");
+        newAlarm.setRecurring(weekDayAtPosition, isChecked);
+        // ---------------------------------------------------------------------------------
+        mAlarmController.save(newAlarm);
     }
     ///////////////////////////////////////////////////////////////////////////////////////////
 
@@ -203,7 +219,6 @@ public class ExpandedAlarmViewHolder extends BaseAlarmViewHolder {
                 .hour(oldAlarm.hour()/*TODO*/)
                 .minutes(oldAlarm.minutes()/*TODO*/)
                 .ringtone(""/*TODO*/)
-                .vibrates(mVibrate.isChecked())
                 .build();
         oldAlarm.copyMutableFieldsTo(newAlarm);
         // ----------------------------------------------
@@ -213,6 +228,5 @@ public class ExpandedAlarmViewHolder extends BaseAlarmViewHolder {
             newAlarm.setRecurring(i, isRecurringDay(i));
         }
         // ----------------------------------------------
-        getInteractionListener().onListItemUpdate(newAlarm, getAdapterPosition());
     }
 }
