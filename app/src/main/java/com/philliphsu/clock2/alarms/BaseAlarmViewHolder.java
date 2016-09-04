@@ -52,7 +52,9 @@ public abstract class BaseAlarmViewHolder extends BaseViewHolder<Alarm> {
     // TODO: Should we use VectorDrawable type?
     private final Drawable mDismissNowDrawable;
     private final Drawable mCancelSnoozeDrawable;
-    private final FragmentManager mFragmentManager;
+
+    // Exposed for use by subclasses (obviously in this package.
+    final FragmentManager mFragmentManager;
 
     @Bind(R.id.time) TextView mTime;
     @Bind(R.id.on_off_switch) SwitchCompat mSwitch;

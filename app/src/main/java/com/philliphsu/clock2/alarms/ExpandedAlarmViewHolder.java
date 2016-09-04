@@ -1,7 +1,5 @@
 package com.philliphsu.clock2.alarms;
 
-import android.app.Activity;
-import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.drawable.Drawable;
 import android.media.RingtoneManager;
@@ -18,6 +16,7 @@ import com.philliphsu.clock2.Alarm;
 import com.philliphsu.clock2.DaysOfWeek;
 import com.philliphsu.clock2.OnListItemInteractionListener;
 import com.philliphsu.clock2.R;
+import com.philliphsu.clock2.RingtonePickerDialog;
 import com.philliphsu.clock2.aospdatetimepicker.Utils;
 import com.philliphsu.clock2.util.AlarmController;
 
@@ -115,18 +114,25 @@ public class ExpandedAlarmViewHolder extends BaseAlarmViewHolder {
 
     @OnClick(R.id.ringtone)
     void showRingtonePickerDialog() {
-        Intent intent = new Intent(RingtoneManager.ACTION_RINGTONE_PICKER);
-        intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE, RingtoneManager.TYPE_ALARM)
-                .putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_SILENT, false)
-                // The ringtone to show as selected when the dialog is opened
-                .putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, getSelectedRingtoneUri())
-                // Whether to show "Default" item in the list
-                .putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_DEFAULT, false);
-        // The ringtone that plays when default option is selected
-        //.putExtra(RingtoneManager.EXTRA_RINGTONE_DEFAULT_URI, DEFAULT_TONE);
-        // TODO: This is VERY BAD. Use a Controller/Presenter instead.
-        // The result will be delivered to MainActivity, and then delegated to AlarmsFragment.
-        ((Activity) getContext()).startActivityForResult(intent, AlarmsFragment.REQUEST_PICK_RINGTONE);
+//        Intent intent = new Intent(RingtoneManager.ACTION_RINGTONE_PICKER);
+//        intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE, RingtoneManager.TYPE_ALARM)
+//                .putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_SILENT, false)
+//                // The ringtone to show as selected when the dialog is opened
+//                .putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, getSelectedRingtoneUri())
+//                // Whether to show "Default" item in the list
+//                .putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_DEFAULT, false);
+//        // The ringtone that plays when default option is selected
+//        //.putExtra(RingtoneManager.EXTRA_RINGTONE_DEFAULT_URI, DEFAULT_TONE);
+//        // TODO: This is VERY BAD. Use a Controller/Presenter instead.
+//        // The result will be delivered to MainActivity, and then delegated to AlarmsFragment.
+//        ((Activity) getContext()).startActivityForResult(intent, AlarmsFragment.REQUEST_PICK_RINGTONE);
+        RingtonePickerDialog dialog = RingtonePickerDialog.newInstance(new RingtonePickerDialog.OnRingtoneSelectedListener() {
+            @Override
+            public void onRingtoneSelected(Uri ringtoneUri) {
+                Log.d(TAG, "Selected ringtone: " + ringtoneUri);
+            }
+        }, getSelectedRingtoneUri());
+        dialog.show(mFragmentManager, "TAG");
     }
 
     @OnClick(R.id.vibrate)

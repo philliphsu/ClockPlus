@@ -203,4 +203,5 @@
     <string name="timer_auto_silenced_text">Your timer expired.</string>
 
     <string name="label">Label</string>
+    <string name="ringtones">Ringtones</string>
 </resources>
