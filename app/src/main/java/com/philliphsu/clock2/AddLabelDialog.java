@@ -1,12 +1,7 @@
 package com.philliphsu.clock2;
 
-import android.app.Dialog;
 import android.content.DialogInterface;
-import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatDialogFragment;
 import android.support.v7.widget.AppCompatEditText;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
@@ -19,11 +14,10 @@ import static com.philliphsu.clock2.util.KeyboardUtils.showKeyboard;
  * TODO: If we have any other needs for a dialog with an EditText, rename this to EditTextDialog,
  * and change the callback interface name appropriately.
  */
-public class AddLabelDialog extends AppCompatDialogFragment {
+public class AddLabelDialog extends BaseAlertDialogFragment {
 
     private EditText mEditText;
     private OnLabelSetListener mOnLabelSetListener;
-
     private CharSequence mInitialText;
 
     public interface OnLabelSetListener {
@@ -41,13 +35,7 @@ public class AddLabelDialog extends AppCompatDialogFragment {
     }
 
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
-
-    @NonNull
-    @Override
-    public Dialog onCreateDialog(Bundle savedInstanceState) {
+    protected AlertDialog createFrom(AlertDialog.Builder builder) {
         mEditText = new AppCompatEditText(getActivity());
         // Views must have IDs set to automatically save instance state
         mEditText.setId(R.id.label);
@@ -60,37 +48,29 @@ public class AddLabelDialog extends AppCompatDialogFragment {
         int spacingLeft = getResources().getDimensionPixelSize(R.dimen.item_padding_start);
         int spacingRight = getResources().getDimensionPixelSize(R.dimen.item_padding_end);
 
-        final AlertDialog alert = new AlertDialog.Builder(getActivity())
-                .setTitle(R.string.label)
-                .setView(mEditText, spacingLeft, 0, spacingRight, 0)
-                .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dismiss();
-                    }
-                })
-                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        if (mOnLabelSetListener != null) {
-                            // If we passed the text back as an Editable (subtype of CharSequence
-                            // used in EditText), then there may be text formatting left in there,
-                            // which we don't want.
-                            mOnLabelSetListener.onLabelSet(mEditText.getText().toString());
-                        }
-                        dismiss();
-                    }
-                })
-                .create();
+        builder.setTitle(R.string.label)
+                .setView(mEditText, spacingLeft, 0, spacingRight, 0);
 
-        alert.setOnShowListener(new DialogInterface.OnShowListener() {
+        AlertDialog dialog = super.createFrom(builder);
+        dialog.setOnShowListener(new DialogInterface.OnShowListener() {
             @Override
             public void onShow(DialogInterface dialog) {
                 showKeyboard(getActivity(), mEditText);
                 mEditText.setSelection(0, mEditText.length());
             }
         });
-        return alert;
+        return dialog;
+    }
+
+    @Override
+    protected void onOk() {
+        if (mOnLabelSetListener != null) {
+            // If we passed the text back as an Editable (subtype of CharSequence
+            // used in EditText), then there may be text formatting left in there,
+            // which we don't want.
+            mOnLabelSetListener.onLabelSet(mEditText.getText().toString());
+        }
+        dismiss();
     }
 
     public void setOnLabelSetListener(OnLabelSetListener l) {
