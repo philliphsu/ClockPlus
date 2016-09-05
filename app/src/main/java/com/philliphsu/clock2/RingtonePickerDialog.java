@@ -2,13 +2,13 @@ package com.philliphsu.clock2;
 
 import android.content.DialogInterface;
 import android.database.Cursor;
-import android.media.AudioManager;
-import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
+
+import com.philliphsu.clock2.ringtone.RingtoneLoop;
 
 /**
  * Created by Phillip Hsu on 9/3/2016.
@@ -31,7 +31,7 @@ public class RingtonePickerDialog extends BaseAlertDialogFragment {
     private RingtoneManager mRingtoneManager;
     private OnRingtoneSelectedListener mOnRingtoneSelectedListener;
     private Uri mRingtoneUri;
-    private Ringtone mRingtone;
+    private RingtoneLoop mRingtone;
 
     public interface OnRingtoneSelectedListener {
         void onRingtoneSelected(Uri ringtoneUri);
@@ -66,12 +66,12 @@ public class RingtonePickerDialog extends BaseAlertDialogFragment {
                 .setSingleChoiceItems(cursor, checkedItem, labelColumn, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+                        if (mRingtone != null) {
+                            destroyLocalPlayer();
+                        }
                         // Here, 'which' param refers to the position of the item clicked.
                         mRingtoneUri = mRingtoneManager.getRingtoneUri(which);
-                        mRingtone = mRingtoneManager.getRingtone(which);
-                        // TODO: Deprecated, but setAudioAttributes() is for 21+, so what is the
-                        // pre-21 alternative?
-                        mRingtone.setStreamType(AudioManager.STREAM_ALARM);
+                        mRingtone = new RingtoneLoop(getActivity(), mRingtoneUri);
                         mRingtone.play();
                     }
                 });
@@ -81,9 +81,7 @@ public class RingtonePickerDialog extends BaseAlertDialogFragment {
     @Override
     public void onDismiss(DialogInterface dialog) {
         super.onDismiss(dialog);
-        if (mRingtone != null && mRingtone.isPlaying()) {
-            mRingtone.stop();
-        }
+        destroyLocalPlayer();
     }
 
     @Override
@@ -97,5 +95,12 @@ public class RingtonePickerDialog extends BaseAlertDialogFragment {
 
     public void setOnRingtoneSelectedListener(OnRingtoneSelectedListener onRingtoneSelectedListener) {
         mOnRingtoneSelectedListener = onRingtoneSelectedListener;
+    }
+
+    private void destroyLocalPlayer() {
+        if (mRingtone != null) {
+            mRingtone.stop();
+            mRingtone = null;
+        }
     }
 }

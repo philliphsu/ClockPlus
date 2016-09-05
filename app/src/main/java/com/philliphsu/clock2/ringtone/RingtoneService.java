@@ -7,7 +7,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.media.AudioManager;
-import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.IBinder;
@@ -19,7 +18,6 @@ import android.util.Log;
 import com.philliphsu.clock2.R;
 import com.philliphsu.clock2.util.LocalBroadcastHelper;
 
-import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -41,7 +39,7 @@ public abstract class RingtoneService<T extends Parcelable> extends Service {
     public static final String EXTRA_RINGING_OBJECT = RingtoneActivity.EXTRA_RINGING_OBJECT;
 
     private AudioManager mAudioManager;
-    private MediaPlayer mMediaPlayer;
+    private RingtoneLoop mRingtone;
     private Vibrator mVibrator;
     private T mRingingObject;
 
@@ -97,7 +95,7 @@ public abstract class RingtoneService<T extends Parcelable> extends Service {
             }
         }
         // Play ringtone, if not already playing
-        if (mAudioManager == null && mMediaPlayer == null) {
+        if (mAudioManager == null && mRingtone == null) {
             // TOneverDO: Pass 0 as the first argument
             startForeground(R.id.ringtone_service_notification, getForegroundNotification());
 
@@ -110,23 +108,8 @@ public abstract class RingtoneService<T extends Parcelable> extends Service {
                     // Request permanent focus, as ringing could last several minutes
                     AudioManager.AUDIOFOCUS_GAIN);
             if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
-                try {
-                    mMediaPlayer = new MediaPlayer();
-                    mMediaPlayer.setDataSource(this, getRingtoneUri());
-                    if (mAudioManager.getStreamVolume(AudioManager.STREAM_ALARM) != 0) {
-                        // "Must call this method before prepare() or prepareAsync() in order
-                        // for the target stream type to become effective thereafter."
-                        mMediaPlayer.setAudioStreamType(AudioManager.STREAM_ALARM);
-                        mMediaPlayer.setLooping(true);
-                        // There is prepare() and prepareAsync().
-                        // "For files, it is OK to call prepare(), which blocks until
-                        // MediaPlayer is ready for playback."
-                        mMediaPlayer.prepare();
-                        mMediaPlayer.start();
-                    }
-                } catch (SecurityException | IOException e) {
-                    destroyLocalPlayer();
-                }
+                mRingtone = new RingtoneLoop(this, getRingtoneUri());
+                mRingtone.play();
                 if (doesVibrate()) {
                     mVibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
                     mVibrator.vibrate(new long[] { // apply pattern
@@ -156,7 +139,7 @@ public abstract class RingtoneService<T extends Parcelable> extends Service {
     @Override
     public void onDestroy() {
         Log.d(TAG, "onDestroy()");
-        destroyLocalPlayer();
+        mRingtone.stop();
         mAudioManager.abandonAudioFocus(null); // no listener was set
         if (mVibrator != null) {
             mVibrator.cancel();
@@ -204,13 +187,5 @@ public abstract class RingtoneService<T extends Parcelable> extends Service {
 
     protected final T getRingingObject() {
         return mRingingObject;
-    }
-
-    private void destroyLocalPlayer() {
-        if (mMediaPlayer != null) {
-            mMediaPlayer.reset();
-            mMediaPlayer.release();
-            mMediaPlayer = null;
-        }
     }
 }
