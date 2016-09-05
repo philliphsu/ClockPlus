@@ -21,6 +21,7 @@ import com.philliphsu.clock2.Alarm;
 import com.philliphsu.clock2.BaseViewHolder;
 import com.philliphsu.clock2.OnListItemInteractionListener;
 import com.philliphsu.clock2.R;
+import com.philliphsu.clock2.aospdatetimepicker.Utils;
 import com.philliphsu.clock2.editalarm.BaseTimePickerDialog;
 import com.philliphsu.clock2.editalarm.BaseTimePickerDialog.OnTimeSetListener;
 import com.philliphsu.clock2.editalarm.TimePickerHelper;
@@ -263,9 +264,9 @@ public abstract class BaseAlarmViewHolder extends BaseViewHolder<Alarm> {
         setVisibility(mDismissButton, visible);
         mDismissButton.setText(buttonText);
         // Set drawable start
-        mDismissButton.setCompoundDrawablesRelativeWithIntrinsicBounds(
-                upcoming ? mDismissNowDrawable : mCancelSnoozeDrawable,
-                null, null, null);
+        Drawable icon = upcoming ? mDismissNowDrawable : mCancelSnoozeDrawable;
+        Utils.setTint(icon, mDismissButton.getCurrentTextColor());
+        mDismissButton.setCompoundDrawablesRelativeWithIntrinsicBounds(icon, null, null, null);
     }
 
     private void bindLabel(String label) {

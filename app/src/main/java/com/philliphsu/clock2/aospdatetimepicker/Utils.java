@@ -223,6 +223,11 @@ public class Utils {
         target.setImageDrawable(drawable);
     }
 
+    public static void setTint(Drawable drawable, @ColorInt int color) {
+        drawable = DrawableCompat.wrap(drawable.mutate());
+        DrawableCompat.setTint(drawable, color);
+    }
+
     /**
      * Returns a tinted drawable from the given drawable resource, if {@code tintList != null}.
      * Otherwise, no tint will be applied.
