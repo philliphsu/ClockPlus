@@ -7,20 +7,19 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.media.AudioManager;
-import android.media.Ringtone;
-import android.media.RingtoneManager;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Parcelable;
 import android.os.Vibrator;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.philliphsu.clock2.R;
 import com.philliphsu.clock2.util.LocalBroadcastHelper;
 
+import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -42,8 +41,8 @@ public abstract class RingtoneService<T extends Parcelable> extends Service {
     public static final String EXTRA_RINGING_OBJECT = RingtoneActivity.EXTRA_RINGING_OBJECT;
 
     private AudioManager mAudioManager;
-    private Ringtone mRingtone;
-    @Nullable private Vibrator mVibrator;
+    private MediaPlayer mMediaPlayer;
+    private Vibrator mVibrator;
     private T mRingingObject;
 
     // TODO: Using Handler for this is ill-suited? Alarm ringing could outlast the
@@ -98,7 +97,7 @@ public abstract class RingtoneService<T extends Parcelable> extends Service {
             }
         }
         // Play ringtone, if not already playing
-        if (mAudioManager == null && mRingtone == null) {
+        if (mAudioManager == null && mMediaPlayer == null) {
             // TOneverDO: Pass 0 as the first argument
             startForeground(R.id.ringtone_service_notification, getForegroundNotification());
 
@@ -111,10 +110,23 @@ public abstract class RingtoneService<T extends Parcelable> extends Service {
                     // Request permanent focus, as ringing could last several minutes
                     AudioManager.AUDIOFOCUS_GAIN);
             if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
-                mRingtone = RingtoneManager.getRingtone(this, getRingtoneUri());
-                // Deprecated, but the alternative AudioAttributes requires API 21
-                mRingtone.setStreamType(AudioManager.STREAM_ALARM);
-                mRingtone.play();
+                try {
+                    mMediaPlayer = new MediaPlayer();
+                    mMediaPlayer.setDataSource(this, getRingtoneUri());
+                    if (mAudioManager.getStreamVolume(AudioManager.STREAM_ALARM) != 0) {
+                        // "Must call this method before prepare() or prepareAsync() in order
+                        // for the target stream type to become effective thereafter."
+                        mMediaPlayer.setAudioStreamType(AudioManager.STREAM_ALARM);
+                        mMediaPlayer.setLooping(true);
+                        // There is prepare() and prepareAsync().
+                        // "For files, it is OK to call prepare(), which blocks until
+                        // MediaPlayer is ready for playback."
+                        mMediaPlayer.prepare();
+                        mMediaPlayer.start();
+                    }
+                } catch (SecurityException | IOException e) {
+                    destroyLocalPlayer();
+                }
                 if (doesVibrate()) {
                     mVibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
                     mVibrator.vibrate(new long[] { // apply pattern
@@ -144,7 +156,7 @@ public abstract class RingtoneService<T extends Parcelable> extends Service {
     @Override
     public void onDestroy() {
         Log.d(TAG, "onDestroy()");
-        mRingtone.stop();
+        destroyLocalPlayer();
         mAudioManager.abandonAudioFocus(null); // no listener was set
         if (mVibrator != null) {
             mVibrator.cancel();
@@ -192,5 +204,13 @@ public abstract class RingtoneService<T extends Parcelable> extends Service {
 
     protected final T getRingingObject() {
         return mRingingObject;
+    }
+
+    private void destroyLocalPlayer() {
+        if (mMediaPlayer != null) {
+            mMediaPlayer.reset();
+            mMediaPlayer.release();
+            mMediaPlayer = null;
+        }
     }
 }
