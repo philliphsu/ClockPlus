@@ -168,7 +168,7 @@ public final class AlarmController {
     public void removeUpcomingAlarmNotification(Alarm a) {
         Intent intent = new Intent(mAppContext, UpcomingAlarmReceiver.class)
                 .setAction(UpcomingAlarmReceiver.ACTION_CANCEL_NOTIFICATION)
-                .putExtra(UpcomingAlarmReceiver.EXTRA_ALARM_ID, a.id());
+                .putExtra(UpcomingAlarmReceiver.EXTRA_ALARM, a);
         mAppContext.sendBroadcast(intent);
     }
 
@@ -200,7 +200,7 @@ public final class AlarmController {
 
     private PendingIntent notifyUpcomingAlarmIntent(Alarm alarm, boolean retrievePrevious) {
         Intent intent = new Intent(mAppContext, UpcomingAlarmReceiver.class)
-                .putExtra(UpcomingAlarmReceiver.EXTRA_ALARM_ID, alarm.id());
+                .putExtra(UpcomingAlarmReceiver.EXTRA_ALARM, alarm);
         if (alarm.isSnoozed()) {
             // TODO: Will this affect retrieving a previous instance? Say if the previous instance
             // didn't have this action set initially, but at a later time we made a new instance
