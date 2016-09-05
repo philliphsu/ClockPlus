@@ -6,12 +6,13 @@ import android.util.Log;
 
 import com.philliphsu.clock2.util.AlarmUtils;
 
+import java.text.DateFormatSymbols;
 import java.util.Arrays;
 
 /**
  * Created by Phillip Hsu on 5/30/2016.
  */
-public class DaysOfWeek implements DaysOfWeekHelper {
+public final class DaysOfWeek {
     private static final String TAG = "DaysOfWeek";
     // DAY_OF_WEEK constants in Calendar class not zero-based
     public static final int SUNDAY    = 0;
@@ -24,25 +25,12 @@ public class DaysOfWeek implements DaysOfWeekHelper {
     public static final int NUM_DAYS  = 7;
 
     private static final int[] DAYS = new int[NUM_DAYS];
-    private static final int[] LABELS_RES = new int[NUM_DAYS];
-    
-    static {
-        // TODO: use `new DateFormatSymbols().getShortWeekdays()` to set texts
-        LABELS_RES[SUNDAY] = R.string.sun;
-        LABELS_RES[MONDAY] = R.string.mon;
-        LABELS_RES[TUESDAY] = R.string.tue;
-        LABELS_RES[WEDNESDAY] = R.string.wed;
-        LABELS_RES[THURSDAY] = R.string.thu;
-        LABELS_RES[FRIDAY] = R.string.fri;
-        LABELS_RES[SATURDAY] = R.string.sat;
-    }
-    
-    private static Context sAppContext;
+    private static final String[] LABELS = new DateFormatSymbols().getShortWeekdays();
+
     private static DaysOfWeek sInstance;
     private static int sLastPreferredFirstDay;
 
     public static DaysOfWeek getInstance(Context context) {
-        sAppContext = context.getApplicationContext();
         int preferredFirstDay = AlarmUtils.firstDayOfWeek(context);
         if (sInstance == null || preferredFirstDay != sLastPreferredFirstDay) {
             sLastPreferredFirstDay = preferredFirstDay;
@@ -52,19 +40,26 @@ public class DaysOfWeek implements DaysOfWeekHelper {
         return sInstance;
     }
 
-    /** @param weekDay the day constant as defined in this class */
-    public static String getLabel(int weekDay) {
-        return sAppContext.getString(LABELS_RES[weekDay]);
+    /**
+     * @param weekday the zero-based index of the week day you would like to get the label for.
+
+     */
+    public static String getLabel(int weekday) {
+        // This array was returned from DateFormatSymbols.getShortWeekdays().
+        // We are supposed to use the constants in the Calendar class as indices, but the previous
+        // implementation of this method used our own zero-based indices. For backward compatibility,
+        // we add one to the index passed in to match up with the values of the Calendar constants.
+        return LABELS[weekday + 1];
     }
 
-    @Override
+    /** @return the week day at {@code position} within the user-defined week */
     public int weekDayAt(int position) {
         if (position < 0 || position > 6)
             throw new ArrayIndexOutOfBoundsException("Ordinal day out of range");
         return DAYS[position];
     }
 
-    @Override
+    /** @return the position of {@code weekDay} within the user-defined week */
     public int positionOf(int weekDay) {
         if (weekDay < SUNDAY || weekDay > SATURDAY)
             throw new ArrayIndexOutOfBoundsException("Week day ("+weekDay+") out of range");

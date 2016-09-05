@@ -75,13 +75,6 @@
 
     <string name="title_activity_settings">Settings</string>
 
-    <string name="sun">Sun</string>
-    <string name="mon">Mon</string>
-    <string name="tue">Tue</string>
-    <string name="wed">Wed</string>
-    <string name="thu">Thu</string>
-    <string name="fri">Fri</string>
-    <string name="sat">Sat</string>
     <string name="every_day">Every day</string>
 
     <string name="zero">0</string>
