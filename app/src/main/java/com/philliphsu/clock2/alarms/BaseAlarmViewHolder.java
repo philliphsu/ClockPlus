@@ -46,8 +46,7 @@ public abstract class BaseAlarmViewHolder extends BaseViewHolder<Alarm> {
     private static final String TAG = "BaseAlarmViewHolder";
     private static final String TAG_ADD_LABEL_DIALOG = "add_label_dialog";
 
-    // Visible for subclasses.
-    final AlarmController mAlarmController;
+    private final AlarmController mAlarmController;
 
     // TODO: Should we use VectorDrawable type?
     private final Drawable mDismissNowDrawable;
@@ -183,8 +182,7 @@ public abstract class BaseAlarmViewHolder extends BaseViewHolder<Alarm> {
             alarm.setEnabled(checked);
             if (alarm.isEnabled()) {
                 // TODO: On 21+, upcoming notification doesn't post immediately
-                mAlarmController.scheduleAlarm(alarm, true);
-                mAlarmController.save(alarm);
+                persistUpdatedAlarm(alarm, true);
             } else {
                 mAlarmController.cancelAlarm(alarm, true);
                 // cancelAlarm() already calls save() for you.
@@ -205,6 +203,21 @@ public abstract class BaseAlarmViewHolder extends BaseViewHolder<Alarm> {
     void openLabelEditor() {
         AddLabelDialog dialog = AddLabelDialog.newInstance(newOnLabelSetListener(), mLabel.getText());
         dialog.show(mFragmentManager, TAG_ADD_LABEL_DIALOG);
+    }
+
+    /**
+     * Helper method that should be called each time a change is made to the underlying alarm.
+     * We should schedule a new alarm with the AlarmManager any time a change is made, even when
+     * it was not the alarm's time that changed. This is so that we cancel and update the
+     * PendingIntent's extra data with the most up-to-date Alarm's values. The effect of this
+     * is to guarantee that the Intent that will launch RingtoneActivity has the most up-to-date
+     * extra data about the updated alarm.
+     *
+     * @param newAlarm The new alarm that has the updated values
+     */
+    final void persistUpdatedAlarm(Alarm newAlarm, boolean showSnackbar) {
+        mAlarmController.scheduleAlarm(newAlarm, showSnackbar);
+        mAlarmController.save(newAlarm);
     }
 
     private void bindTime(Alarm alarm) {
@@ -276,7 +289,7 @@ public abstract class BaseAlarmViewHolder extends BaseViewHolder<Alarm> {
                         .label(label)
                         .build();
                 oldAlarm.copyMutableFieldsTo(newAlarm);
-                mAlarmController.save(newAlarm);
+                persistUpdatedAlarm(newAlarm, false);
             }
         };
     }
@@ -301,8 +314,7 @@ public abstract class BaseAlarmViewHolder extends BaseViewHolder<Alarm> {
                         .minutes(minute)
                         .build();
                 oldAlarm.copyMutableFieldsTo(newAlarm);
-                mAlarmController.scheduleAlarm(newAlarm, true);
-                mAlarmController.save(newAlarm);
+                persistUpdatedAlarm(newAlarm, true);
             }
         };
     }

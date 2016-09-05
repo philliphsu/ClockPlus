@@ -143,7 +143,7 @@ public class ExpandedAlarmViewHolder extends BaseAlarmViewHolder {
                 .vibrates(mVibrate.isChecked())
                 .build();
         oldAlarm.copyMutableFieldsTo(newAlarm);
-        mAlarmController.save(newAlarm);
+        persistUpdatedAlarm(newAlarm, false);
     }
 
     @OnClick({ R.id.day0, R.id.day1, R.id.day2, R.id.day3, R.id.day4, R.id.day5, R.id.day6 })
@@ -159,7 +159,7 @@ public class ExpandedAlarmViewHolder extends BaseAlarmViewHolder {
                 + weekDayAtPosition + " relative to a week starting on Sunday");
         newAlarm.setRecurring(weekDayAtPosition, view.isChecked());
         // ---------------------------------------------------------------------------------
-        mAlarmController.save(newAlarm);
+        persistUpdatedAlarm(newAlarm, true);
     }
 
     private void bindDays(Alarm alarm) {
@@ -217,7 +217,7 @@ public class ExpandedAlarmViewHolder extends BaseAlarmViewHolder {
                         .ringtone(ringtoneUri.toString())
                         .build();
                 oldAlarm.copyMutableFieldsTo(newAlarm);
-                mAlarmController.save(newAlarm);
+                persistUpdatedAlarm(newAlarm, false);
             }
         };
     }
