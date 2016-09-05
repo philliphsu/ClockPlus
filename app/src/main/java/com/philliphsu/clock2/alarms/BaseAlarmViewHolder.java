@@ -314,6 +314,10 @@ public abstract class BaseAlarmViewHolder extends BaseViewHolder<Alarm> {
                         .minutes(minute)
                         .build();
                 oldAlarm.copyMutableFieldsTo(newAlarm);
+                // -------------------------------------------
+                // TOneverDO: precede copyMutableFieldsTo()
+                newAlarm.setEnabled(true); // Always enabled, esp. if oldAlarm is not enabled
+                // ----------------------------------------------
                 persistUpdatedAlarm(newAlarm, true);
             }
         };
