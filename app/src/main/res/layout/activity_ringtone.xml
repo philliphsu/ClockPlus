@@ -3,7 +3,7 @@
              android:layout_width="match_parent"
              android:layout_height="match_parent"
              android:orientation="vertical"
-             android:background="@color/colorPrimary">
+             android:background="?attr/colorPrimary">
 
     <LinearLayout
         android:id="@+id/header"
@@ -11,14 +11,15 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/activity_vertical_margin"
         android:orientation="vertical"
-        android:gravity="center_horizontal">
+        android:gravity="center_horizontal"
+        android:theme="@style/AppTheme.TextOverlay">
 
         <TextView
             android:id="@+id/title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            style="@style/TextAppearance.AppCompat.Title.Inverse"
-            android:layout_marginBottom="@dimen/item_margin_between_elements"/>
+            android:layout_marginBottom="@dimen/item_margin_between_elements"
+            style="@style/TextAppearance.AppCompat.Title"/>
 
     </LinearLayout>
 
@@ -37,7 +38,8 @@
             android:drawableTop="@drawable/ic_half_day_1_24dp"
             android:drawablePadding="8dp"
             android:text="@string/alarm_auto_silenced_text"
-            style="@style/TextAppearance.AppCompat.Large.Inverse"
+            style="@style/TextAppearance.AppCompat.Large"
+            android:theme="@style/AppTheme.TextOverlay"
             android:layout_marginBottom="16dp"/>
 
         <Button
@@ -54,7 +56,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="bottom"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:theme="@style/AppTheme.TextOverlay">
 
         <FrameLayout
             android:id="@+id/btn_left"
@@ -69,7 +72,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:drawablePadding="8dp"
-                style="@style/TextAppearance.AppCompat.Medium.Inverse"/>
+                style="@style/TextAppearance.AppCompat.Medium"/>
 
         </FrameLayout>
 
@@ -86,7 +89,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:drawablePadding="8dp"
-                style="@style/TextAppearance.AppCompat.Medium.Inverse"/>
+                style="@style/TextAppearance.AppCompat.Medium"/>
 
         </FrameLayout>
 
