@@ -62,12 +62,6 @@ public class TimesUpActivity extends RingtoneActivity<Timer> {
     }
 
     @Override
-    protected int getAutoSilencedDrawable() {
-        // TODO: correct icon
-        return R.drawable.ic_half_day_1_24dp;
-    }
-
-    @Override
     protected int getAutoSilencedText() {
         return R.string.timer_auto_silenced_text;
     }

@@ -56,7 +56,9 @@ public abstract class RingtoneActivity<T extends Parcelable> extends AppCompatAc
     protected abstract void getHeaderContent(ViewGroup parent);
 
     @DrawableRes
-    protected abstract int getAutoSilencedDrawable();
+    protected int getAutoSilencedDrawable() {
+        return R.drawable.ic_error_outline_96dp;
+    }
 
     @StringRes
     protected abstract int getAutoSilencedText();
