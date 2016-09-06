@@ -69,13 +69,13 @@ public class TimerRingtoneService extends RingtoneService<Timer> {
         return new NotificationCompat.Builder(this)
                 .setContentTitle(title)
                 .setContentText(getString(R.string.times_up))
-                .setSmallIcon(R.drawable.ic_half_day_1_24dp) // TODO: correct icon
+                .setSmallIcon(R.drawable.ic_timer_24dp)
                 .setShowWhen(false) // TODO: Should we show this?
 //                .setOngoing(true) // foreground notes are ongoing by default
-                .addAction(R.drawable.ic_add_circle_24dp, // TODO: correct icon
+                .addAction(R.drawable.ic_add_24dp,
                         getString(R.string.add_one_minute),
                         getPendingIntent(ACTION_ADD_ONE_MINUTE, getRingingObject().getIntId()))
-                .addAction(R.drawable.ic_add_circle_24dp, // TODO: correct icon
+                .addAction(R.drawable.ic_stop_24dp,
                         getString(R.string.stop),
                         getPendingIntent(ACTION_STOP, getRingingObject().getIntId()))
                 .build();

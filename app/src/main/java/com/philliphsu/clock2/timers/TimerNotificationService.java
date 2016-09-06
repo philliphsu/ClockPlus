@@ -74,6 +74,7 @@ public class TimerNotificationService extends Service {
                 // TODO: Verify the notification countdown is extended by one minute.
             } else if (ACTION_START_PAUSE.equals(action)) {
                 mController.startPause();
+                showNotification(); // Update the notification
             } else if (ACTION_STOP.equals(action)) {
                 mController.stop();
                 stopSelf();
@@ -93,7 +94,7 @@ public class TimerNotificationService extends Service {
     private void showNotification() {
         // Base note
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
-                .setSmallIcon(R.drawable.ic_half_day_1_24dp) // TODO: correct icon
+                .setSmallIcon(R.drawable.ic_timer_24dp)
                 .setShowWhen(false)
                 .setOngoing(true);
         // TODO: Set content intent so that when clicked, we launch
@@ -118,12 +119,13 @@ public class TimerNotificationService extends Service {
         }
         builder.setContentTitle(title);
 
-        addAction(builder, ACTION_ADD_ONE_MINUTE,
-                R.drawable.ic_add_circle_24dp/*TODO: correct icon*/);
+        addAction(builder, ACTION_ADD_ONE_MINUTE, R.drawable.ic_add_24dp, getString(R.string.minute));
+
+        boolean running = mTimer.isRunning();
         addAction(builder, ACTION_START_PAUSE,
-                R.drawable.ic_add_circle_24dp/*TODO: correct icon*/);
-        addAction(builder, ACTION_STOP,
-                R.drawable.ic_add_circle_24dp/*TODO: correct icon*/);
+                running ? R.drawable.ic_pause_24dp : R.drawable.ic_start_24dp,
+                getString(running ? R.string.pause : R.string.resume));
+        addAction(builder, ACTION_STOP, R.drawable.ic_stop_24dp, getString(R.string.stop));
 
         NotificationManager nm = (NotificationManager)
                 getSystemService(Context.NOTIFICATION_SERVICE);
@@ -133,12 +135,13 @@ public class TimerNotificationService extends Service {
     /**
      * Builds and adds the specified action to the notification's builder.
      */
-    private void addAction(NotificationCompat.Builder noteBuilder, String action, @DrawableRes int icon) {
+    private void addAction(NotificationCompat.Builder noteBuilder, String action,
+                           @DrawableRes int icon, String actionTitle) {
         Intent intent = new Intent(this, TimerNotificationService.class)
                 .setAction(action);
 //                .putExtra(EXTRA_TIMER, mTimer);
         PendingIntent pi = PendingIntent.getService(this,
                 mTimer.getIntId(), intent, 0/*no flags*/);
-        noteBuilder.addAction(icon, ""/*no action title*/, pi);
+        noteBuilder.addAction(icon, actionTitle, pi);
     }
 }

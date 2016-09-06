@@ -197,4 +197,7 @@
 
     <string name="label">Label</string>
     <string name="ringtones">Ringtones</string>
+
+    <string name="pause">Pause</string>
+    <string name="resume">Resume</string>
 </resources>
