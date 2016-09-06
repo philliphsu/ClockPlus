@@ -57,6 +57,10 @@ public class TimerController {
         // Prompts a reload of the list data, so the list will reflect this modified timer
     }
 
+    public void deleteTimer() {
+        mUpdateHandler.asyncDelete(mTimer);
+    }
+
     private void update() {
         mUpdateHandler.asyncUpdate(mTimer.getId(), mTimer);
     }

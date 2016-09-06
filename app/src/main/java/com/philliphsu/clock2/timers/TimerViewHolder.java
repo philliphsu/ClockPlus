@@ -5,7 +5,9 @@ import android.graphics.drawable.Drawable;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.PopupMenu;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
@@ -36,6 +38,7 @@ public class TimerViewHolder extends BaseViewHolder<Timer> {
     private final Drawable mStartIcon;
     private final Drawable mPauseIcon;
     private final FragmentManager mFragmentManager;
+    private final PopupMenu mPopupMenu;
 
     @Bind(R.id.label) TextView mLabel;
     @Bind(R.id.duration) CountdownChronometer mChronometer;
@@ -43,6 +46,7 @@ public class TimerViewHolder extends BaseViewHolder<Timer> {
     @Bind(R.id.add_one_minute) TextView mAddOneMinute;
     @Bind(R.id.start_pause) ImageButton mStartPause;
     @Bind(R.id.stop) ImageButton mStop;
+    @Bind(R.id.menu) ImageButton mMenuButton;
 
     public TimerViewHolder(ViewGroup parent, OnListItemInteractionListener<Timer> listener,
                            AsyncTimersTableUpdateHandler asyncTimersTableUpdateHandler) {
@@ -66,6 +70,21 @@ public class TimerViewHolder extends BaseViewHolder<Timer> {
             Log.i(TAG, "Restoring add label callback");
             labelDialog.setOnLabelSetListener(newOnLabelSetListener());
         }
+
+        // The item layout is inflated in the super ctor, so we can safely reference our views.
+        mPopupMenu = new PopupMenu(getContext(), mMenuButton);
+        mPopupMenu.inflate(R.menu.menu_timer_viewholder);
+        mPopupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                switch (item.getItemId()) {
+                    case R.id.action_delete:
+                        mController.deleteTimer();
+                        return true;
+                }
+                return false;
+            }
+        });
     }
 
     @Override
@@ -100,6 +119,11 @@ public class TimerViewHolder extends BaseViewHolder<Timer> {
     void openLabelEditor() {
         AddLabelDialog dialog = AddLabelDialog.newInstance(newOnLabelSetListener(), mLabel.getText());
         dialog.show(mFragmentManager, TAG_ADD_LABEL_DIALOG);
+    }
+
+    @OnClick(R.id.menu)
+    void openMenu() {
+        mPopupMenu.show();
     }
 
     private void bindLabel(String label) {
