@@ -161,6 +161,11 @@ public class StopwatchFragment extends RecyclerViewFragment<
     }
 
     @Override
+    protected boolean hasEmptyView() {
+        return false;
+    }
+
+    @Override
     public Loader<LapCursor> onCreateLoader(int id, Bundle args) {
         return new LapsCursorLoader(getActivity());
     }

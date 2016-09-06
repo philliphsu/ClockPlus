@@ -103,6 +103,11 @@ public class TimersFragment extends RecyclerViewFragment<
     }
 
     @Override
+    protected int emptyMessage() {
+        return R.string.empty_timers_container;
+    }
+
+    @Override
     public Loader<TimerCursor> onCreateLoader(int id, Bundle args) {
         return new TimersListCursorLoader(getActivity());
     }

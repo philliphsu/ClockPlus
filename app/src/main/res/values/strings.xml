@@ -200,4 +200,7 @@
 
     <string name="pause">Pause</string>
     <string name="resume">Resume</string>
+
+    <string name="empty_alarms_container">No alarms added</string>
+    <string name="empty_timers_container">No timers added</string>
 </resources>

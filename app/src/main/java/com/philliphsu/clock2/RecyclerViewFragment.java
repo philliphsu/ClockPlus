@@ -1,7 +1,10 @@
 package com.philliphsu.clock2;
 
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.support.annotation.DrawableRes;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v7.widget.LinearLayoutManager;
@@ -9,8 +12,10 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.philliphsu.clock2.alarms.ScrollHandler;
+import com.philliphsu.clock2.aospdatetimepicker.Utils;
 import com.philliphsu.clock2.model.BaseItemCursor;
 import com.philliphsu.clock2.model.ObjectWithId;
 
@@ -34,7 +39,12 @@ public abstract class RecyclerViewFragment<
 
     // TODO: Rename id to recyclerView?
     // TODO: Rename variable to mRecyclerView?
-    @Bind(R.id.list) RecyclerView mList;
+    @Bind(R.id.list)
+    RecyclerView mList;
+
+    @Nullable // Subclasses are not required to use the default content layout, so this may not be present.
+    @Bind(R.id.empty_view)
+    TextView mEmptyView;
 
     public abstract void onFabClick();
 
@@ -50,6 +60,33 @@ public abstract class RecyclerViewFragment<
      * @return the adapter to set on the RecyclerView. Called in onCreateView().
      */
     protected abstract A onCreateAdapter();
+
+    /**
+     * @return a resource to a String that will be displayed when the list is empty
+     */
+    @StringRes
+    protected int emptyMessage() {
+        // The reason this isn't abstract is so we don't require subclasses that
+        // don't have an empty view to implement this.
+        return 0;
+    }
+
+    /**
+     * @return a resource to a Drawable that will be displayed when the list is empty
+     */
+    @DrawableRes
+    protected int emptyMessageIcon() {
+        // TODO: If this is the same for all RecyclerViewFragments, then why not just specify
+        // the compound drawable in XML?
+        return R.drawable.ic_empty_list_96dp;
+    }
+
+    /**
+     * @return whether the list should show an empty view when its adapter has an item count of zero
+     */
+    protected boolean hasEmptyView() {
+        return true;
+    }
 
     /**
      * @return the adapter instance created from {@link #onCreateAdapter()}
@@ -73,6 +110,13 @@ public abstract class RecyclerViewFragment<
         View view = super.onCreateView(inflater, container, savedInstanceState);
         mList.setLayoutManager(getLayoutManager());
         mList.setAdapter(mAdapter = onCreateAdapter());
+        if (hasEmptyView() && mEmptyView != null) {
+            // Configure the empty view, even if there currently are items.
+            mEmptyView.setText(emptyMessage());
+            int iconColor = Utils.getTextColorFromThemeAttr(getActivity(), R.attr.themedIconTint);
+            Drawable emptyMessageIcon = Utils.getTintedDrawable(getActivity(), emptyMessageIcon(), iconColor);
+            mEmptyView.setCompoundDrawablesRelativeWithIntrinsicBounds(null, emptyMessageIcon, null, null);
+        }
         return view;
     }
 
@@ -87,6 +131,12 @@ public abstract class RecyclerViewFragment<
     @Override
     public void onLoadFinished(Loader<C> loader, C data) {
         mAdapter.swapCursor(data);
+        if (hasEmptyView() && mEmptyView != null) {
+            // TODO: Last I checked after a fresh install, this worked fine.
+            // However, previous attempts (without fresh installs) didn't hide the empty view
+            // upon an item being added. Verify this is no longer the case.
+            mEmptyView.setVisibility(mAdapter.getItemCount() == 0 ? View.VISIBLE : View.GONE);
+        }
         // This may have been a requery due to content change. If the change
         // was an insertion, scroll to the last modified alarm.
         performScrollToStableId();

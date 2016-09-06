@@ -146,6 +146,11 @@ public class AlarmsFragment extends RecyclerViewFragment<
         return new AlarmsCursorAdapter(this, mAlarmController);
     }
 
+    @Override
+    protected int emptyMessage() {
+        return R.string.empty_alarms_container;
+    }
+
     // TODO: We're not using EditAlarmActivity anymore, so move this logic somewhere else.
     // We also don't need to delay the change to get animations working.
     @Override
