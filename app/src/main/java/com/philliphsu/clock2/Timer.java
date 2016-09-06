@@ -32,6 +32,9 @@ public abstract class Timer extends ObjectWithId implements Parcelable {
     public abstract int hour();
     public abstract int minute();
     public abstract int second();
+    // 9/6/2016: Just found/fixed a very subtle bug involving mixing up the parameter orders
+    // of group and label when `create()`ing a Timer in TimerCursor.
+    // TODO: We have never used this at all, so consider deleting this!
     public abstract String group();
     public abstract String label();
 
@@ -52,6 +55,13 @@ public abstract class Timer extends ObjectWithId implements Parcelable {
             throw new IllegalArgumentException("Cannot create a timer with h = "
                     + hour + ", m = " + minute + ", s = " + second);
         return new AutoValue_Timer(hour, minute, second, group, label);
+    }
+
+    public void copyMutableFieldsTo(Timer target) {
+        target.setId(this.getId());
+        target.endTime = this.endTime;
+        target.pauseTime = this.pauseTime;
+        target.duration = this.duration;
     }
 
     public long endTime() {

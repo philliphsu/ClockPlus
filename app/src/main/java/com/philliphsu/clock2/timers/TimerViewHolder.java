@@ -2,6 +2,7 @@ package com.philliphsu.clock2.timers;
 
 import android.animation.ObjectAnimator;
 import android.graphics.drawable.Drawable;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -27,12 +28,14 @@ import butterknife.OnClick;
  */
 public class TimerViewHolder extends BaseViewHolder<Timer> {
     private static final String TAG = "TimerViewHolder";
+    private static final String TAG_ADD_LABEL_DIALOG = "add_label_dialog";
 
     private final AsyncTimersTableUpdateHandler mAsyncTimersTableUpdateHandler;
     private TimerController mController;
     private ObjectAnimator mProgressAnimator;
     private final Drawable mStartIcon;
     private final Drawable mPauseIcon;
+    private final FragmentManager mFragmentManager;
 
     @Bind(R.id.label) TextView mLabel;
     @Bind(R.id.duration) CountdownChronometer mChronometer;
@@ -48,6 +51,21 @@ public class TimerViewHolder extends BaseViewHolder<Timer> {
         mAsyncTimersTableUpdateHandler = asyncTimersTableUpdateHandler;
         mStartIcon = ContextCompat.getDrawable(getContext(), R.drawable.ic_start_24dp);
         mPauseIcon = ContextCompat.getDrawable(getContext(), R.drawable.ic_pause_24dp);
+
+        // TODO: This is bad! Use a Controller/Presenter instead...
+        // or simply pass in an instance of FragmentManager to the ctor.
+        AppCompatActivity act = (AppCompatActivity) getContext();
+        mFragmentManager = act.getSupportFragmentManager();
+
+        // Are we recreating this because of a rotation?
+        // If so, try finding any dialog that was last shown in our backstack,
+        // and restore the callback.
+        AddLabelDialog labelDialog = (AddLabelDialog)
+                mFragmentManager.findFragmentByTag(TAG_ADD_LABEL_DIALOG);
+        if (labelDialog != null) {
+            Log.i(TAG, "Restoring add label callback");
+            labelDialog.setOnLabelSetListener(newOnLabelSetListener());
+        }
     }
 
     @Override
@@ -56,6 +74,7 @@ public class TimerViewHolder extends BaseViewHolder<Timer> {
         Log.d(TAG, "Binding TimerViewHolder");
         // TOneverDO: create before super
         mController = new TimerController(timer, mAsyncTimersTableUpdateHandler);
+        Log.d(TAG, "timer.label() = " + timer.label());
         bindLabel(timer.label());
         bindChronometer(timer);
         bindButtonControls(timer);
@@ -79,16 +98,8 @@ public class TimerViewHolder extends BaseViewHolder<Timer> {
 
     @OnClick(R.id.label)
     void openLabelEditor() {
-        AddLabelDialog dialog = AddLabelDialog.newInstance(new AddLabelDialog.OnLabelSetListener() {
-            @Override
-            public void onLabelSet(String label) {
-                mLabel.setText(label);
-                // TODO: persist change. Use TimerController and its update()
-            }
-        }, mLabel.getText());
-        // TODO: This is bad! Use a Controller instead!
-        AppCompatActivity act = (AppCompatActivity) getContext();
-        dialog.show(act.getSupportFragmentManager(), "TAG");
+        AddLabelDialog dialog = AddLabelDialog.newInstance(newOnLabelSetListener(), mLabel.getText());
+        dialog.show(mFragmentManager, TAG_ADD_LABEL_DIALOG);
     }
 
     private void bindLabel(String label) {
@@ -162,5 +173,21 @@ public class TimerViewHolder extends BaseViewHolder<Timer> {
                     mSeekBar, ratio, timeRemaining);
         }
         mSeekBar.getThumb().mutate().setAlpha(timeRemaining <= 0 ? 0 : 255);
+    }
+
+    private AddLabelDialog.OnLabelSetListener newOnLabelSetListener() {
+        // Create a new listener per request. This is primarily used for
+        // setting the dialog callback again after a rotation.
+        //
+        // If we saved a reference to a listener, it would be tied to
+        // its ViewHolder instance. ViewHolders are reused, so we
+        // could accidentally leak this reference to other Timer items
+        // in the list.
+        return new AddLabelDialog.OnLabelSetListener() {
+            @Override
+            public void onLabelSet(String label) {
+                mController.updateLabel(label);
+            }
+        };
     }
 }

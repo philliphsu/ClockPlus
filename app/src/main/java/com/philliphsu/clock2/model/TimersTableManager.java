@@ -48,6 +48,7 @@ public class TimersTableManager extends DatabaseTableManager<Timer> {
         cv.put(TimersTable.COLUMN_HOUR, timer.hour());
         cv.put(TimersTable.COLUMN_MINUTE, timer.minute());
         cv.put(TimersTable.COLUMN_SECOND, timer.second());
+        Log.d(TAG, "toContentValues() label = " + timer.label());
         cv.put(TimersTable.COLUMN_LABEL, timer.label());
 //        cv.put(TimersTable.COLUMN_GROUP, timer.group());
         Log.d(TAG, "endTime = " + timer.endTime() + ", pauseTime = " + timer.pauseTime());

@@ -1,5 +1,7 @@
 package com.philliphsu.clock2.timers;
 
+import android.util.Log;
+
 import com.philliphsu.clock2.AsyncTimersTableUpdateHandler;
 import com.philliphsu.clock2.Timer;
 
@@ -7,6 +9,7 @@ import com.philliphsu.clock2.Timer;
  * Created by Phillip Hsu on 7/27/2016.
  */
 public class TimerController {
+    private static final String TAG = "TimerController";
     private final Timer mTimer;
     private final AsyncTimersTableUpdateHandler mUpdateHandler;
 
@@ -39,6 +42,19 @@ public class TimerController {
     public void addOneMinute() {
         mTimer.addOneMinute();
         update();
+    }
+    
+    public void updateLabel(String label) {
+        Log.d(TAG, "Updating Timer with label = " + label);
+        Timer newTimer = Timer.create(
+                mTimer.hour(),
+                mTimer.minute(),
+                mTimer.second(),
+                mTimer.group(),
+                label);
+        mTimer.copyMutableFieldsTo(newTimer);
+        mUpdateHandler.asyncUpdate(mTimer.getId(), newTimer);
+        // Prompts a reload of the list data, so the list will reflect this modified timer
     }
 
     private void update() {

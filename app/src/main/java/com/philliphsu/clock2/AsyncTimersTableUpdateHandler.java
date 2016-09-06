@@ -4,6 +4,7 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 
 import com.philliphsu.clock2.alarms.ScrollHandler;
 import com.philliphsu.clock2.model.TimersTableManager;
@@ -40,6 +41,7 @@ public final class AsyncTimersTableUpdateHandler extends AsyncDatabaseTableUpdat
 
     @Override
     protected void onPostAsyncUpdate(Long result, Timer timer) {
+        Log.d(TAG, "onPostAsyncUpdate, timer = " + timer);
         if (timer.isRunning()) {
             // We don't need to cancel the previous alarm, because this one
             // will remove and replace it.
