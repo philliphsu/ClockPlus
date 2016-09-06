@@ -67,11 +67,11 @@ public class UpcomingAlarmReceiver extends BroadcastReceiver {
                         .setAction(ACTION_DISMISS_NOW);
                 PendingIntent pi = PendingIntent.getBroadcast(context, (int) id, in, FLAG_ONE_SHOT);
                 Notification note = new NotificationCompat.Builder(context)
-                        .setSmallIcon(R.mipmap.ic_launcher) // TODO: alarm icon
+                        .setSmallIcon(R.drawable.ic_alarm_24dp)
                         .setContentTitle(title)
                         .setContentText(text)
                         .setOngoing(true)
-                        .addAction(R.mipmap.ic_launcher, context.getString(R.string.dismiss_now), pi)
+                        .addAction(R.drawable.ic_dismiss_alarm_24dp, context.getString(R.string.dismiss_now), pi)
                         .build();
                 nm.notify(TAG, (int) id, note);
             }

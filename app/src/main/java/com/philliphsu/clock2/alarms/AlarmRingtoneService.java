@@ -70,13 +70,13 @@ public class AlarmRingtoneService extends RingtoneService<Alarm> {
                 : getRingingObject().label();
         return new NotificationCompat.Builder(this)
                 // Required contents
-                .setSmallIcon(R.mipmap.ic_launcher) // TODO: alarm icon
+                .setSmallIcon(R.drawable.ic_alarm_24dp)
                 .setContentTitle(title)
                 .setContentText(formatTime(this, System.currentTimeMillis()))
-                .addAction(R.mipmap.ic_launcher, // TODO: correct icon
+                .addAction(R.drawable.ic_snooze_24dp,
                         getString(R.string.snooze),
                         getPendingIntent(ACTION_SNOOZE, getRingingObject().getIntId()))
-                .addAction(R.mipmap.ic_launcher, // TODO: correct icon
+                .addAction(R.drawable.ic_dismiss_alarm_24dp,
                         getString(R.string.dismiss),
                         getPendingIntent(ACTION_DISMISS, getRingingObject().getIntId()))
                 .build();
