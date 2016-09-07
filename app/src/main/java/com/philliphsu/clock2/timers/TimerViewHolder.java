@@ -2,6 +2,7 @@ package com.philliphsu.clock2.timers;
 
 import android.animation.ObjectAnimator;
 import android.graphics.drawable.Drawable;
+import android.support.annotation.IdRes;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.PopupMenu;
@@ -20,6 +21,7 @@ import com.philliphsu.clock2.BaseViewHolder;
 import com.philliphsu.clock2.OnListItemInteractionListener;
 import com.philliphsu.clock2.R;
 import com.philliphsu.clock2.Timer;
+import com.philliphsu.clock2.util.FragmentTagUtils;
 import com.philliphsu.clock2.util.ProgressBarUtils;
 
 import butterknife.Bind;
@@ -30,7 +32,6 @@ import butterknife.OnClick;
  */
 public class TimerViewHolder extends BaseViewHolder<Timer> {
     private static final String TAG = "TimerViewHolder";
-    private static final String TAG_ADD_LABEL_DIALOG = "add_label_dialog";
 
     private final AsyncTimersTableUpdateHandler mAsyncTimersTableUpdateHandler;
     private TimerController mController;
@@ -67,7 +68,7 @@ public class TimerViewHolder extends BaseViewHolder<Timer> {
                         mController.updateLabel(label);
                     }
                 });
-        mAddLabelDialogController.tryRestoreCallback();
+        mAddLabelDialogController.tryRestoreCallback(makeTag(R.id.label));
 
         // The item layout is inflated in the super ctor, so we can safely reference our views.
         mPopupMenu = new PopupMenu(getContext(), mMenuButton);
@@ -115,7 +116,7 @@ public class TimerViewHolder extends BaseViewHolder<Timer> {
 
     @OnClick(R.id.label)
     void openLabelEditor() {
-        mAddLabelDialogController.show(mLabel.getText());
+        mAddLabelDialogController.show(mLabel.getText(), makeTag(R.id.label));
     }
 
     @OnClick(R.id.menu)
@@ -194,5 +195,9 @@ public class TimerViewHolder extends BaseViewHolder<Timer> {
                     mSeekBar, ratio, timeRemaining);
         }
         mSeekBar.getThumb().mutate().setAlpha(timeRemaining <= 0 ? 0 : 255);
+    }
+
+    private String makeTag(@IdRes int viewId) {
+        return FragmentTagUtils.makeTag(TimerViewHolder.class, viewId, getItemId());
     }
 }

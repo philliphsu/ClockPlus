@@ -16,12 +16,14 @@ import com.philliphsu.clock2.Alarm;
 import com.philliphsu.clock2.AsyncAlarmsTableUpdateHandler;
 import com.philliphsu.clock2.R;
 import com.philliphsu.clock2.RecyclerViewFragment;
+import com.philliphsu.clock2.TimePickerDialogController;
 import com.philliphsu.clock2.editalarm.BaseTimePickerDialog;
-import com.philliphsu.clock2.editalarm.TimePickerHelper;
 import com.philliphsu.clock2.model.AlarmCursor;
 import com.philliphsu.clock2.model.AlarmsListCursorLoader;
 import com.philliphsu.clock2.util.AlarmController;
 import com.philliphsu.clock2.util.DelayedSnackbarHandler;
+
+import static com.philliphsu.clock2.util.FragmentTagUtils.makeTag;
 
 public class AlarmsFragment extends RecyclerViewFragment<
         Alarm,
@@ -31,8 +33,6 @@ public class AlarmsFragment extends RecyclerViewFragment<
     implements ScrollHandler, // TODO: Move interface to base class
         BaseTimePickerDialog.OnTimeSetListener {
     private static final String TAG = "AlarmsFragment";
-
-    static final String TAG_TIME_PICKER = "time_picker";
 
     private static final String KEY_EXPANDED_POSITION = "expanded_position";
 
@@ -44,13 +44,15 @@ public class AlarmsFragment extends RecyclerViewFragment<
 //    @Deprecated
 //    public static final int REQUEST_CREATE_ALARM = 1;
 
+    // TODO: Delete this. We no longer use the system's ringtone picker.
     public static final int REQUEST_PICK_RINGTONE = 1;
 
-//    private AlarmsCursorAdapter mAdapter;
     private AsyncAlarmsTableUpdateHandler mAsyncUpdateHandler;
     private AlarmController mAlarmController;
+    // TODO: Delete this. If I recall correctly, this was just used for delaying item animations.
     private Handler mHandler = new Handler();
     private View mSnackbarAnchor;
+    private TimePickerDialogController mTimePickerDialogController;
 
     private int mExpandedPosition = RecyclerView.NO_POSITION;
 
@@ -91,6 +93,9 @@ public class AlarmsFragment extends RecyclerViewFragment<
         mAlarmController = new AlarmController(getActivity(), mSnackbarAnchor);
         mAsyncUpdateHandler = new AsyncAlarmsTableUpdateHandler(getActivity(),
                 mSnackbarAnchor, this, mAlarmController);
+        mTimePickerDialogController = new TimePickerDialogController(
+                getFragmentManager(), getActivity(), this);
+        mTimePickerDialogController.tryRestoreCallback(makeTimePickerDialogTag());
     }
 
     @Override
@@ -120,21 +125,7 @@ public class AlarmsFragment extends RecyclerViewFragment<
 
     @Override
     public void onFabClick() {
-//        Intent intent = new Intent(getActivity(), EditAlarmActivity.class);
-//        startActivityForResult(intent, REQUEST_CREATE_ALARM);
-
-        // Close the keyboard first, or else our dialog will be screwed up.
-        // If not open, this does nothing.
-        // TODO: I don't think the keyboard can possibly be open in this Fragment?
-//        hideKeyboard(this); // This is only important for BottomSheetDialogs!
-
-        // Create a new instance each time we want to show the dialog.
-        // If we keep a reference to the dialog, we keep its previous state as well.
-        // So the next time we call show() on it, the input field will show the
-        // last inputted time.
-        BaseTimePickerDialog dialog = TimePickerHelper.newDialog(getActivity(), this, 0, 0);
-        // DISREGARD THE LINT WARNING ABOUT DIALOG BEING NULL.
-        dialog.show(getFragmentManager(), TAG_TIME_PICKER);
+        mTimePickerDialogController.show(0, 0, makeTimePickerDialogTag());
     }
 
     @Override
@@ -302,6 +293,10 @@ public class AlarmsFragment extends RecyclerViewFragment<
             // be called through).
             outState.putInt(KEY_EXPANDED_POSITION, getAdapter().getExpandedPosition());
         }
+    }
+
+    private static String makeTimePickerDialogTag() {
+        return makeTag(AlarmsFragment.class, R.id.fab);
     }
 
     /////////////////////////////////////////////////////////////////////////////////////

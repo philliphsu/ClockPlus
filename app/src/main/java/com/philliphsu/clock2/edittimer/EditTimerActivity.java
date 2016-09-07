@@ -2,6 +2,7 @@ package com.philliphsu.clock2.edittimer;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.IdRes;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.GridLayout;
 import android.text.InputType;
@@ -15,6 +16,7 @@ import com.philliphsu.clock2.AddLabelDialog;
 import com.philliphsu.clock2.AddLabelDialogController;
 import com.philliphsu.clock2.BaseActivity;
 import com.philliphsu.clock2.R;
+import com.philliphsu.clock2.util.FragmentTagUtils;
 
 import butterknife.Bind;
 import butterknife.OnClick;
@@ -50,7 +52,7 @@ public class EditTimerActivity extends BaseActivity implements AddLabelDialog.On
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mAddLabelDialogController = new AddLabelDialogController(getSupportFragmentManager(), this);
-        mAddLabelDialogController.tryRestoreCallback();
+        mAddLabelDialogController.tryRestoreCallback(makeTag(R.id.label));
     }
 
     @Override
@@ -154,7 +156,7 @@ public class EditTimerActivity extends BaseActivity implements AddLabelDialog.On
 
     @OnClick(R.id.label)
     void openEditLabelDialog() {
-        mAddLabelDialogController.show(mLabel.getText());
+        mAddLabelDialogController.show(mLabel.getText(), makeTag(R.id.label));
     }
 
     @OnClick(R.id.fab)
@@ -178,5 +180,9 @@ public class EditTimerActivity extends BaseActivity implements AddLabelDialog.On
 
     private EditText getFocusedField() {
         return (EditText) mEditFieldsLayout.findFocus();
+    }
+
+    private static String makeTag(@IdRes int viewId) {
+        return FragmentTagUtils.makeTag(EditTimerActivity.class, viewId);
     }
 }

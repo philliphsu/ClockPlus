@@ -2,6 +2,7 @@ package com.philliphsu.clock2.alarms;
 
 import android.content.res.ColorStateList;
 import android.graphics.drawable.Drawable;
+import android.support.annotation.IdRes;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentManager;
@@ -9,7 +10,6 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SwitchCompat;
 import android.text.format.DateFormat;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,13 +22,13 @@ import com.philliphsu.clock2.Alarm;
 import com.philliphsu.clock2.BaseViewHolder;
 import com.philliphsu.clock2.OnListItemInteractionListener;
 import com.philliphsu.clock2.R;
+import com.philliphsu.clock2.TimePickerDialogController;
 import com.philliphsu.clock2.aospdatetimepicker.Utils;
-import com.philliphsu.clock2.editalarm.BaseTimePickerDialog;
 import com.philliphsu.clock2.editalarm.BaseTimePickerDialog.OnTimeSetListener;
-import com.philliphsu.clock2.editalarm.TimePickerHelper;
 import com.philliphsu.clock2.editalarm.TimeTextUtils;
 import com.philliphsu.clock2.util.AlarmController;
 import com.philliphsu.clock2.util.AlarmUtils;
+import com.philliphsu.clock2.util.FragmentTagUtils;
 
 import java.util.Date;
 
@@ -49,12 +49,14 @@ public abstract class BaseAlarmViewHolder extends BaseViewHolder<Alarm> {
 
     private final AlarmController mAlarmController;
     private final AddLabelDialogController mAddLabelDialogController;
+    private final TimePickerDialogController mTimePickerDialogController;
 
     // TODO: Should we use VectorDrawable type?
     private final Drawable mDismissNowDrawable;
     private final Drawable mCancelSnoozeDrawable;
 
-    // Exposed for use by subclasses (obviously in this package.
+    // TODO: THis is still here for ExpandedVH's RingtonePickerDialog. If we ever write a
+    // Controller for it, finally delete this.
     final FragmentManager mFragmentManager;
 
     @Bind(R.id.time) TextView mTime;
@@ -76,30 +78,48 @@ public abstract class BaseAlarmViewHolder extends BaseViewHolder<Alarm> {
         // or simply pass in an instance of FragmentManager to the ctor.
         AppCompatActivity act = (AppCompatActivity) getContext();
         mFragmentManager = act.getSupportFragmentManager();
-        mAddLabelDialogController = new AddLabelDialogController(
-                mFragmentManager,
-                new AddLabelDialog.OnLabelSetListener() {
-                    @Override
-                    public void onLabelSet(String label) {
-                        final Alarm oldAlarm = getAlarm();
-                        Alarm newAlarm = oldAlarm.toBuilder()
-                                .label(label)
-                                .build();
-                        oldAlarm.copyMutableFieldsTo(newAlarm);
-                        persistUpdatedAlarm(newAlarm, false);
-                    }
-                });
+        mAddLabelDialogController = new AddLabelDialogController(mFragmentManager,
+            // TODO: Why can't we implement the interface and pass `this` instead?
+            new AddLabelDialog.OnLabelSetListener() {
+                @Override
+                public void onLabelSet(String label) {
+                    final Alarm oldAlarm = getAlarm();
+                    Alarm newAlarm = oldAlarm.toBuilder()
+                            .label(label)
+                            .build();
+                    oldAlarm.copyMutableFieldsTo(newAlarm);
+                    persistUpdatedAlarm(newAlarm, false);
+                }
+            }
+        );
+        mTimePickerDialogController = new TimePickerDialogController(mFragmentManager, getContext(),
+            // TODO: Why can't we implement the interface and pass `this` instead?
+            new OnTimeSetListener() {
+                @Override
+                public void onTimeSet(ViewGroup viewGroup, int hourOfDay, int minute) {
+                    final Alarm oldAlarm = getAlarm();
+                    // I don't think we need this; scheduling a new alarm that is considered
+                    // equal to a previous alarm will overwrite the previous alarm.
+//                        mAlarmController.cancelAlarm(oldAlarm, false);
+                    Alarm newAlarm = oldAlarm.toBuilder()
+                            .hour(hourOfDay)
+                            .minutes(minute)
+                            .build();
+                    oldAlarm.copyMutableFieldsTo(newAlarm);
+                    // -------------------------------------------
+                    // TOneverDO: precede copyMutableFieldsTo()
+                    newAlarm.setEnabled(true); // Always enabled, esp. if oldAlarm is not enabled
+                    // ----------------------------------------------
+                    persistUpdatedAlarm(newAlarm, true);
+                }
+            }
+        );
 
         // Are we recreating this because of a rotation?
         // If so, try finding any dialog that was last shown in our backstack,
         // and restore the callback.
-        BaseTimePickerDialog picker = (BaseTimePickerDialog)
-                mFragmentManager.findFragmentByTag(AlarmsFragment.TAG_TIME_PICKER);
-        if (picker != null) {
-            Log.i(TAG, "Restoring time picker callback");
-            picker.setOnTimeSetListener(newOnTimeSetListener());
-        }
-        mAddLabelDialogController.tryRestoreCallback();
+        mAddLabelDialogController.tryRestoreCallback(makeTag(R.id.label));
+        mTimePickerDialogController.tryRestoreCallback(makeTag(R.id.time));
     }
 
     @Override
@@ -204,14 +224,12 @@ public abstract class BaseAlarmViewHolder extends BaseViewHolder<Alarm> {
     @OnClick(R.id.time)
     void openTimePicker() {
         Alarm alarm = getAlarm();
-        BaseTimePickerDialog dialog = TimePickerHelper.newDialog(getContext(),
-                newOnTimeSetListener(), alarm.hour(), alarm.minutes());
-        dialog.show(mFragmentManager, AlarmsFragment.TAG_TIME_PICKER);
+        mTimePickerDialogController.show(alarm.hour(), alarm.minutes(), makeTag(R.id.time));
     }
 
     @OnClick(R.id.label)
     void openLabelEditor() {
-        mAddLabelDialogController.show(mLabel.getText());
+        mAddLabelDialogController.show(mLabel.getText(), makeTag(R.id.label));
     }
 
     /**
@@ -282,32 +300,7 @@ public abstract class BaseAlarmViewHolder extends BaseViewHolder<Alarm> {
         bindLabel(visible, label);
     }
 
-    private OnTimeSetListener newOnTimeSetListener() {
-        // Create a new listener per request. This is primarily used for
-        // setting the dialog callback again after a rotation.
-        //
-        // If we saved a reference to a listener, it would be tied to
-        // its ViewHolder instance. ViewHolders are reused, so we
-        // could accidentally leak this reference to other Alarm items
-        // in the list.
-        return new OnTimeSetListener() {
-            @Override
-            public void onTimeSet(ViewGroup viewGroup, int hourOfDay, int minute) {
-                final Alarm oldAlarm = getAlarm();
-                // I don't think we need this; scheduling a new alarm that is considered
-                // equal to a previous alarm will overwrite the previous alarm.
-//                mAlarmController.cancelAlarm(oldAlarm, false);
-                Alarm newAlarm = oldAlarm.toBuilder()
-                        .hour(hourOfDay)
-                        .minutes(minute)
-                        .build();
-                oldAlarm.copyMutableFieldsTo(newAlarm);
-                // -------------------------------------------
-                // TOneverDO: precede copyMutableFieldsTo()
-                newAlarm.setEnabled(true); // Always enabled, esp. if oldAlarm is not enabled
-                // ----------------------------------------------
-                persistUpdatedAlarm(newAlarm, true);
-            }
-        };
+    private String makeTag(@IdRes int viewId) {
+        return FragmentTagUtils.makeTag(BaseAlarmViewHolder.class, viewId, getItemId());
     }
 }

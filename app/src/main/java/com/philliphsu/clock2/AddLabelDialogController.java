@@ -6,26 +6,24 @@ import android.util.Log;
 /**
  * Created by Phillip Hsu on 9/6/2016.
  */
-public final class AddLabelDialogController {
-    private static final String TAG = "add_label_dialog";
+public final class AddLabelDialogController extends DialogFragmentController<AddLabelDialog> {
+    private static final String TAG = "AddLabelController";
 
-    private final FragmentManager mFragmentManager;
     private final AddLabelDialog.OnLabelSetListener mListener;
 
     public AddLabelDialogController(FragmentManager fragmentManager, AddLabelDialog.OnLabelSetListener listener) {
-        mFragmentManager = fragmentManager;
+        super(fragmentManager);
         mListener = listener;
     }
 
-    public void show(CharSequence initialText) {
+    public void show(CharSequence initialText, String tag) {
         AddLabelDialog dialog = AddLabelDialog.newInstance(mListener, initialText);
-        dialog.show(mFragmentManager, TAG);
-//        show(dialog, TAG);
+        show(dialog, tag);
     }
 
-    // TODO: Rename to onConfigurationChange()?
-    public void tryRestoreCallback() {
-        AddLabelDialog labelDialog = (AddLabelDialog) mFragmentManager.findFragmentByTag(TAG);
+    @Override
+    public void tryRestoreCallback(String tag) {
+        AddLabelDialog labelDialog = findDialog(tag);
         if (labelDialog != null) {
             Log.i(TAG, "Restoring add label callback");
             labelDialog.setOnLabelSetListener(mListener);
