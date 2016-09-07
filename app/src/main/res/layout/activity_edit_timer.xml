@@ -8,10 +8,10 @@
     tools:context="com.philliphsu.clock2.edittimer.EditTimerActivity">
     
     <RelativeLayout
-        android:id="@+id/appbar"
+        android:id="@+id/edit_fields_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/colorPrimary"
+        android:background="?attr/colorPrimary"
         android:theme="@style/AppTheme.AppBarOverlay"
         android:layout_alignParentTop="true"
         android:paddingBottom="16dp">
@@ -24,15 +24,17 @@
             app:contentInsetStart="72dp"
             android:layout_alignParentTop="true">
 
-            <!-- Set inputType to text to get single-line input -->
+            <!--Unfortunately, we can't use a style that extends from BaseLabel
+            because we want the parent to be `TextAppearance.AppCompat.Title`, whereas
+            BaseLabel's parent is `TextAppearance.AppCompat`. We have duplicate attributes,
+            but this is fine since this is the only view that is styled like this.-->
             <TextView
                 android:id="@+id/label"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="?selectableItemBackground"
+                android:layout_height="wrap_content"
+                android:background="?android:attr/selectableItemBackground"
                 style="@style/TextAppearance.AppCompat.Title"
-                android:hint="Add label"
-                android:gravity="center_vertical"
+                android:hint="@string/label"
                 android:maxLines="1"
                 android:ellipsize="end"/>
 
@@ -40,12 +42,8 @@
 
         <EditText
             android:id="@+id/hour"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="00"
-            android:background="@android:color/transparent"
             android:layout_below="@id/toolbar"
-            android:textSize="45sp"
+            style="@style/TimerText.EditField"
             android:layout_marginStart="72dp"/>
         
         <TextView
@@ -53,57 +51,38 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="h"
-            android:textSize="24sp"
             android:layout_below="@id/toolbar"
             android:layout_toEndOf="@id/hour"
             android:layout_alignBaseline="@id/hour"
-            style="@style/TextAppearance.AppCompat"/>
+            style="@style/TimerText.FieldLabel"/>
 
         <EditText
             android:id="@+id/minute"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="00"
-            android:background="@android:color/transparent"
             android:layout_below="@id/toolbar"
             android:layout_toEndOf="@id/hour_label"
-            android:textSize="45sp"
-            />
+            style="@style/TimerText.EditField"/>
 
         <TextView
             android:id="@+id/minute_label"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
             android:text="m"
-            android:textSize="24sp"
             android:layout_below="@id/toolbar"
             android:layout_toEndOf="@id/minute"
             android:layout_alignBaseline="@id/minute"
-            style="@style/TextAppearance.AppCompat"
-            />
+            style="@style/TimerText.FieldLabel"/>
 
         <EditText
             android:id="@+id/second"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="00"
-            android:background="@android:color/transparent"
             android:layout_below="@id/toolbar"
             android:layout_toEndOf="@id/minute_label"
-            android:textSize="45sp"
-            />
+            style="@style/TimerText.EditField"/>
 
         <TextView
             android:id="@+id/second_label"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
             android:text="s"
-            android:textSize="24sp"
             android:layout_below="@id/toolbar"
             android:layout_toEndOf="@id/second"
             android:layout_alignBaseline="@id/minute"
-            style="@style/TextAppearance.AppCompat"
-            />
+            style="@style/TimerText.FieldLabel"/>
 
         <View
             android:id="@+id/focus_grabber"
@@ -129,31 +108,90 @@
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"/>-->
 
-    <!-- TODO: Consider defining a style instead. Use the same attrs
-    as below for base API versions, and make a v21 version
-    that includes margin bottom of 16dp. -->
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/ic_half_day_1_24dp"
         android:layout_centerHorizontal="true"
-        android:layout_alignParentBottom="true"/>
+        android:layout_alignParentBottom="true"
+        style="@style/TimerFab"/>
 
     <!-- We don't really need the overhead of the GridLayoutNumpad,
      because it would be a major hassle to adapt it for timers. -->
+    <!-- We're borrowing the margins for bottom sheets, since this numpad
+    was "borrowed" from the bottom sheet numpad anyway. -->
     <android.support.v7.widget.GridLayout
         android:id="@+id/numpad"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/appbar"
+        android:layout_below="@id/edit_fields_layout"
         android:layout_above="@id/fab"
-        android:layout_marginTop="16dp"
-        android:layout_marginStart="24dp"
-        android:layout_marginEnd="24dp"
+        android:layout_marginTop="@dimen/bottom_sheet_vertical_space"
+        android:layout_marginStart="@dimen/bottom_sheet_edge_margin"
+        android:layout_marginEnd="@dimen/bottom_sheet_edge_margin"
         app:columnCount="3">
 
-        <include layout="@layout/content_numpad_timer"/>
+        <!--We require the buttons' heights to be weighted, so we can't
+        reuse the GridLayoutNumpadButton style used by the bottom
+        sheet numpad.-->
+        <Button
+            android:id="@+id/one"
+            style="@style/GridLayoutTimerNumpadButton"
+            android:text="1"/>
+
+        <Button
+            android:id="@+id/two"
+            style="@style/GridLayoutTimerNumpadButton"
+            android:text="2"/>
+
+        <Button
+            android:id="@+id/three"
+            style="@style/GridLayoutTimerNumpadButton"
+            android:text="3"/>
+
+        <Button
+            android:id="@+id/four"
+            style="@style/GridLayoutTimerNumpadButton"
+            android:text="4"/>
+
+        <Button
+            android:id="@+id/five"
+            style="@style/GridLayoutTimerNumpadButton"
+            android:text="5"/>
+
+        <Button
+            android:id="@+id/six"
+            style="@style/GridLayoutTimerNumpadButton"
+            android:text="6"/>
+
+        <Button
+            android:id="@+id/seven"
+            style="@style/GridLayoutTimerNumpadButton"
+            android:text="7"/>
+
+        <Button
+            android:id="@+id/eight"
+            style="@style/GridLayoutTimerNumpadButton"
+            android:text="8"/>
+
+        <Button
+            android:id="@+id/nine"
+            style="@style/GridLayoutTimerNumpadButton"
+            android:text="9"/>
+
+        <Button
+            android:id="@+id/zero"
+            style="@style/GridLayoutTimerNumpadButton"
+            app:layout_column="1"
+            android:text="0"/>
+
+        <!--GridLayoutTimerNumpadButton has text attributes.. but using it
+        is a simple way to get the weighted height. I'd rather not define a
+        new style based on GridLayoutNumpadElement just for this... -->
+        <ImageButton
+            android:id="@+id/backspace"
+            android:src="@drawable/ic_backspace_24dp"
+            style="@style/GridLayoutTimerNumpadButton"
+            app:layout_column="2"
+            android:tint="?attr/themedIconTint"/>
 
     </android.support.v7.widget.GridLayout>
 

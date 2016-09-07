@@ -28,7 +28,7 @@ public class EditTimerActivity extends BaseActivity {
     public static final String EXTRA_LABEL = "com.philliphsu.clock2.edittimer.extra.LABEL";
     public static final String EXTRA_START_TIMER = "com.philliphsu.clock2.edittimer.extra.START_TIMER";
 
-    @Bind(R.id.appbar) ViewGroup mAppBar;
+    @Bind(R.id.edit_fields_layout) ViewGroup mEditFieldsLayout;
     @Bind(R.id.label) TextView mLabel;
     @Bind(R.id.hour) EditText mHour;
     @Bind(R.id.minute) EditText mMinute;
@@ -100,7 +100,7 @@ public class EditTimerActivity extends BaseActivity {
     @OnClick(R.id.backspace)
     void backspace() {
         if (mFocusGrabber.isFocused()) {
-            mAppBar.focusSearch(mFocusGrabber, View.FOCUS_LEFT).requestFocus();
+            mEditFieldsLayout.focusSearch(mFocusGrabber, View.FOCUS_LEFT).requestFocus();
         }
         EditText field = getFocusedField();
         if (field == null)
@@ -167,7 +167,7 @@ public class EditTimerActivity extends BaseActivity {
     }
 
     private EditText getFocusedField() {
-        return (EditText) mAppBar.findFocus();
+        return (EditText) mEditFieldsLayout.findFocus();
     }
 
 //    private void updateStartButtonVisibility() {

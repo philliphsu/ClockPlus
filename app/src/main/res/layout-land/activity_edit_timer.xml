@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context="com.philliphsu.clock2.edittimer.EditTimerActivity">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/colorPrimary"
+        app:popupTheme="@style/AppTheme.PopupOverlay"
+        app:contentInsetStart="72dp">
+
+        <!--Unfortunately, we can't use a style that extends from BaseLabel
+        because we want the parent to be `TextAppearance.AppCompat.Title`, whereas
+        BaseLabel's parent is `TextAppearance.AppCompat`. We have duplicate attributes,
+        but this is fine since this is the only view that is styled like this.-->
+        <TextView
+            android:id="@+id/label"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?android:attr/selectableItemBackground"
+            style="@style/TextAppearance.AppCompat.Title"
+            android:hint="@string/label"
+            android:maxLines="1"
+            android:ellipsize="end"/>
+
+    </android.support.v7.widget.Toolbar>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal">
+
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="?attr/colorPrimary">
+
+            <LinearLayout
+                android:id="@+id/edit_fields_layout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:theme="@style/AppTheme.AppBarOverlay"
+                android:layout_gravity="center"
+                android:layout_marginBottom="28dp">
+
+                <EditText
+                    android:id="@+id/hour"
+                    style="@style/TimerText.EditField"/>
+
+                <TextView
+                    android:id="@+id/hour_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="h"
+                    style="@style/TimerText.FieldLabel"/>
+
+                <EditText
+                    android:id="@+id/minute"
+                    style="@style/TimerText.EditField"/>
+
+                <TextView
+                    android:id="@+id/minute_label"
+                    android:text="m"
+                    style="@style/TimerText.FieldLabel"/>
+
+                <EditText
+                    android:id="@+id/second"
+                    style="@style/TimerText.EditField"/>
+
+                <TextView
+                    android:id="@+id/second_label"
+                    android:text="s"
+                    style="@style/TimerText.FieldLabel"/>
+
+                <View
+                    android:id="@+id/focus_grabber"
+                    style="@style/FocusGrabber"/> <!-- Required for right focus search -->
+
+            </LinearLayout>
+
+            <android.support.design.widget.FloatingActionButton
+                android:id="@+id/fab"
+                android:layout_gravity="bottom|center"
+                style="@style/TimerFab"/>
+
+        </FrameLayout>
+
+        <!-- We don't really need the overhead of the GridLayoutNumpad,
+        because it would be a major hassle to adapt it for timers. -->
+        <!-- We're borrowing the margins for bottom sheets, since this numpad
+        was "borrowed" from the bottom sheet numpad anyway. -->
+        <android.support.v7.widget.GridLayout
+            android:id="@+id/numpad"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            app:columnCount="3">
+
+            <!--We require the buttons' heights to be weighted, so we can't
+            reuse the GridLayoutNumpadButton style used by the bottom
+            sheet numpad.-->
+            <Button
+                android:id="@+id/one"
+                style="@style/GridLayoutTimerNumpadButton"
+                android:text="1"/>
+
+            <Button
+                android:id="@+id/two"
+                style="@style/GridLayoutTimerNumpadButton"
+                android:text="2"/>
+
+            <Button
+                android:id="@+id/three"
+                style="@style/GridLayoutTimerNumpadButton"
+                android:text="3"/>
+
+            <Button
+                android:id="@+id/four"
+                style="@style/GridLayoutTimerNumpadButton"
+                android:text="4"/>
+
+            <Button
+                android:id="@+id/five"
+                style="@style/GridLayoutTimerNumpadButton"
+                android:text="5"/>
+
+            <Button
+                android:id="@+id/six"
+                style="@style/GridLayoutTimerNumpadButton"
+                android:text="6"/>
+
+            <Button
+                android:id="@+id/seven"
+                style="@style/GridLayoutTimerNumpadButton"
+                android:text="7"/>
+
+            <Button
+                android:id="@+id/eight"
+                style="@style/GridLayoutTimerNumpadButton"
+                android:text="8"/>
+
+            <Button
+                android:id="@+id/nine"
+                style="@style/GridLayoutTimerNumpadButton"
+                android:text="9"/>
+
+            <Button
+                android:id="@+id/zero"
+                style="@style/GridLayoutTimerNumpadButton"
+                app:layout_column="1"
+                android:text="0"/>
+
+            <!--GridLayoutTimerNumpadButton has text attributes.. but using it
+            is a simple way to get the weighted height. I'd rather not define a
+            new style based on GridLayoutNumpadElement just for this... -->
+            <ImageButton
+                android:id="@+id/backspace"
+                android:src="@drawable/ic_backspace_24dp"
+                style="@style/GridLayoutTimerNumpadButton"
+                app:layout_column="2"
+                android:tint="?attr/themedIconTint"/>
+
+        </android.support.v7.widget.GridLayout>
+
+    </LinearLayout>
+
+</LinearLayout>

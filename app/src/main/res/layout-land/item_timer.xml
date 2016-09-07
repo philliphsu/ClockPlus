@@ -17,7 +17,7 @@
         <com.philliphsu.clock2.timers.CountdownChronometer
             android:id="@+id/duration"
             android:layout_below="@id/label"
-            style="@style/TimerCountdown"/>
+            style="@style/TimerText.Countdown"/>
 
         <!--The default style has padding start and end, so we remove both-->
         <com.philliphsu.clock2.UntouchableSeekBar

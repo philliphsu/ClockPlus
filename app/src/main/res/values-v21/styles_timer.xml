@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="TimerFab" parent="BaseTimerFab">
+        <item name="android:layout_marginBottom">@dimen/fab_margin</item>
+    </style>
+</resources>

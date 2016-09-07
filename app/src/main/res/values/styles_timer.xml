@@ -4,12 +4,23 @@
         <item name="android:layout_centerHorizontal">true</item>
         <item name="android:padding">@dimen/cardview_margin</item>
     </style>
-    <style name="TimerCountdown" parent="TextAppearance.AppCompat">
+    <style name="TimerText" parent="TextAppearance.AppCompat">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:fontFamily">sans-serif-light</item>
-        <item name="android:layout_centerHorizontal">true</item>
         <item name="android:textSize">@dimen/text_size_display_2</item>
+    </style>
+    <style name="TimerText.Countdown">
+        <item name="android:layout_centerHorizontal">true</item>
+    </style>
+    <style name="TimerText.EditField">
+        <item name="android:text">00</item>
+        <item name="android:textSize">@dimen/text_size_display_3</item>
+        <item name="android:background">@android:color/transparent</item>
+    </style>
+    <style name="TimerText.FieldLabel">
+        <item name="android:textSize">@dimen/text_size_medium</item>
+        <item name="android:layout_marginEnd">@dimen/field_end_margin</item>
     </style>
     <style name="TimerSeekBar" parent="BaseSeekBar">
         <item name="android:splitTrack">false</item> <!--TODO: Move to v21?-->
@@ -32,5 +43,16 @@
         <item name="android:textSize">@dimen/add_one_minute_text_size</item>
         <item name="android:textColor">?attr/themedIconTint</item>
         <item name="android:textStyle">bold</item>
+    </style>
+    <!--Style for the FAB in EditTimerActivity-->
+    <style name="BaseTimerFab">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:src">@drawable/ic_start_24dp</item>
+    </style>
+    <style name="TimerFab" parent="BaseTimerFab"/>
+    <style name="GridLayoutTimerNumpadButton" parent="GridLayoutNumpadButton">
+        <item name="android:layout_height">0dp</item>
+        <item name="layout_rowWeight">1</item>
     </style>
 </resources>
