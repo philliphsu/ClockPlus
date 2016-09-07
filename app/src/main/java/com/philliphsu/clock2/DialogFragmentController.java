@@ -38,7 +38,7 @@ public abstract class DialogFragmentController<T extends DialogFragment> {
         // Typically, we can't cast to a generic type. However, I've written non-generic code that
         // blindly casts the result to an arbitrary type that I expect is correct, so this is
         // pretty much the same thing.
-        Log.d(TAG, "Finding dialog with tag " + tag);
+        Log.d(TAG, "Finding dialog by tag " + tag);
         return (T) mFragmentManager.findFragmentByTag(tag);
     }
 }

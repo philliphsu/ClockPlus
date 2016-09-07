@@ -301,6 +301,6 @@ public abstract class BaseAlarmViewHolder extends BaseViewHolder<Alarm> {
     }
 
     private String makeTag(@IdRes int viewId) {
-        return FragmentTagUtils.makeTag(BaseAlarmViewHolder.class, viewId, getItemId());
+        return FragmentTagUtils.makeTag(BaseAlarmViewHolder.class, viewId);
     }
 }

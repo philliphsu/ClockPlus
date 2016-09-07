@@ -198,6 +198,6 @@ public class TimerViewHolder extends BaseViewHolder<Timer> {
     }
 
     private String makeTag(@IdRes int viewId) {
-        return FragmentTagUtils.makeTag(TimerViewHolder.class, viewId, getItemId());
+        return FragmentTagUtils.makeTag(TimerViewHolder.class, viewId);
     }
 }
