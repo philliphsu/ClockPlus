@@ -2,7 +2,6 @@ package com.philliphsu.clock2.timers;
 
 import android.animation.ObjectAnimator;
 import android.graphics.drawable.Drawable;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.PopupMenu;
@@ -15,6 +14,7 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.philliphsu.clock2.AddLabelDialog;
+import com.philliphsu.clock2.AddLabelDialogController;
 import com.philliphsu.clock2.AsyncTimersTableUpdateHandler;
 import com.philliphsu.clock2.BaseViewHolder;
 import com.philliphsu.clock2.OnListItemInteractionListener;
@@ -37,8 +37,8 @@ public class TimerViewHolder extends BaseViewHolder<Timer> {
     private ObjectAnimator mProgressAnimator;
     private final Drawable mStartIcon;
     private final Drawable mPauseIcon;
-    private final FragmentManager mFragmentManager;
     private final PopupMenu mPopupMenu;
+    private final AddLabelDialogController mAddLabelDialogController;
 
     @Bind(R.id.label) TextView mLabel;
     @Bind(R.id.duration) CountdownChronometer mChronometer;
@@ -59,17 +59,15 @@ public class TimerViewHolder extends BaseViewHolder<Timer> {
         // TODO: This is bad! Use a Controller/Presenter instead...
         // or simply pass in an instance of FragmentManager to the ctor.
         AppCompatActivity act = (AppCompatActivity) getContext();
-        mFragmentManager = act.getSupportFragmentManager();
-
-        // Are we recreating this because of a rotation?
-        // If so, try finding any dialog that was last shown in our backstack,
-        // and restore the callback.
-        AddLabelDialog labelDialog = (AddLabelDialog)
-                mFragmentManager.findFragmentByTag(TAG_ADD_LABEL_DIALOG);
-        if (labelDialog != null) {
-            Log.i(TAG, "Restoring add label callback");
-            labelDialog.setOnLabelSetListener(newOnLabelSetListener());
-        }
+        mAddLabelDialogController = new AddLabelDialogController(
+                act.getSupportFragmentManager(),
+                new AddLabelDialog.OnLabelSetListener() {
+                    @Override
+                    public void onLabelSet(String label) {
+                        mController.updateLabel(label);
+                    }
+                });
+        mAddLabelDialogController.tryRestoreCallback();
 
         // The item layout is inflated in the super ctor, so we can safely reference our views.
         mPopupMenu = new PopupMenu(getContext(), mMenuButton);
@@ -117,8 +115,7 @@ public class TimerViewHolder extends BaseViewHolder<Timer> {
 
     @OnClick(R.id.label)
     void openLabelEditor() {
-        AddLabelDialog dialog = AddLabelDialog.newInstance(newOnLabelSetListener(), mLabel.getText());
-        dialog.show(mFragmentManager, TAG_ADD_LABEL_DIALOG);
+        mAddLabelDialogController.show(mLabel.getText());
     }
 
     @OnClick(R.id.menu)
@@ -197,21 +194,5 @@ public class TimerViewHolder extends BaseViewHolder<Timer> {
                     mSeekBar, ratio, timeRemaining);
         }
         mSeekBar.getThumb().mutate().setAlpha(timeRemaining <= 0 ? 0 : 255);
-    }
-
-    private AddLabelDialog.OnLabelSetListener newOnLabelSetListener() {
-        // Create a new listener per request. This is primarily used for
-        // setting the dialog callback again after a rotation.
-        //
-        // If we saved a reference to a listener, it would be tied to
-        // its ViewHolder instance. ViewHolders are reused, so we
-        // could accidentally leak this reference to other Timer items
-        // in the list.
-        return new AddLabelDialog.OnLabelSetListener() {
-            @Override
-            public void onLabelSet(String label) {
-                mController.updateLabel(label);
-            }
-        };
     }
 }

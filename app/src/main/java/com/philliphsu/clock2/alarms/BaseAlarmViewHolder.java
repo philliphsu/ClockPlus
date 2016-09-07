@@ -17,6 +17,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.philliphsu.clock2.AddLabelDialog;
+import com.philliphsu.clock2.AddLabelDialogController;
 import com.philliphsu.clock2.Alarm;
 import com.philliphsu.clock2.BaseViewHolder;
 import com.philliphsu.clock2.OnListItemInteractionListener;
@@ -45,9 +46,9 @@ import static com.philliphsu.clock2.util.DateFormatUtils.formatTime;
  */
 public abstract class BaseAlarmViewHolder extends BaseViewHolder<Alarm> {
     private static final String TAG = "BaseAlarmViewHolder";
-    private static final String TAG_ADD_LABEL_DIALOG = "add_label_dialog";
 
     private final AlarmController mAlarmController;
+    private final AddLabelDialogController mAddLabelDialogController;
 
     // TODO: Should we use VectorDrawable type?
     private final Drawable mDismissNowDrawable;
@@ -75,6 +76,19 @@ public abstract class BaseAlarmViewHolder extends BaseViewHolder<Alarm> {
         // or simply pass in an instance of FragmentManager to the ctor.
         AppCompatActivity act = (AppCompatActivity) getContext();
         mFragmentManager = act.getSupportFragmentManager();
+        mAddLabelDialogController = new AddLabelDialogController(
+                mFragmentManager,
+                new AddLabelDialog.OnLabelSetListener() {
+                    @Override
+                    public void onLabelSet(String label) {
+                        final Alarm oldAlarm = getAlarm();
+                        Alarm newAlarm = oldAlarm.toBuilder()
+                                .label(label)
+                                .build();
+                        oldAlarm.copyMutableFieldsTo(newAlarm);
+                        persistUpdatedAlarm(newAlarm, false);
+                    }
+                });
 
         // Are we recreating this because of a rotation?
         // If so, try finding any dialog that was last shown in our backstack,
@@ -85,12 +99,7 @@ public abstract class BaseAlarmViewHolder extends BaseViewHolder<Alarm> {
             Log.i(TAG, "Restoring time picker callback");
             picker.setOnTimeSetListener(newOnTimeSetListener());
         }
-        AddLabelDialog labelDialog = (AddLabelDialog)
-                mFragmentManager.findFragmentByTag(TAG_ADD_LABEL_DIALOG);
-        if (labelDialog != null) {
-            Log.i(TAG, "Restoring add label callback");
-            labelDialog.setOnLabelSetListener(newOnLabelSetListener());
-        }
+        mAddLabelDialogController.tryRestoreCallback();
     }
 
     @Override
@@ -202,8 +211,7 @@ public abstract class BaseAlarmViewHolder extends BaseViewHolder<Alarm> {
 
     @OnClick(R.id.label)
     void openLabelEditor() {
-        AddLabelDialog dialog = AddLabelDialog.newInstance(newOnLabelSetListener(), mLabel.getText());
-        dialog.show(mFragmentManager, TAG_ADD_LABEL_DIALOG);
+        mAddLabelDialogController.show(mLabel.getText());
     }
 
     /**
@@ -272,27 +280,6 @@ public abstract class BaseAlarmViewHolder extends BaseViewHolder<Alarm> {
     private void bindLabel(String label) {
         boolean visible = label.length() > 0;
         bindLabel(visible, label);
-    }
-
-    private AddLabelDialog.OnLabelSetListener newOnLabelSetListener() {
-        // Create a new listener per request. This is primarily used for
-        // setting the dialog callback again after a rotation.
-        //
-        // If we saved a reference to a listener, it would be tied to
-        // its ViewHolder instance. ViewHolders are reused, so we
-        // could accidentally leak this reference to other Alarm items
-        // in the list.
-        return new AddLabelDialog.OnLabelSetListener() {
-            @Override
-            public void onLabelSet(String label) {
-                final Alarm oldAlarm = getAlarm();
-                Alarm newAlarm = oldAlarm.toBuilder()
-                        .label(label)
-                        .build();
-                oldAlarm.copyMutableFieldsTo(newAlarm);
-                persistUpdatedAlarm(newAlarm, false);
-            }
-        };
     }
 
     private OnTimeSetListener newOnTimeSetListener() {

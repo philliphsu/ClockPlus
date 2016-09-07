@@ -11,6 +11,8 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.philliphsu.clock2.AddLabelDialog;
+import com.philliphsu.clock2.AddLabelDialogController;
 import com.philliphsu.clock2.BaseActivity;
 import com.philliphsu.clock2.R;
 
@@ -20,13 +22,15 @@ import butterknife.OnLongClick;
 import butterknife.OnTouch;
 
 // TODO: Rename to CreateTimerActivity
-public class EditTimerActivity extends BaseActivity {
+public class EditTimerActivity extends BaseActivity implements AddLabelDialog.OnLabelSetListener {
     private static final int FIELD_LENGTH = 2;
     public static final String EXTRA_HOUR = "com.philliphsu.clock2.edittimer.extra.HOUR";
     public static final String EXTRA_MINUTE = "com.philliphsu.clock2.edittimer.extra.MINUTE";
     public static final String EXTRA_SECOND = "com.philliphsu.clock2.edittimer.extra.SECOND";
     public static final String EXTRA_LABEL = "com.philliphsu.clock2.edittimer.extra.LABEL";
     public static final String EXTRA_START_TIMER = "com.philliphsu.clock2.edittimer.extra.START_TIMER";
+
+    private AddLabelDialogController mAddLabelDialogController;
 
     @Bind(R.id.edit_fields_layout) ViewGroup mEditFieldsLayout;
     @Bind(R.id.label) TextView mLabel;
@@ -39,13 +43,14 @@ public class EditTimerActivity extends BaseActivity {
     @Bind(R.id.focus_grabber) View mFocusGrabber;
     @Bind(R.id.fab) FloatingActionButton mFab;
     // Intentionally not using a (subclass of) GridLayoutNumpad, because
-    // it is expedient to refrain from adapting it for timers.
+    // it is expedient to not adapt it for timers.
     @Bind(R.id.numpad) GridLayout mNumpad;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        updateStartButtonVisibility();
+        mAddLabelDialogController = new AddLabelDialogController(getSupportFragmentManager(), this);
+        mAddLabelDialogController.tryRestoreCallback();
     }
 
     @Override
@@ -62,6 +67,11 @@ public class EditTimerActivity extends BaseActivity {
     @Override
     public void finish() {
         super.finish();
+    }
+
+    @Override
+    public void onLabelSet(String label) {
+        mLabel.setText(label);
     }
 
     @OnClick({ R.id.zero, R.id.one, R.id.two, R.id.three, R.id.four,
@@ -144,7 +154,7 @@ public class EditTimerActivity extends BaseActivity {
 
     @OnClick(R.id.label)
     void openEditLabelDialog() {
-        // TODO: Show the edit label alert dialog.
+        mAddLabelDialogController.show(mLabel.getText());
     }
 
     @OnClick(R.id.fab)
@@ -169,15 +179,4 @@ public class EditTimerActivity extends BaseActivity {
     private EditText getFocusedField() {
         return (EditText) mEditFieldsLayout.findFocus();
     }
-
-//    private void updateStartButtonVisibility() {
-//        // TODO: parse the field's text to an integer and check > 0 instead?
-//        if (TextUtils.equals(mHour.getText(), "00")
-//                && TextUtils.equals(mMinute.getText(), "00")
-//                && TextUtils.equals(mSecond.getText(), "00")) {
-//            mFab.hide();
-//        } else {
-//            mFab.show();
-//        }
-//    }
 }
