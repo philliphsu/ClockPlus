@@ -68,7 +68,6 @@ public class TimerViewHolder extends BaseViewHolder<Timer> {
                         mController.updateLabel(label);
                     }
                 });
-        mAddLabelDialogController.tryRestoreCallback(makeTag(R.id.label));
 
         // The item layout is inflated in the super ctor, so we can safely reference our views.
         mPopupMenu = new PopupMenu(getContext(), mMenuButton);
@@ -92,6 +91,10 @@ public class TimerViewHolder extends BaseViewHolder<Timer> {
         Log.d(TAG, "Binding TimerViewHolder");
         // TOneverDO: create before super
         mController = new TimerController(timer, mAsyncTimersTableUpdateHandler);
+        // Items that are not in view will not be bound. If in one orientation the item was in view
+        // and in another it is out of view, then the callback for that item will not be restored
+        // for the new orientation.
+        mAddLabelDialogController.tryRestoreCallback(makeTag(R.id.label));
         Log.d(TAG, "timer.label() = " + timer.label());
         bindLabel(timer.label());
         bindChronometer(timer);
@@ -198,6 +201,6 @@ public class TimerViewHolder extends BaseViewHolder<Timer> {
     }
 
     private String makeTag(@IdRes int viewId) {
-        return FragmentTagUtils.makeTag(TimerViewHolder.class, viewId);
+        return FragmentTagUtils.makeTag(TimerViewHolder.class, viewId, getItemId());
     }
 }

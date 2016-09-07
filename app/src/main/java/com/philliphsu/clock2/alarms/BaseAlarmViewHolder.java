@@ -114,17 +114,16 @@ public abstract class BaseAlarmViewHolder extends BaseViewHolder<Alarm> {
                 }
             }
         );
-
-        // Are we recreating this because of a rotation?
-        // If so, try finding any dialog that was last shown in our backstack,
-        // and restore the callback.
-        mAddLabelDialogController.tryRestoreCallback(makeTag(R.id.label));
-        mTimePickerDialogController.tryRestoreCallback(makeTag(R.id.time));
     }
 
     @Override
     public void onBind(Alarm alarm) {
         super.onBind(alarm);
+        // Items that are not in view will not be bound. If in one orientation the item was in view
+        // and in another it is out of view, then the callback for that item will not be restored
+        // for the new orientation.
+        mAddLabelDialogController.tryRestoreCallback(makeTag(R.id.label));
+        mTimePickerDialogController.tryRestoreCallback(makeTag(R.id.time));
         bindTime(alarm);
         bindSwitch(alarm.isEnabled());
         bindDismissButton(alarm);
@@ -301,6 +300,6 @@ public abstract class BaseAlarmViewHolder extends BaseViewHolder<Alarm> {
     }
 
     private String makeTag(@IdRes int viewId) {
-        return FragmentTagUtils.makeTag(BaseAlarmViewHolder.class, viewId);
+        return FragmentTagUtils.makeTag(BaseAlarmViewHolder.class, viewId, getItemId());
     }
 }
