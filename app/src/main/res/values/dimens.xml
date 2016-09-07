@@ -67,6 +67,8 @@
     <!--EditTimerActivity-->
     <dimen name="field_end_margin">8dp</dimen>
 
+    <dimen name="appbar_elevation">4dp</dimen>
+
     <dimen name="text_size_body_1">14sp</dimen>
     <dimen name="text_size_body_2">14sp</dimen>
     <dimen name="text_size_button">14sp</dimen>
