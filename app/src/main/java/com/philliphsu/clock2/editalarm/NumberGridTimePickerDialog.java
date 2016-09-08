@@ -237,8 +237,7 @@ public class NumberGridTimePickerDialog extends BaseTimePickerDialog implements 
 
     public void initialize(OnTimeSetListener callback,
             int hourOfDay, int minute, boolean is24HourMode) {
-        mCallback = callback; // TODO: Use setOnTimeSetListener() instead?
-
+        setOnTimeSetListener(callback);
         mInitialHourOfDay = hourOfDay;
         mInitialMinute = minute;
         mIs24HourMode = is24HourMode;
@@ -390,11 +389,7 @@ public class NumberGridTimePickerDialog extends BaseTimePickerDialog implements 
                 } else {
                     tryVibrate();
                 }
-                if (mCallback != null) {
-//                    Log.d(TAG, String.format("Time set: %d:%02d", mTimePicker.getHours(), mTimePicker.getMinutes()));
-                    mCallback.onTimeSet(mTimePicker, mTimePicker.getHours(), mTimePicker.getMinutes());
-                }
-                dismiss();
+                onTimeSet(mTimePicker, mTimePicker.getHours(), mTimePicker.getMinutes());
             }
         });
 //        mDoneButton.setOnKeyListener(keyboardListener);

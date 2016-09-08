@@ -16,9 +16,7 @@ import butterknife.ButterKnife;
 public abstract class BaseTimePickerDialog extends BottomSheetDialogFragment {
     private static final String TAG = "BaseTimePickerDialog";
 
-    // TODO: Consider private access, and then writing package/protected API that subclasses
-    // can use to interface with this field.
-    /*package*/ OnTimeSetListener mCallback;
+    private OnTimeSetListener mCallback;
 
     /**
      * The callback interface used to indicate the user is done filling in
@@ -73,6 +71,13 @@ public abstract class BaseTimePickerDialog extends BottomSheetDialogFragment {
 //        });
 
         return view;
+    }
+
+    protected final void onTimeSet(ViewGroup vg, int hourOfDay, int minute) {
+        if (mCallback != null) {
+            mCallback.onTimeSet(vg, hourOfDay, minute);
+        }
+        dismiss();
     }
 
 //    @Override

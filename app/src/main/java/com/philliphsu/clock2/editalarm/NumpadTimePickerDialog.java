@@ -65,7 +65,7 @@ public class NumpadTimePickerDialog extends BaseTimePickerDialog
     @Deprecated
     public void initialize(OnTimeSetListener callback,
                            int hourOfDay, int minute, boolean is24HourMode) {
-        mCallback = callback;
+        setOnTimeSetListener(callback);
         mIs24HourMode = is24HourMode;
     }
 
@@ -170,9 +170,7 @@ public class NumpadTimePickerDialog extends BaseTimePickerDialog
     void confirmSelection() {
         if (!mNumpad.checkTimeValid())
             return;
-//        Log.d(TAG, String.format("Time set: %d:%02d", mNumpad.getHour(), mNumpad.getMinute()));
-        mCallback.onTimeSet(mNumpad, mNumpad.getHour(), mNumpad.getMinute());
-        dismiss();
+        onTimeSet(mNumpad, mNumpad.getHour(), mNumpad.getMinute());
     }
 
     private void updateInputText(String inputText) {
