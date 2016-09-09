@@ -21,14 +21,9 @@ import android.content.Context;
 import android.os.Handler;
 import android.os.Message;
 import android.os.SystemClock;
-import android.text.format.DateUtils;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.widget.TextView;
-
-import java.util.Formatter;
-import java.util.IllegalFormatException;
-import java.util.Locale;
 
 /**
  * Created by Phillip Hsu on 7/25/2016.
@@ -52,19 +47,11 @@ public class CountdownChronometer extends TextView {
 
     }
 
-    private long mBase;
-    private long mNow; // the currently displayed time
     private boolean mVisible;
     private boolean mStarted;
     private boolean mRunning;
-    private boolean mLogged;
-    private String mFormat;
-    private Formatter mFormatter;
-    private Locale mFormatterLocale;
-    private Object[] mFormatterArgs = new Object[1];
-    private StringBuilder mFormatBuilder;
+    private final CountdownDelegate mDelegate = new CountdownDelegate();
     private OnChronometerTickListener mOnChronometerTickListener;
-    private StringBuilder mRecycle = new StringBuilder(8);
 
     private static final int TICK_WHAT = 2;
 
@@ -112,8 +99,8 @@ public class CountdownChronometer extends TextView {
     }
 
     private void init() {
-        mBase = SystemClock.elapsedRealtime();
-        updateText(mBase);
+        mDelegate.init();
+        updateText(SystemClock.elapsedRealtime());
     }
 
     /**
@@ -123,7 +110,7 @@ public class CountdownChronometer extends TextView {
      */
 //    @android.view.RemotableViewMethod
     public void setBase(long base) {
-        mBase = base;
+        mDelegate.setBase(base);
         dispatchChronometerTick();
         updateText(SystemClock.elapsedRealtime());
     }
@@ -132,7 +119,7 @@ public class CountdownChronometer extends TextView {
      * Return the base time as set through {@link #setBase}.
      */
     public long getBase() {
-        return mBase;
+        return mDelegate.getBase();
     }
 
     /**
@@ -155,17 +142,14 @@ public class CountdownChronometer extends TextView {
      */
 //    @android.view.RemotableViewMethod
     public void setFormat(String format) {
-        mFormat = format;
-        if (format != null && mFormatBuilder == null) {
-            mFormatBuilder = new StringBuilder(format.length() * 2);
-        }
+        mDelegate.setFormat(format);
     }
 
     /**
      * Returns the current format string as set through {@link #setFormat}.
      */
     public String getFormat() {
-        return mFormat;
+        return mDelegate.getFormat();
     }
 
     /**
@@ -236,30 +220,7 @@ public class CountdownChronometer extends TextView {
     }
 
     private synchronized void updateText(long now) {
-        mNow = now;
-        long seconds = mBase - now;
-        seconds /= 1000;
-        String text = DateUtils.formatElapsedTime(mRecycle, seconds);
-
-        if (mFormat != null) {
-            Locale loc = Locale.getDefault();
-            if (mFormatter == null || !loc.equals(mFormatterLocale)) {
-                mFormatterLocale = loc;
-                mFormatter = new Formatter(mFormatBuilder, loc);
-            }
-            mFormatBuilder.setLength(0);
-            mFormatterArgs[0] = text;
-            try {
-                mFormatter.format(mFormat, mFormatterArgs);
-                text = mFormatBuilder.toString();
-            } catch (IllegalFormatException ex) {
-                if (!mLogged) {
-                    Log.w(TAG, "Illegal format string: " + mFormat);
-                    mLogged = true;
-                }
-            }
-        }
-        setText(text);
+        setText(mDelegate.formatElapsedTime(now));
     }
 
     private void updateRunning() {

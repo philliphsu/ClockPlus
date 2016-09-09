@@ -47,7 +47,12 @@ public final class AsyncTimersTableUpdateHandler extends AsyncDatabaseTableUpdat
             // will remove and replace it.
             scheduleAlarm(timer);
         } else {
-            cancelAlarm(timer, !timer.hasStarted());
+            boolean removeNotification = !timer.hasStarted();
+            cancelAlarm(timer, removeNotification);
+            if (!removeNotification) {
+                // Post a new notification to reflect the paused state of the timer
+                TimerNotificationService.showNotification(getContext(), timer);
+            }
         }
     }
 
