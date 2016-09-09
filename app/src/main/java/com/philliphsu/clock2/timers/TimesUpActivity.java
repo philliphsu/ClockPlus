@@ -2,7 +2,6 @@ package com.philliphsu.clock2.timers;
 
 import android.app.Notification;
 import android.app.NotificationManager;
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.v4.app.NotificationCompat;
@@ -23,8 +22,6 @@ public class TimesUpActivity extends RingtoneActivity<Timer> {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        stopService(new Intent(this, TimerNotificationService.class));
-        // TODO: Consider calling this in the service's onDestroy()
         TimerNotificationService.cancelNotification(this, getRingingObject().getId());
         mController = new TimerController(getRingingObject(),
                 new AsyncTimersTableUpdateHandler(this, null));

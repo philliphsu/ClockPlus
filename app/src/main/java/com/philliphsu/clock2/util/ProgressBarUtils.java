@@ -37,7 +37,7 @@ public class ProgressBarUtils {
                 // have hardcoded this animator to be a "countdown" progress bar. This is
                 // sufficient for our current needs.
                 progress, 0);
-        animator.setDuration(duration);
+        animator.setDuration(duration < 0 ? 0 : duration);
         // The algorithm that calculates intermediate values between keyframes. We use linear
         // interpolation so that the animation runs at constant speed.
         animator.setInterpolator(null/*results in linear interpolation*/);

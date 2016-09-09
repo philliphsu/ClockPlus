@@ -36,12 +36,12 @@ public class TimerNotificationService extends Service {
 
     public static final String EXTRA_TIMER = "com.philliphsu.clock2.timers.extra.TIMER";
 
-    private Timer mTimer;
+    private Timer mTimer; // TODO: I think we may need a list of timers.
     private TimerController mController;
     private NotificationCompat.Builder mNoteBuilder;
     private NotificationManager mNotificationManager;
     private final CountdownDelegate mCountdownDelegate = new CountdownDelegate();
-    private MyHandlerThread mThread;
+    private MyHandlerThread mThread; // TODO: I think we may need a list of threads.
 
     /**
      * Helper method to start this Service for its default action: to show
@@ -62,9 +62,9 @@ public class TimerNotificationService extends Service {
      *                you want to cancel
      */
     public static void cancelNotification(Context context, long timerId) { // TODO: remove long param
-//        NotificationManager nm = (NotificationManager)
-//                context.getSystemService(Context.NOTIFICATION_SERVICE);
-//        nm.cancel(TAG, (int) timerId);
+        NotificationManager nm = (NotificationManager)
+                context.getSystemService(Context.NOTIFICATION_SERVICE);
+        nm.cancel(TAG, (int) timerId);
         context.stopService(new Intent(context, TimerNotificationService.class));
     }
 
@@ -99,7 +99,6 @@ public class TimerNotificationService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        mNotificationManager.cancelAll();
         quitThread();
     }
 
