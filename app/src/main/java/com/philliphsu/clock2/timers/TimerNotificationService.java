@@ -66,6 +66,13 @@ public class TimerNotificationService extends Service {
                 context.getSystemService(Context.NOTIFICATION_SERVICE);
         nm.cancel(TAG, (int) timerId);
         context.stopService(new Intent(context, TimerNotificationService.class));
+        // After being cancelled due to time being up, sometimes the active timer notification posts again
+        // with a static 00:00 text, along with the Time's up notification. My theory is
+        // our thread has enough leeway to sneak in a final call to post the notification before it
+        // is actually quit().
+        // TODO: Write an API in MyHandlerThread that removes its messages. Then, write and
+        // handle a service command that calls that API. Alternatively, we may not need the
+        // command because we could just call that API in your quitThread() helper method.
     }
 
     @Override
