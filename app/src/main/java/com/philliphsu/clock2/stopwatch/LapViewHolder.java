@@ -46,7 +46,7 @@ public class LapViewHolder extends BaseViewHolder<Lap> {
         // We're going to forget about the + sign in front of the text. I think
         // the 'Elapsed' header column is sufficient to convey what this timer means.
         // (Don't want to figure out a solution)
-        mElapsedTime.setElapsed(lap.elapsed());
+        mElapsedTime.setDuration(lap.elapsed());
         if (lap.isRunning()) {
             mElapsedTime.start();
         }

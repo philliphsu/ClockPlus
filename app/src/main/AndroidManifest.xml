@@ -125,6 +125,11 @@
             android:enabled="true"
             android:exported="false">
         </service>
+        <service
+            android:name=".stopwatch.StopwatchNotificationService"
+            android:enabled="true"
+            android:exported="false">
+        </service>
     </application>
 
 </manifest>

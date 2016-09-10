@@ -40,7 +40,7 @@ public class TimerNotificationService extends Service {
     private TimerController mController;
     private NotificationCompat.Builder mNoteBuilder;
     private NotificationManager mNotificationManager;
-    private final CountdownDelegate mCountdownDelegate = new CountdownDelegate();
+    private final ChronometerDelegate mCountdownDelegate = new ChronometerDelegate();
     private MyHandlerThread mThread; // TODO: I think we may need a list of threads.
 
     /**
@@ -210,7 +210,7 @@ public class TimerNotificationService extends Service {
     }
 
     private void updateNotification() {
-        String text = mCountdownDelegate.formatElapsedTime(SystemClock.elapsedRealtime());
+        CharSequence text = mCountdownDelegate.formatElapsedTime(SystemClock.elapsedRealtime());
         mNoteBuilder.setContentText(text);
         mNotificationManager.notify(TAG, mTimer.getIntId(), mNoteBuilder.build());
     }

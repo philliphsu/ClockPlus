@@ -203,4 +203,7 @@
 
     <string name="empty_alarms_container">No alarms added</string>
     <string name="empty_timers_container">No timers added</string>
+
+    <string name="stopwatch">Stopwatch</string>
+    <string name="lap">Lap</string>
 </resources>

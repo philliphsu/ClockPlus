@@ -2,6 +2,7 @@ package com.philliphsu.clock2.stopwatch;
 
 import android.animation.Animator;
 import android.animation.ObjectAnimator;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -82,7 +83,7 @@ public class StopwatchFragment extends RecyclerViewFragment<
         Log.d(TAG, "onCreateView()");
         View view = super.onCreateView(inflater, container, savedInstanceState);
 
-        mChronometer.setApplySizeSpan(true);
+        mChronometer.setShowCentiseconds(true, true);
         if (mStartTime > 0) {
             long base = mStartTime;
             if (mPauseTime > 0) {
@@ -252,6 +253,7 @@ public class StopwatchFragment extends RecyclerViewFragment<
 //            if (mProgressAnimator != null) {
 //                mProgressAnimator.resume();
 //            }
+            getActivity().startService(new Intent(getActivity(), StopwatchNotificationService.class));
         }
         savePrefs();
         // TOneverDO: Precede savePrefs(), or else we don't save false to KEY_CHRONOMETER_RUNNING
