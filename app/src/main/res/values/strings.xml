@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <string name="app_name">Clock+2</string>
     <string name="action_settings">Settings</string>
     <string name="section_format">Hello World from section: %1$d</string>
@@ -206,4 +206,8 @@
 
     <string name="stopwatch">Stopwatch</string>
     <string name="lap">Lap</string>
+
+    <!-- https://android.googlesource.com/platform/frameworks/base/+/master/core/res/res/values/strings.xml -->
+    <!-- The representation of a time duration when negative. An example is -1:14. This can be used with a countdown timer for example.-->
+    <string name="negative_duration">\u2212<xliff:g id="time" example="1:14">%1$s</xliff:g></string>
 </resources>

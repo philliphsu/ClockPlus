@@ -1,5 +1,6 @@
 package com.philliphsu.clock2.timers;
 
+import android.content.res.Resources;
 import android.os.SystemClock;
 import android.text.SpannableString;
 import android.text.Spanned;
@@ -7,6 +8,8 @@ import android.text.TextUtils;
 import android.text.format.DateUtils;
 import android.text.style.RelativeSizeSpan;
 import android.util.Log;
+
+import com.philliphsu.clock2.R;
 
 import java.util.Formatter;
 import java.util.IllegalFormatException;
@@ -77,10 +80,18 @@ public final class ChronometerDelegate {
         return mFormat;
     }
 
-    public CharSequence formatElapsedTime(long now) {
+    public CharSequence formatElapsedTime(long now, Resources resources) {
         mNow = now;
-        long millis = mCountDown ? mBase - now : now - mBase;
-        String text = DateUtils.formatElapsedTime(mRecycle, millis / 1000);
+        long seconds = mCountDown ? mBase - now : now - mBase;
+        boolean negative = false;
+        if (seconds < 0) {
+            seconds = -seconds;
+            negative = true;
+        }
+        String text = DateUtils.formatElapsedTime(mRecycle, seconds / 1000);
+        if (negative) {
+            text = resources.getString(R.string.negative_duration, text);
+        }
 
         Locale loc = Locale.getDefault();
         if (mFormat != null) {
@@ -101,7 +112,7 @@ public final class ChronometerDelegate {
             }
         }
         if (mShowCentiseconds) {
-            long centiseconds = (millis % 1000) / 10;
+            long centiseconds = (seconds % 1000) / 10;
             String centisecondsText = String.format(loc,
                     // TODO: Different locales use different decimal marks.
                     // The two most common are . and ,

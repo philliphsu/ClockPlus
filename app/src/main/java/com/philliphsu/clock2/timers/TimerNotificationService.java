@@ -211,7 +211,7 @@ public class TimerNotificationService extends Service {
     }
 
     private void updateNotification() {
-        CharSequence text = mCountdownDelegate.formatElapsedTime(SystemClock.elapsedRealtime());
+        CharSequence text = mCountdownDelegate.formatElapsedTime(SystemClock.elapsedRealtime(), getResources());
         mNoteBuilder.setContentText(text);
         mNotificationManager.notify(TAG, mTimer.getIntId(), mNoteBuilder.build());
     }

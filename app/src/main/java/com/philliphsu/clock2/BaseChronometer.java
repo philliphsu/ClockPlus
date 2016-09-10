@@ -2,8 +2,6 @@ package com.philliphsu.clock2;
 
 import android.annotation.TargetApi;
 import android.content.Context;
-import android.os.Handler;
-import android.os.Message;
 import android.os.SystemClock;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -34,10 +32,9 @@ public class BaseChronometer extends TextView {
     private boolean mVisible;
     private boolean mStarted;
     private boolean mRunning;
+    private long mTickInterval;
     private OnChronometerTickListener mOnChronometerTickListener;
     private final ChronometerDelegate mDelegate = new ChronometerDelegate();
-
-    private static final int TICK_WHAT = 2;
 
     /**
      * Initialize this Chronometer object.
@@ -85,6 +82,7 @@ public class BaseChronometer extends TextView {
     private void init() {
         mDelegate.init();
         updateText(SystemClock.elapsedRealtime());
+        mTickInterval = 1000;
     }
 
     /**
@@ -96,6 +94,7 @@ public class BaseChronometer extends TextView {
      */
     public void setCountDown(boolean countDown) {
         mDelegate.setCountDown(countDown);
+        updateText(SystemClock.elapsedRealtime());
     }
 
     /**
@@ -119,7 +118,18 @@ public class BaseChronometer extends TextView {
      */
     public void setShowCentiseconds(boolean showCentiseconds, boolean applySizeSpan) {
         mDelegate.setShowCentiseconds(showCentiseconds, applySizeSpan);
-        init(); // Clear and update the text again
+        // Clear and update the text again. The reason we don't just update the text, as in
+        // setCountDown(), is that if showCentiseconds is true, we will be increasing the
+        // granularity of this time display; the time delta between the first
+        // setting of the base time (when this view is first instantiated), and the next call
+        // to updateText() is, while minuscule, significant enough that there would be some nonzero
+        // centiseconds value initially displayed. By resetting the timer, we minimize
+        // this time delta, and that should display an initial centiseconds value of zero.
+        init();
+        // ----------------------------------------------------------------------------
+        // TOneverDO: Precede init(), because init() resets mTickInterval to 1000.
+        mTickInterval = showCentiseconds ? 10 : 1000;
+        // ----------------------------------------------------------------------------
     }
 
     /**
@@ -268,31 +278,34 @@ public class BaseChronometer extends TextView {
     }
 
     private synchronized void updateText(long now) {
-        setText(mDelegate.formatElapsedTime(now));
+        setText(mDelegate.formatElapsedTime(now, getResources()));
     }
 
     private void updateRunning() {
-        boolean running = mVisible && mStarted;
+        // The isShown() check is new to the Chronometer source in API 24.
+        // It is preventing the chronometer in TimerViewHolder from ticking, so leave it off.
+        boolean running = mVisible && mStarted /*&& isShown()*/;
         if (running != mRunning) {
             if (running) {
                 Log.d(TAG, "Running");
                 updateText(SystemClock.elapsedRealtime());
                 dispatchChronometerTick();
-                mHandler.sendMessageDelayed(Message.obtain(mHandler, TICK_WHAT), 10);
+                postDelayed(mTickRunnable, mTickInterval);
             } else {
                 Log.d(TAG, "Not running anymore");
-                mHandler.removeMessages(TICK_WHAT);
+                removeCallbacks(mTickRunnable);
             }
             mRunning = running;
         }
     }
 
-    private Handler mHandler = new Handler() {
-        public void handleMessage(Message m) {
+    private final Runnable mTickRunnable = new Runnable() {
+        @Override
+        public void run() {
             if (mRunning) {
                 updateText(SystemClock.elapsedRealtime());
                 dispatchChronometerTick();
-                sendMessageDelayed(Message.obtain(this, TICK_WHAT), 10);
+                postDelayed(mTickRunnable, mTickInterval);
             }
         }
     };
