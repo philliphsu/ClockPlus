@@ -94,6 +94,7 @@ public class TimerNotificationService extends Service {
 //                0/*Shouldn't need a flag..*/));
 
         mCountdownDelegate.init();
+        mCountdownDelegate.setCountDown(true);
     }
 
     @Override
