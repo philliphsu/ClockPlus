@@ -237,6 +237,13 @@ public abstract class ChronometerNotificationService extends Service {
     }
 
     /**
+     * Cancels the notification with the pair ({@link #getNoteTag() tag}, id)
+     */
+    protected final void cancelNotification(int id) {
+        mNotificationManager.cancel(getNoteTag(), id);
+    }
+
+    /**
      * Causes the handler thread's looper to terminate without processing
      * any more messages in the message queue.
      */

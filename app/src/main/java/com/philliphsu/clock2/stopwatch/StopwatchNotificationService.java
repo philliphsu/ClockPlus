@@ -1,117 +1,109 @@
 package com.philliphsu.clock2.stopwatch;
 
-import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
-import android.os.IBinder;
-import android.support.annotation.DrawableRes;
-import android.support.v4.app.NotificationCompat;
+import android.content.SharedPreferences;
+import android.os.SystemClock;
+import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
-import com.philliphsu.clock2.ChronometerNotificationThread;
+import com.philliphsu.clock2.ChronometerNotificationService;
 import com.philliphsu.clock2.MainActivity;
 import com.philliphsu.clock2.R;
 
-public class StopwatchNotificationService extends Service {
+public class StopwatchNotificationService extends ChronometerNotificationService {
     private static final String ACTION_ADD_LAP = "com.philliphsu.clock2.stopwatch.action.ADD_LAP";
-    private static final String ACTION_START_PAUSE = "com.philliphsu.clock2.stopwatch.action.START_PAUSE";
-    private static final String ACTION_STOP = "com.philliphsu.clock2.stopwatch.action.STOP";
 
-    private NotificationCompat.Builder mNoteBuilder;
-    private NotificationManager mNotificationManager;
     private AsyncLapsTableUpdateHandler mLapsTableUpdateHandler;
-    private ChronometerNotificationThread mThread;
+    private SharedPreferences mPrefs;
 
     @Override
     public void onCreate() {
         super.onCreate();
-        mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         mLapsTableUpdateHandler = new AsyncLapsTableUpdateHandler(this, null);
-
-        // Create base note
+        mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
         // TODO: I think we can make this a foreground service so even
         // if the process is killed, this service remains alive.
-        mNoteBuilder = new NotificationCompat.Builder(this)
-                .setSmallIcon(R.drawable.ic_stopwatch_24dp)
-                .setOngoing(true)
-//                .setUsesChronometer(true) // No way to pause/resume this native chronometer.
-                .setContentTitle(getString(R.string.stopwatch));
-        Intent intent = new Intent(this, MainActivity.class);
-        intent.putExtra(null/*TODO:MainActivity.EXTRA_SHOW_PAGE*/, 2/*TODO:MainActivity.INDEX_STOPWATCH*/);
-        mNoteBuilder.setContentIntent(PendingIntent.getActivity(this, 0, intent, 0));
-
-        // TODO: Move adding these actions to the default case
-        // TODO: Change fillColor to white, to accommodate API < 21.
-        // Apparently, notifications on 21+ are automatically
-        // tinted to gray to contrast against the native notification background color.
-        addAction(ACTION_ADD_LAP, R.drawable.ic_add_lap_24dp, getString(R.string.lap));
-        // TODO: Set icon and title according to state of stopwatch
-        addAction(ACTION_START_PAUSE, R.drawable.ic_pause_24dp, getString(R.string.pause));
-        addAction(ACTION_STOP, R.drawable.ic_stop_24dp, getString(R.string.stop));
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        quitThread();
+        // After being cancelled due to time being up, sometimes the active timer notification posts again
+        // with a static 00:00 text, along with the Time's up notification. My theory is
+        // our thread has enough leeway to sneak in a final call to post the notification before it
+        // is actually quit().
+        // As such, try cancelling the notification with this (tag, id) pair again.
+        cancelNotification(0);
     }
 
     @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        if (intent != null) {
-            final String action = intent.getAction();
-            if (action == null) {
-                // TODO: Read the stopwatch's start time in shared prefs.
-                mNoteBuilder.setWhen(System.currentTimeMillis());
-                // TODO: Lap # content text
-                mNoteBuilder.setContentText("Lap 1");
-                // Use class name as tag instead of defining our own tag constant, because
-                // the latter is limited to 23 (?) chars if you also want to use it as
-                // a log tag.
-                mNotificationManager.notify(getClass().getName(), 0, mNoteBuilder.build());
-            } else {
-                switch (action) {
-                    case ACTION_ADD_LAP:
-//                        mLapsTableUpdateHandler.asyncInsert(null/*TODO*/);
-                        break;
-                    case ACTION_START_PAUSE:
-                        break;
-                    case ACTION_STOP:
-                        // Cancels all of the notifications issued by *this instance* of the manager,
-                        // not those of any other instances (in this app or otherwise).
-                        // TODO: We could cancel by (tag, id) if we cared.
-                        mNotificationManager.cancelAll();
-                        break;
-                }
-            }
+    protected int getSmallIcon() {
+        return R.drawable.ic_stopwatch_24dp;
+    }
+
+    @Nullable
+    @Override
+    protected PendingIntent getContentIntent() {
+        Intent intent = new Intent(this, MainActivity.class);
+        intent.putExtra(null/*TODO:MainActivity.EXTRA_SHOW_PAGE*/, 2/*TODO:MainActivity.INDEX_STOPWATCH*/);
+        return PendingIntent.getActivity(this, 0, intent, 0);
+    }
+
+    @Override
+    protected boolean isCountDown() {
+        return false;
+    }
+
+    @Override
+    protected void handleDefaultAction(Intent intent, int flags, long startId) {
+        // TODO: String resource [Stopwatch: Lap %1$s]. If no laps, just [Stopwatch]
+        setContentTitle(getString(R.string.stopwatch));
+        syncNotificationWithStopwatchState(true/*always true*/);
+        // We don't need to write anything to SharedPrefs because if we're here, StopwatchFragment
+        // already wrote the necessary values to file.
+    }
+
+    @Override
+    protected void handleStartPauseAction(Intent intent, int flags, long startId) {
+        // TODO: Tell StopwatchFragment to start/pause itself.. perhaps with an Intent?
+        boolean running = mPrefs.getBoolean(StopwatchFragment.KEY_CHRONOMETER_RUNNING, false);
+        syncNotificationWithStopwatchState(!running);
+        SharedPreferences.Editor editor = mPrefs.edit();
+        editor.putBoolean(StopwatchFragment.KEY_CHRONOMETER_RUNNING, !running);
+    }
+
+    @Override
+    protected void handleStopAction(Intent intent, int flags, long startId) {
+        // TODO: Tell StopwatchFragment to stop itself.. perhaps with an Intent?
+        stopSelf();
+    }
+
+    @Override
+    protected void handleAction(@NonNull String action, Intent intent, int flags, long startId) {
+        if (ACTION_ADD_LAP.equals(action)) {
+            mLapsTableUpdateHandler.asyncInsert(null/*TODO*/);
+        } else {
+            throw new IllegalArgumentException("StopwatchNotificationService cannot handle action " + action);
         }
-        return super.onStartCommand(intent, flags, startId);
     }
 
-    @Override
-    public IBinder onBind(Intent intent) {
-        return null;
-    }
+    private void syncNotificationWithStopwatchState(boolean running) {
+        clearActions();
+        // TODO: Change fillColor to white, to accommodate API < 21.
+        // Apparently, notifications on 21+ are automatically
+        // tinted to gray to contrast against the native notification background color.
+        //
+        // No request code needed, so use 0.
+        addAction(ACTION_ADD_LAP, R.drawable.ic_add_lap_24dp, getString(R.string.lap), 0);
+        addStartPauseAction(running, 0);
+        addStopAction(0);
 
-    /**
-     * Builds and adds the specified action to the notification's mNoteBuilder.
-     */
-    private void addAction(String action, @DrawableRes int icon, String actionTitle) {
-        Intent intent = new Intent(this, StopwatchNotificationService.class)
-                .setAction(action);
-        PendingIntent pi = PendingIntent.getService(this, 0/*no requestCode*/,
-                intent, 0/*no flags*/);
-        mNoteBuilder.addAction(icon, actionTitle, pi);
-    }
-
-    /**
-     * Causes the handler thread's looper to terminate without processing
-     * any more messages in the message queue.
-     */
-    private void quitThread() {
-        if (mThread != null && mThread.isAlive()) {
-            mThread.quit();
+        quitCurrentThread();
+        if (running) {
+            // TODO: Read the stopwatch's start time in shared prefs.
+            startNewThread(0, SystemClock.elapsedRealtime());
         }
     }
 }

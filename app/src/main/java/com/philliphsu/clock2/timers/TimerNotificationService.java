@@ -1,6 +1,5 @@
 package com.philliphsu.clock2.timers;
 
-import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
@@ -97,8 +96,7 @@ public class TimerNotificationService extends ChronometerNotificationService {
         // our thread has enough leeway to sneak in a final call to post the notification before it
         // is actually quit().
         // As such, try cancelling the notification with this (tag, id) pair again.
-        NotificationManager nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-        nm.cancel(getNoteTag(), mTimer.getIntId());
+        cancelNotification(mTimer.getIntId());
     }
 
     @Override

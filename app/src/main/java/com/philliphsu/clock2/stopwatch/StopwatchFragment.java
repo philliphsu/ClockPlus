@@ -36,9 +36,11 @@ public class StopwatchFragment extends RecyclerViewFragment<
         LapCursor,
         LapsAdapter> {
     private static final String TAG = "StopwatchFragment";
-    private static final String KEY_START_TIME = "start_time";
-    private static final String KEY_PAUSE_TIME = "pause_time";
-    private static final String KEY_CHRONOMETER_RUNNING = "chronometer_running";
+
+    // Exposed for StopwatchNotificationService
+    static final String KEY_START_TIME = "start_time";
+    static final String KEY_PAUSE_TIME = "pause_time";
+    static final String KEY_CHRONOMETER_RUNNING = "chronometer_running";
 
     private long mStartTime;
     private long mPauseTime;
