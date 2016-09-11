@@ -2,6 +2,7 @@ package com.philliphsu.clock2.timers;
 
 import android.content.res.Resources;
 import android.os.SystemClock;
+import android.support.annotation.Nullable;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.TextUtils;
@@ -80,16 +81,21 @@ public final class ChronometerDelegate {
         return mFormat;
     }
 
-    public CharSequence formatElapsedTime(long now, Resources resources) {
+    public CharSequence formatElapsedTime(long now, @Nullable Resources resources) {
         mNow = now;
         long seconds = mCountDown ? mBase - now : now - mBase;
         boolean negative = false;
-        if (seconds < 0) {
+        // Only modify how negative timers are displayed if we have a Resources.
+        // Otherwise, if we invert the sign of seconds and we don't have a Resources,
+        // the timer will be positive again which will confuse the user.
+        if (seconds < 0 && resources != null) {
             seconds = -seconds;
             negative = true;
         }
         String text = DateUtils.formatElapsedTime(mRecycle, seconds / 1000);
         if (negative) {
+            // The only way this can call through is if the previous null check on
+            // `resources` passed.
             text = resources.getString(R.string.negative_duration, text);
         }
 

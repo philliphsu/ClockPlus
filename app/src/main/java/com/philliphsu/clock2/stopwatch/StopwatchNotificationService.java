@@ -9,6 +9,7 @@ import android.os.IBinder;
 import android.support.annotation.DrawableRes;
 import android.support.v4.app.NotificationCompat;
 
+import com.philliphsu.clock2.ChronometerNotificationThread;
 import com.philliphsu.clock2.MainActivity;
 import com.philliphsu.clock2.R;
 
@@ -20,6 +21,7 @@ public class StopwatchNotificationService extends Service {
     private NotificationCompat.Builder mNoteBuilder;
     private NotificationManager mNotificationManager;
     private AsyncLapsTableUpdateHandler mLapsTableUpdateHandler;
+    private ChronometerNotificationThread mThread;
 
     @Override
     public void onCreate() {
@@ -33,13 +35,7 @@ public class StopwatchNotificationService extends Service {
         mNoteBuilder = new NotificationCompat.Builder(this)
                 .setSmallIcon(R.drawable.ic_stopwatch_24dp)
                 .setOngoing(true)
-                // TODO: The chronometer takes the place of the 'when' timestamp
-                // at its usual location. If you don't like this location,
-                // we can write a thread that posts a new notification every second
-                // that updates the content text.
-                // TODO: We would have to write our own chronometer logic if there
-                // is no way to pause/resume the native chronometer.
-                .setUsesChronometer(true)
+//                .setUsesChronometer(true) // No way to pause/resume this native chronometer.
                 .setContentTitle(getString(R.string.stopwatch));
         Intent intent = new Intent(this, MainActivity.class);
         intent.putExtra(null/*TODO:MainActivity.EXTRA_SHOW_PAGE*/, 2/*TODO:MainActivity.INDEX_STOPWATCH*/);
@@ -58,6 +54,7 @@ public class StopwatchNotificationService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        quitThread();
     }
 
     @Override
@@ -106,5 +103,15 @@ public class StopwatchNotificationService extends Service {
         PendingIntent pi = PendingIntent.getService(this, 0/*no requestCode*/,
                 intent, 0/*no flags*/);
         mNoteBuilder.addAction(icon, actionTitle, pi);
+    }
+
+    /**
+     * Causes the handler thread's looper to terminate without processing
+     * any more messages in the message queue.
+     */
+    private void quitThread() {
+        if (mThread != null && mThread.isAlive()) {
+            mThread.quit();
+        }
     }
 }
