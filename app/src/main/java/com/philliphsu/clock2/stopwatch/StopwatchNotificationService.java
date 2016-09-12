@@ -92,6 +92,18 @@ public class StopwatchNotificationService extends ChronometerNotificationService
                 .putLong(StopwatchFragment.KEY_PAUSE_TIME, 0)
                 .putBoolean(StopwatchFragment.KEY_CHRONOMETER_RUNNING, false)
                 .apply();
+        // If after this we restart the application, and then start the stopwatch in StopwatchFragment,
+        // we will see that first and second laps appear in the list immediately. This is because
+        // the laps from before we made this stop action are still in our SQLite database, because
+        // they weren't cleared.
+        //
+        // We can either clear the laps table here, as we've done already, or do as the TODO above
+        // says and tell StopwatchFragment to stop itself. The latter would also stop the
+        // chronometer view if the fragment is still in view (i.e. app is still open).
+        mLapsTableUpdateHandler.asyncClear();
+        // TODO: When stopping the stopwatch from the fragment, send an intent to this service
+        // with the stop action specified. We will end up making the above calls twice, since
+        // they would be called in the fragment already, but that's not an issue to worry about too much.
         stopSelf();
     }
 
