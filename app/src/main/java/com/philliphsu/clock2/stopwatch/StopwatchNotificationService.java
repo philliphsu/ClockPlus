@@ -87,6 +87,11 @@ public class StopwatchNotificationService extends ChronometerNotificationService
     @Override
     protected void handleStopAction(Intent intent, int flags, long startId) {
         // TODO: Tell StopwatchFragment to stop itself.. perhaps with an Intent?
+        mPrefs.edit()
+                .putLong(StopwatchFragment.KEY_START_TIME, 0)
+                .putLong(StopwatchFragment.KEY_PAUSE_TIME, 0)
+                .putBoolean(StopwatchFragment.KEY_CHRONOMETER_RUNNING, false)
+                .apply();
         stopSelf();
     }
 
