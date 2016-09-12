@@ -68,18 +68,20 @@ public class StopwatchNotificationService extends ChronometerNotificationService
     @Override
     protected void handleStartPauseAction(Intent intent, int flags, long startId) {
         // TODO: Tell StopwatchFragment to start/pause itself.. perhaps with an Intent?
-        boolean running = mPrefs.getBoolean("KEY_RUNNING", false);
-        syncNotificationWithStopwatchState(!running);
+        boolean running = mPrefs.getBoolean(StopwatchFragment.KEY_CHRONOMETER_RUNNING, false);
         SharedPreferences.Editor editor = mPrefs.edit();
-        editor.putBoolean("KEY_RUNNING", !running);
+        editor.putBoolean(StopwatchFragment.KEY_CHRONOMETER_RUNNING, !running);
         if (running) {
-            editor.putLong("key_pause_time", SystemClock.elapsedRealtime());
+            editor.putLong(StopwatchFragment.KEY_PAUSE_TIME, SystemClock.elapsedRealtime());
         } else {
-            long startTime = mPrefs.getLong("key_start_time", 0);
-            long pauseTime = mPrefs.getLong("key_pause_time", 0);
-            editor.putLong("key_start_time", startTime + SystemClock.elapsedRealtime() - pauseTime);
+            long startTime = mPrefs.getLong(StopwatchFragment.KEY_START_TIME, 0);
+            long pauseTime = mPrefs.getLong(StopwatchFragment.KEY_PAUSE_TIME, 0);
+            startTime += SystemClock.elapsedRealtime() - pauseTime;
+            editor.putLong(StopwatchFragment.KEY_START_TIME, startTime);
+            editor.putLong(StopwatchFragment.KEY_PAUSE_TIME, 0);
         }
         editor.apply();
+        syncNotificationWithStopwatchState(!running);
     }
 
     @Override
@@ -110,8 +112,8 @@ public class StopwatchNotificationService extends ChronometerNotificationService
 
         quitCurrentThread();
         if (running) {
-            // TODO: Read the stopwatch's start time in shared prefs.
-            startNewThread(0, SystemClock.elapsedRealtime());
+            long startTime = mPrefs.getLong(StopwatchFragment.KEY_START_TIME, SystemClock.elapsedRealtime());
+            startNewThread(0, startTime);
         }
     }
 }

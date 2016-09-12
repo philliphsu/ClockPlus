@@ -135,7 +135,7 @@ public abstract class ChronometerNotificationService extends Service {
             // Display any notification updates associated with the current state
             // of the chronometer. If we relied on the HandlerThread to do this for us,
             // the message delivery would be delayed.
-            mThread.updateNotification();
+            mThread.updateNotification(false/*updateText*/);
             // If the chronometer has been set to not run, the effect is obvious.
             // Otherwise, we're preparing for the start of a new thread.
             quitThread();
@@ -214,8 +214,8 @@ public abstract class ChronometerNotificationService extends Service {
         return mDelegate.getBase();
     }
 
-    protected final void updateNotification() {
-        mThread.updateNotification();
+    protected final void updateNotification(boolean updateText) {
+        mThread.updateNotification(updateText);
     }
 
     protected final void setContentTitle(CharSequence title) {

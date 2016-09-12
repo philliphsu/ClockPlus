@@ -136,7 +136,7 @@ public class TimerNotificationService extends ChronometerNotificationService {
             // there is a noticeable delay before the minute gets added on.
             // Update the text immediately, because there's no harm in doing so.
             setBase(getBase() + 60000);
-            updateNotification();
+            updateNotification(true);
             mController.addOneMinute();
         } else {
             throw new IllegalArgumentException("TimerNotificationService cannot handle action " + action);

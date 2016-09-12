@@ -75,7 +75,7 @@ public class ChronometerNotificationThread extends HandlerThread {
         mHandler = new Handler() {
             @Override
             public void handleMessage(Message m) {
-                updateNotification();
+                updateNotification(true);
                 sendMessageDelayed(Message.obtain(this, MSG_WHAT), 1000);
             }
         };
@@ -83,9 +83,16 @@ public class ChronometerNotificationThread extends HandlerThread {
         mHandler.sendMessageDelayed(Message.obtain(mHandler, MSG_WHAT), 1000);
     }
 
-    public void updateNotification() {
-        CharSequence text = mDelegate.formatElapsedTime(SystemClock.elapsedRealtime(), mResources);
-        mNoteBuilder.setContentText(text);
+    /**
+     * @param updateText whether the new notification should update its chronometer.
+     *                   Use {@code false} if you are updating everything else about the notification,
+     *                   e.g. you just want to refresh the actions due to a start/pause state change.
+     */
+    public void updateNotification(boolean updateText) {
+        if (updateText) {
+            CharSequence text = mDelegate.formatElapsedTime(SystemClock.elapsedRealtime(), mResources);
+            mNoteBuilder.setContentText(text);
+        }
         mNotificationManager.notify(mNoteTag, mNoteId, mNoteBuilder.build());
     }
 
