@@ -101,9 +101,6 @@ public class StopwatchNotificationService extends ChronometerNotificationService
         // says and tell StopwatchFragment to stop itself. The latter would also stop the
         // chronometer view if the fragment is still in view (i.e. app is still open).
         mLapsTableUpdateHandler.asyncClear();
-        // TODO: When stopping the stopwatch from the fragment, send an intent to this service
-        // with the stop action specified. We will end up making the above calls twice, since
-        // they would be called in the fragment already, but that's not an issue to worry about too much.
         stopSelf();
     }
 

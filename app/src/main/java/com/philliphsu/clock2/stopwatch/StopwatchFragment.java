@@ -314,7 +314,6 @@ public class StopwatchFragment extends RecyclerViewFragment<
         // ----------------------------------------------------------------------
         mCurrentLap = null;
         mPreviousLap = null;
-        mUpdateHandler.asyncClear(); // Clear laps
         // No issues controlling the animator here, because onLoadFinished() can't
         // call through to startNewProgressBarAnimator(), because by that point
         // the chronometer won't be running.
@@ -322,10 +321,37 @@ public class StopwatchFragment extends RecyclerViewFragment<
             mProgressAnimator.end();
         }
         mProgressAnimator = null;
+
+        // ---------------------------------------------------------------------------------------
+        // TOneverDO: Leave these up to StopwatchNotificationService for ACTION_STOP.
+        // Even though the service calls these for us, we MUST still keep these here;
+        // otherwise, updateAllFabs() won't restore the activity FAB icon back to the start icon.
+        // Possible reasons for why this happens:
+        // * BOTH SharedPreferences.Editor#apply() and #commit() return before the prefs are actually
+        // written to file, so updateAllFabs() is still reading the old value of KEY_CHRONOMETER_RUNNING.
+        // But doesn't #commit() block until the write is complete?
+        // * The SharedPreferences instances between this Fragment and the Service were created with
+        // different Contexts, so editing an instance applies the changes to that Context only. It
+        // is only until a "refresh" occurs (e.g. app restart) that the values are synced between
+        // Contexts?
+        // * Different thread execution orders between the thread used by the Service and the main
+        // thread here? But isn't the Service's handleStopAction() being called by the main thread?
+        // The only worker thread is for updating the notification periodically...
+        mUpdateHandler.asyncClear();
         savePrefs();
+        // ---------------------------------------------------------------------------------------
+
+        // ---------------------------------------------------------------------------------------
         // TOneverDO: Precede savePrefs(), or else we don't save false to KEY_CHRONOMETER_RUNNING
-        /// and updateFab will update the wrong icon.
+        // and updateFab will update the wrong icon.
         updateAllFabs();
+        // ---------------------------------------------------------------------------------------
+
+        // Remove the notification. This will also write to prefs and clear the laps table again,
+        // but we probably won't notice a performance penalty...
+        Intent stop = new Intent(getActivity(), StopwatchNotificationService.class)
+                .setAction(StopwatchNotificationService.ACTION_STOP);
+        getActivity().startService(stop);
     }
 
     private void updateAllFabs() {
@@ -349,6 +375,7 @@ public class StopwatchFragment extends RecyclerViewFragment<
     }
 
     private void updateFab() {
+        Log.d(TAG, "Running? " + isStopwatchRunning());
         mActivityFab.get().setImageDrawable(isStopwatchRunning() ? mPauseDrawable : mStartDrawable);
     }
 
