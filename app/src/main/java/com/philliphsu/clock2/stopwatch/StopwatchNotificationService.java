@@ -68,10 +68,18 @@ public class StopwatchNotificationService extends ChronometerNotificationService
     @Override
     protected void handleStartPauseAction(Intent intent, int flags, long startId) {
         // TODO: Tell StopwatchFragment to start/pause itself.. perhaps with an Intent?
-        boolean running = mPrefs.getBoolean(StopwatchFragment.KEY_CHRONOMETER_RUNNING, false);
+        boolean running = mPrefs.getBoolean("KEY_RUNNING", false);
         syncNotificationWithStopwatchState(!running);
         SharedPreferences.Editor editor = mPrefs.edit();
-        editor.putBoolean(StopwatchFragment.KEY_CHRONOMETER_RUNNING, !running);
+        editor.putBoolean("KEY_RUNNING", !running);
+        if (running) {
+            editor.putLong("key_pause_time", SystemClock.elapsedRealtime());
+        } else {
+            long startTime = mPrefs.getLong("key_start_time", 0);
+            long pauseTime = mPrefs.getLong("key_pause_time", 0);
+            editor.putLong("key_start_time", startTime + SystemClock.elapsedRealtime() - pauseTime);
+        }
+        editor.apply();
     }
 
     @Override

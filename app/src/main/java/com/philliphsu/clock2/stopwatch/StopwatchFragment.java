@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
@@ -37,22 +36,17 @@ public class StopwatchFragment extends RecyclerViewFragment<
         LapsAdapter> {
     private static final String TAG = "StopwatchFragment";
 
-    // Exposed for StopwatchNotificationService
-    static final String KEY_START_TIME = "start_time";
-    static final String KEY_PAUSE_TIME = "pause_time";
-    static final String KEY_CHRONOMETER_RUNNING = "chronometer_running";
-
-    private long mStartTime;
-    private long mPauseTime;
-    private Lap mCurrentLap;
-    private Lap mPreviousLap;
-
-    private AsyncLapsTableUpdateHandler mUpdateHandler;
     private ObjectAnimator mProgressAnimator;
-    private SharedPreferences mPrefs;
     private WeakReference<FloatingActionButton> mActivityFab;
     private Drawable mStartDrawable;
     private Drawable mPauseDrawable;
+    // TODO: Actual subclass
+    private BaseStopwatchController mController;
+
+    // For read-only purposes within this Fragment.
+    // Actual changes are persisted by the controller.
+    private Lap mCurrentLap;
+    private Lap mPreviousLap;
 
     @Bind(R.id.chronometer) ChronometerWithMillis mChronometer;
     @Bind(R.id.new_lap) FloatingActionButton mNewLapButton;
@@ -67,12 +61,6 @@ public class StopwatchFragment extends RecyclerViewFragment<
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mUpdateHandler = new AsyncLapsTableUpdateHandler(getActivity(), null/*we shouldn't need a scroll handler*/);
-        mPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        mStartTime = mPrefs.getLong(KEY_START_TIME, 0);
-        mPauseTime = mPrefs.getLong(KEY_PAUSE_TIME, 0);
-        Log.d(TAG, "mStartTime = " + mStartTime
-                + ", mPauseTime = " + mPauseTime);
         // TODO: Will these be kept alive after onDestroyView()? If not, we should move these to
         // onCreateView() or any other callback that is guaranteed to be called.
         mStartDrawable = ContextCompat.getDrawable(getActivity(), R.drawable.ic_start_24dp);
@@ -85,21 +73,13 @@ public class StopwatchFragment extends RecyclerViewFragment<
         Log.d(TAG, "onCreateView()");
         View view = super.onCreateView(inflater, container, savedInstanceState);
 
-        mChronometer.setShowCentiseconds(true, true);
-        if (mStartTime > 0) {
-            long base = mStartTime;
-            if (mPauseTime > 0) {
-                base += SystemClock.elapsedRealtime() - mPauseTime;
-                // We're not done pausing yet, so don't reset mPauseTime.
-            }
-            mChronometer.setBase(base);
-        }
-        if (isStopwatchRunning()) {
-            mChronometer.start();
-            // Note: mChronometer.isRunning() will return false at this point and
-            // in other upcoming lifecycle methods because it is not yet visible
-            // (i.e. mVisible == false).
-        }
+        AsyncLapsTableUpdateHandler updateHandler = new AsyncLapsTableUpdateHandler(
+                getActivity(), null/*we shouldn't need a scroll handler*/);
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        // This can't be initialized until the layout is inflated, because we need the
+        // mChronometer reference for the controller.
+        mController = new StopwatchViewController(updateHandler, prefs, mChronometer);
+
         // The primary reason we call this is to show the mini FABs after rotate,
         // if the stopwatch is running. If the stopwatch is stopped, then this
         // would have hidden the mini FABs, if not for us already setting its
@@ -158,9 +138,6 @@ public class StopwatchFragment extends RecyclerViewFragment<
         if (mProgressAnimator != null) {
             mProgressAnimator.removeAllListeners();
         }
-        Log.d(TAG, "onDestroyView()");
-        Log.d(TAG, "mStartTime = " + mStartTime
-                + ", mPauseTime = " + mPauseTime);
     }
 
     @Override
@@ -203,7 +180,8 @@ public class StopwatchFragment extends RecyclerViewFragment<
             //
             // NOTE: If we just recreated ourselves due to rotation, mChronometer.isRunning() == false,
             // because it is not yet visible (i.e. mVisible == false).
-            if (isStopwatchRunning()) {
+            if (mController.isStopwatchRunning()) {
+                // TODO: I think we should just pass in the two laps as local params
                 startNewProgressBarAnimator();
             } else {
                 // I verified the bar was visible already without this, so we probably don't need this,
@@ -220,10 +198,7 @@ public class StopwatchFragment extends RecyclerViewFragment<
     @Override
     public void onFabClick() {
         if (mChronometer.isRunning()) {
-            mPauseTime = SystemClock.elapsedRealtime();
-            mChronometer.stop();
-            mCurrentLap.pause();
-            mUpdateHandler.asyncUpdate(mCurrentLap.getId(), mCurrentLap);
+            mController.pause();
             // No issues controlling the animator here, because onLoadFinished() can't
             // call through to startNewProgressBarAnimator(), because by that point
             // the chronometer won't be running.
@@ -234,20 +209,7 @@ public class StopwatchFragment extends RecyclerViewFragment<
                 mProgressAnimator.cancel();
             }
         } else {
-            if (mStartTime == 0) {
-                // addNewLap() won't call through unless chronometer is running, which
-                // we can't start until we compute mStartTime
-                mCurrentLap = new Lap();
-                mUpdateHandler.asyncInsert(mCurrentLap);
-            }
-            mStartTime += SystemClock.elapsedRealtime() - mPauseTime;
-            mPauseTime = 0;
-            mChronometer.setBase(mStartTime);
-            mChronometer.start();
-            if (!mCurrentLap.isRunning()) {
-                mCurrentLap.resume();
-                mUpdateHandler.asyncUpdate(mCurrentLap.getId(), mCurrentLap);
-            }
+            mController.run();
             // This animator instance will end up having end() called on it. When
             // the table update prompts us to requery, onLoadFinished will be called as a result.
             // There, it calls startNewProgressAnimator() to end this animation and starts an
@@ -257,7 +219,6 @@ public class StopwatchFragment extends RecyclerViewFragment<
 //            }
             getActivity().startService(new Intent(getActivity(), StopwatchNotificationService.class));
         }
-        savePrefs();
         // TOneverDO: Precede savePrefs(), or else we don't save false to KEY_CHRONOMETER_RUNNING
         /// and updateFab will update the wrong icon.
         updateAllFabs();
@@ -280,23 +241,7 @@ public class StopwatchFragment extends RecyclerViewFragment<
 
     @OnClick(R.id.new_lap)
     void addNewLap() {
-        if (!mChronometer.isRunning()) {
-            Log.d(TAG, "Cannot add new lap");
-            return;
-        }
-        if (mCurrentLap != null) {
-            mCurrentLap.end(mChronometer.getText().toString());
-        }
-        mPreviousLap = mCurrentLap;
-        mCurrentLap = new Lap();
-        if (mPreviousLap != null) {
-//            if (getAdapter().getItemCount() == 0) {
-//                mUpdateHandler.asyncInsert(mPreviousLap);
-//            } else {
-                mUpdateHandler.asyncUpdate(mPreviousLap.getId(), mPreviousLap);
-//            }
-        }
-        mUpdateHandler.asyncInsert(mCurrentLap);
+        mController.addNewLap(mChronometer.getText().toString());
         // This would end up being called twice: here, and in onLoadFinished(), because the
         // table updates will prompt us to requery.
 //        startNewProgressBarAnimator();
@@ -304,17 +249,13 @@ public class StopwatchFragment extends RecyclerViewFragment<
 
     @OnClick(R.id.stop)
     void stop() {
-        mChronometer.stop();
-        mChronometer.setBase(SystemClock.elapsedRealtime());
         // ----------------------------------------------------------------------
         // TOneverDO: Precede these with mProgressAnimator.end(), otherwise our
         // Animator.onAnimationEnd() callback won't hide SeekBar in time.
-        mStartTime = 0;
-        mPauseTime = 0;
+        mController.stop();
         // ----------------------------------------------------------------------
         mCurrentLap = null;
         mPreviousLap = null;
-        mUpdateHandler.asyncClear(); // Clear laps
         // No issues controlling the animator here, because onLoadFinished() can't
         // call through to startNewProgressBarAnimator(), because by that point
         // the chronometer won't be running.
@@ -322,7 +263,6 @@ public class StopwatchFragment extends RecyclerViewFragment<
             mProgressAnimator.end();
         }
         mProgressAnimator = null;
-        savePrefs();
         // TOneverDO: Precede savePrefs(), or else we don't save false to KEY_CHRONOMETER_RUNNING
         /// and updateFab will update the wrong icon.
         updateAllFabs();
@@ -342,14 +282,14 @@ public class StopwatchFragment extends RecyclerViewFragment<
     }
 
     private void updateMiniFabs() {
-        boolean started = mStartTime > 0;
+        boolean started = mController.getStopwatch().hasStarted();
         int vis = started ? View.VISIBLE : View.INVISIBLE;
         mNewLapButton.setVisibility(vis);
         mStopButton.setVisibility(vis);
     }
 
     private void updateFab() {
-        mActivityFab.get().setImageDrawable(isStopwatchRunning() ? mPauseDrawable : mStartDrawable);
+        mActivityFab.get().setImageDrawable(mController.isStopwatchRunning() ? mPauseDrawable : mStartDrawable);
     }
 
     private void startNewProgressBarAnimator() {
@@ -412,21 +352,6 @@ public class StopwatchFragment extends RecyclerViewFragment<
         if (mCurrentLap == null || mPreviousLap == null)
             return 0;
         return mPreviousLap.elapsed() - mCurrentLap.elapsed();
-    }
-
-    private void savePrefs() {
-        mPrefs.edit().putLong(KEY_START_TIME, mStartTime)
-                .putLong(KEY_PAUSE_TIME, mPauseTime)
-                .putBoolean(KEY_CHRONOMETER_RUNNING, mChronometer.isRunning())
-                .apply();
-    }
-
-    /**
-     * @return the state of the stopwatch when we're in a resumed and visible state,
-     * or when we're going through a rotation
-     */
-    private boolean isStopwatchRunning() {
-        return mChronometer.isRunning() || mPrefs.getBoolean(KEY_CHRONOMETER_RUNNING, false);
     }
 
     // ======================= DO NOT IMPLEMENT ============================
