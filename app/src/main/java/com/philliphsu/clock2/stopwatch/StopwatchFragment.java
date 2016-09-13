@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.animation.ObjectAnimator;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.SystemClock;
@@ -107,6 +108,7 @@ public class StopwatchFragment extends RecyclerViewFragment<
         // visibility to invisible in XML. We haven't initialized the WeakReference to
         // our Activity's FAB yet, so this call does nothing with the FAB.
         setMiniFabsVisible(isStopwatchRunning());
+        mPrefs.registerOnSharedPreferenceChangeListener(mPrefChangeListener);
         return view;
     }
 
@@ -162,6 +164,7 @@ public class StopwatchFragment extends RecyclerViewFragment<
         Log.d(TAG, "onDestroyView()");
         Log.d(TAG, "mStartTime = " + mStartTime
                 + ", mPauseTime = " + mPauseTime);
+        mPrefs.unregisterOnSharedPreferenceChangeListener(mPrefChangeListener);
     }
 
     @Override
@@ -220,50 +223,18 @@ public class StopwatchFragment extends RecyclerViewFragment<
 
     @Override
     public void onFabClick() {
-        final Intent serviceIntent = new Intent(getActivity(), StopwatchNotificationService.class);
-
         final boolean running = mChronometer.isRunning();
         syncFabIconWithStopwatchState(!running/*invert the current state*/);
 
-        if (running) {
-            mPauseTime = SystemClock.elapsedRealtime();
-            mChronometer.stop();
-            mCurrentLap.pause();
-            mUpdateHandler.asyncUpdate(mCurrentLap.getId(), mCurrentLap);
-            // No issues controlling the animator here, because onLoadFinished() can't
-            // call through to startNewProgressBarAnimator(), because by that point
-            // the chronometer won't be running.
-            if (mProgressAnimator != null) {
-                // We may as well call cancel(), since our resume() call would be
-                // rendered meaningless.
-//                mProgressAnimator.pause();
-                mProgressAnimator.cancel();
-            }
-        } else {
-            if (mStartTime == 0) {
-                // addNewLap() won't call through unless chronometer is running, which
-                // we can't start until we compute mStartTime
-                mCurrentLap = new Lap();
-                mUpdateHandler.asyncInsert(mCurrentLap);
-                setMiniFabsVisible(true);
-                // Handle the default action, i.e. post the notification for the first time.
-                getActivity().startService(serviceIntent);
-            }
-            mStartTime += SystemClock.elapsedRealtime() - mPauseTime;
-            mPauseTime = 0;
-            mChronometer.setBase(mStartTime);
-            mChronometer.start();
-            if (!mCurrentLap.isRunning()) {
-                mCurrentLap.resume();
-                mUpdateHandler.asyncUpdate(mCurrentLap.getId(), mCurrentLap);
-            }
-            // This animator instance will end up having end() called on it. When
-            // the table update prompts us to requery, onLoadFinished will be called as a result.
-            // There, it calls startNewProgressAnimator() to end this animation and starts an
-            // entirely new animator instance.
-//            if (mProgressAnimator != null) {
-//                mProgressAnimator.resume();
-//            }
+        final Intent serviceIntent = new Intent(getActivity(), StopwatchNotificationService.class);
+        if (mStartTime == 0) {
+            // addNewLap() won't call through unless chronometer is running, which
+            // we can't start until we compute mStartTime
+            mCurrentLap = new Lap();
+            mUpdateHandler.asyncInsert(mCurrentLap);
+            setMiniFabsVisible(true);
+            // Handle the default action, i.e. post the notification for the first time.
+            getActivity().startService(serviceIntent);
         }
         serviceIntent.setAction(StopwatchNotificationService.ACTION_START_PAUSE);
         getActivity().startService(serviceIntent);
@@ -333,9 +304,54 @@ public class StopwatchFragment extends RecyclerViewFragment<
         syncFabIconWithStopwatchState(false);
 
         // Remove the notification. This will also write to prefs and clear the laps table.
+        //
+        // The service will make changes to shared prefs, which will fire our
+        // OnSharedPrefChangeListener, which will call this stop() method. As such, this
+        // stop() method will be called twice: first from the click, and the second from
+        // the OnSharedPrefChange callback.
+        // TODO: Make similar changes as you did with onFabClick() so that the above method calls
+        // are made in the OnSharedPrefChange callback. You may find it helpful to extract
+        // the above method calls into private helper methods, just as you did for
+        // onFabClick().
         Intent stop = new Intent(getActivity(), StopwatchNotificationService.class)
                 .setAction(StopwatchNotificationService.ACTION_STOP);
         getActivity().startService(stop);
+    }
+
+    private void pauseStopwatch() {
+        mPauseTime = SystemClock.elapsedRealtime();
+        mChronometer.stop();
+        mCurrentLap.pause();
+        mUpdateHandler.asyncUpdate(mCurrentLap.getId(), mCurrentLap);
+        // No issues controlling the animator here, because onLoadFinished() can't
+        // call through to startNewProgressBarAnimator(), because by that point
+        // the chronometer won't be running.
+        if (mProgressAnimator != null) {
+            // We may as well call cancel(), since our resume() call would be
+            // rendered meaningless.
+//                mProgressAnimator.pause();
+            mProgressAnimator.cancel();
+        }
+        syncFabIconWithStopwatchState(false);
+    }
+
+    private void runStopwatch() {
+        mStartTime += SystemClock.elapsedRealtime() - mPauseTime;
+        mPauseTime = 0;
+        mChronometer.setBase(mStartTime);
+        mChronometer.start();
+        if (!mCurrentLap.isRunning()) {
+            mCurrentLap.resume();
+            mUpdateHandler.asyncUpdate(mCurrentLap.getId(), mCurrentLap);
+        }
+        // This animator instance will end up having end() called on it. When
+        // the table update prompts us to requery, onLoadFinished will be called as a result.
+        // There, it calls startNewProgressAnimator() to end this animation and starts an
+        // entirely new animator instance.
+//            if (mProgressAnimator != null) {
+//                mProgressAnimator.resume();
+//            }
+        syncFabIconWithStopwatchState(true);
     }
 
     private void setMiniFabsVisible(boolean visible) {
@@ -410,6 +426,7 @@ public class StopwatchFragment extends RecyclerViewFragment<
         return mPreviousLap.elapsed() - mCurrentLap.elapsed();
     }
 
+    // TODO: Delete.
     private void savePrefs() {
         mPrefs.edit().putLong(KEY_START_TIME, mStartTime)
                 .putLong(KEY_PAUSE_TIME, mPauseTime)
@@ -424,6 +441,43 @@ public class StopwatchFragment extends RecyclerViewFragment<
     private boolean isStopwatchRunning() {
         return mChronometer.isRunning() || mPrefs.getBoolean(KEY_CHRONOMETER_RUNNING, false);
     }
+
+    private final OnSharedPreferenceChangeListener mPrefChangeListener = new OnSharedPreferenceChangeListener() {
+        // TOneverDO: initial value >= 0
+        private long mNewStartTime = -1;
+        private long mNewPauseTime = -1;
+
+        @Override
+        public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+            // int instead of boolean because -1 indicates "uninitialized" better than false
+            int setRunningFlag = -1;
+
+            switch (key) {
+                case KEY_CHRONOMETER_RUNNING:
+                    setRunningFlag = sharedPreferences.getBoolean(key, false) ? 1 : 0;
+                    break;
+                case KEY_START_TIME:
+                    mNewStartTime = sharedPreferences.getLong(key, 0);
+                    break;
+                case KEY_PAUSE_TIME:
+                    mNewPauseTime = sharedPreferences.getLong(key, 0);
+                    break;
+            }
+
+            if (setRunningFlag == 0) {
+                if (mNewStartTime == 0 && mNewPauseTime == 0) {
+                    stop();
+                } else {
+                    pauseStopwatch();
+                }
+            } else if (setRunningFlag == 1) {
+                // We don't need to check the values of mNewStartTime and mNewPauseTime, because
+                // we don't need to deduce between different methods to call; this is the only method
+                // that runs the stopwatch.
+                runStopwatch();
+            }
+        }
+    };
 
     // ======================= DO NOT IMPLEMENT ============================
 
