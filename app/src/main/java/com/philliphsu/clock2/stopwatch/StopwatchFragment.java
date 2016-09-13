@@ -42,6 +42,7 @@ public class StopwatchFragment extends RecyclerViewFragment<
     static final String KEY_PAUSE_TIME = "pause_time";
     static final String KEY_CHRONOMETER_RUNNING = "chronometer_running";
 
+    // TODO: See if we can remove these? Since we save prefs in the notif. service.
     private long mStartTime;
     private long mPauseTime;
     private Lap mCurrentLap;
@@ -105,7 +106,7 @@ public class StopwatchFragment extends RecyclerViewFragment<
         // would have hidden the mini FABs, if not for us already setting its
         // visibility to invisible in XML. We haven't initialized the WeakReference to
         // our Activity's FAB yet, so this call does nothing with the FAB.
-        updateMiniFabs();
+        setMiniFabsVisible(isStopwatchRunning());
         return view;
     }
 
@@ -136,7 +137,7 @@ public class StopwatchFragment extends RecyclerViewFragment<
             // The reason when you open up the app for the first time and scrolling to page 2
             // doesn't prematurely change the icon is the savedInstanceState is null, and so
             // this call would be filtered out sufficiently just from the first check.
-            updateFab();
+            syncFabIconWithStopwatchState(isStopwatchRunning());
         }
     }
 
@@ -219,7 +220,12 @@ public class StopwatchFragment extends RecyclerViewFragment<
 
     @Override
     public void onFabClick() {
-        if (mChronometer.isRunning()) {
+        final Intent serviceIntent = new Intent(getActivity(), StopwatchNotificationService.class);
+
+        final boolean running = mChronometer.isRunning();
+        syncFabIconWithStopwatchState(!running/*invert the current state*/);
+
+        if (running) {
             mPauseTime = SystemClock.elapsedRealtime();
             mChronometer.stop();
             mCurrentLap.pause();
@@ -239,6 +245,9 @@ public class StopwatchFragment extends RecyclerViewFragment<
                 // we can't start until we compute mStartTime
                 mCurrentLap = new Lap();
                 mUpdateHandler.asyncInsert(mCurrentLap);
+                setMiniFabsVisible(true);
+                // Handle the default action, i.e. post the notification for the first time.
+                getActivity().startService(serviceIntent);
             }
             mStartTime += SystemClock.elapsedRealtime() - mPauseTime;
             mPauseTime = 0;
@@ -255,17 +264,15 @@ public class StopwatchFragment extends RecyclerViewFragment<
 //            if (mProgressAnimator != null) {
 //                mProgressAnimator.resume();
 //            }
-            getActivity().startService(new Intent(getActivity(), StopwatchNotificationService.class));
         }
-        savePrefs();
-        // TOneverDO: Precede savePrefs(), or else we don't save false to KEY_CHRONOMETER_RUNNING
-        /// and updateFab will update the wrong icon.
-        updateAllFabs();
+        serviceIntent.setAction(StopwatchNotificationService.ACTION_START_PAUSE);
+        getActivity().startService(serviceIntent);
     }
 
     @Override
     public void onPageSelected() {
-        updateAllFabs();
+        setMiniFabsVisible(mStartTime > 0);
+        syncFabIconWithStopwatchState(mStartTime > 0);
     }
 
     @Override
@@ -300,6 +307,7 @@ public class StopwatchFragment extends RecyclerViewFragment<
         // This would end up being called twice: here, and in onLoadFinished(), because the
         // table updates will prompt us to requery.
 //        startNewProgressBarAnimator();
+        // TODO: Start service with ACTION_ADD_LAP
     }
 
     @OnClick(R.id.stop)
@@ -321,62 +329,23 @@ public class StopwatchFragment extends RecyclerViewFragment<
             mProgressAnimator.end();
         }
         mProgressAnimator = null;
+        setMiniFabsVisible(false);
+        syncFabIconWithStopwatchState(false);
 
-        // ---------------------------------------------------------------------------------------
-        // TOneverDO: Leave these up to StopwatchNotificationService for ACTION_STOP.
-        // Even though the service calls these for us, we MUST still keep these here;
-        // otherwise, updateAllFabs() won't restore the activity FAB icon back to the start icon.
-        // Possible reasons for why this happens:
-        // * BOTH SharedPreferences.Editor#apply() and #commit() return before the prefs are actually
-        // written to file, so updateAllFabs() is still reading the old value of KEY_CHRONOMETER_RUNNING.
-        // But doesn't #commit() block until the write is complete?
-        // * The SharedPreferences instances between this Fragment and the Service were created with
-        // different Contexts, so editing an instance applies the changes to that Context only. It
-        // is only until a "refresh" occurs (e.g. app restart) that the values are synced between
-        // Contexts?
-        // * Different thread execution orders between the thread used by the Service and the main
-        // thread here? But isn't the Service's handleStopAction() being called by the main thread?
-        // The only worker thread is for updating the notification periodically...
-        mUpdateHandler.asyncClear();
-        savePrefs();
-        // ---------------------------------------------------------------------------------------
-
-        // ---------------------------------------------------------------------------------------
-        // TOneverDO: Precede savePrefs(), or else we don't save false to KEY_CHRONOMETER_RUNNING
-        // and updateFab will update the wrong icon.
-        updateAllFabs();
-        // ---------------------------------------------------------------------------------------
-
-        // Remove the notification. This will also write to prefs and clear the laps table again,
-        // but we probably won't notice a performance penalty...
+        // Remove the notification. This will also write to prefs and clear the laps table.
         Intent stop = new Intent(getActivity(), StopwatchNotificationService.class)
                 .setAction(StopwatchNotificationService.ACTION_STOP);
         getActivity().startService(stop);
     }
 
-    private void updateAllFabs() {
-        updateMiniFabs();
-        // TODO: If we're calling this method, then chances are we are visible.
-        // You can verify this yourself by finding all usages.
-        // isVisible() is good for filtering out calls to this method when this Fragment
-        // isn't actually visible to the user; however, a side effect is it also filters
-        // out calls to this method when this Fragment is rotated. Fortunately, we don't
-        // make any calls to this method after a rotation.
-        if (isVisible()) {
-            updateFab();
-        }
-    }
-
-    private void updateMiniFabs() {
-        boolean started = mStartTime > 0;
-        int vis = started ? View.VISIBLE : View.INVISIBLE;
+    private void setMiniFabsVisible(boolean visible) {
+        int vis = visible ? View.VISIBLE : View.INVISIBLE;
         mNewLapButton.setVisibility(vis);
         mStopButton.setVisibility(vis);
     }
 
-    private void updateFab() {
-        Log.d(TAG, "Running? " + isStopwatchRunning());
-        mActivityFab.get().setImageDrawable(isStopwatchRunning() ? mPauseDrawable : mStartDrawable);
+    private void syncFabIconWithStopwatchState(boolean running) {
+        mActivityFab.get().setImageDrawable(running ? mPauseDrawable : mStartDrawable);
     }
 
     private void startNewProgressBarAnimator() {
