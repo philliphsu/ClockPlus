@@ -243,7 +243,7 @@ public class StopwatchFragment extends RecyclerViewFragment<
     @Override
     public void onPageSelected() {
         setMiniFabsVisible(mStartTime > 0);
-        syncFabIconWithStopwatchState(mStartTime > 0);
+        syncFabIconWithStopwatchState(isStopwatchRunning());
     }
 
     @Override
