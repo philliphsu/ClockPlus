@@ -283,26 +283,6 @@ public class StopwatchFragment extends RecyclerViewFragment<
 
     @OnClick(R.id.stop)
     void stop() {
-        mChronometer.stop();
-        mChronometer.setBase(SystemClock.elapsedRealtime());
-        // ----------------------------------------------------------------------
-        // TOneverDO: Precede these with mProgressAnimator.end(), otherwise our
-        // Animator.onAnimationEnd() callback won't hide SeekBar in time.
-        mStartTime = 0;
-        mPauseTime = 0;
-        // ----------------------------------------------------------------------
-        mCurrentLap = null;
-        mPreviousLap = null;
-        // No issues controlling the animator here, because onLoadFinished() can't
-        // call through to startNewProgressBarAnimator(), because by that point
-        // the chronometer won't be running.
-        if (mProgressAnimator != null) {
-            mProgressAnimator.end();
-        }
-        mProgressAnimator = null;
-        setMiniFabsVisible(false);
-        syncFabIconWithStopwatchState(false);
-
         // Remove the notification. This will also write to prefs and clear the laps table.
         //
         // The service will make changes to shared prefs, which will fire our
@@ -362,6 +342,28 @@ public class StopwatchFragment extends RecyclerViewFragment<
 //                mProgressAnimator.resume();
 //            }
         syncFabIconWithStopwatchState(true);
+    }
+
+    private void resetStopwatch() {
+        mChronometer.stop();
+        mChronometer.setBase(SystemClock.elapsedRealtime());
+        // ----------------------------------------------------------------------
+        // TOneverDO: Precede these with mProgressAnimator.end(), otherwise our
+        // Animator.onAnimationEnd() callback won't hide SeekBar in time.
+        mStartTime = 0;
+        mPauseTime = 0;
+        // ----------------------------------------------------------------------
+        mCurrentLap = null;
+        mPreviousLap = null;
+        // No issues controlling the animator here, because onLoadFinished() can't
+        // call through to startNewProgressBarAnimator(), because by that point
+        // the chronometer won't be running.
+        if (mProgressAnimator != null) {
+            mProgressAnimator.end();
+        }
+        mProgressAnimator = null;
+        setMiniFabsVisible(false);
+        syncFabIconWithStopwatchState(false);
     }
 
     private void setMiniFabsVisible(boolean visible) {
@@ -456,13 +458,6 @@ public class StopwatchFragment extends RecyclerViewFragment<
         @Override
         public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
             Log.d(TAG, "Pref " + key + " changed");
-            // int instead of boolean because -1 indicates "uninitialized" better than false
-            // TODO: I think we should read the KEY_CHRONOMETER_RUNNING flag instead, espeicially
-            // when we refactor the stop() method to be called here. The only reason clicking
-            // on the stop fab is doing what we expect is because we control everything there.
-//            int setRunningFlag = -1;
-//            boolean running = sharedPreferences.getBoolean(key, false);
-
             switch (key) {
                 case KEY_CHRONOMETER_RUNNING:
                     // The value of running tells us what state the stopwatch *should be set to*.
@@ -471,6 +466,20 @@ public class StopwatchFragment extends RecyclerViewFragment<
                         runStopwatch();
                     } else {
                         Log.d(TAG, "Pausing stopwatch");
+                        // TODO: If your claim that there is no defined order with which this
+                        // callback fires is true, then you need to be wary of the following
+                        // scenario:
+                        // The value of KEY_START_TIME is changed to zero, and happens before the
+                        // change to the value of KEY_CHRONOMETER_RUNNING. Therefore, resetStopwatch()
+                        // is called, and within that call, mCurrentLap is set to null. When the
+                        // value of KEY_CHRONOMETER_RUNNING changes to false sometime later in the future,
+                        // pauseStopwatch() is called, and within that call, mCurrentLap.pause() is
+                        // called--this will result in a NPE.
+                        //
+                        // However, it appears the change to the value of KEY_CHRONOMETER_RUNNING
+                        // always happens first. So pauseStopwatch() is called first, and then
+                        // resetStopwatch() follows shortly after. This is acceptable and produces
+                        // the desired result.
                         pauseStopwatch();
                     }
                     break;
@@ -480,7 +489,8 @@ public class StopwatchFragment extends RecyclerViewFragment<
                     // the change to that value may not have occurred before this point;
                     // we cannot rely on there being a defined order with which this callback fires.
                     if (sharedPreferences.getLong(key, 0) == 0) {
-                        stop();
+                        Log.d(TAG, "Resetting stopwatch");
+                        resetStopwatch();
                     }
                     break;
                 case KEY_PAUSE_TIME:
