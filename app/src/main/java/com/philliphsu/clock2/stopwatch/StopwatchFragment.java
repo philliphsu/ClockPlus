@@ -320,6 +320,16 @@ public class StopwatchFragment extends RecyclerViewFragment<
 
     private void pauseStopwatch() {
         mPauseTime = SystemClock.elapsedRealtime();
+        // If the app is currently not visible, then the chronometer was already stopped
+        // when we left the app. The next time we resume the app, the chronometer will show
+        // the elapsed time as it was when we first left the app.
+        // As such, we manually update the text no matter what the app's state is in.
+        mChronometer.setBase(mStartTime);
+        // If the app is currently not visible, then this will not call through.
+        // This is because the Chronometer's visibility changed when we left the app,
+        // so updateRunning() was already called to stop the running.
+        // stop() will also make a call to updateRunning(), but the running state has not
+        // changed from the time we left the app.
         mChronometer.stop();
         mCurrentLap.pause();
         mUpdateHandler.asyncUpdate(mCurrentLap.getId(), mCurrentLap);
@@ -443,38 +453,42 @@ public class StopwatchFragment extends RecyclerViewFragment<
     }
 
     private final OnSharedPreferenceChangeListener mPrefChangeListener = new OnSharedPreferenceChangeListener() {
-        // TOneverDO: initial value >= 0
-        private long mNewStartTime = -1;
-        private long mNewPauseTime = -1;
-
         @Override
         public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+            Log.d(TAG, "Pref " + key + " changed");
             // int instead of boolean because -1 indicates "uninitialized" better than false
-            int setRunningFlag = -1;
+            // TODO: I think we should read the KEY_CHRONOMETER_RUNNING flag instead, espeicially
+            // when we refactor the stop() method to be called here. The only reason clicking
+            // on the stop fab is doing what we expect is because we control everything there.
+//            int setRunningFlag = -1;
+//            boolean running = sharedPreferences.getBoolean(key, false);
 
             switch (key) {
                 case KEY_CHRONOMETER_RUNNING:
-                    setRunningFlag = sharedPreferences.getBoolean(key, false) ? 1 : 0;
+                    // The value of running tells us what state the stopwatch *should be set to*.
+                    if (sharedPreferences.getBoolean(key, false)) {
+                        Log.d(TAG, "Running stopwatch");
+                        runStopwatch();
+                    } else {
+                        Log.d(TAG, "Pausing stopwatch");
+                        pauseStopwatch();
+                    }
                     break;
                 case KEY_START_TIME:
-                    mNewStartTime = sharedPreferences.getLong(key, 0);
+                    // This is the best indication that the stopwatch should be stopped.
+                    // We shouldn't depend on the value of KEY_CHRONOMETER_RUNNING, because
+                    // the change to that value may not have occurred before this point;
+                    // we cannot rely on there being a defined order with which this callback fires.
+                    if (sharedPreferences.getLong(key, 0) == 0) {
+                        stop();
+                    }
                     break;
                 case KEY_PAUSE_TIME:
-                    mNewPauseTime = sharedPreferences.getLong(key, 0);
+                    // In terms of the UI, we don't need to react to a change to the pause time.
+                    // A change in the pause time is associated with the stopwatch changing its
+                    // running state; as such, the UI can be handled when we react
+                    // to a change to the value of KEY_CHRONOMETER_RUNNING.
                     break;
-            }
-
-            if (setRunningFlag == 0) {
-                if (mNewStartTime == 0 && mNewPauseTime == 0) {
-                    stop();
-                } else {
-                    pauseStopwatch();
-                }
-            } else if (setRunningFlag == 1) {
-                // We don't need to check the values of mNewStartTime and mNewPauseTime, because
-                // we don't need to deduce between different methods to call; this is the only method
-                // that runs the stopwatch.
-                runStopwatch();
             }
         }
     };
