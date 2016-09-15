@@ -206,6 +206,8 @@
 
     <string name="stopwatch">Stopwatch</string>
     <string name="lap">Lap</string>
+    <!-- The notification title to use when there are laps in a stopwatch timing. An example is "Stopwatch - Lap 2". -->
+    <string name="stopwatch_and_lap_number">Stopwatch \u002d Lap %1$d</string>
 
     <!-- https://android.googlesource.com/platform/frameworks/base/+/master/core/res/res/values/strings.xml -->
     <!-- The representation of a time duration when negative. An example is -1:14. This can be used with a countdown timer for example.-->

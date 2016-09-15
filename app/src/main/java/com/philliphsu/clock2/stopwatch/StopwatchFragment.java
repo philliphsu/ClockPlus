@@ -46,10 +46,7 @@ public class StopwatchFragment extends RecyclerViewFragment<
     // TODO: See if we can remove these? Since we save prefs in the notif. service.
     private long mStartTime;
     private long mPauseTime;
-    private Lap mCurrentLap;
-    private Lap mPreviousLap;
 
-    private AsyncLapsTableUpdateHandler mUpdateHandler;
     private ObjectAnimator mProgressAnimator;
     private SharedPreferences mPrefs;
     private WeakReference<FloatingActionButton> mActivityFab;
@@ -69,7 +66,6 @@ public class StopwatchFragment extends RecyclerViewFragment<
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mUpdateHandler = new AsyncLapsTableUpdateHandler(getActivity(), null/*we shouldn't need a scroll handler*/);
         mPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
         mStartTime = mPrefs.getLong(KEY_START_TIME, 0);
         mPauseTime = mPrefs.getLong(KEY_PAUSE_TIME, 0);
@@ -79,6 +75,8 @@ public class StopwatchFragment extends RecyclerViewFragment<
         // onCreateView() or any other callback that is guaranteed to be called.
         mStartDrawable = ContextCompat.getDrawable(getActivity(), R.drawable.ic_start_24dp);
         mPauseDrawable = ContextCompat.getDrawable(getActivity(), R.drawable.ic_pause_24dp);
+
+        // TODO: Load the current lap here
     }
 
     @Nullable
@@ -184,15 +182,17 @@ public class StopwatchFragment extends RecyclerViewFragment<
         // TODO: Will manipulating the cursor's position here affect the current
         // position in the adapter? Should we make a defensive copy and manipulate
         // that copy instead?
+        Lap currentLap = null;
+        Lap previousLap = null;
         if (data.moveToFirst()) {
-            mCurrentLap = data.getItem();
+            currentLap = data.getItem();
 //            Log.d(TAG, "Current lap ID = " + mCurrentLap.getId());
         }
         if (data.moveToNext()) {
-            mPreviousLap = data.getItem();
+            previousLap = data.getItem();
 //            Log.d(TAG, "Previous lap ID = " + mPreviousLap.getId());
         }
-        if (mCurrentLap != null && mPreviousLap != null) {
+        if (currentLap != null && previousLap != null) {
             // We really only want to start a new animator when the NEWLY RETRIEVED current
             // and previous laps are different (i.e. different laps, NOT merely different instances)
             // from the CURRENT current and previous laps, as referenced by mCurrentLap and mPreviousLap.
@@ -208,13 +208,13 @@ public class StopwatchFragment extends RecyclerViewFragment<
             // NOTE: If we just recreated ourselves due to rotation, mChronometer.isRunning() == false,
             // because it is not yet visible (i.e. mVisible == false).
             if (isStopwatchRunning()) {
-                startNewProgressBarAnimator();
+                startNewProgressBarAnimator(currentLap, previousLap);
             } else {
                 // I verified the bar was visible already without this, so we probably don't need this,
                 // but it's just a safety measure..
                 // ACTUALLY NOT A SAFETY MEASURE!
 //                mSeekBar.setVisibility(View.VISIBLE);
-                ProgressBarUtils.setProgress(mSeekBar, getCurrentLapProgressRatio());
+                ProgressBarUtils.setProgress(mSeekBar, getCurrentLapProgressRatio(currentLap, previousLap));
             }
         } else {
             mSeekBar.setVisibility(View.INVISIBLE);
@@ -228,10 +228,6 @@ public class StopwatchFragment extends RecyclerViewFragment<
 
         final Intent serviceIntent = new Intent(getActivity(), StopwatchNotificationService.class);
         if (mStartTime == 0) {
-            // addNewLap() won't call through unless chronometer is running, which
-            // we can't start until we compute mStartTime
-            mCurrentLap = new Lap();
-            mUpdateHandler.asyncInsert(mCurrentLap);
             setMiniFabsVisible(true);
             // Handle the default action, i.e. post the notification for the first time.
             getActivity().startService(serviceIntent);
@@ -258,41 +254,14 @@ public class StopwatchFragment extends RecyclerViewFragment<
 
     @OnClick(R.id.new_lap)
     void addNewLap() {
-        if (!mChronometer.isRunning()) {
-            Log.d(TAG, "Cannot add new lap");
-            return;
-        }
-        if (mCurrentLap != null) {
-            mCurrentLap.end(mChronometer.getText().toString());
-        }
-        mPreviousLap = mCurrentLap;
-        mCurrentLap = new Lap();
-        if (mPreviousLap != null) {
-//            if (getAdapter().getItemCount() == 0) {
-//                mUpdateHandler.asyncInsert(mPreviousLap);
-//            } else {
-                mUpdateHandler.asyncUpdate(mPreviousLap.getId(), mPreviousLap);
-//            }
-        }
-        mUpdateHandler.asyncInsert(mCurrentLap);
-        // This would end up being called twice: here, and in onLoadFinished(), because the
-        // table updates will prompt us to requery.
-//        startNewProgressBarAnimator();
-        // TODO: Start service with ACTION_ADD_LAP
+        Intent serviceIntent = new Intent(getActivity(), StopwatchNotificationService.class)
+                .setAction(StopwatchNotificationService.ACTION_ADD_LAP);
+        getActivity().startService(serviceIntent);
     }
 
     @OnClick(R.id.stop)
     void stop() {
         // Remove the notification. This will also write to prefs and clear the laps table.
-        //
-        // The service will make changes to shared prefs, which will fire our
-        // OnSharedPrefChangeListener, which will call this stop() method. As such, this
-        // stop() method will be called twice: first from the click, and the second from
-        // the OnSharedPrefChange callback.
-        // TODO: Make similar changes as you did with onFabClick() so that the above method calls
-        // are made in the OnSharedPrefChange callback. You may find it helpful to extract
-        // the above method calls into private helper methods, just as you did for
-        // onFabClick().
         Intent stop = new Intent(getActivity(), StopwatchNotificationService.class)
                 .setAction(StopwatchNotificationService.ACTION_STOP);
         getActivity().startService(stop);
@@ -311,8 +280,6 @@ public class StopwatchFragment extends RecyclerViewFragment<
         // stop() will also make a call to updateRunning(), but the running state has not
         // changed from the time we left the app.
         mChronometer.stop();
-        mCurrentLap.pause();
-        mUpdateHandler.asyncUpdate(mCurrentLap.getId(), mCurrentLap);
         // No issues controlling the animator here, because onLoadFinished() can't
         // call through to startNewProgressBarAnimator(), because by that point
         // the chronometer won't be running.
@@ -330,10 +297,6 @@ public class StopwatchFragment extends RecyclerViewFragment<
         mPauseTime = 0;
         mChronometer.setBase(mStartTime);
         mChronometer.start();
-        if (!mCurrentLap.isRunning()) {
-            mCurrentLap.resume();
-            mUpdateHandler.asyncUpdate(mCurrentLap.getId(), mCurrentLap);
-        }
         // This animator instance will end up having end() called on it. When
         // the table update prompts us to requery, onLoadFinished will be called as a result.
         // There, it calls startNewProgressAnimator() to end this animation and starts an
@@ -353,8 +316,6 @@ public class StopwatchFragment extends RecyclerViewFragment<
         mStartTime = 0;
         mPauseTime = 0;
         // ----------------------------------------------------------------------
-        mCurrentLap = null;
-        mPreviousLap = null;
         // No issues controlling the animator here, because onLoadFinished() can't
         // call through to startNewProgressBarAnimator(), because by that point
         // the chronometer won't be running.
@@ -376,8 +337,8 @@ public class StopwatchFragment extends RecyclerViewFragment<
         mActivityFab.get().setImageDrawable(running ? mPauseDrawable : mStartDrawable);
     }
 
-    private void startNewProgressBarAnimator() {
-        final long timeRemaining = remainingTimeBetweenLaps();
+    private void startNewProgressBarAnimator(Lap currentLap, Lap previousLap) {
+        final long timeRemaining = remainingTimeBetweenLaps(currentLap, previousLap);
         if (timeRemaining <= 0) {
             mSeekBar.setVisibility(View.INVISIBLE);
             return;
@@ -388,8 +349,8 @@ public class StopwatchFragment extends RecyclerViewFragment<
         // This can't go in the onAnimationStart() callback because the listener is added
         // AFTER ProgressBarUtils.startNewAnimator() starts the animation.
         mSeekBar.setVisibility(View.VISIBLE);
-        mProgressAnimator = ProgressBarUtils.startNewAnimator(
-                mSeekBar, getCurrentLapProgressRatio(), timeRemaining);
+        mProgressAnimator = ProgressBarUtils.startNewAnimator(mSeekBar,
+                getCurrentLapProgressRatio(currentLap, previousLap), timeRemaining);
         mProgressAnimator.addListener(new Animator.AnimatorListener() {
             private boolean cancelled;
 
@@ -424,26 +385,18 @@ public class StopwatchFragment extends RecyclerViewFragment<
         });
     }
 
-    private double getCurrentLapProgressRatio() {
-        if (mPreviousLap == null)
+    private double getCurrentLapProgressRatio(Lap currentLap, Lap previousLap) {
+        if (previousLap == null)
             return 0;
         // The cast is necessary, or else we'd have integer division between two longs and we'd
         // always get zero since the numerator will always be less than the denominator.
-        return remainingTimeBetweenLaps() / (double) mPreviousLap.elapsed();
+        return remainingTimeBetweenLaps(currentLap, previousLap) / (double) previousLap.elapsed();
     }
 
-    private long remainingTimeBetweenLaps() {
-        if (mCurrentLap == null || mPreviousLap == null)
+    private long remainingTimeBetweenLaps(Lap currentLap, Lap previousLap) {
+        if (currentLap == null || previousLap == null)
             return 0;
-        return mPreviousLap.elapsed() - mCurrentLap.elapsed();
-    }
-
-    // TODO: Delete.
-    private void savePrefs() {
-        mPrefs.edit().putLong(KEY_START_TIME, mStartTime)
-                .putLong(KEY_PAUSE_TIME, mPauseTime)
-                .putBoolean(KEY_CHRONOMETER_RUNNING, mChronometer.isRunning())
-                .apply();
+        return previousLap.elapsed() - currentLap.elapsed();
     }
 
     /**
