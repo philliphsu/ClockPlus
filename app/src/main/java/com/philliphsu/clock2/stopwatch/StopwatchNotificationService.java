@@ -41,6 +41,23 @@ public class StopwatchNotificationService extends ChronometerNotificationService
     }
 
     @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        // The base implementation returns START_STICKY, so this null intent
+        // signifies that the service is being recreated after its process
+        // had ended previously.
+        if (intent == null) {
+            // Start the ticking again, leaving everything else in the notification
+            // as it was.
+            Log.d(TAG, "Recreated service, starting chronometer again.");
+            startChronometer();
+        }
+        // If this service is being recreated and the above if-block called through,
+        // then the call to super won't run any commands, because it will see
+        // that the intent is null.
+        return super.onStartCommand(intent, flags, startId);
+    }
+
+    @Override
     public void onDestroy() {
         super.onDestroy();
         // After being cancelled due to time being up, sometimes the active timer notification posts again
@@ -168,8 +185,15 @@ public class StopwatchNotificationService extends ChronometerNotificationService
 
         quitCurrentThread();
         if (running) {
-            long startTime = mPrefs.getLong(StopwatchFragment.KEY_START_TIME, SystemClock.elapsedRealtime());
-            startNewThread(0, startTime);
+            startChronometer();
         }
+    }
+
+    /**
+     * Reads the value of KEY_START_TIME and passes it to {@link #startNewThread(int, long)} for you.
+     */
+    private void startChronometer() {
+        long startTime = mPrefs.getLong(StopwatchFragment.KEY_START_TIME, SystemClock.elapsedRealtime());
+        startNewThread(0, startTime);
     }
 }
