@@ -52,7 +52,7 @@ public class ChronometerNotificationThread extends HandlerThread {
                                          @NonNull NotificationManager manager,
                                          @NonNull NotificationCompat.Builder builder,
                                          @Nullable Resources resources,
-                                         @NonNull String noteTag,
+                                         @NonNull String noteTag, // TODO: remove param
                                          int noteId) {
         super(TAG);
         mDelegate = delegate;
@@ -93,7 +93,7 @@ public class ChronometerNotificationThread extends HandlerThread {
             CharSequence text = mDelegate.formatElapsedTime(SystemClock.elapsedRealtime(), mResources);
             mNoteBuilder.setContentText(text);
         }
-        mNotificationManager.notify(mNoteTag, mNoteId, mNoteBuilder.build());
+        mNotificationManager.notify(mNoteId, mNoteBuilder.build());
     }
 
     @Override

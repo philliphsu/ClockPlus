@@ -48,8 +48,18 @@ public abstract class ChronometerNotificationService extends Service {
      * @return a tag associated with the notification. The default implementation returns the
      * name of this class.
      */
+    @Deprecated
     protected String getNoteTag() {
         return getClass().getName();
+    }
+
+    /**
+     * @return the id for the foreground notification
+     */
+    protected int getNoteId() {
+        // TODO: Abstract this and override in TimerNotificationService. Currently only
+        // StopwatchNotificationService implements this.
+        return 0;
     }
 
     /**
@@ -83,6 +93,7 @@ public abstract class ChronometerNotificationService extends Service {
                 .setShowWhen(false)
                 .setOngoing(true)
                 .setContentIntent(getContentIntent());
+        startForeground(getNoteId(), mNoteBuilder.build());
         mDelegate.init();
         mDelegate.setCountDown(isCountDown());
     }
@@ -149,7 +160,7 @@ public abstract class ChronometerNotificationService extends Service {
      * @param noteId the id with which the thread created here will be posting notifications.
      * @param base the new base time of the chronometer
      */
-    public void startNewThread(int noteId, long base) {
+    public void startNewThread(int noteId/*TODO remove*/, long base) {
         // An instance of Thread cannot be started more than once. You must create
         // a new instance if you want to start the Thread's work again.
         mThread = new ChronometerNotificationThread(
@@ -158,7 +169,7 @@ public abstract class ChronometerNotificationService extends Service {
                 mNoteBuilder,
                 getResources(),
                 getNoteTag(),
-                noteId);
+                getNoteId());
         // Initializes this thread as a looper. HandlerThread.run() will be executed
         // in this thread.
         // This gives you a chance to create handlers that then reference this looper,
@@ -237,10 +248,10 @@ public abstract class ChronometerNotificationService extends Service {
     }
 
     /**
-     * Cancels the notification with the pair ({@link #getNoteTag() tag}, id)
+     * Cancels the foreground notification.
      */
-    protected final void cancelNotification(int id) {
-        mNotificationManager.cancel(getNoteTag(), id);
+    protected final void cancelNotification(int id/*TODO remove*/) {
+        mNotificationManager.cancel(getNoteId());
     }
 
     /**

@@ -30,13 +30,11 @@ public class StopwatchNotificationService extends ChronometerNotificationService
     @Override
     public void onCreate() {
         super.onCreate();
+        setContentTitle(getString(R.string.stopwatch));
         mUpdateHandler = new AsyncLapsTableUpdateHandler(this, null);
         mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
         mDelegate.init();
         mDelegate.setShowCentiseconds(true, false);
-        setContentTitle(getString(R.string.stopwatch));
-        // TODO: I think we can make this a foreground service so even
-        // if the process is killed, this service remains alive.
     }
 
     @Override
@@ -82,7 +80,7 @@ public class StopwatchNotificationService extends ChronometerNotificationService
         // our thread has enough leeway to sneak in a final call to post the notification before it
         // is actually quit().
         // As such, try cancelling the notification with this (tag, id) pair again.
-        cancelNotification(0);
+//        cancelNotification(0);
     }
 
     @Override
@@ -101,6 +99,11 @@ public class StopwatchNotificationService extends ChronometerNotificationService
     @Override
     protected boolean isCountDown() {
         return false;
+    }
+
+    @Override
+    protected int getNoteId() {
+        return R.id.stopwatch_notification_service;
     }
 
     @Override
@@ -197,17 +200,8 @@ public class StopwatchNotificationService extends ChronometerNotificationService
 
         quitCurrentThread();
         if (running) {
-//            startChronometer();
             long startTime = mPrefs.getLong(StopwatchFragment.KEY_START_TIME, SystemClock.elapsedRealtime());
             startNewThread(0, startTime);
         }
     }
-
-//    /**
-//     * Reads the value of KEY_START_TIME and passes it to {@link #startNewThread(int, long)} for you.
-//     */
-//    private void startChronometer() {
-//        long startTime = mPrefs.getLong(StopwatchFragment.KEY_START_TIME, SystemClock.elapsedRealtime());
-//        startNewThread(0, startTime);
-//    }
 }

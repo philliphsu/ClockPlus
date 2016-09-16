@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <item type="id" name="ringtone_service_notification"/>
+    <item type="id" name="stopwatch_notification_service"/>
+    <item type="id" name="timer_notification_service"/>
 </resources>
