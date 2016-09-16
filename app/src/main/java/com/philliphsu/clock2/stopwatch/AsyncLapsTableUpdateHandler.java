@@ -16,7 +16,7 @@ public class AsyncLapsTableUpdateHandler extends AsyncDatabaseTableUpdateHandler
     }
 
     @Override
-    protected LapsTableManager getTableManager(Context context) {
+    protected LapsTableManager onCreateTableManager(Context context) {
         return new LapsTableManager(context);
     }
 

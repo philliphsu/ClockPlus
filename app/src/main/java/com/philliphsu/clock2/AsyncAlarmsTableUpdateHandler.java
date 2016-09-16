@@ -31,7 +31,7 @@ public final class AsyncAlarmsTableUpdateHandler extends AsyncDatabaseTableUpdat
     }
 
     @Override
-    protected AlarmsTableManager getTableManager(Context context) {
+    protected AlarmsTableManager onCreateTableManager(Context context) {
         return new AlarmsTableManager(context);
     }
 

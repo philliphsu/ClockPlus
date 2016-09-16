@@ -25,7 +25,7 @@ public abstract class AsyncDatabaseTableUpdateHandler<
     public AsyncDatabaseTableUpdateHandler(Context context, ScrollHandler scrollHandler) {
         mAppContext = context.getApplicationContext(); // to prevent memory leaks
         mScrollHandler = scrollHandler;
-        mTableManager = getTableManager(context);
+        mTableManager = onCreateTableManager(context);
     }
 
     public final void asyncInsert(final T item) {
@@ -63,14 +63,15 @@ public abstract class AsyncDatabaseTableUpdateHandler<
         }.execute();
     }
 
+    public final TM getTableManager() {
+        return mTableManager;
+    }
+
     protected final Context getContext() {
         return mAppContext;
     }
 
-    // TODO: Consider giving a base impl that returns our mTableManager field.
-    // Subclasses will check if this base impl is null before creating and returning
-    // a new instance of the TableManager.
-    protected abstract TM getTableManager(Context context);
+    protected abstract TM onCreateTableManager(Context context);
 
     protected abstract void onPostAsyncDelete(Integer result, T item);
 

@@ -43,6 +43,16 @@ public class LapsTableManager extends DatabaseTableManager<Lap> {
 //        return cursor;
 //    }
 
+    public LapCursor queryCurrentLap() {
+        // The default sort order for the laps table is ID descending.
+        // Normally, not specifying a where clause would return all rows.
+        // Here, we limit the result to 1.
+        // This has the effect of retrieving the row with the highest ID value.
+        LapCursor c = queryItems(null, "1");
+        c.moveToFirst();
+        return c;
+    }
+
     @Override
     protected String getTableName() {
         return LapsTable.TABLE_LAPS;

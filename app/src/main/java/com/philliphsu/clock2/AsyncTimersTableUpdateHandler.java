@@ -23,7 +23,7 @@ public final class AsyncTimersTableUpdateHandler extends AsyncDatabaseTableUpdat
     }
 
     @Override
-    protected TimersTableManager getTableManager(Context context) {
+    protected TimersTableManager onCreateTableManager(Context context) {
         return new TimersTableManager(context);
     }
 

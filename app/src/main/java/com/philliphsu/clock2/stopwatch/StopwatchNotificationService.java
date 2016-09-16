@@ -32,10 +32,9 @@ public class StopwatchNotificationService extends ChronometerNotificationService
         super.onCreate();
         mUpdateHandler = new AsyncLapsTableUpdateHandler(this, null);
         mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
-        // TODO: I'm afraid the base time here will be off by a considerable amount from the base time
-        // set in StopwatchFragment.
         mDelegate.init();
         mDelegate.setShowCentiseconds(true, false);
+        setContentTitle(getString(R.string.stopwatch));
         // TODO: I think we can make this a foreground service so even
         // if the process is killed, this service remains alive.
     }
@@ -46,10 +45,28 @@ public class StopwatchNotificationService extends ChronometerNotificationService
         // signifies that the service is being recreated after its process
         // had ended previously.
         if (intent == null) {
-            // Start the ticking again, leaving everything else in the notification
-            // as it was.
             Log.d(TAG, "Recreated service, starting chronometer again.");
-            startChronometer();
+            // Restore the current lap
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    // If the service is being restarted, there is AT LEAST one lap in the table.
+                    // This is the first lap that was inserted when the service was first started.
+                    // The Cursor has already been moved to its first row.
+                    mCurrentLap = mUpdateHandler.getTableManager().queryCurrentLap().getItem();
+                    Log.d(TAG, "Restored current lap " + mCurrentLap);
+                }
+            }).start();
+            // Start the ticking again from where we left off.
+            // The default actions will be set on the Builder.
+            //
+            // For simplicity, even if there were laps
+            // in this stopwatch before the process was destroyed, we won't be restoring
+            // the lap number in the title. If the user is leaving this service in the background
+            // long enough that the system can kill its process, they probably aren't
+            // recording laps. As such, a solution for this is a waste of time.
+            boolean running = mPrefs.getBoolean(StopwatchFragment.KEY_CHRONOMETER_RUNNING, false);
+            syncNotificationWithStopwatchState(running);
         }
         // If this service is being recreated and the above if-block called through,
         // then the call to super won't run any commands, because it will see
@@ -93,8 +110,6 @@ public class StopwatchNotificationService extends ChronometerNotificationService
             mCurrentLap = new Lap();
             mUpdateHandler.asyncInsert(mCurrentLap);
         }
-        // TODO: String resource [Stopwatch: Lap %1$s]. If no laps, just [Stopwatch]
-        setContentTitle(getString(R.string.stopwatch));
         syncNotificationWithStopwatchState(true/*always true*/);
         // We don't need to write anything to SharedPrefs because if we're here, StopwatchFragment
         // will start this service again with ACTION_START_PAUSE, which will do the writing.
@@ -175,10 +190,6 @@ public class StopwatchNotificationService extends ChronometerNotificationService
 
     private void syncNotificationWithStopwatchState(boolean running) {
         clearActions();
-        // TODO: Change fillColor to white, to accommodate API < 21.
-        // Apparently, notifications on 21+ are automatically
-        // tinted to gray to contrast against the native notification background color.
-        //
         // No request code needed, so use 0.
         addAction(ACTION_ADD_LAP, R.drawable.ic_add_lap_24dp, getString(R.string.lap), 0);
         addStartPauseAction(running, 0);
@@ -186,15 +197,17 @@ public class StopwatchNotificationService extends ChronometerNotificationService
 
         quitCurrentThread();
         if (running) {
-            startChronometer();
+//            startChronometer();
+            long startTime = mPrefs.getLong(StopwatchFragment.KEY_START_TIME, SystemClock.elapsedRealtime());
+            startNewThread(0, startTime);
         }
     }
 
-    /**
-     * Reads the value of KEY_START_TIME and passes it to {@link #startNewThread(int, long)} for you.
-     */
-    private void startChronometer() {
-        long startTime = mPrefs.getLong(StopwatchFragment.KEY_START_TIME, SystemClock.elapsedRealtime());
-        startNewThread(0, startTime);
-    }
+//    /**
+//     * Reads the value of KEY_START_TIME and passes it to {@link #startNewThread(int, long)} for you.
+//     */
+//    private void startChronometer() {
+//        long startTime = mPrefs.getLong(StopwatchFragment.KEY_START_TIME, SystemClock.elapsedRealtime());
+//        startNewThread(0, startTime);
+//    }
 }
