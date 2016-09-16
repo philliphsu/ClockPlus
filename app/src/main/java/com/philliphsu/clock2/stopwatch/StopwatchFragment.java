@@ -43,10 +43,6 @@ public class StopwatchFragment extends RecyclerViewFragment<
     static final String KEY_PAUSE_TIME = "pause_time";
     static final String KEY_CHRONOMETER_RUNNING = "chronometer_running";
 
-    // TODO: See if we can remove these? Since we save prefs in the notif. service.
-    private long mStartTime;
-    private long mPauseTime;
-
     private ObjectAnimator mProgressAnimator;
     private SharedPreferences mPrefs;
     private WeakReference<FloatingActionButton> mActivityFab;
@@ -67,8 +63,6 @@ public class StopwatchFragment extends RecyclerViewFragment<
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        mStartTime = mPrefs.getLong(KEY_START_TIME, 0);
-        mPauseTime = mPrefs.getLong(KEY_PAUSE_TIME, 0);
         // TODO: Will these be kept alive after onDestroyView()? If not, we should move these to
         // onCreateView() or any other callback that is guaranteed to be called.
         mStartDrawable = ContextCompat.getDrawable(getActivity(), R.drawable.ic_start_24dp);
@@ -84,13 +78,15 @@ public class StopwatchFragment extends RecyclerViewFragment<
         View view = super.onCreateView(inflater, container, savedInstanceState);
 
         mChronometer.setShowCentiseconds(true, true);
-        if (mStartTime > 0) {
-            long base = mStartTime;
-            if (mPauseTime > 0) {
-                base += SystemClock.elapsedRealtime() - mPauseTime;
-                // We're not done pausing yet, so don't reset mPauseTime.
+        long startTime = getLongFromPref(KEY_START_TIME);
+        long pauseTime = getLongFromPref(KEY_PAUSE_TIME);
+        // If we have a nonzero startTime from a previous session, restore it as
+        // the chronometer's base. Otherwise, leave the default base.
+        if (startTime > 0) {
+            if (pauseTime > 0) {
+                startTime += SystemClock.elapsedRealtime() - pauseTime;
             }
-            mChronometer.setBase(base);
+            mChronometer.setBase(startTime);
         }
         if (isStopwatchRunning()) {
             mChronometer.start();
@@ -103,7 +99,7 @@ public class StopwatchFragment extends RecyclerViewFragment<
         // would have hidden the mini FABs, if not for us already setting its
         // visibility to invisible in XML. We haven't initialized the WeakReference to
         // our Activity's FAB yet, so this call does nothing with the FAB.
-        setMiniFabsVisible(isStopwatchRunning());
+        setMiniFabsVisible(startTime > 0);
         mPrefs.registerOnSharedPreferenceChangeListener(mPrefChangeListener);
         return view;
     }
@@ -152,8 +148,7 @@ public class StopwatchFragment extends RecyclerViewFragment<
         super.onDestroyView();
         // Every view that was in our tree is dereferenced for us.
         // The reason we can control the animator here is because members
-        // are not dereferenced here, as evidenced by mStartTime and mPauseTime
-        // retaining their values.
+        // are not dereferenced here.
         if (mProgressAnimator != null) {
             mProgressAnimator.removeAllListeners();
         }
@@ -208,9 +203,16 @@ public class StopwatchFragment extends RecyclerViewFragment<
             } else {
                 // I verified the bar was visible already without this, so we probably don't need this,
                 // but it's just a safety measure..
-                // ACTUALLY NOT A SAFETY MEASURE!
+                // ACTUALLY NOT A SAFETY MEASURE! TODO: Why was this not acceptable?
 //                mSeekBar.setVisibility(View.VISIBLE);
-                ProgressBarUtils.setProgress(mSeekBar, getCurrentLapProgressRatio(currentLap, previousLap));
+                double ratio = getCurrentLapProgressRatio(currentLap, previousLap);
+                if (ratio > 0d) {
+                    // TODO: To be consistent with the else case, we could set the visibility
+                    // to VISIBLE if we cared.
+                    ProgressBarUtils.setProgress(mSeekBar, ratio);
+                } else {
+                    mSeekBar.setVisibility(View.INVISIBLE);
+                }
             }
         } else {
             mSeekBar.setVisibility(View.INVISIBLE);
@@ -223,7 +225,7 @@ public class StopwatchFragment extends RecyclerViewFragment<
         syncFabIconWithStopwatchState(!running/*invert the current state*/);
 
         final Intent serviceIntent = new Intent(getActivity(), StopwatchNotificationService.class);
-        if (mStartTime == 0) {
+        if (getLongFromPref(KEY_START_TIME) == 0) {
             setMiniFabsVisible(true);
             // Handle the default action, i.e. post the notification for the first time.
             getActivity().startService(serviceIntent);
@@ -234,7 +236,7 @@ public class StopwatchFragment extends RecyclerViewFragment<
 
     @Override
     public void onPageSelected() {
-        setMiniFabsVisible(mStartTime > 0);
+        setMiniFabsVisible(getLongFromPref(KEY_START_TIME) > 0);
         syncFabIconWithStopwatchState(isStopwatchRunning());
     }
 
@@ -332,6 +334,7 @@ public class StopwatchFragment extends RecyclerViewFragment<
     private long remainingTimeBetweenLaps(Lap currentLap, Lap previousLap) {
         if (currentLap == null || previousLap == null)
             return 0;
+        // TODO: Should we check if the subtraction results in negative number, and return 0?
         return previousLap.elapsed() - currentLap.elapsed();
     }
 
@@ -341,6 +344,10 @@ public class StopwatchFragment extends RecyclerViewFragment<
      */
     private boolean isStopwatchRunning() {
         return mChronometer.isRunning() || mPrefs.getBoolean(KEY_CHRONOMETER_RUNNING, false);
+    }
+
+    private long getLongFromPref(String key) {
+        return mPrefs.getLong(key, 0);
     }
 
     private final OnSharedPreferenceChangeListener mPrefChangeListener = new OnSharedPreferenceChangeListener() {
