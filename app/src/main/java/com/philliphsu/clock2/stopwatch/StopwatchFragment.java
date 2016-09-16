@@ -69,8 +69,6 @@ public class StopwatchFragment extends RecyclerViewFragment<
         mPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
         mStartTime = mPrefs.getLong(KEY_START_TIME, 0);
         mPauseTime = mPrefs.getLong(KEY_PAUSE_TIME, 0);
-        Log.d(TAG, "mStartTime = " + mStartTime
-                + ", mPauseTime = " + mPauseTime);
         // TODO: Will these be kept alive after onDestroyView()? If not, we should move these to
         // onCreateView() or any other callback that is guaranteed to be called.
         mStartDrawable = ContextCompat.getDrawable(getActivity(), R.drawable.ic_start_24dp);
@@ -160,8 +158,6 @@ public class StopwatchFragment extends RecyclerViewFragment<
             mProgressAnimator.removeAllListeners();
         }
         Log.d(TAG, "onDestroyView()");
-        Log.d(TAG, "mStartTime = " + mStartTime
-                + ", mPauseTime = " + mPauseTime);
         mPrefs.unregisterOnSharedPreferenceChangeListener(mPrefChangeListener);
     }
 
@@ -267,66 +263,6 @@ public class StopwatchFragment extends RecyclerViewFragment<
         getActivity().startService(stop);
     }
 
-    private void pauseStopwatch() {
-        mPauseTime = SystemClock.elapsedRealtime();
-        // If the app is currently not visible, then the chronometer was already stopped
-        // when we left the app. The next time we resume the app, the chronometer will show
-        // the elapsed time as it was when we first left the app.
-        // As such, we manually update the text no matter what the app's state is in.
-        mChronometer.setBase(mStartTime);
-        // If the app is currently not visible, then this will not call through.
-        // This is because the Chronometer's visibility changed when we left the app,
-        // so updateRunning() was already called to stop the running.
-        // stop() will also make a call to updateRunning(), but the running state has not
-        // changed from the time we left the app.
-        mChronometer.stop();
-        // No issues controlling the animator here, because onLoadFinished() can't
-        // call through to startNewProgressBarAnimator(), because by that point
-        // the chronometer won't be running.
-        if (mProgressAnimator != null) {
-            // We may as well call cancel(), since our resume() call would be
-            // rendered meaningless.
-//                mProgressAnimator.pause();
-            mProgressAnimator.cancel();
-        }
-        syncFabIconWithStopwatchState(false);
-    }
-
-    private void runStopwatch() {
-        mStartTime += SystemClock.elapsedRealtime() - mPauseTime;
-        mPauseTime = 0;
-        mChronometer.setBase(mStartTime);
-        mChronometer.start();
-        // This animator instance will end up having end() called on it. When
-        // the table update prompts us to requery, onLoadFinished will be called as a result.
-        // There, it calls startNewProgressAnimator() to end this animation and starts an
-        // entirely new animator instance.
-//            if (mProgressAnimator != null) {
-//                mProgressAnimator.resume();
-//            }
-        syncFabIconWithStopwatchState(true);
-    }
-
-    private void resetStopwatch() {
-        mChronometer.stop();
-        mChronometer.setBase(SystemClock.elapsedRealtime());
-        // ----------------------------------------------------------------------
-        // TOneverDO: Precede these with mProgressAnimator.end(), otherwise our
-        // Animator.onAnimationEnd() callback won't hide SeekBar in time.
-        mStartTime = 0;
-        mPauseTime = 0;
-        // ----------------------------------------------------------------------
-        // No issues controlling the animator here, because onLoadFinished() can't
-        // call through to startNewProgressBarAnimator(), because by that point
-        // the chronometer won't be running.
-        if (mProgressAnimator != null) {
-            mProgressAnimator.end();
-        }
-        mProgressAnimator = null;
-        setMiniFabsVisible(false);
-        syncFabIconWithStopwatchState(false);
-    }
-
     private void setMiniFabsVisible(boolean visible) {
         int vis = visible ? View.VISIBLE : View.INVISIBLE;
         mNewLapButton.setVisibility(vis);
@@ -410,48 +346,39 @@ public class StopwatchFragment extends RecyclerViewFragment<
     private final OnSharedPreferenceChangeListener mPrefChangeListener = new OnSharedPreferenceChangeListener() {
         @Override
         public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-            Log.d(TAG, "Pref " + key + " changed");
-            switch (key) {
-                case KEY_CHRONOMETER_RUNNING:
-                    // The value of running tells us what state the stopwatch *should be set to*.
-                    if (sharedPreferences.getBoolean(key, false)) {
-                        Log.d(TAG, "Running stopwatch");
-                        runStopwatch();
-                    } else {
-                        Log.d(TAG, "Pausing stopwatch");
-                        // TODO: If your claim that there is no defined order with which this
-                        // callback fires is true, then you need to be wary of the following
-                        // scenario:
-                        // The value of KEY_START_TIME is changed to zero, and happens before the
-                        // change to the value of KEY_CHRONOMETER_RUNNING. Therefore, resetStopwatch()
-                        // is called, and within that call, mCurrentLap is set to null. When the
-                        // value of KEY_CHRONOMETER_RUNNING changes to false sometime later in the future,
-                        // pauseStopwatch() is called, and within that call, mCurrentLap.pause() is
-                        // called--this will result in a NPE.
-                        //
-                        // However, it appears the change to the value of KEY_CHRONOMETER_RUNNING
-                        // always happens first. So pauseStopwatch() is called first, and then
-                        // resetStopwatch() follows shortly after. This is acceptable and produces
-                        // the desired result.
-                        pauseStopwatch();
-                    }
-                    break;
-                case KEY_START_TIME:
-                    // This is the best indication that the stopwatch should be stopped.
-                    // We shouldn't depend on the value of KEY_CHRONOMETER_RUNNING, because
-                    // the change to that value may not have occurred before this point;
-                    // we cannot rely on there being a defined order with which this callback fires.
-                    if (sharedPreferences.getLong(key, 0) == 0) {
-                        Log.d(TAG, "Resetting stopwatch");
-                        resetStopwatch();
-                    }
-                    break;
-                case KEY_PAUSE_TIME:
-                    // In terms of the UI, we don't need to react to a change to the pause time.
-                    // A change in the pause time is associated with the stopwatch changing its
-                    // running state; as such, the UI can be handled when we react
-                    // to a change to the value of KEY_CHRONOMETER_RUNNING.
-                    break;
+            // We don't care what key-value pair actually changed, just configure all the views again.
+            long startTime = sharedPreferences.getLong(KEY_START_TIME, 0);
+            long pauseTime = sharedPreferences.getLong(KEY_PAUSE_TIME, 0);
+            boolean running = sharedPreferences.getBoolean(KEY_CHRONOMETER_RUNNING, false);
+            setMiniFabsVisible(startTime > 0);
+            syncFabIconWithStopwatchState(running);
+            // ==================================================
+            // TOneverDO: Precede setMiniFabsVisible()
+            if (startTime == 0) {
+                startTime = SystemClock.elapsedRealtime();
+            }
+            // ==================================================
+
+            // If we're resuming, the pause duration is already added to the startTime.
+            // If we're pausing, then the chronometer will be stopped and we can use
+            // the startTime that was originally set the last time we were running.
+            //
+            // We don't need to add the pause duration if we're pausing because it's going to
+            // be negligible at this point.
+//            if (pauseTime > 0) {
+//                startTime += SystemClock.elapsedRealtime() - pauseTime;
+//            }
+            mChronometer.setBase(startTime);
+            mChronometer.setStarted(running);
+            // Starting an instance of Animator is not the responsibility of this method,
+            // but is of onLoadFinished().
+            if (mProgressAnimator != null && !running) {
+                // Wait until both values have been notified of being reset.
+                if (startTime == 0 && pauseTime == 0) {
+                    mProgressAnimator.end();
+                } else {
+                    mProgressAnimator.cancel();
+                }
             }
         }
     };

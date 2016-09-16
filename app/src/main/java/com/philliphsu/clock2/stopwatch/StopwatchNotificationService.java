@@ -149,6 +149,7 @@ public class StopwatchNotificationService extends ChronometerNotificationService
     protected void handleAction(@NonNull String action, Intent intent, int flags, long startId) {
         if (ACTION_ADD_LAP.equals(action)) {
             if (mPrefs.getBoolean(StopwatchFragment.KEY_CHRONOMETER_RUNNING, false)) {
+                mDelegate.setBase(mPrefs.getLong(StopwatchFragment.KEY_START_TIME, SystemClock.elapsedRealtime()));
                 String timestamp = mDelegate.formatElapsedTime(SystemClock.elapsedRealtime(),
                         null/*Resources not needed here*/).toString();
                 mCurrentLap.end(timestamp);
