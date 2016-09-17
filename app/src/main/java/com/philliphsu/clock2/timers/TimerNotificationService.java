@@ -89,6 +89,11 @@ public class TimerNotificationService extends ChronometerNotificationService {
     }
 
     @Override
+    protected int getNoteId() {
+        return R.id.timer_notification_service;
+    }
+
+    @Override
     public void onDestroy() {
         super.onDestroy();
         // After being cancelled due to time being up, sometimes the active timer notification posts again
@@ -96,7 +101,7 @@ public class TimerNotificationService extends ChronometerNotificationService {
         // our thread has enough leeway to sneak in a final call to post the notification before it
         // is actually quit().
         // As such, try cancelling the notification with this (tag, id) pair again.
-        cancelNotification(mTimer.getIntId());
+        cancelNotification();
     }
 
     @Override
@@ -158,7 +163,7 @@ public class TimerNotificationService extends ChronometerNotificationService {
 
         quitCurrentThread();
         if (running) {
-            startNewThread(timerId, SystemClock.elapsedRealtime() + mTimer.timeRemaining());
+            startNewThread(SystemClock.elapsedRealtime() + mTimer.timeRemaining());
         }
     }
 }

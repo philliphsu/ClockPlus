@@ -45,22 +45,9 @@ public abstract class ChronometerNotificationService extends Service {
     protected abstract boolean isCountDown();
 
     /**
-     * @return a tag associated with the notification. The default implementation returns the
-     * name of this class.
-     */
-    @Deprecated
-    protected String getNoteTag() {
-        return getClass().getName();
-    }
-
-    /**
      * @return the id for the foreground notification
      */
-    protected int getNoteId() {
-        // TODO: Abstract this and override in TimerNotificationService. Currently only
-        // StopwatchNotificationService implements this.
-        return 0;
-    }
+    protected abstract int getNoteId();
 
     /**
      * The intent received in {@link #onStartCommand(Intent, int, int)}
@@ -172,10 +159,9 @@ public abstract class ChronometerNotificationService extends Service {
      * Instantiates a new HandlerThread and calls its {@link Thread#start() start()}.
      * The calling thread will be blocked until the HandlerThread created here finishes
      * initializing its looper.
-     * @param noteId the id with which the thread created here will be posting notifications.
      * @param base the new base time of the chronometer
      */
-    public void startNewThread(int noteId/*TODO remove*/, long base) {
+    public void startNewThread(long base) {
         // An instance of Thread cannot be started more than once. You must create
         // a new instance if you want to start the Thread's work again.
         mThread = new ChronometerNotificationThread(
@@ -183,7 +169,6 @@ public abstract class ChronometerNotificationService extends Service {
                 mNotificationManager,
                 mNoteBuilder,
                 getResources(),
-                getNoteTag(),
                 getNoteId());
         // Initializes this thread as a looper. HandlerThread.run() will be executed
         // in this thread.
@@ -207,7 +192,7 @@ public abstract class ChronometerNotificationService extends Service {
      * @param running whether the chronometer is running
      * @param requestCode Used to create the PendingIntent that is fired when this action is clicked.
      */
-    protected final void addStartPauseAction(boolean running, int requestCode) {
+    protected final void addStartPauseAction(boolean running, int requestCode/*TODO remove*/) {
         addAction(ACTION_START_PAUSE,
                 running ? R.drawable.ic_pause_24dp : R.drawable.ic_start_24dp,
                 getString(running ? R.string.pause : R.string.resume),
@@ -218,7 +203,7 @@ public abstract class ChronometerNotificationService extends Service {
      * Helper method to add the stop action to the notification's builder.
      * @param requestCode Used to create the PendingIntent that is fired when this action is clicked.
      */
-    protected final void addStopAction(int requestCode) {
+    protected final void addStopAction(int requestCode/*TODO remove*/) {
         addAction(ACTION_STOP, R.drawable.ic_stop_24dp, getString(R.string.stop), requestCode);
     }
 
@@ -251,7 +236,7 @@ public abstract class ChronometerNotificationService extends Service {
     /**
      * Adds the specified action to the notification's Builder.
      */
-    protected final void addAction(String action, @DrawableRes int icon, String actionTitle, int requestCode) {
+    protected final void addAction(String action, @DrawableRes int icon, String actionTitle, int requestCode/*TODO remove*/) {
         Intent intent = new Intent(this, getClass())
                 .setAction(action);
         // TODO: We can put the requestCode as an extra to this intent, and then retrieve that extra
@@ -265,7 +250,7 @@ public abstract class ChronometerNotificationService extends Service {
     /**
      * Cancels the foreground notification.
      */
-    protected final void cancelNotification(int id/*TODO remove*/) {
+    protected final void cancelNotification() {
         mNotificationManager.cancel(getNoteId());
     }
 

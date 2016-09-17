@@ -75,12 +75,6 @@ public class StopwatchNotificationService extends ChronometerNotificationService
     @Override
     public void onDestroy() {
         super.onDestroy();
-        // After being cancelled due to time being up, sometimes the active timer notification posts again
-        // with a static 00:00 text, along with the Time's up notification. My theory is
-        // our thread has enough leeway to sneak in a final call to post the notification before it
-        // is actually quit().
-        // As such, try cancelling the notification with this (tag, id) pair again.
-//        cancelNotification(0);
     }
 
     @Override
@@ -201,7 +195,7 @@ public class StopwatchNotificationService extends ChronometerNotificationService
         quitCurrentThread();
         if (running) {
             long startTime = mPrefs.getLong(StopwatchFragment.KEY_START_TIME, SystemClock.elapsedRealtime());
-            startNewThread(0, startTime);
+            startNewThread(startTime);
         }
     }
 }

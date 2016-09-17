@@ -29,7 +29,6 @@ public class ChronometerNotificationThread extends HandlerThread {
     private final NotificationManager mNotificationManager;
     private final NotificationCompat.Builder mNoteBuilder;
     private final Resources mResources;
-    private final String mNoteTag;
     private final int mNoteId;
 
     private Handler mHandler;
@@ -39,27 +38,20 @@ public class ChronometerNotificationThread extends HandlerThread {
      * @param builder A preconfigured Builder from the client service whose content
      *                text will be updated and eventually built from.
      * @param resources Required only if the ChronometerDelegate is configured to count down.
-     *                  Used to retrieve a String resource if/when the countdown reaches negative.
-     *                  TODO: Will the notification be cancelled fast enough before the countdown
-     *                  becomes negative? If so, this param is rendered useless.
-     * @param noteTag A tag associated with the client service, used for posting
-     *                the notification. We require this because we want to avoid
-     *                using a tag associated with this thread, or else the client
-     *                service won't be able to manipulate the notifications that
-     *                are posted from this thread.
+ *                  Used to retrieve a String resource if/when the countdown reaches negative.
+ *                  TODO: Will the notification be cancelled fast enough before the countdown
+ *                  becomes negative? If so, this param is rendered useless.
      */
     public ChronometerNotificationThread(@NonNull ChronometerDelegate delegate,
                                          @NonNull NotificationManager manager,
                                          @NonNull NotificationCompat.Builder builder,
                                          @Nullable Resources resources,
-                                         @NonNull String noteTag, // TODO: remove param
                                          int noteId) {
         super(TAG);
         mDelegate = delegate;
         mNotificationManager = manager;
         mNoteBuilder = builder;
         mResources = resources;
-        mNoteTag = noteTag;
         mNoteId = noteId;
     }
 
