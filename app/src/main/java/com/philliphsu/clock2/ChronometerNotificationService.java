@@ -98,11 +98,26 @@ public abstract class ChronometerNotificationService extends Service {
         mDelegate.setCountDown(isCountDown());
     }
 
+    // Didn't work!
+//    @Override
+//    public void onTrimMemory(int level) {
+//        if (level >= TRIM_MEMORY_BACKGROUND) {
+//            Log.d("ChronomNotifService", "Stopping foreground");
+//            // The penultimate trim level, indicates the process is around the
+//            // middle of the background LRU list.
+//            // If we didn't call this, we would continue to run in the foreground
+//            // until we get killed, and the notification would be removed with it.
+//            // We want to keep the notification alive even if the process is killed,
+//            // so the user can still be aware of the stopwatch.
+//            stopForeground(true);
+//            // Post it again, but outside of the foreground state.
+//            updateNotification(true);
+//        }
+//    }
+
     @Override
     public void onDestroy() {
-        super.onDestroy();
-        quitThread();
-        // TODO: Cancel all notifications pushed by this notification manager.
+        quitThread(); // TOneverDO: quitCurrentThread() because that posts the notification again
     }
 
     @CallSuper
