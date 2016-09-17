@@ -35,6 +35,7 @@ public class TimersFragment extends RecyclerViewFragment<
     private static final int LANDSCAPE_LAYOUT_COLUMNS = 2;
 
     public static final int REQUEST_CREATE_TIMER = 0;
+    public static final String EXTRA_SCROLL_TO_TIMER_ID = "com.philliphsu.clock2.timers.extra.SCROLL_TO_TIMER_ID";
 
     private AsyncTimersTableUpdateHandler mAsyncTimersTableUpdateHandler;
 
@@ -42,6 +43,13 @@ public class TimersFragment extends RecyclerViewFragment<
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mAsyncTimersTableUpdateHandler = new AsyncTimersTableUpdateHandler(getActivity(), this);
+
+        // TimerNotificationService was supposed to put this extra in its content intent.
+        // Currently, it does not implement this feature. May be left for a future release?
+        long scrollToStableId = getActivity().getIntent().getLongExtra(EXTRA_SCROLL_TO_TIMER_ID, -1);
+        if (scrollToStableId != -1) {
+            setScrollToStableId(scrollToStableId);
+        }
     }
 
     @Nullable

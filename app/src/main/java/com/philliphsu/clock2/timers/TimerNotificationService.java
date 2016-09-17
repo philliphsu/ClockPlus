@@ -9,6 +9,7 @@ import android.support.annotation.Nullable;
 
 import com.philliphsu.clock2.AsyncTimersTableUpdateHandler;
 import com.philliphsu.clock2.ChronometerNotificationService;
+import com.philliphsu.clock2.MainActivity;
 import com.philliphsu.clock2.R;
 import com.philliphsu.clock2.Timer;
 
@@ -29,6 +30,7 @@ public class TimerNotificationService extends ChronometerNotificationService {
     // TODO: I think we may need a list of timers.
     private Timer mTimer;
     private TimerController mController;
+    private Intent mIntent;
 
     /**
      * Helper method to start this Service for its default action: to show
@@ -66,21 +68,18 @@ public class TimerNotificationService extends ChronometerNotificationService {
     @Nullable
     @Override
     protected PendingIntent getContentIntent() {
-        // TODO: Set content intent so that when clicked, we launch
-        // TimersFragment and scroll to the given timer id. The following
-        // is merely pseudocode.
-//        Intent contentIntent = new Intent(this, MainActivity.class);
-//        contentIntent.putExtra(null/*TODO:MainActivity.EXTRA_SHOW_PAGE*/, 1/*TODO:The tab index of the timers page*/);
-//        contentIntent.putExtra(null/*TODO:MainActivity.EXTRA_SCROLL_TO_ID*/, mTimer.getId());
-//        mNoteBuilder.setContentIntent(PendingIntent.getActivity(
-//                this,
-//                0, // TODO: Request code not needed? Since any multiple notifications
-//                // should be able to use the same PendingIntent for this action....
-//                // unless the underlying *Intent* and its id extra are overwritten
-//                // per notification when retrieving the PendingIntent..
-//                contentIntent,
-//                0/*Shouldn't need a flag..*/));
-        return null;
+        mIntent = new Intent(this, MainActivity.class);
+        // http://stackoverflow.com/a/3128418/5055032
+        // "For some unspecified reason, extras will be delivered only if you've set some action"
+        // This ONLY applies to PendingIntents...
+        // And for another unspecified reason, this dummy action must NOT be the same value
+        // as another PendingIntent's dummy action. For example, StopwatchNotificationService
+        // uses the dummy action "foo"; we previously used "foo" here as well, and firing this
+        // intent scrolled us to MainActivity.PAGE_STOPWATCH...
+        mIntent.setAction("bar");
+        mIntent.putExtra(MainActivity.EXTRA_SHOW_PAGE, MainActivity.PAGE_TIMERS);
+        // Request code not needed because we're only going to have one foreground notification.
+        return PendingIntent.getActivity(this, 0, mIntent, 0);
     }
 
     @Override
@@ -109,9 +108,12 @@ public class TimerNotificationService extends ChronometerNotificationService {
         if ((mTimer = intent.getParcelableExtra(EXTRA_TIMER)) == null) {
             throw new IllegalStateException("Cannot start TimerNotificationService without a Timer");
         }
+        // TODO: Wrap this around an `if (only one timer running)` statement.
+        // TODO: We have to update the PendingIntent.. so write an API in the base class to do so.
+        // TODO: Not implemented for simplicity. Future release??
+//        mIntent.putExtra(TimersFragment.EXTRA_SCROLL_TO_TIMER_ID, mTimer.getId());
         mController = new TimerController(mTimer, new AsyncTimersTableUpdateHandler(this, null));
-        // The note's title should change here every time,
-        // especially if the Timer's label was updated.
+        // The note's title should change here every time, especially if the Timer's label was updated.
         String title = mTimer.label();
         if (title.isEmpty()) {
             title = getString(R.string.timer);
