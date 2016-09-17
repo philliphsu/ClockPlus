@@ -86,7 +86,11 @@ public class StopwatchNotificationService extends ChronometerNotificationService
     @Override
     protected PendingIntent getContentIntent() {
         Intent intent = new Intent(this, MainActivity.class);
-        intent.putExtra(null/*TODO:MainActivity.EXTRA_SHOW_PAGE*/, 2/*TODO:MainActivity.INDEX_STOPWATCH*/);
+        // http://stackoverflow.com/a/3128418/5055032
+        // "For some unspecified reason, extras will be delivered only if you've set some action"
+        // This ONLY applies to PendingIntents...
+        intent.setAction("foo"/*dummy action*/);
+        intent.putExtra(MainActivity.EXTRA_SHOW_PAGE, MainActivity.PAGE_STOPWATCH);
         return PendingIntent.getActivity(this, 0, intent, 0);
     }
 

@@ -29,6 +29,11 @@ import butterknife.Bind;
 public class MainActivity extends BaseActivity {
     private static final String TAG = "MainActivity";
 
+    public static final int PAGE_ALARMS = 0;
+    public static final int PAGE_TIMERS = 1;
+    public static final int PAGE_STOPWATCH = 2;
+    public static final String EXTRA_SHOW_PAGE = "com.philliphsu.clock2.extra.SHOW_PAGE";
+
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
      * fragments for each of the sections. We use a
@@ -230,6 +235,20 @@ public class MainActivity extends BaseActivity {
         });
 
         mAddItemDrawable = ContextCompat.getDrawable(this, R.drawable.ic_add_24dp);
+
+        final int initialPage = getIntent().getIntExtra(EXTRA_SHOW_PAGE, -1);
+        if (initialPage > 0/*0 is already the default page*/ && initialPage <= PAGE_STOPWATCH) {
+            // Run this only after the ViewPager is finished drawing
+            mViewPager.post(new Runnable() {
+                @Override
+                public void run() {
+                    // TOneverDO: smoothScroll == false, or else the onPageScrolled callback won't
+                    // be called for the intermediate pages that are responsible for translating
+                    // the FAB
+                    mViewPager.setCurrentItem(initialPage, true/*smoothScroll*/);
+                }
+            });
+        }
     }
 
     @Override
@@ -387,11 +406,11 @@ public class MainActivity extends BaseActivity {
         public Fragment getItem(int position) {
             // getItem is called to instantiate the fragment for the given page.
             switch (position) {
-                case 0:
+                case PAGE_ALARMS:
                     return AlarmsFragment.newInstance(1);
-                case 1:
+                case PAGE_TIMERS:
                     return new TimersFragment();
-                case 2:
+                case PAGE_STOPWATCH:
                     return new StopwatchFragment();
                 default:
                     return PlaceholderFragment.newInstance(position + 1);
