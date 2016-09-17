@@ -45,9 +45,17 @@ public abstract class ChronometerNotificationService extends Service {
     protected abstract boolean isCountDown();
 
     /**
-     * @return the id for the foreground notification
+     * @return the id for the foreground notification, if {@link #isForeground()} returns true.
+     * Otherwise, this value will not be considered for anything.
      */
     protected abstract int getNoteId();
+
+    /**
+     * @return whether this service should run in the foreground. The default is true.
+     */
+    protected boolean isForeground() {
+        return true;
+    }
 
     /**
      * The intent received in {@link #onStartCommand(Intent, int, int)}
@@ -80,7 +88,9 @@ public abstract class ChronometerNotificationService extends Service {
                 .setShowWhen(false)
                 .setOngoing(true)
                 .setContentIntent(getContentIntent());
-        startForeground(getNoteId(), mNoteBuilder.build());
+        if (isForeground()) {
+            startForeground(getNoteId(), mNoteBuilder.build());
+        }
         mDelegate.init();
         mDelegate.setCountDown(isCountDown());
     }
