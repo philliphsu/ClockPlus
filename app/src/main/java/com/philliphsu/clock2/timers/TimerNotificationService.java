@@ -89,7 +89,15 @@ public class TimerNotificationService extends ChronometerNotificationService {
 
     @Override
     protected int getNoteId() {
-        return R.id.timer_notification_service;
+        // Since isForeground() returns false, this won't be called by the base class.
+        return 0;
+    }
+
+    @Override
+    protected boolean isForeground() {
+        // We're going to post a separate notification for each Timer.
+        // Foreground services are limited to one notification.
+        return false;
     }
 
     @Override
