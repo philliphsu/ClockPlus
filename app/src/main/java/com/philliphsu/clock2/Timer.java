@@ -127,10 +127,12 @@ public abstract class Timer extends ObjectWithId implements Parcelable {
     }
 
     public void addOneMinute() {
-        // Allow extending even if paused.
-//        if (!isRunning())
-//            throw new IllegalStateException("Cannot extend a timer that is not running");
-        if (expired()) {
+        if (!isRunning()) {
+            resume();
+            addOneMinute(); // recursion!
+            pause();
+            return;
+        } else if (expired()) {
             endTime = SystemClock.elapsedRealtime() + MINUTE;
             // If the timer's normal duration is >= MINUTE, then an extra run time of one minute
             // will still be within the normal duration. Thus, the progress calculation does not
@@ -140,10 +142,11 @@ public abstract class Timer extends ObjectWithId implements Parcelable {
                 // This scales the progress bar to a full minute.
                 duration = MINUTE;
             }
-        } else {
-            endTime += MINUTE;
-            duration += MINUTE;
+            return;
         }
+
+        endTime += MINUTE;
+        duration += MINUTE;
     }
 
     public boolean hasStarted() {
