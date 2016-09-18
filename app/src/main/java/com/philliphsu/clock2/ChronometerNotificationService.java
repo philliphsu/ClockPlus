@@ -61,6 +61,14 @@ public abstract class ChronometerNotificationService extends Service {
     protected abstract int getNoteId();
 
     /**
+     * @return an optional tag associated with the notification(s). The default implementation
+     * returns null if {@link #isForeground()} returns true; otherwise, it returns the class's name.
+     */
+    protected String getNoteTag() {
+        return isForeground() ? null : getClass().getName();
+    }
+
+    /**
      * @return whether this service should run in the foreground. The default is true.
      */
     protected boolean isForeground() {
@@ -208,7 +216,8 @@ public abstract class ChronometerNotificationService extends Service {
                 mNotificationManager,
                 mNoteBuilders.get(id),
                 getResources(),
-                getNoteId());
+                getNoteTag(),
+                (int) id);
         mThreads.put(id, thread);
         // Initializes this thread as a looper. HandlerThread.run() will be executed
         // in this thread.
@@ -307,10 +316,10 @@ public abstract class ChronometerNotificationService extends Service {
     }
 
     /**
-     * Cancels the notification associated with the ID.
+     * Cancels the notification with the pair ({@link #getNoteTag() tag}, id)
      */
     protected final void cancelNotification(long id/*TODO: change to int noteId?*/) {
-        mNotificationManager.cancel((int) id);
+        mNotificationManager.cancel(getNoteTag(), (int) id);
     }
 
     /**

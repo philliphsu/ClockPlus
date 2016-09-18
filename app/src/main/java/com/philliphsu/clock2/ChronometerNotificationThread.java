@@ -29,6 +29,7 @@ public class ChronometerNotificationThread extends HandlerThread {
     private final NotificationManager mNotificationManager;
     private final NotificationCompat.Builder mNoteBuilder;
     private final Resources mResources;
+    private final String mNoteTag;
     private final int mNoteId;
 
     private Handler mHandler;
@@ -38,20 +39,22 @@ public class ChronometerNotificationThread extends HandlerThread {
      * @param builder A preconfigured Builder from the client service whose content
      *                text will be updated and eventually built from.
      * @param resources Required only if the ChronometerDelegate is configured to count down.
- *                  Used to retrieve a String resource if/when the countdown reaches negative.
- *                  TODO: Will the notification be cancelled fast enough before the countdown
- *                  becomes negative? If so, this param is rendered useless.
+*                  Used to retrieve a String resource if/when the countdown reaches negative.
+*                  TODO: Will the notification be cancelled fast enough before the countdown
+     * @param noteTag An optional tag for posting notifications.
      */
     public ChronometerNotificationThread(@NonNull ChronometerDelegate delegate,
                                          @NonNull NotificationManager manager,
                                          @NonNull NotificationCompat.Builder builder,
                                          @Nullable Resources resources,
+                                         @Nullable String noteTag,
                                          int noteId) {
         super(TAG);
         mDelegate = delegate;
         mNotificationManager = manager;
         mNoteBuilder = builder;
         mResources = resources;
+        mNoteTag = noteTag;
         mNoteId = noteId;
     }
 
@@ -85,7 +88,7 @@ public class ChronometerNotificationThread extends HandlerThread {
             CharSequence text = mDelegate.formatElapsedTime(SystemClock.elapsedRealtime(), mResources);
             mNoteBuilder.setContentText(text);
         }
-        mNotificationManager.notify(mNoteId, mNoteBuilder.build());
+        mNotificationManager.notify(mNoteTag, mNoteId, mNoteBuilder.build());
     }
 
     @Override
