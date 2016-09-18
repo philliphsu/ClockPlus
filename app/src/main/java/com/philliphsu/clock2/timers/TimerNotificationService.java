@@ -3,7 +3,6 @@ package com.philliphsu.clock2.timers;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.util.SimpleArrayMap;
@@ -169,18 +168,26 @@ public class TimerNotificationService extends ChronometerNotificationService {
             throw new IllegalStateException("Cannot start TimerNotificationService without a Timer");
         }
         final long id = timer.getId();
+//        final boolean isUpdate = mTimers.containsKey(id); // could use either map
         mTimers.put(id, timer);
         mControllers.put(id, new TimerController(timer, mUpdateHandler));
 
-        mMostRecentTimerId = timer.getId();
+        mMostRecentTimerId = id;
+        // If isUpdate == true, this won't call through because the id already exists in the
+        // internal mappings as well.
         registerNewNoteBuilder(id);
-        
         // The note's title should change here every time, especially if the Timer's label was updated.
         String title = timer.label();
         if (title.isEmpty()) {
             title = getString(R.string.timer);
         }
         setContentTitle(id, title);
+        // There was still a delay before the notification got updated, so forget this.
+//        if (isUpdate) {
+//            // Immediately push any updates, or else there will be a noticeable delay.
+//            Log.d(TAG, "Updating notification");
+//            updateNotification(id, true);
+//        }
         syncNotificationWithTimerState(id, timer.isRunning());
     }
 
@@ -208,7 +215,19 @@ public class TimerNotificationService extends ChronometerNotificationService {
             // there is a noticeable delay before the minute gets added on.
             // Update the text immediately, because there's no harm in doing so.
             long id = getActionId(intent);
-            setBase(id, getBase(id) + 60000);
+            final Timer orig = mTimers.get(id);
+            // We have to add the minute to a copy Timer. If we had modified the original Timer,
+            // then the controller would also add another minute to the same instance, and what
+            // would happen after the DB update is the Timer instance with this ID ends up
+            // being extended by 2 minutes.
+            //
+            // Why not just do something like: `t.endTime() + 60000`? Because extending timers that
+            // are paused is a special case, and Timer.addOneMinute() already has the logic to handle
+            // that.
+            Timer copy = Timer.create(orig.hour(), orig.minute(), orig.second(), orig.group(), orig.label());
+            orig.copyMutableFieldsTo(copy);
+            copy.addOneMinute();
+            setBase(id, copy.endTime());
             updateNotification(id, true);
             mControllers.get(id).addOneMinute();
         } else if (ACTION_CANCEL_NOTIFICATION.equals(action)) {
@@ -249,7 +268,7 @@ public class TimerNotificationService extends ChronometerNotificationService {
 
         quitCurrentThread(id);
         if (running) {
-            startNewThread(id, SystemClock.elapsedRealtime() + mTimers.get(id).timeRemaining());
+            startNewThread(id, mTimers.get(id).endTime());
         }
     }
     
