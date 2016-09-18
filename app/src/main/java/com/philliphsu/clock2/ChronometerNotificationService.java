@@ -111,6 +111,8 @@ public abstract class ChronometerNotificationService extends Service {
     }
 
     private void registerNewChronometer(long id) {
+        if (mDelegates.containsKey(id))
+            return;
         ChronometerDelegate delegate = new ChronometerDelegate();
         delegate.init();
         delegate.setCountDown(isCountDown());
@@ -118,10 +120,29 @@ public abstract class ChronometerNotificationService extends Service {
     }
 
     /**
-     * Registers a new Notification builder with the provided ID. Each new builder
-     * is associated with a new chronometer.
+     * If a notification builder is not already registered with the provided ID,
+     * then register a new instance. Each new builder comes with a new chronometer.
      */
     protected final void registerNewNoteBuilder(long id) {
+        // If we didn't have this check, then we'd be replacing a previous
+        // builder with a new instance. The problem with that is the new id->builder
+        // mapping here will not kept in sync with the builder reference in the
+        // ChronometerNotificationThread, unless you make a later call to
+        // startNewThread(). If the chronometer represents a Timer and it gets paused,
+        // quitCurrentThread() is called, but startNewThread() will NOT be called.
+        // In quitCurrentThread(), we tell the thread to update the notification for us
+        // prior to actually quiting. This is where the problem manifests: because the
+        // thread is holding onto the previous builder instance, updating the notification
+        // means the old builder's attributes will be used to build a new notification.
+        // When we later make attribute changes to the builder via e.g. addAction(),
+        // we are actually affecting the new builder instance registered here,
+        // not the old instance held by the thread.
+        //
+        // We could have avoided this out-of-sync issue by updating the notification
+        // in this class, using getNoteTag() and the id passed to quitCurrentThread(),
+        // instead of telling the thread to do it for us.
+        if (mNoteBuilders.containsKey(id))
+            return;
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
                 .setSmallIcon(getSmallIcon())
                 .setShowWhen(false)
@@ -199,6 +220,10 @@ public abstract class ChronometerNotificationService extends Service {
             // Display any notification updates associated with the current state
             // of the chronometer. If we relied on the HandlerThread to do this for us,
             // the message delivery would be delayed.
+            // TODO: We could update the notification ourselves using getNoteTag() and
+            // the id param. This is desirable if we ever encounter other "out-of-sync"
+            // issues regarding the notification builder references between this class
+            // and the thread. See #registerNewNoteBuilder() for more info.
             thread.updateNotification(false/*updateText*/);
             // If the chronometer has been set to not run, the effect is obvious.
             // Otherwise, we're preparing for the start of a new thread.
