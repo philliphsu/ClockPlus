@@ -3,6 +3,7 @@ package com.philliphsu.clock2.model;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.os.SystemClock;
 import android.util.Log;
 
 import com.philliphsu.clock2.Timer;
@@ -30,6 +31,12 @@ public class TimersTableManager extends DatabaseTableManager<Timer> {
     @Override
     public TimerCursor queryItems() {
         return wrapInTimerCursor(super.queryItems());
+    }
+
+    public TimerCursor queryStartedTimers() {
+        String where = TimersTable.COLUMN_END_TIME + " > " + SystemClock.elapsedRealtime()
+                + " OR " + TimersTable.COLUMN_PAUSE_TIME + " > 0";
+        return queryItems(where, null);
     }
 
     @Override

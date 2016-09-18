@@ -22,7 +22,7 @@ public abstract class ChronometerNotificationService extends Service {
     public static final String ACTION_START_PAUSE = "com.philliphsu.clock2.timers.action.START_PAUSE";
     public static final String ACTION_STOP = "com.philliphsu.clock2.timers.action.STOP";
 
-    public static final String EXTRA_ID = "com.philliphsu.clock2.extra.ID";
+    public static final String EXTRA_ACTION_ID = "com.philliphsu.clock2.extra.ID";
 
     // TODO: I think we'll need a collection of builders too. However, we can have a common immutable
     // builder instance with attributes that all timer notifications will have.
@@ -83,18 +83,19 @@ public abstract class ChronometerNotificationService extends Service {
      * @param flags
      * @param startId
      */
-    protected abstract void handleDefaultAction(Intent intent, int flags, long startId);
+    protected abstract void handleDefaultAction(Intent intent, int flags, int startId);
 
-    protected abstract void handleStartPauseAction(Intent intent, int flags, long startId);
+    protected abstract void handleStartPauseAction(Intent intent, int flags, int startId);
 
-    protected abstract void handleStopAction(Intent intent, int flags, long startId);
+    protected abstract void handleStopAction(Intent intent, int flags, int startId);
 
     /**
      * This will be called if the command in {@link #onStartCommand(Intent, int, int)}
      * has an action that your subclass defines.
      * @param action Your custom action.
+     * @param startId
      */
-    protected abstract void handleAction(@NonNull String action, Intent intent, int flags, long startId);
+    protected abstract void handleAction(@NonNull String action, Intent intent, int flags, int startId);
 
     @Override
     public void onCreate() {
@@ -102,7 +103,6 @@ public abstract class ChronometerNotificationService extends Service {
         mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         if (isForeground()) {
             registerNewNoteBuilder(getNoteId());
-            registerNewChronometer(getNoteId());
             // IGNORE THE LINT WARNING ABOUT UNNECESSARY BOXING. Because getNoteId() returns an int,
             // it gets boxed to an Integer. A Long and an Integer are never interchangeable, even
             // if they wrap the same integer value.
@@ -110,13 +110,17 @@ public abstract class ChronometerNotificationService extends Service {
         }
     }
 
-    protected final void registerNewChronometer(long id) {
+    private void registerNewChronometer(long id) {
         ChronometerDelegate delegate = new ChronometerDelegate();
         delegate.init();
         delegate.setCountDown(isCountDown());
         mDelegates.put(id, delegate);
     }
 
+    /**
+     * Registers a new Notification builder with the provided ID. Each new builder
+     * is associated with a new chronometer.
+     */
     protected final void registerNewNoteBuilder(long id) {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this)
                 .setSmallIcon(getSmallIcon())
@@ -124,6 +128,7 @@ public abstract class ChronometerNotificationService extends Service {
                 .setOngoing(true)
                 .setContentIntent(getContentIntent());
         mNoteBuilders.put(id, builder);
+        registerNewChronometer(id);
     }
 
     // Didn't work!
@@ -194,7 +199,7 @@ public abstract class ChronometerNotificationService extends Service {
             // Display any notification updates associated with the current state
             // of the chronometer. If we relied on the HandlerThread to do this for us,
             // the message delivery would be delayed.
-            thread.updateNotification(/*TODO:pass in id*/false/*updateText*/);
+            thread.updateNotification(false/*updateText*/);
             // If the chronometer has been set to not run, the effect is obvious.
             // Otherwise, we're preparing for the start of a new thread.
             quitThread(id);
@@ -235,6 +240,20 @@ public abstract class ChronometerNotificationService extends Service {
         ChronometerDelegate delegate = mDelegates.get(id);
         delegate.setBase(base);
         // -------------------------------------------------------------------------------
+    }
+
+    /**
+     * Releases all resources associated with this id. This is only
+     * necessary for subclasses that support multiple notifications,
+     * because they don't have the convenience of stopping the service
+     * altogether to GC all resources.
+     */
+    @CallSuper
+    protected void releaseResources(long id) {
+        mNoteBuilders.remove(id);
+        quitThread(id);
+        mThreads.remove(id);
+        mDelegates.remove(id);
     }
 
     /**
@@ -309,7 +328,7 @@ public abstract class ChronometerNotificationService extends Service {
     protected final void addAction(String action, @DrawableRes int icon, String actionTitle, long id) {
         Intent intent = new Intent(this, getClass())
                 .setAction(action)
-                .putExtra(EXTRA_ID, id);
+                .putExtra(EXTRA_ACTION_ID, id);
         PendingIntent pi = PendingIntent.getService(
                 this, (int) id, intent, 0/*no flags*/);
         mNoteBuilders.get(id).addAction(icon, actionTitle, pi);

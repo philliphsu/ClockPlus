@@ -100,7 +100,7 @@ public class StopwatchNotificationService extends ChronometerNotificationService
     }
 
     @Override
-    protected void handleDefaultAction(Intent intent, int flags, long startId) {
+    protected void handleDefaultAction(Intent intent, int flags, int startId) {
         // TODO: Why do we need this check? Won't KEY_START_TIME always have a value of 0 here?
         if (mPrefs.getLong(StopwatchFragment.KEY_START_TIME, 0) == 0) {
             mCurrentLap = new Lap();
@@ -112,7 +112,7 @@ public class StopwatchNotificationService extends ChronometerNotificationService
     }
 
     @Override
-    protected void handleStartPauseAction(Intent intent, int flags, long startId) {
+    protected void handleStartPauseAction(Intent intent, int flags, int startId) {
         boolean running = mPrefs.getBoolean(StopwatchFragment.KEY_CHRONOMETER_RUNNING, false);
         SharedPreferences.Editor editor = mPrefs.edit();
         editor.putBoolean(StopwatchFragment.KEY_CHRONOMETER_RUNNING, !running);
@@ -137,7 +137,7 @@ public class StopwatchNotificationService extends ChronometerNotificationService
     }
 
     @Override
-    protected void handleStopAction(Intent intent, int flags, long startId) {
+    protected void handleStopAction(Intent intent, int flags, int startId) {
         mPrefs.edit()
                 .putLong(StopwatchFragment.KEY_START_TIME, 0)
                 .putLong(StopwatchFragment.KEY_PAUSE_TIME, 0)
@@ -157,7 +157,7 @@ public class StopwatchNotificationService extends ChronometerNotificationService
     }
 
     @Override
-    protected void handleAction(@NonNull String action, Intent intent, int flags, long startId) {
+    protected void handleAction(@NonNull String action, Intent intent, int flags, int startId) {
         if (ACTION_ADD_LAP.equals(action)) {
             if (mPrefs.getBoolean(StopwatchFragment.KEY_CHRONOMETER_RUNNING, false)) {
                 mDelegate.setBase(mPrefs.getLong(StopwatchFragment.KEY_START_TIME, SystemClock.elapsedRealtime()));

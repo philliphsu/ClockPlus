@@ -6,12 +6,15 @@ import android.content.Intent;
 import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.util.SimpleArrayMap;
+import android.util.Log;
 
 import com.philliphsu.clock2.AsyncTimersTableUpdateHandler;
 import com.philliphsu.clock2.ChronometerNotificationService;
 import com.philliphsu.clock2.MainActivity;
 import com.philliphsu.clock2.R;
 import com.philliphsu.clock2.Timer;
+import com.philliphsu.clock2.model.TimerCursor;
 
 /**
  * Handles the notification for an active Timer.
@@ -23,14 +26,17 @@ import com.philliphsu.clock2.Timer;
 public class TimerNotificationService extends ChronometerNotificationService {
     private static final String TAG = "TimerNotifService";
 
+    private static final String ACTION_CANCEL_NOTIFICATION = "com.philliphsu.clock2.timers.action.CANCEL_NOTIFICATION";
     public static final String ACTION_ADD_ONE_MINUTE = "com.philliphsu.clock2.timers.action.ADD_ONE_MINUTE";
 
     public static final String EXTRA_TIMER = "com.philliphsu.clock2.timers.extra.TIMER";
+    private static final String EXTRA_CANCEL_TIMER_ID = "com.philliphsu.clock2.timers.extra.CANCEL_TIMER_ID";
 
-    // TODO: I think we may need a list of timers.
-    private Timer mTimer;
-    private TimerController mController;
-    private Intent mIntent;
+    private AsyncTimersTableUpdateHandler mUpdateHandler;
+    private final SimpleArrayMap<Long, Timer> mTimers = new SimpleArrayMap<>();
+    private final SimpleArrayMap<Long, TimerController> mControllers = new SimpleArrayMap<>();
+
+    private long mMostRecentTimerId;
 
     /**
      * Helper method to start this Service for its default action: to show
@@ -50,14 +56,11 @@ public class TimerNotificationService extends ChronometerNotificationService {
      * @param timerId the id of the Timer associated with the notification
      *                you want to cancel
      */
-    public static void cancelNotification(Context context, long timerId) { // TODO: remove long param
-        // TODO: We do this in onDestroy() for a single notification.
-        // Multiples will probably need something like this.
-//        NotificationManager nm = (NotificationManager)
-//                context.getSystemService(Context.NOTIFICATION_SERVICE);
-//        nm.cancel(getNoteTag(), (int) timerId);
-        // TODO: We only do this for a single notification. Remove this for multiples.
-        context.stopService(new Intent(context, TimerNotificationService.class));
+    public static void cancelNotification(Context context, long timerId) {
+        Intent intent = new Intent(context, TimerNotificationService.class)
+                .setAction(ACTION_CANCEL_NOTIFICATION)
+                .putExtra(EXTRA_CANCEL_TIMER_ID, timerId);
+        context.startService(intent);
     }
 
     @Override
@@ -68,7 +71,10 @@ public class TimerNotificationService extends ChronometerNotificationService {
     @Nullable
     @Override
     protected PendingIntent getContentIntent() {
-        mIntent = new Intent(this, MainActivity.class);
+        // The base class won't call this for us because this is not a foreground service,
+        // as we require multiple notifications created as needed. Instead, this is called after
+        // we call registerNewNoteBuilder() in handleDefaultAction().
+        Intent intent = new Intent(this, MainActivity.class);
         // http://stackoverflow.com/a/3128418/5055032
         // "For some unspecified reason, extras will be delivered only if you've set some action"
         // This ONLY applies to PendingIntents...
@@ -76,10 +82,11 @@ public class TimerNotificationService extends ChronometerNotificationService {
         // as another PendingIntent's dummy action. For example, StopwatchNotificationService
         // uses the dummy action "foo"; we previously used "foo" here as well, and firing this
         // intent scrolled us to MainActivity.PAGE_STOPWATCH...
-        mIntent.setAction("bar");
-        mIntent.putExtra(MainActivity.EXTRA_SHOW_PAGE, MainActivity.PAGE_TIMERS);
-        // Request code not needed because we're only going to have one foreground notification.
-        return PendingIntent.getActivity(this, 0, mIntent, 0);
+        intent.setAction("bar");
+        intent.putExtra(MainActivity.EXTRA_SHOW_PAGE, MainActivity.PAGE_TIMERS);
+        // Before we called registerNewNoteBuilder(), we saved a reference to the most recent timer id.
+        intent.putExtra(TimersFragment.EXTRA_SCROLL_TO_TIMER_ID, mMostRecentTimerId);
+        return PendingIntent.getActivity(this, (int) mMostRecentTimerId, intent, 0);
     }
 
     @Override
@@ -94,10 +101,23 @@ public class TimerNotificationService extends ChronometerNotificationService {
     }
 
     @Override
+    protected String getNoteTag() {
+        // This is so we can cancel notifications in our static helper method
+        // cancelNotification(Context, long) with the static TAG constant
+        return TAG;
+    }
+
+    @Override
     protected boolean isForeground() {
         // We're going to post a separate notification for each Timer.
         // Foreground services are limited to one notification.
         return false;
+    }
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        mUpdateHandler = new AsyncTimersTableUpdateHandler(this, null);
     }
 
     @Override
@@ -108,73 +128,132 @@ public class TimerNotificationService extends ChronometerNotificationService {
         // our thread has enough leeway to sneak in a final call to post the notification before it
         // is actually quit().
         // As such, try cancelling the notification with this (tag, id) pair again.
-        cancelNotification(getNoteId());
+        for (int i = 0; i < mTimers.size(); i++) {
+            cancelNotification(mTimers.keyAt(i));
+        }
     }
 
     @Override
-    protected void handleDefaultAction(Intent intent, int flags, long startId) {
-        if ((mTimer = intent.getParcelableExtra(EXTRA_TIMER)) == null) {
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        if (intent == null) {
+            Log.d(TAG, "Recreated service, starting chronometer again.");
+            // Restore all running timers. This restores all of the base
+            // class's member state as well, due to the various API
+            // calls required.
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    TimerCursor cursor = mUpdateHandler.getTableManager().queryStartedTimers();
+                    while (cursor.moveToNext()) {
+                        // We actually don't need any args since this will be
+                        // passed directly to our handler method. If we were going
+                        // to startService() with this, then we would need to
+                        // specify them.
+                        Intent intent = new Intent(
+                                /*TimerNotificationService.this,
+                                TimerNotificationService.class*/);
+                        intent.putExtra(EXTRA_TIMER, cursor.getItem());
+                        // TODO: Should we startService() instead?
+                        handleDefaultAction(intent, 0, 0);
+                    }
+                }
+            }).start();
+        }
+        return super.onStartCommand(intent, flags, startId);
+    }
+
+    @Override
+    protected void handleDefaultAction(Intent intent, int flags, int startId) {
+        Timer timer = intent.getParcelableExtra(EXTRA_TIMER);
+        if (timer == null) {
             throw new IllegalStateException("Cannot start TimerNotificationService without a Timer");
         }
-        // TODO: Wrap this around an `if (only one timer running)` statement.
-        // TODO: We have to update the PendingIntent.. so write an API in the base class to do so.
-        // TODO: Not implemented for simplicity. Future release??
-//        mIntent.putExtra(TimersFragment.EXTRA_SCROLL_TO_TIMER_ID, mTimer.getId());
-        mController = new TimerController(mTimer, new AsyncTimersTableUpdateHandler(this, null));
+        final long id = timer.getId();
+        mTimers.put(id, timer);
+        mControllers.put(id, new TimerController(timer, mUpdateHandler));
+
+        mMostRecentTimerId = timer.getId();
+        registerNewNoteBuilder(id);
+        
         // The note's title should change here every time, especially if the Timer's label was updated.
-        String title = mTimer.label();
+        String title = timer.label();
         if (title.isEmpty()) {
             title = getString(R.string.timer);
         }
-        setContentTitle(mTimer.getId(), title);
-        syncNotificationWithTimerState(mTimer.isRunning());
+        setContentTitle(id, title);
+        syncNotificationWithTimerState(id, timer.isRunning());
     }
 
     @Override
-    protected void handleStartPauseAction(Intent intent, int flags, long startId) {
-        mController.startPause();
-        syncNotificationWithTimerState(mTimer.isRunning());
+    protected void handleStartPauseAction(Intent intent, int flags, int startId) {
+        long id = getActionId(intent);
+        mControllers.get(id).startPause();
+        syncNotificationWithTimerState(id, mTimers.get(id).isRunning());
     }
 
     @Override
-    protected void handleStopAction(Intent intent, int flags, long startId) {
-        mController.stop();
-        stopSelf();
+    protected void handleStopAction(Intent intent, int flags, int startId) {
+        long id = getActionId(intent);
+        mControllers.get(id).stop();
         // We leave removing the notification up to AsyncTimersTableUpdateHandler
         // when it calls cancelAlarm() from onPostAsyncUpdate().
+        // This calls the static helper cancelNotification(), which
+        // starts this service to handle ACTION_CANCEL_NOTIFICATION.
     }
 
     @Override
-    protected void handleAction(@NonNull String action, Intent intent, int flags, long startId) {
+    protected void handleAction(@NonNull String action, Intent intent, int flags, int startId) {
         if (ACTION_ADD_ONE_MINUTE.equals(action)) {
             // While the notification's countdown would automatically be extended by one minute,
             // there is a noticeable delay before the minute gets added on.
             // Update the text immediately, because there's no harm in doing so.
-            long id = intent.getLongExtra(EXTRA_ID, -1);
+            long id = getActionId(intent);
             setBase(id, getBase(id) + 60000);
             updateNotification(id, true);
-            mController.addOneMinute();
+            mControllers.get(id).addOneMinute();
+        } else if (ACTION_CANCEL_NOTIFICATION.equals(action)) {
+            long id = intent.getLongExtra(EXTRA_CANCEL_TIMER_ID, -1);
+            cancelNotification(id);
+            // TODO: SHould this be before cancelNotification()? I'm worried
+            // that the thread's handler will have enough leeway to sneak
+            // in a notification update before it is quit. If it did,
+            // then at least cancelNotification should theoretically
+            // remove it...
+            releaseResources(id);
         } else {
             throw new IllegalArgumentException("TimerNotificationService cannot handle action " + action);
         }
     }
 
-    private void syncNotificationWithTimerState(boolean running) {
+    @Override
+    protected void releaseResources(long id) {
+        super.releaseResources(id);
+        mTimers.remove(id);
+        mControllers.remove(id);
+        // TODO: Should we make a private method?
+        // This private method would first call releaseResources(),
+        // and then this block.
+        if (mTimers.isEmpty()) { // We could check any map, since they should all have the same sizes
+            stopSelf();
+        }
+    }
+
+    private void syncNotificationWithTimerState(long id, boolean running) {
         // The actions from the last time we configured the Builder are still here.
         // We have to retain the relative ordering of the actions while updating
         // just the start/pause action, so clear them and set them again.
-        final long timerId = mTimer.getId();
-        clearActions(timerId);
-        addAction(ACTION_ADD_ONE_MINUTE,
-                R.drawable.ic_add_24dp,
-                getString(R.string.minute),
-                timerId);
-        addStartPauseAction(running, timerId);
-        addStopAction(timerId);
+        clearActions(id);
+        addAction(ACTION_ADD_ONE_MINUTE, R.drawable.ic_add_24dp, getString(R.string.minute), id);
+        addStartPauseAction(running, id);
+        addStopAction(id);
 
-        quitCurrentThread(getNoteId());
+        quitCurrentThread(id);
         if (running) {
-            startNewThread(getNoteId(), SystemClock.elapsedRealtime() + mTimer.timeRemaining());
+            startNewThread(id, SystemClock.elapsedRealtime() + mTimers.get(id).timeRemaining());
         }
+    }
+    
+    private long getActionId(Intent intent) {
+        return intent.getLongExtra(EXTRA_ACTION_ID, -1);
     }
 }
