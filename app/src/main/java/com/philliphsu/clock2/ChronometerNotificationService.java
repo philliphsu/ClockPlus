@@ -11,6 +11,7 @@ import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.util.SimpleArrayMap;
 
 import com.philliphsu.clock2.timers.ChronometerDelegate;
 
@@ -21,11 +22,22 @@ public abstract class ChronometerNotificationService extends Service {
     public static final String ACTION_START_PAUSE = "com.philliphsu.clock2.timers.action.START_PAUSE";
     public static final String ACTION_STOP = "com.philliphsu.clock2.timers.action.STOP";
 
+    // TODO: I think we'll need a collection of builders too. However, we can have a common immutable
+    // builder instance with attributes that all timer notifications will have.
     private NotificationCompat.Builder mNoteBuilder;
     private NotificationManager mNotificationManager;
-    // TODO: I think we may need a list of threads.
+    @Deprecated
     private ChronometerNotificationThread mThread;
+    @Deprecated
     private final ChronometerDelegate mDelegate = new ChronometerDelegate();
+
+    /**
+     * The default capacity of an array map is 0.
+     * The minimum amount by which the capacity of a ArrayMap will increase
+     * is currently {@link SimpleArrayMap#BASE_SIZE 4}.
+     */
+    private final SimpleArrayMap<Long, ChronometerNotificationThread> mThreads = new SimpleArrayMap<>();
+    private final SimpleArrayMap<Long, ChronometerDelegate> mDelegates = new SimpleArrayMap<>();
 
     /**
      * @return the icon for the notification
@@ -89,10 +101,16 @@ public abstract class ChronometerNotificationService extends Service {
                 .setOngoing(true)
                 .setContentIntent(getContentIntent());
         if (isForeground()) {
+            registerNewChronometer(getNoteId());
             startForeground(getNoteId(), mNoteBuilder.build());
         }
-        mDelegate.init();
-        mDelegate.setCountDown(isCountDown());
+    }
+
+    private void registerNewChronometer(long id) {
+        ChronometerDelegate delegate = new ChronometerDelegate();
+        delegate.init();
+        delegate.setCountDown(isCountDown());
+        mDelegates.put(id, delegate);
     }
 
     // Didn't work!
@@ -114,6 +132,7 @@ public abstract class ChronometerNotificationService extends Service {
 
     @Override
     public void onDestroy() {
+        // TODO: Quit all threads by iterating through the collection
         quitThread(); // TOneverDO: quitCurrentThread() because that posts the notification again
     }
 
@@ -153,6 +172,7 @@ public abstract class ChronometerNotificationService extends Service {
      * you might have configured in the Builder and then call the thread's {@link
      * ChronometerNotificationThread#quit() quit()}.
      */
+    // TODO: rename method to quitThread(long id)
     public void quitCurrentThread() {
         if (mThread != null) {
             // Display any notification updates associated with the current state
@@ -171,6 +191,7 @@ public abstract class ChronometerNotificationService extends Service {
      * initializing its looper.
      * @param base the new base time of the chronometer
      */
+    // TODO: Change sig to (long id, long base)
     public void startNewThread(long base) {
         // An instance of Thread cannot be started more than once. You must create
         // a new instance if you want to start the Thread's work again.
@@ -202,7 +223,8 @@ public abstract class ChronometerNotificationService extends Service {
      * @param running whether the chronometer is running
      * @param requestCode Used to create the PendingIntent that is fired when this action is clicked.
      */
-    protected final void addStartPauseAction(boolean running, int requestCode/*TODO remove*/) {
+    protected final void addStartPauseAction(boolean running, int requestCode/*TODO: long id. as a request code, cast down.*/) {
+        // TODO: Add this to the correct Builder, associated with the provided long id.
         addAction(ACTION_START_PAUSE,
                 running ? R.drawable.ic_pause_24dp : R.drawable.ic_start_24dp,
                 getString(running ? R.string.pause : R.string.resume),
@@ -213,20 +235,22 @@ public abstract class ChronometerNotificationService extends Service {
      * Helper method to add the stop action to the notification's builder.
      * @param requestCode Used to create the PendingIntent that is fired when this action is clicked.
      */
-    protected final void addStopAction(int requestCode/*TODO remove*/) {
+    protected final void addStopAction(int requestCode/*TODO: long id. as a request code, cast down.*/) {
         addAction(ACTION_STOP, R.drawable.ic_stop_24dp, getString(R.string.stop), requestCode);
     }
 
     /**
      * Clear the notification builder's set actions.
      */
-    protected final void clearActions() {
+    protected final void clearActions(/*TODO: long id*/) {
+        // TODO: Clear the actions from the correct builder.
         // TODO: The source indicates mActions is hidden, so how are we able to access it?
         // Will it remain accessible for all SDK versions? If not, we would have to rebuild
         // the entire notification with a new local Builder instance.
         mNoteBuilder.mActions.clear();
     }
 
+    // TODO: We'll need to change the signatures of all these to have a long id param.
     protected final void setBase(long base) {
         mDelegate.setBase(base);
     }
@@ -243,10 +267,12 @@ public abstract class ChronometerNotificationService extends Service {
         mNoteBuilder.setContentTitle(title);
     }
 
+    //////////////////////////////////////////////////////////////////////////////////////
+
     /**
      * Adds the specified action to the notification's Builder.
      */
-    protected final void addAction(String action, @DrawableRes int icon, String actionTitle, int requestCode/*TODO remove*/) {
+    protected final void addAction(String action, @DrawableRes int icon, String actionTitle, int requestCode/*TODO: long id. as a request code, cast down.*/) {
         Intent intent = new Intent(this, getClass())
                 .setAction(action);
         // TODO: We can put the requestCode as an extra to this intent, and then retrieve that extra
@@ -260,6 +286,7 @@ public abstract class ChronometerNotificationService extends Service {
     /**
      * Cancels the foreground notification.
      */
+    // TODO: change sig to long id
     protected final void cancelNotification() {
         mNotificationManager.cancel(getNoteId());
     }
@@ -268,6 +295,7 @@ public abstract class ChronometerNotificationService extends Service {
      * Causes the handler thread's looper to terminate without processing
      * any more messages in the message queue.
      */
+    // TODO: change sig to long id
     private void quitThread() {
         if (mThread != null && mThread.isAlive()) {
             mThread.quit();
