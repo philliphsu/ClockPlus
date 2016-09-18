@@ -30,7 +30,7 @@ public class StopwatchNotificationService extends ChronometerNotificationService
     @Override
     public void onCreate() {
         super.onCreate();
-        setContentTitle(getString(R.string.stopwatch));
+        setContentTitle(getNoteId(), getString(R.string.stopwatch));
         mUpdateHandler = new AsyncLapsTableUpdateHandler(this, null);
         mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
         mDelegate.init();
@@ -70,11 +70,6 @@ public class StopwatchNotificationService extends ChronometerNotificationService
         // then the call to super won't run any commands, because it will see
         // that the intent is null.
         return super.onStartCommand(intent, flags, startId);
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
     }
 
     @Override
@@ -180,26 +175,23 @@ public class StopwatchNotificationService extends ChronometerNotificationService
             if (lapNumber == 0) {
                 Log.w(TAG, "Lap number was not passed in with intent");
             }
-            // Unfortunately, the ID is only assigned when retrieving a Lap instance from
-            // its cursor; the value here will always be 0.
-            setContentTitle(getString(R.string.stopwatch_and_lap_number, lapNumber));
-            updateNotification(true);
+            setContentTitle(getNoteId(), getString(R.string.stopwatch_and_lap_number, lapNumber));
+            updateNotification(getNoteId(), true);
         } else {
             throw new IllegalArgumentException("StopwatchNotificationService cannot handle action " + action);
         }
     }
 
     private void syncNotificationWithStopwatchState(boolean running) {
-        clearActions();
-        // No request code needed, so use 0.
-        addAction(ACTION_ADD_LAP, R.drawable.ic_add_lap_24dp, getString(R.string.lap), 0);
-        addStartPauseAction(running, 0);
-        addStopAction(0);
+        clearActions(getNoteId());
+        addAction(ACTION_ADD_LAP, R.drawable.ic_add_lap_24dp, getString(R.string.lap), getNoteId());
+        addStartPauseAction(running, getNoteId());
+        addStopAction(getNoteId());
 
-        quitCurrentThread();
+        quitCurrentThread(getNoteId());
         if (running) {
             long startTime = mPrefs.getLong(StopwatchFragment.KEY_START_TIME, SystemClock.elapsedRealtime());
-            startNewThread(startTime);
+            startNewThread(getNoteId(), startTime);
         }
     }
 }

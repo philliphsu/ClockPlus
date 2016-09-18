@@ -108,7 +108,7 @@ public class TimerNotificationService extends ChronometerNotificationService {
         // our thread has enough leeway to sneak in a final call to post the notification before it
         // is actually quit().
         // As such, try cancelling the notification with this (tag, id) pair again.
-        cancelNotification();
+        cancelNotification(getNoteId());
     }
 
     @Override
@@ -126,7 +126,7 @@ public class TimerNotificationService extends ChronometerNotificationService {
         if (title.isEmpty()) {
             title = getString(R.string.timer);
         }
-        setContentTitle(title);
+        setContentTitle(mTimer.getId(), title);
         syncNotificationWithTimerState(mTimer.isRunning());
     }
 
@@ -150,8 +150,9 @@ public class TimerNotificationService extends ChronometerNotificationService {
             // While the notification's countdown would automatically be extended by one minute,
             // there is a noticeable delay before the minute gets added on.
             // Update the text immediately, because there's no harm in doing so.
-            setBase(getBase() + 60000);
-            updateNotification(true);
+            long id = intent.getLongExtra(EXTRA_ID, -1);
+            setBase(id, getBase(id) + 60000);
+            updateNotification(id, true);
             mController.addOneMinute();
         } else {
             throw new IllegalArgumentException("TimerNotificationService cannot handle action " + action);
@@ -162,8 +163,8 @@ public class TimerNotificationService extends ChronometerNotificationService {
         // The actions from the last time we configured the Builder are still here.
         // We have to retain the relative ordering of the actions while updating
         // just the start/pause action, so clear them and set them again.
-        clearActions();
-        final int timerId = mTimer.getIntId();
+        final long timerId = mTimer.getId();
+        clearActions(timerId);
         addAction(ACTION_ADD_ONE_MINUTE,
                 R.drawable.ic_add_24dp,
                 getString(R.string.minute),
@@ -171,9 +172,9 @@ public class TimerNotificationService extends ChronometerNotificationService {
         addStartPauseAction(running, timerId);
         addStopAction(timerId);
 
-        quitCurrentThread();
+        quitCurrentThread(getNoteId());
         if (running) {
-            startNewThread(SystemClock.elapsedRealtime() + mTimer.timeRemaining());
+            startNewThread(getNoteId(), SystemClock.elapsedRealtime() + mTimer.timeRemaining());
         }
     }
 }
