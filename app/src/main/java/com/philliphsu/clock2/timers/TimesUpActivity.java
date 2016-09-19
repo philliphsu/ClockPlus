@@ -2,6 +2,7 @@ package com.philliphsu.clock2.timers;
 
 import android.app.Notification;
 import android.app.NotificationManager;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.v4.app.NotificationCompat;
@@ -32,6 +33,12 @@ public class TimesUpActivity extends RingtoneActivity<Timer> {
     public void finish() {
         super.finish();
         mNotificationManager.cancel(TAG, getRingingObject().getIntId());
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        postExpiredTimerNote();
     }
 
     @Override
@@ -100,10 +107,14 @@ public class TimesUpActivity extends RingtoneActivity<Timer> {
     @Override
     protected void showAutoSilenced() {
         super.showAutoSilenced();
+        postExpiredTimerNote();
+    }
+
+    private void postExpiredTimerNote() {
         Notification note = new NotificationCompat.Builder(this)
                 .setContentTitle(getString(R.string.timer_expired))
                 .setContentText(getRingingObject().label())
-                .setSmallIcon(R.mipmap.ic_launcher) // TODO: correct icon
+                .setSmallIcon(R.drawable.ic_timer_24dp)
                 .build();
         mNotificationManager.notify(TAG, getRingingObject().getIntId(), note);
     }

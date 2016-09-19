@@ -1,6 +1,7 @@
 package com.philliphsu.clock2.timers;
 
 import android.animation.ObjectAnimator;
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.IdRes;
 import android.support.v4.content.ContextCompat;
@@ -115,6 +116,7 @@ public class TimerViewHolder extends BaseViewHolder<Timer> {
     @OnClick(R.id.stop)
     void stop() {
         mController.stop();
+        getContext().stopService(new Intent(getContext(), TimerRingtoneService.class));
     }
 
     @OnClick(R.id.label)

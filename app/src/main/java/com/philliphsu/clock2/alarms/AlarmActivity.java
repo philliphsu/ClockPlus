@@ -15,7 +15,7 @@ import com.philliphsu.clock2.util.AlarmController;
 import com.philliphsu.clock2.util.DateFormatUtils;
 
 public class AlarmActivity extends RingtoneActivity<Alarm> {
-    private static final String TAG = "TimesUpActivity";
+    private static final String TAG = "AlarmActivity";
 
     private AlarmController mAlarmController;
     private NotificationManager mNotificationManager;
