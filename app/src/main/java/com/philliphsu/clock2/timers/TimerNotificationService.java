@@ -163,15 +163,17 @@ public class TimerNotificationService extends ChronometerNotificationService {
 
     @Override
     protected void handleDefaultAction(Intent intent, int flags, int startId) {
-        Timer timer = intent.getParcelableExtra(EXTRA_TIMER);
+        final Timer timer = intent.getParcelableExtra(EXTRA_TIMER);
         if (timer == null) {
             throw new IllegalStateException("Cannot start TimerNotificationService without a Timer");
         }
         final long id = timer.getId();
-        final boolean isUpdate = mTimers.containsKey(id); // could use either map
-        mTimers.put(id, timer);
+        boolean updateChronometer = false;
+        Timer oldTimer = mTimers.put(id, timer);
+        if (oldTimer != null) {
+            updateChronometer = oldTimer.endTime() != timer.endTime();
+        }
         mControllers.put(id, new TimerController(timer, mUpdateHandler));
-
         mMostRecentTimerId = id;
         // If isUpdate == true, this won't call through because the id already exists in the
         // internal mappings as well.
@@ -182,12 +184,14 @@ public class TimerNotificationService extends ChronometerNotificationService {
             title = getString(R.string.timer);
         }
         setContentTitle(id, title);
-        if (isUpdate) {
-            // Immediately push any updates, or else there will be a noticeable delay.
-            // If there were any duration changes, this will reflect them.
+        if (updateChronometer) {
+            // Immediately push any duration updates, or else there will be a noticeable delay.
             setBase(id, timer.endTime());
             updateNotification(id, true);
         }
+        // This handles any other notification updates like the title or actions, even if
+        // the timer is not running because the current thread will update the notification
+        // (besides the content text) before quitting.
         syncNotificationWithTimerState(id, timer.isRunning());
     }
 
