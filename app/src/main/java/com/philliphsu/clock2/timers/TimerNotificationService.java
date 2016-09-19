@@ -168,7 +168,7 @@ public class TimerNotificationService extends ChronometerNotificationService {
             throw new IllegalStateException("Cannot start TimerNotificationService without a Timer");
         }
         final long id = timer.getId();
-//        final boolean isUpdate = mTimers.containsKey(id); // could use either map
+        final boolean isUpdate = mTimers.containsKey(id); // could use either map
         mTimers.put(id, timer);
         mControllers.put(id, new TimerController(timer, mUpdateHandler));
 
@@ -182,12 +182,12 @@ public class TimerNotificationService extends ChronometerNotificationService {
             title = getString(R.string.timer);
         }
         setContentTitle(id, title);
-        // There was still a delay before the notification got updated, so forget this.
-//        if (isUpdate) {
-//            // Immediately push any updates, or else there will be a noticeable delay.
-//            Log.d(TAG, "Updating notification");
-//            updateNotification(id, true);
-//        }
+        if (isUpdate) {
+            // Immediately push any updates, or else there will be a noticeable delay.
+            // If there were any duration changes, this will reflect them.
+            setBase(id, timer.endTime());
+            updateNotification(id, true);
+        }
         syncNotificationWithTimerState(id, timer.isRunning());
     }
 
