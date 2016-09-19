@@ -237,8 +237,7 @@ public class MainActivity extends BaseActivity {
         mAddItemDrawable = ContextCompat.getDrawable(this, R.drawable.ic_add_24dp);
 
         final int initialPage = getIntent().getIntExtra(EXTRA_SHOW_PAGE, -1);
-        if (initialPage > 0/*0 is already the default page*/
-                && initialPage <= mSectionsPagerAdapter.getCount() - 1) {
+        if (initialPage >= 0 && initialPage <= mSectionsPagerAdapter.getCount() - 1) {
             // Run this only after the ViewPager is finished drawing
             mViewPager.post(new Runnable() {
                 @Override

@@ -25,13 +25,8 @@ import com.philliphsu.clock2.util.DelayedSnackbarHandler;
 
 import static com.philliphsu.clock2.util.FragmentTagUtils.makeTag;
 
-public class AlarmsFragment extends RecyclerViewFragment<
-        Alarm,
-        BaseAlarmViewHolder,
-        AlarmCursor,
-        AlarmsCursorAdapter>
-    implements ScrollHandler, // TODO: Move interface to base class
-        BaseTimePickerDialog.OnTimeSetListener {
+public class AlarmsFragment extends RecyclerViewFragment<Alarm, BaseAlarmViewHolder, AlarmCursor,
+        AlarmsCursorAdapter> implements BaseTimePickerDialog.OnTimeSetListener {
     private static final String TAG = "AlarmsFragment";
 
     private static final String KEY_EXPANDED_POSITION = "expanded_position";
@@ -46,6 +41,7 @@ public class AlarmsFragment extends RecyclerViewFragment<
 
     // TODO: Delete this. We no longer use the system's ringtone picker.
     public static final int REQUEST_PICK_RINGTONE = 1;
+    public static final String EXTRA_SCROLL_TO_ALARM_ID = "com.philliphsu.clock2.alarms.extra.SCROLL_TO_ALARM_ID";
 
     private AsyncAlarmsTableUpdateHandler mAsyncUpdateHandler;
     private AlarmController mAlarmController;
@@ -96,6 +92,11 @@ public class AlarmsFragment extends RecyclerViewFragment<
         mTimePickerDialogController = new TimePickerDialogController(
                 getFragmentManager(), getActivity(), this);
         mTimePickerDialogController.tryRestoreCallback(makeTimePickerDialogTag());
+
+        long scrollToStableId = getActivity().getIntent().getLongExtra(EXTRA_SCROLL_TO_ALARM_ID, -1);
+        if (scrollToStableId != -1) {
+            setScrollToStableId(scrollToStableId);
+        }
     }
 
     @Override

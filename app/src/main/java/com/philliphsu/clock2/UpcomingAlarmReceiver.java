@@ -8,8 +8,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.v4.app.NotificationCompat;
 
+import com.philliphsu.clock2.alarms.AlarmsFragment;
 import com.philliphsu.clock2.util.AlarmController;
 
+import static android.app.PendingIntent.FLAG_CANCEL_CURRENT;
 import static android.app.PendingIntent.FLAG_ONE_SHOT;
 import static com.philliphsu.clock2.util.DateFormatUtils.formatTime;
 
@@ -62,16 +64,27 @@ public class UpcomingAlarmReceiver extends BroadcastReceiver {
                     }
                 }
 
-                Intent in = new Intent(context, UpcomingAlarmReceiver.class)
-                        .putExtra(EXTRA_ALARM, alarm)
-                        .setAction(ACTION_DISMISS_NOW);
-                PendingIntent pi = PendingIntent.getBroadcast(context, (int) id, in, FLAG_ONE_SHOT);
+                Intent dismissIntent = new Intent(context, UpcomingAlarmReceiver.class)
+                        .setAction(ACTION_DISMISS_NOW)
+                        .putExtra(EXTRA_ALARM, alarm);
+                PendingIntent piDismiss = PendingIntent.getBroadcast(context, (int) id, dismissIntent, FLAG_ONE_SHOT);
+                Intent contentIntent = new Intent(context, MainActivity.class)
+                        // http://stackoverflow.com/a/3128418/5055032
+                        // "For some unspecified reason, extras will be delivered only if you've set some action"
+                        // This ONLY applies to PendingIntents...
+                        // And for another unspecified reason, this dummy action must NOT be the same value
+                        // as another PendingIntent's dummy action.
+                        .setAction("abc")
+                        .putExtra(MainActivity.EXTRA_SHOW_PAGE, MainActivity.PAGE_ALARMS)
+                        .putExtra(AlarmsFragment.EXTRA_SCROLL_TO_ALARM_ID, id);
+                PendingIntent piContent = PendingIntent.getActivity(context, (int) id, contentIntent, FLAG_CANCEL_CURRENT);
                 Notification note = new NotificationCompat.Builder(context)
                         .setSmallIcon(R.drawable.ic_alarm_24dp)
                         .setContentTitle(title)
                         .setContentText(text)
+                        .setContentIntent(piContent)
                         .setOngoing(true)
-                        .addAction(R.drawable.ic_dismiss_alarm_24dp, context.getString(R.string.dismiss_now), pi)
+                        .addAction(R.drawable.ic_dismiss_alarm_24dp, context.getString(R.string.dismiss_now), piDismiss)
                         .build();
                 nm.notify(TAG, (int) id, note);
             }

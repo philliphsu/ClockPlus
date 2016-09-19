@@ -25,11 +25,7 @@ import com.philliphsu.clock2.model.TimersListCursorLoader;
 import static butterknife.ButterKnife.findById;
 import static com.philliphsu.clock2.util.ConfigurationUtils.getOrientation;
 
-public class TimersFragment extends RecyclerViewFragment<
-        Timer,
-        TimerViewHolder,
-        TimerCursor,
-        TimersCursorAdapter> {
+public class TimersFragment extends RecyclerViewFragment<Timer, TimerViewHolder, TimerCursor, TimersCursorAdapter> {
     // TODO: Different number of columns for different display densities, instead of landscape.
     // Use smallest width qualifiers. I can imagine 3 or 4 columns for a large enough tablet in landscape.
     private static final int LANDSCAPE_LAYOUT_COLUMNS = 2;
@@ -44,8 +40,6 @@ public class TimersFragment extends RecyclerViewFragment<
         super.onCreate(savedInstanceState);
         mAsyncTimersTableUpdateHandler = new AsyncTimersTableUpdateHandler(getActivity(), this);
 
-        // TimerNotificationService was supposed to put this extra in its content intent.
-        // Currently, it does not implement this feature. May be left for a future release?
         long scrollToStableId = getActivity().getIntent().getLongExtra(EXTRA_SCROLL_TO_TIMER_ID, -1);
         if (scrollToStableId != -1) {
             setScrollToStableId(scrollToStableId);
