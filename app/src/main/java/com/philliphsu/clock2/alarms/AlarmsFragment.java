@@ -6,6 +6,7 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.Nullable;
 import android.support.v4.content.Loader;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -82,13 +83,6 @@ public class AlarmsFragment extends RecyclerViewFragment<Alarm, BaseAlarmViewHol
             // is called.
             mExpandedPosition = savedInstanceState.getInt(KEY_EXPANDED_POSITION, RecyclerView.NO_POSITION);
         }
-
-        // Will succeed because the activity is created at this point.
-        // See the Fragment lifecycle.
-        mSnackbarAnchor = getActivity().findViewById(R.id.main_content);
-        mAlarmController = new AlarmController(getActivity(), mSnackbarAnchor);
-        mAsyncUpdateHandler = new AsyncAlarmsTableUpdateHandler(getActivity(),
-                mSnackbarAnchor, this, mAlarmController);
         mTimePickerDialogController = new TimePickerDialogController(
                 getFragmentManager(), getActivity(), this);
         mTimePickerDialogController.tryRestoreCallback(makeTimePickerDialogTag());
@@ -97,6 +91,15 @@ public class AlarmsFragment extends RecyclerViewFragment<Alarm, BaseAlarmViewHol
         if (scrollToStableId != -1) {
             setScrollToStableId(scrollToStableId);
         }
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        mSnackbarAnchor = getActivity().findViewById(R.id.main_content);
+        mAlarmController = new AlarmController(getActivity(), mSnackbarAnchor);
+        mAsyncUpdateHandler = new AsyncAlarmsTableUpdateHandler(getActivity(),
+                mSnackbarAnchor, this, mAlarmController);
     }
 
     @Override
@@ -132,7 +135,7 @@ public class AlarmsFragment extends RecyclerViewFragment<Alarm, BaseAlarmViewHol
     @Override
     protected AlarmsCursorAdapter onCreateAdapter() {
         // Create a new adapter. This is called before we can initialize mAlarmController,
-        // so right now it is null. However, after super.onCreate() returns, it is initialized, and
+        // so right now it is null. However, after onActivityCreated() returns, it is initialized, and
         // the reference variable will be pointing to an actual object. This assignment "propagates"
         // to all references to mAlarmController.
         return new AlarmsCursorAdapter(this, mAlarmController);
