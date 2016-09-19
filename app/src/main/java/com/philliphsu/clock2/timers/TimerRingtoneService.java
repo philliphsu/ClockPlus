@@ -20,6 +20,10 @@ public class TimerRingtoneService extends RingtoneService<Timer> {
     // don't actually matter.
     private static final String ACTION_ADD_ONE_MINUTE = TimerNotificationService.ACTION_ADD_ONE_MINUTE;
     private static final String ACTION_STOP = TimerNotificationService.ACTION_STOP;
+    /**
+     * The dummy action required for PendingIntents.
+     */
+    private static final String ACTION_CONTENT_INTENT = "launch_times_up_activity";
 
     private TimerController mController;
 
@@ -66,6 +70,12 @@ public class TimerRingtoneService extends RingtoneService<Timer> {
         if (title.isEmpty()) {
             title = getString(R.string.timer);
         }
+        // Not implemented for simplicity and the feature isn't very useful.. future release??
+        // TODO: We need to pass in the ringing object as an extra.
+//        Intent intent = new Intent(this, TimesUpActivity.class);
+        // Since there can only be one Timer at a time for this Activity/Service pair,
+        // we don't need to specify a request code.
+//        PendingIntent pi = PendingIntent.getActivity(this, 0, intent, 0);
         return new NotificationCompat.Builder(this)
                 .setContentTitle(title)
                 .setContentText(getString(R.string.times_up))
@@ -78,8 +88,8 @@ public class TimerRingtoneService extends RingtoneService<Timer> {
                 .addAction(R.drawable.ic_stop_24dp,
                         getString(R.string.stop),
                         getPendingIntent(ACTION_STOP, getRingingObject().getIntId()))
+//                .setContentIntent(pi)
                 .build();
-// TODO:               .setContentIntent(getPendingIntent(timer.requestCode(), intent, true));
     }
 
     @Override
