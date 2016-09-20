@@ -12,6 +12,15 @@
             android:summary="%s"/>
     </PreferenceCategory>-->
     <PreferenceCategory android:title="@string/title_category_general">
+        <ListPreference
+            android:key="@string/key_theme"
+            android:title="@string/title_theme"
+            android:dialogTitle="@string/title_theme"
+            android:entries="@array/array_theme"
+            android:entryValues="@array/array_theme"
+            android:defaultValue="@string/theme_light"
+            android:summary="%s">
+        </ListPreference>
         <Preference android:title="@string/title_system_date_time_settings">
             <!-- https://developer.android.com/reference/android/provider/Settings.html -->
             <intent android:action="android.settings.DATE_SETTINGS"/>
