@@ -30,13 +30,23 @@ public abstract class BaseActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(layoutResId());
         // Initialize the associated SharedPreferences file with default values
         // for each preference when the user first opens your application.
         // When false, the system sets the default values only if this method has
         // never been called in the past (or the KEY_HAS_SET_DEFAULT_VALUES in the
         // default value shared preferences file is false).
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
+        // ========================================================================================
+        // TOneverDO: Set theme after setContentView()
+        // Since the default theme is light, we only need to check against the dark theme.
+        String themeDark = getString(R.string.theme_dark);
+        String theme = PreferenceManager.getDefaultSharedPreferences(this).getString(
+                getString(R.string.key_theme), null);
+        if (themeDark.equals(theme)) {
+            setTheme(R.style.AppTheme_Dark);
+        }
+        // ========================================================================================
+        setContentView(layoutResId());
         // Direct volume changes to the alarm stream
         setVolumeControlStream(AudioManager.STREAM_ALARM);
         ButterKnife.bind(this);
