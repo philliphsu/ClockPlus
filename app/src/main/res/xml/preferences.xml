@@ -11,6 +11,12 @@
             android:defaultValue="@string/local_time"
             android:summary="%s"/>
     </PreferenceCategory>-->
+    <PreferenceCategory android:title="@string/title_category_general">
+        <Preference android:title="@string/title_system_date_time_settings">
+            <!-- https://developer.android.com/reference/android/provider/Settings.html -->
+            <intent android:action="android.settings.DATE_SETTINGS"/>
+        </Preference>
+    </PreferenceCategory>
     <PreferenceCategory android:title="@string/title_category_alarms">
         <ListPreference
             android:key="@string/key_time_picker_style"
