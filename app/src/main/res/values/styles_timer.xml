@@ -44,6 +44,12 @@
         <item name="android:textColor">?attr/themedIconTint</item>
         <item name="android:textStyle">bold</item>
     </style>
+    <style name="TimerAction.Menu">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginEnd">0dp</item>
+        <item name="android:padding">@dimen/cardview_action_icon_margin</item>
+    </style>
     <!--Style for the FAB in EditTimerActivity-->
     <style name="BaseTimerFab">
         <item name="android:layout_width">wrap_content</item>

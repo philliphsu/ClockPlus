@@ -49,13 +49,10 @@
 
         <ImageButton
             android:id="@+id/menu"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
             android:src="@drawable/ic_overflow_24dp"
             android:layout_alignParentTop="true"
             android:layout_alignParentEnd="true"
-            android:layout_marginTop="@dimen/cardview_action_icon_margin"
-            style="@style/TimerAction"/>
+            style="@style/TimerAction.Menu"/>
 
     </RelativeLayout>
 
