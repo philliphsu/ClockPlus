@@ -22,24 +22,6 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <!--
-        <activity
-            android:name=".ringtone.RingtoneActivity"
-            android:excludeFromRecents="true"
-            android:label="@string/title_activity_ringtone"
-            android:launchMode="singleTask"
-            android:taskAffinity="com.philliphsu.clock2.RingtoneActivity">
-        </activity>
-        -->
-
-
-        <!--
-        <service
-            android:name=".ringtone.RingtoneService"
-            android:enabled="true"
-            android:exported="false">
-        </service>
-        -->
 
         <receiver
             android:name=".UpcomingAlarmReceiver"
@@ -47,15 +29,6 @@
             android:exported="false">
         </receiver>
 
-        <activity
-            android:name=".editalarm.EditAlarmActivity"
-            android:label="@string/title_activity_edit_alarm"
-            android:parentActivityName=".MainActivity"
-            android:windowSoftInputMode="adjustNothing">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.philliphsu.clock2.MainActivity"/>
-        </activity>
         <activity
             android:name=".settings.SettingsActivity"
             android:label="@string/title_activity_settings"
