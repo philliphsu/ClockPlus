@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.StringRes;
-import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -15,6 +14,7 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.philliphsu.clock2.BaseActivity;
 import com.philliphsu.clock2.R;
 import com.philliphsu.clock2.util.LocalBroadcastHelper;
 
@@ -26,7 +26,7 @@ import butterknife.OnClick;
  * An example full-screen activity that shows and hides the system UI (i.e.
  * status bar and navigation/system bar) with user interaction.
  */
-public abstract class RingtoneActivity<T extends Parcelable> extends AppCompatActivity {
+public abstract class RingtoneActivity<T extends Parcelable> extends BaseActivity {
     private static final String TAG = "RingtoneActivity";
 
     // Shared with RingtoneService
@@ -84,7 +84,6 @@ public abstract class RingtoneActivity<T extends Parcelable> extends AppCompatAc
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_ringtone);
         ButterKnife.bind(this);
 
         if ((mRingingObject = getIntent().getParcelableExtra(EXTRA_RINGING_OBJECT)) == null)
@@ -177,6 +176,21 @@ public abstract class RingtoneActivity<T extends Parcelable> extends AppCompatAc
     @OnClick(R.id.ok)
     public void finish() {
         super.finish();
+    }
+
+    @Override
+    protected final int layoutResId() {
+        return R.layout.activity_ringtone;
+    }
+
+    @Override
+    protected final int menuResId() {
+        return 0;
+    }
+
+    @Override
+    protected final boolean isDisplayHomeUpEnabled() {
+        return false;
     }
 
     public static boolean isAlive() {

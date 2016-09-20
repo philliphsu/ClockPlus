@@ -20,7 +20,10 @@ import butterknife.ButterKnife;
  */
 public abstract class BaseActivity extends AppCompatActivity {
 
-    @Nullable @Bind(R.id.toolbar) Toolbar mToolbar;
+    @Nullable
+    @Bind(R.id.toolbar)
+    Toolbar mToolbar;
+
     private Menu mMenu;
 
     @LayoutRes protected abstract int layoutResId();
