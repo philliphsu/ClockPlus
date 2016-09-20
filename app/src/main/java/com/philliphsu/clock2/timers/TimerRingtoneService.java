@@ -100,7 +100,8 @@ public class TimerRingtoneService extends RingtoneService<Timer> {
 
     @Override
     protected int minutesToAutoSilence() {
-        // TODO: Use same value as for Alarms, or create new preference.
-        return 1;
+        String value = PreferenceManager.getDefaultSharedPreferences(this).getString(
+                getString(R.string.key_timer_silence_after), "15");
+        return Integer.parseInt(value);
     }
 }
