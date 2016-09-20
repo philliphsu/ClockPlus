@@ -34,6 +34,8 @@ public class MainActivity extends BaseActivity {
     public static final int PAGE_STOPWATCH = 2;
     public static final String EXTRA_SHOW_PAGE = "com.philliphsu.clock2.extra.SHOW_PAGE";
 
+    public static final int REQUEST_THEME_CHANGE = 5;
+
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
      * fragments for each of the sections. We use a
@@ -253,6 +255,8 @@ public class MainActivity extends BaseActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode != RESULT_OK)
+            return;
         // If we get here, either this Activity OR one of its hosted Fragments
         // started a requested Activity for a result. The latter case may seem
         // strange; the Fragment is the one starting the requested Activity, so why
@@ -298,6 +302,14 @@ public class MainActivity extends BaseActivity {
         // DUPLICATE TIMERS.
 //        mSectionsPagerAdapter.getFragment(mViewPager.getCurrentItem())
 //                .onActivityResult(requestCode, resultCode, data);
+
+        switch (requestCode) {
+            case REQUEST_THEME_CHANGE:
+                if (data != null && data.getBooleanExtra(SettingsActivity.EXTRA_THEME_CHANGED, false)) {
+                    recreate();
+                }
+                break;
+        }
     }
 
     @Override
@@ -324,7 +336,7 @@ public class MainActivity extends BaseActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
-            startActivity(new Intent(this, SettingsActivity.class));
+            startActivityForResult(new Intent(this, SettingsActivity.class), REQUEST_THEME_CHANGE);
             return true;
         }
 

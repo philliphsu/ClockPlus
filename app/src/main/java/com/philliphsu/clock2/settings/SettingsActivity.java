@@ -9,6 +9,7 @@ import com.philliphsu.clock2.R;
  * Created by Phillip Hsu on 6/6/2016.
  */
 public class SettingsActivity extends BaseActivity {
+    public static final String EXTRA_THEME_CHANGED = "com.philliphsu.clock2.settings.extra.THEME_CHANGED";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
