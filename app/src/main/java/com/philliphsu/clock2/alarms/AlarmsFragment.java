@@ -10,6 +10,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.content.Loader;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -93,13 +94,14 @@ public class AlarmsFragment extends RecyclerViewFragment<Alarm, BaseAlarmViewHol
         }
     }
 
+    @Nullable
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         mSnackbarAnchor = getActivity().findViewById(R.id.main_content);
         mAlarmController = new AlarmController(getActivity(), mSnackbarAnchor);
         mAsyncUpdateHandler = new AsyncAlarmsTableUpdateHandler(getActivity(),
                 mSnackbarAnchor, this, mAlarmController);
+        return super.onCreateView(inflater, container, savedInstanceState);
     }
 
     @Override
@@ -134,10 +136,6 @@ public class AlarmsFragment extends RecyclerViewFragment<Alarm, BaseAlarmViewHol
 
     @Override
     protected AlarmsCursorAdapter onCreateAdapter() {
-        // Create a new adapter. This is called before we can initialize mAlarmController,
-        // so right now it is null. However, after onActivityCreated() returns, it is initialized, and
-        // the reference variable will be pointing to an actual object. This assignment "propagates"
-        // to all references to mAlarmController.
         return new AlarmsCursorAdapter(this, mAlarmController);
     }
 
