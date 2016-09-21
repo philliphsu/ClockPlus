@@ -4,6 +4,7 @@ import android.content.res.ColorStateList;
 import android.graphics.drawable.Drawable;
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.support.annotation.IdRes;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.util.Log;
 import android.view.View;
@@ -18,7 +19,9 @@ import com.philliphsu.clock2.OnListItemInteractionListener;
 import com.philliphsu.clock2.R;
 import com.philliphsu.clock2.RingtonePickerDialog;
 import com.philliphsu.clock2.aospdatetimepicker.Utils;
+import com.philliphsu.clock2.settings.RingtonePickerDialogController;
 import com.philliphsu.clock2.util.AlarmController;
+import com.philliphsu.clock2.util.FragmentTagUtils;
 
 import butterknife.Bind;
 import butterknife.OnClick;
@@ -28,7 +31,6 @@ import butterknife.OnClick;
  */
 public class ExpandedAlarmViewHolder extends BaseAlarmViewHolder {
     private static final String TAG = "ExpandedAlarmViewHolder";
-    private static final String TAG_RINGTONE_PICKER = "ringtone_picker";
 
     @Bind(R.id.ok) Button mOk;
     @Bind(R.id.delete) Button mDelete;
@@ -38,6 +40,7 @@ public class ExpandedAlarmViewHolder extends BaseAlarmViewHolder {
     ToggleButton[] mDays;
 
     private final ColorStateList mDayToggleColors;
+    private final RingtonePickerDialogController mRingtonePickerController;
 
     public ExpandedAlarmViewHolder(ViewGroup parent, final OnListItemInteractionListener<Alarm> listener,
                                    AlarmController controller) {
@@ -86,17 +89,26 @@ public class ExpandedAlarmViewHolder extends BaseAlarmViewHolder {
         };
         mDayToggleColors = new ColorStateList(states, colors);
 
-        RingtonePickerDialog picker = (RingtonePickerDialog)
-                mFragmentManager.findFragmentByTag(TAG_RINGTONE_PICKER);
-        if (picker != null) {
-            Log.i(TAG, "Restoring ringtone picker callback");
-            picker.setOnRingtoneSelectedListener(newOnRingtoneSelectedListener());
-        }
+        mRingtonePickerController = new RingtonePickerDialogController(mFragmentManager,
+                new RingtonePickerDialog.OnRingtoneSelectedListener() {
+                    @Override
+                    public void onRingtoneSelected(Uri ringtoneUri) {
+                        Log.d(TAG, "Selected ringtone: " + ringtoneUri.toString());
+                        final Alarm oldAlarm = getAlarm();
+                        Alarm newAlarm = oldAlarm.toBuilder()
+                                .ringtone(ringtoneUri.toString())
+                                .build();
+                        oldAlarm.copyMutableFieldsTo(newAlarm);
+                        persistUpdatedAlarm(newAlarm, false);
+                    }
+                }
+        );
     }
 
     @Override
     public void onBind(Alarm alarm) {
         super.onBind(alarm);
+        mRingtonePickerController.tryRestoreCallback(makeTag(R.id.ringtone));
         bindDays(alarm);
         bindRingtone();
         bindVibrate(alarm.vibrates());
@@ -131,9 +143,8 @@ public class ExpandedAlarmViewHolder extends BaseAlarmViewHolder {
 //        // TODO: This is VERY BAD. Use a Controller/Presenter instead.
 //        // The result will be delivered to MainActivity, and then delegated to AlarmsFragment.
 //        ((Activity) getContext()).startActivityForResult(intent, AlarmsFragment.REQUEST_PICK_RINGTONE);
-        RingtonePickerDialog dialog = RingtonePickerDialog.newInstance(
-                newOnRingtoneSelectedListener(), getSelectedRingtoneUri());
-        dialog.show(mFragmentManager, TAG_RINGTONE_PICKER);
+
+        mRingtonePickerController.show(getSelectedRingtoneUri(), makeTag(R.id.ringtone));
     }
 
     @OnClick(R.id.vibrate)
@@ -207,18 +218,7 @@ public class ExpandedAlarmViewHolder extends BaseAlarmViewHolder {
                 : Uri.parse(ringtone);
     }
 
-    private RingtonePickerDialog.OnRingtoneSelectedListener newOnRingtoneSelectedListener() {
-        return new RingtonePickerDialog.OnRingtoneSelectedListener() {
-            @Override
-            public void onRingtoneSelected(Uri ringtoneUri) {
-                Log.d(TAG, "Selected ringtone: " + ringtoneUri.toString());
-                final Alarm oldAlarm = getAlarm();
-                Alarm newAlarm = oldAlarm.toBuilder()
-                        .ringtone(ringtoneUri.toString())
-                        .build();
-                oldAlarm.copyMutableFieldsTo(newAlarm);
-                persistUpdatedAlarm(newAlarm, false);
-            }
-        };
+    private String makeTag(@IdRes int viewId) {
+        return FragmentTagUtils.makeTag(ExpandedAlarmViewHolder.class, viewId, getItemId());
     }
 }

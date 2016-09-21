@@ -55,8 +55,6 @@ public abstract class BaseAlarmViewHolder extends BaseViewHolder<Alarm> {
     private final Drawable mDismissNowDrawable;
     private final Drawable mCancelSnoozeDrawable;
 
-    // TODO: THis is still here for ExpandedVH's RingtonePickerDialog. If we ever write a
-    // Controller for it, finally delete this.
     final FragmentManager mFragmentManager;
 
     @Bind(R.id.time) TextView mTime;
@@ -79,7 +77,6 @@ public abstract class BaseAlarmViewHolder extends BaseViewHolder<Alarm> {
         AppCompatActivity act = (AppCompatActivity) getContext();
         mFragmentManager = act.getSupportFragmentManager();
         mAddLabelDialogController = new AddLabelDialogController(mFragmentManager,
-            // TODO: Why can't we implement the interface and pass `this` instead?
             new AddLabelDialog.OnLabelSetListener() {
                 @Override
                 public void onLabelSet(String label) {
@@ -93,7 +90,6 @@ public abstract class BaseAlarmViewHolder extends BaseViewHolder<Alarm> {
             }
         );
         mTimePickerDialogController = new TimePickerDialogController(mFragmentManager, getContext(),
-            // TODO: Why can't we implement the interface and pass `this` instead?
             new OnTimeSetListener() {
                 @Override
                 public void onTimeSet(ViewGroup viewGroup, int hourOfDay, int minute) {
