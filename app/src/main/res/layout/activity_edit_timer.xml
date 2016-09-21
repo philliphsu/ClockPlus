@@ -33,7 +33,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="?android:attr/selectableItemBackground"
-                style="@style/TextAppearance.AppCompat.Title"
+                style="@style/TextAppearance.Widget.AppCompat.Toolbar.Title"
                 android:hint="@string/label"
                 android:maxLines="1"
                 android:ellipsize="end"/>
