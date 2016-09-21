@@ -7,7 +7,10 @@
         <item name="colorAccent">@color/colorAccent</item>
         <!-- TODO: This doesn't work for BottomSheetDialogs. Verify this works for other types of dialogs. -->
         <!--<item name="dialogTheme">@style/AppCompatDialogTheme</item>-->
+        <!-- This theme is applied to appcompat AlertDialogs. -->
         <item name="alertDialogTheme">@style/AppCompatAlertDialogStyle</item>
+        <!-- This theme is applied to standard `android.app.AlertDialog`s. -->
+        <item name="android:alertDialogTheme">@style/AppCompatAlertDialogStyle</item>
         <item name="bottomSheetDialogTheme">@style/BottomSheetDialogTheme</item>
         <!--The icons that need to be tinted with this attribute will only ever be in
          the active state, so we don't need to use @color/icon_color ColorStateList resource.
@@ -24,7 +27,10 @@
         <item name="colorAccent">@color/colorAccentInverse</item>
         <!-- TODO: This doesn't work for BottomSheetDialogs. Verify this works for other types of dialogs. -->
         <!--<item name="dialogTheme">@style/AppCompatDialogTheme.Dark</item>-->
+        <!-- This theme is applied to appcompat AlertDialogs. -->
         <item name="alertDialogTheme">@style/AppCompatAlertDialogStyle.Dark</item>
+        <!-- This theme is applied to standard `android.app.AlertDialog`s. -->
+        <item name="android:alertDialogTheme">@style/AppCompatAlertDialogStyle.Dark</item>
         <!--TODO: Dark theme-->
         <item name="bottomSheetDialogTheme">@style/BottomSheetDialogTheme</item>
         <!--The icons that need to be tinted with this attribute will only ever be in
