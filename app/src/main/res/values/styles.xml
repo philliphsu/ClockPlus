@@ -19,6 +19,8 @@
         <item name="themedIconTint">@color/icon_color_active_light</item>
         <item name="android:textColorHint">@color/text_color_disabled_light</item>
         <item name="themedPopupOverlay">@style/ThemeOverlay.AppCompat.Light</item>
+        <!-- For BottomSheetTimePickers -->
+        <item name="themeDark">false</item>
     </style>
 
     <style name="AppTheme.Dark" parent="Theme.AppCompat.NoActionBar">
@@ -40,6 +42,8 @@
         <item name="themedIconTint">@color/icon_color_active_dark</item>
         <item name="android:textColorHint">@color/text_color_disabled_dark</item>
         <item name="themedPopupOverlay">@style/ThemeOverlay.AppCompat.Dark</item>
+        <!-- For BottomSheetTimePickers -->
+        <item name="themeDark">true</item>
     </style>
 
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar"/>

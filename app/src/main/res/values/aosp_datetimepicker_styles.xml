@@ -15,7 +15,7 @@
 -->
 
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
-    <attr name="theme_dark" format="boolean">false</attr>
+    <attr name="themeDark" format="boolean">false</attr>
 
     <style name="time_label">
         <item name="android:textSize">@dimen/time_label_size</item>

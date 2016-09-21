@@ -280,7 +280,7 @@ public class Utils {
      * @return true if dark mode, false if light.
      */
     public static boolean isDarkTheme(Context context, boolean current) {
-        return resolveBoolean(context, R.attr.theme_dark, current);
+        return resolveBoolean(context, R.attr.themeDark, current);
     }
 
     /**

@@ -70,6 +70,7 @@ public class NumberGridTimePickerDialog extends BaseTimePickerDialog implements 
     private static final String KEY_IN_KB_MODE = "in_kb_mode";
     private static final String KEY_TYPED_TIMES = "typed_times";
     private static final String KEY_DARK_THEME = "dark_theme";
+    private static final String KEY_THEME_SET_AT_RUNTIME = "theme_set_at_runtime";
 
     public static final int HOUR_INDEX = 0;
     public static final int MINUTE_INDEX = 1;
@@ -112,6 +113,7 @@ public class NumberGridTimePickerDialog extends BaseTimePickerDialog implements 
     private int mInitialMinute;
     private boolean mIs24HourMode;
     private boolean mThemeDark;
+    private boolean mThemeSetAtRuntime;
 
     // For hardware IME input.
     private char mPlaceholderText;
@@ -243,6 +245,7 @@ public class NumberGridTimePickerDialog extends BaseTimePickerDialog implements 
         mIs24HourMode = is24HourMode;
         mInKbMode = false;
         mThemeDark = false;
+        mThemeSetAtRuntime = false;
     }
 
     /**
@@ -250,6 +253,7 @@ public class NumberGridTimePickerDialog extends BaseTimePickerDialog implements 
      */
     public void setThemeDark(boolean dark) {
         mThemeDark = dark;
+        mThemeSetAtRuntime = true;
     }
 
     public boolean isThemeDark() {
@@ -278,6 +282,7 @@ public class NumberGridTimePickerDialog extends BaseTimePickerDialog implements 
             mIs24HourMode = savedInstanceState.getBoolean(KEY_IS_24_HOUR_VIEW);
             mInKbMode = savedInstanceState.getBoolean(KEY_IN_KB_MODE);
             mThemeDark = savedInstanceState.getBoolean(KEY_DARK_THEME);
+            mThemeSetAtRuntime = savedInstanceState.getBoolean(KEY_THEME_SET_AT_RUNTIME);
         }
     }
 
@@ -291,6 +296,10 @@ public class NumberGridTimePickerDialog extends BaseTimePickerDialog implements 
 //        view.findViewById(R.id.time_picker_dialog).setOnKeyListener(keyboardListener);
 
         View view = super.onCreateView(inflater, container, savedInstanceState);
+
+        if (!mThemeSetAtRuntime) {
+            mThemeDark = Utils.isDarkTheme(getActivity(), mThemeDark);
+        }
 
         Resources res = getResources();
         mHourPickerDescription = res.getString(R.string.hour_picker_description);
@@ -575,6 +584,7 @@ public class NumberGridTimePickerDialog extends BaseTimePickerDialog implements 
                 outState.putIntegerArrayList(KEY_TYPED_TIMES, mTypedTimes);
             }
             outState.putBoolean(KEY_DARK_THEME, mThemeDark);
+            outState.putBoolean(KEY_THEME_SET_AT_RUNTIME, mThemeSetAtRuntime);
         }
     }
 
