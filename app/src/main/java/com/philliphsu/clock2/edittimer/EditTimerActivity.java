@@ -12,8 +12,8 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.philliphsu.clock2.AddLabelDialog;
-import com.philliphsu.clock2.AddLabelDialogController;
+import com.philliphsu.clock2.dialogs.AddLabelDialog;
+import com.philliphsu.clock2.dialogs.AddLabelDialogController;
 import com.philliphsu.clock2.BaseActivity;
 import com.philliphsu.clock2.R;
 import com.philliphsu.clock2.util.FragmentTagUtils;

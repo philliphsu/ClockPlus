@@ -1,4 +1,4 @@
-package com.philliphsu.clock2.editalarm;
+package com.philliphsu.clock2.timepickers;
 
 import android.os.Bundle;
 import android.support.annotation.LayoutRes;

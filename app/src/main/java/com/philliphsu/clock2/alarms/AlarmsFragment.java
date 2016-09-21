@@ -19,7 +19,7 @@ import com.philliphsu.clock2.AsyncAlarmsTableUpdateHandler;
 import com.philliphsu.clock2.R;
 import com.philliphsu.clock2.RecyclerViewFragment;
 import com.philliphsu.clock2.TimePickerDialogController;
-import com.philliphsu.clock2.editalarm.BaseTimePickerDialog;
+import com.philliphsu.clock2.timepickers.BaseTimePickerDialog;
 import com.philliphsu.clock2.model.AlarmCursor;
 import com.philliphsu.clock2.model.AlarmsListCursorLoader;
 import com.philliphsu.clock2.util.AlarmController;

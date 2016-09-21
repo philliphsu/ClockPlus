@@ -16,15 +16,15 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.philliphsu.clock2.AddLabelDialog;
-import com.philliphsu.clock2.AddLabelDialogController;
+import com.philliphsu.clock2.dialogs.AddLabelDialog;
+import com.philliphsu.clock2.dialogs.AddLabelDialogController;
 import com.philliphsu.clock2.Alarm;
 import com.philliphsu.clock2.BaseViewHolder;
 import com.philliphsu.clock2.OnListItemInteractionListener;
 import com.philliphsu.clock2.R;
 import com.philliphsu.clock2.TimePickerDialogController;
 import com.philliphsu.clock2.aospdatetimepicker.Utils;
-import com.philliphsu.clock2.editalarm.BaseTimePickerDialog.OnTimeSetListener;
+import com.philliphsu.clock2.timepickers.BaseTimePickerDialog.OnTimeSetListener;
 import com.philliphsu.clock2.util.TimeTextUtils;
 import com.philliphsu.clock2.util.AlarmController;
 import com.philliphsu.clock2.util.AlarmUtils;

@@ -15,8 +15,8 @@ import android.widget.ImageButton;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
-import com.philliphsu.clock2.AddLabelDialog;
-import com.philliphsu.clock2.AddLabelDialogController;
+import com.philliphsu.clock2.dialogs.AddLabelDialog;
+import com.philliphsu.clock2.dialogs.AddLabelDialogController;
 import com.philliphsu.clock2.AsyncTimersTableUpdateHandler;
 import com.philliphsu.clock2.BaseViewHolder;
 import com.philliphsu.clock2.OnListItemInteractionListener;

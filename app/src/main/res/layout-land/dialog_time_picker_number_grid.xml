@@ -22,7 +22,7 @@
                 android:layout_gravity="center" />
         </FrameLayout>
 
-        <com.philliphsu.clock2.editalarm.GridSelectorLayout
+        <com.philliphsu.clock2.timepickers.GridSelectorLayout
             android:id="@+id/time_picker"
             android:layout_width="0dp"
             android:layout_height="match_parent"

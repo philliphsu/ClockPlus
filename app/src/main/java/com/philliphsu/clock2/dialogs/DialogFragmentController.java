@@ -1,4 +1,4 @@
-package com.philliphsu.clock2;
+package com.philliphsu.clock2.dialogs;
 
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;

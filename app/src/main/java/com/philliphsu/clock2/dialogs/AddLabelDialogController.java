@@ -1,4 +1,4 @@
-package com.philliphsu.clock2;
+package com.philliphsu.clock2.dialogs;
 
 import android.support.v4.app.FragmentManager;
 import android.util.Log;

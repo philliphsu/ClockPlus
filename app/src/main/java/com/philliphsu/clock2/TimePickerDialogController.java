@@ -6,9 +6,10 @@ import android.support.v4.app.FragmentManager;
 import android.text.format.DateFormat;
 import android.util.Log;
 
-import com.philliphsu.clock2.editalarm.BaseTimePickerDialog;
-import com.philliphsu.clock2.editalarm.NumberGridTimePickerDialog;
-import com.philliphsu.clock2.editalarm.NumpadTimePickerDialog;
+import com.philliphsu.clock2.dialogs.DialogFragmentController;
+import com.philliphsu.clock2.timepickers.BaseTimePickerDialog;
+import com.philliphsu.clock2.timepickers.NumberGridTimePickerDialog;
+import com.philliphsu.clock2.timepickers.NumpadTimePickerDialog;
 
 /**
  * Created by Phillip Hsu on 9/6/2016.

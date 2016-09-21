@@ -17,9 +17,9 @@ import com.philliphsu.clock2.Alarm;
 import com.philliphsu.clock2.DaysOfWeek;
 import com.philliphsu.clock2.OnListItemInteractionListener;
 import com.philliphsu.clock2.R;
-import com.philliphsu.clock2.RingtonePickerDialog;
+import com.philliphsu.clock2.dialogs.RingtonePickerDialog;
 import com.philliphsu.clock2.aospdatetimepicker.Utils;
-import com.philliphsu.clock2.settings.RingtonePickerDialogController;
+import com.philliphsu.clock2.dialogs.RingtonePickerDialogController;
 import com.philliphsu.clock2.util.AlarmController;
 import com.philliphsu.clock2.util.FragmentTagUtils;
 

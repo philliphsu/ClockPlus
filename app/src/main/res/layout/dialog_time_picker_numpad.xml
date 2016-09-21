@@ -20,7 +20,7 @@ doesn't work. -->
     <!--<View style="@style/FocusGrabber"
           android:id="@+id/focus_grabber"/>-->
 
-    <com.philliphsu.clock2.editalarm.NumpadTimePicker
+    <com.philliphsu.clock2.timepickers.NumpadTimePicker
         android:id="@+id/number_grid"
         android:layout_width="match_parent"
         android:layout_height="@dimen/numeric_keypad_height"

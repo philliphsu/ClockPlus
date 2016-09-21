@@ -14,7 +14,7 @@
  * limitations under the License
  */
 
-package com.philliphsu.clock2.editalarm;
+package com.philliphsu.clock2.timepickers;
 
 import android.animation.ObjectAnimator;
 import android.app.ActionBar.LayoutParams;
@@ -37,7 +37,7 @@ import android.widget.TextView;
 
 import com.philliphsu.clock2.R;
 import com.philliphsu.clock2.aospdatetimepicker.Utils;
-import com.philliphsu.clock2.editalarm.GridSelectorLayout.OnValueSelectedListener;
+import com.philliphsu.clock2.timepickers.GridSelectorLayout.OnValueSelectedListener;
 
 import java.text.DateFormatSymbols;
 import java.util.ArrayList;
