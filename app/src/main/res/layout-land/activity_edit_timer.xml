@@ -14,7 +14,7 @@
         android:layout_height="wrap_content"
         android:background="?attr/colorPrimary"
         android:theme="@style/AppTheme.AppBarOverlay"
-        app:popupTheme="@style/AppTheme.PopupOverlay"
+        app:popupTheme="?themedPopupOverlay"
         app:contentInsetStart="72dp">
 
         <!--Unfortunately, we can't use a style that extends from BaseLabel

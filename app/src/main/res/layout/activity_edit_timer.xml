@@ -20,7 +20,7 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:popupTheme="@style/AppTheme.PopupOverlay"
+            app:popupTheme="?themedPopupOverlay"
             app:contentInsetStart="72dp"
             android:layout_alignParentTop="true">
 
