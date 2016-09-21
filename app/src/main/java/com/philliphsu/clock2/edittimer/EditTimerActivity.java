@@ -26,6 +26,8 @@ import butterknife.OnTouch;
 // TODO: Rename to CreateTimerActivity
 public class EditTimerActivity extends BaseActivity implements AddLabelDialog.OnLabelSetListener {
     private static final int FIELD_LENGTH = 2;
+    private static final String KEY_LABEL = "key_label";
+
     public static final String EXTRA_HOUR = "com.philliphsu.clock2.edittimer.extra.HOUR";
     public static final String EXTRA_MINUTE = "com.philliphsu.clock2.edittimer.extra.MINUTE";
     public static final String EXTRA_SECOND = "com.philliphsu.clock2.edittimer.extra.SECOND";
@@ -51,6 +53,9 @@ public class EditTimerActivity extends BaseActivity implements AddLabelDialog.On
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (savedInstanceState != null) {
+            mLabel.setText(savedInstanceState.getCharSequence(KEY_LABEL));
+        }
         mAddLabelDialogController = new AddLabelDialogController(getSupportFragmentManager(), this);
         mAddLabelDialogController.tryRestoreCallback(makeTag(R.id.label));
     }
@@ -74,6 +79,12 @@ public class EditTimerActivity extends BaseActivity implements AddLabelDialog.On
     @Override
     public void onLabelSet(String label) {
         mLabel.setText(label);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putCharSequence(KEY_LABEL, mLabel.getText());
     }
 
     @OnClick({ R.id.zero, R.id.one, R.id.two, R.id.three, R.id.four,
