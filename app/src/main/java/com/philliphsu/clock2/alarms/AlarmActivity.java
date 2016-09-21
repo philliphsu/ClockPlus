@@ -122,7 +122,7 @@ public class AlarmActivity extends RingtoneActivity<Alarm> {
         Notification note = new NotificationCompat.Builder(this)
                 .setContentTitle(getString(R.string.missed_alarm))
                 .setContentText(alarmTime)
-                .setSmallIcon(R.mipmap.ic_launcher)
+                .setSmallIcon(R.drawable.ic_alarm_24dp)
                 .build();
         mNotificationManager.notify(TAG, getRingingObject().getIntId(), note);
     }
