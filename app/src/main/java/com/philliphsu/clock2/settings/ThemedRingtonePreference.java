@@ -3,9 +3,11 @@ package com.philliphsu.clock2.settings;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.TypedArray;
 import android.net.Uri;
 import android.os.Parcelable;
 import android.preference.RingtonePreference;
+import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
 import android.util.AttributeSet;
 
@@ -55,6 +57,19 @@ public class ThemedRingtonePreference extends RingtonePreference
             mController = newController();
         }
         mController.tryRestoreCallback(TAG);
+    }
+
+    @Override
+    protected Object onGetDefaultValue(TypedArray a, int index) {
+        // Our picker does not show a 'Default' item, so our defaultValue
+        // "content://settings/system/alarm_alert" set in XML will not show as initially selected.
+        // The default ringtone and its sound file URI is different for every device,
+        // so there isn't a string literal we can specify in XML.
+        // This is the same as calling:
+        //     `RingtoneManager.getActualDefaultRingtoneUri(
+        //         getContext(), RingtoneManager.TYPE_ALARM).toString();`
+        // but skips the toString().
+        return Settings.System.getString(getContext().getContentResolver(), Settings.System.ALARM_ALERT);
     }
 
     @Override
