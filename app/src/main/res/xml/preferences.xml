@@ -33,7 +33,7 @@
             android:dialogTitle="@string/title_time_picker_style"
             android:entries="@array/array_time_picker_styles"
             android:entryValues="@array/array_time_picker_styles"
-            android:defaultValue="@string/number_pad"
+            android:defaultValue="@string/grid_selector"
             android:summary="%s"/>
         <ListPreference
             android:key="@string/key_silence_after"
