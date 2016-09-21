@@ -15,5 +15,6 @@
     </declare-styleable>
 
     <attr name="themedIconTint" format="reference|color"/>
+    <attr name="themedPopupOverlay" format="reference"/>
     
 </resources>
