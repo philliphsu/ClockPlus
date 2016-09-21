@@ -25,6 +25,7 @@ public class NumpadTimePickerDialog extends BaseTimePickerDialog
     private static final String KEY_DIGITS_INPUTTED = "digits_inputted";
     private static final String KEY_AMPM_STATE = "ampm_state";
     private static final String KEY_THEME_DARK = "theme_dark";
+    private static final String KEY_THEME_SET_AT_RUNTIME = "theme_set_at_runtime";
 
     private boolean mIs24HourMode; // TODO: Why do we need this?
     /**
@@ -38,6 +39,7 @@ public class NumpadTimePickerDialog extends BaseTimePickerDialog
     private int[] mInputtedDigits;
     private int mAmPmState = NumpadTimePicker.UNSPECIFIED; // TOneverDO: zero initial value, b/c 0 == AM
     private boolean mThemeDark;
+    private boolean mThemeSetAtRuntime;
 
     // Don't need to keep a reference to the dismiss ImageButton
     @Bind(R.id.input_time) TextView mInputField;
@@ -59,6 +61,7 @@ public class NumpadTimePickerDialog extends BaseTimePickerDialog
         // TODO: Do these in initialize()
         ret.setOnTimeSetListener(callback);
         ret.mThemeDark = false;
+        ret.mThemeSetAtRuntime = false;
         return ret;
     }
 
@@ -74,6 +77,7 @@ public class NumpadTimePickerDialog extends BaseTimePickerDialog
      */
     public void setThemeDark(boolean dark) {
         mThemeDark = dark;
+        mThemeSetAtRuntime = true;
     }
 
     public boolean isThemeDark() {
@@ -88,6 +92,7 @@ public class NumpadTimePickerDialog extends BaseTimePickerDialog
             mIs24HourMode = savedInstanceState.getBoolean(KEY_IS_24_HOUR_VIEW);
             mAmPmState = savedInstanceState.getInt(KEY_AMPM_STATE);
             mThemeDark = savedInstanceState.getBoolean(KEY_THEME_DARK);
+            mThemeSetAtRuntime = savedInstanceState.getBoolean(KEY_THEME_SET_AT_RUNTIME);
         }
     }
 
@@ -95,6 +100,9 @@ public class NumpadTimePickerDialog extends BaseTimePickerDialog
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = super.onCreateView(inflater, container, savedInstanceState);
+        if (!mThemeSetAtRuntime) {
+            mThemeDark = Utils.isDarkTheme(getActivity(), mThemeDark);
+        }
         mNumpad.setOnInputChangeListener(this);
         mNumpad.insertDigits(mInputtedDigits); // TOneverDO: before mNumpad.setOnInputChangeListener(this);
         mNumpad.setAmPmState(mAmPmState);
@@ -133,6 +141,7 @@ public class NumpadTimePickerDialog extends BaseTimePickerDialog
             outState.putBoolean(KEY_IS_24_HOUR_VIEW, mIs24HourMode);
             outState.putInt(KEY_AMPM_STATE, mNumpad.getAmPmState());
             outState.putBoolean(KEY_THEME_DARK, mThemeDark);
+            outState.putBoolean(KEY_THEME_SET_AT_RUNTIME, mThemeSetAtRuntime);
         }
     }
 
