@@ -105,7 +105,7 @@
 
                 <!--TODO: See CheckableImageButton-->
                 <CheckBox
-                    android:id="@id/vibrate"
+                    android:id="@+id/vibrate"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:text="Vibrate"/>
