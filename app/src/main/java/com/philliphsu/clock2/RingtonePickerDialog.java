@@ -27,6 +27,7 @@ import com.philliphsu.clock2.ringtone.RingtoneLoop;
  */
 public class RingtonePickerDialog extends BaseAlertDialogFragment {
     private static final String TAG = "RingtonePickerDialog";
+    private static final String KEY_RINGTONE_URI = "key_ringtone_uri";
 
     private RingtoneManager mRingtoneManager;
     private OnRingtoneSelectedListener mOnRingtoneSelectedListener;
@@ -50,6 +51,9 @@ public class RingtonePickerDialog extends BaseAlertDialogFragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (savedInstanceState != null) {
+            mRingtoneUri = savedInstanceState.getParcelable(KEY_RINGTONE_URI);
+        }
         mRingtoneManager = new RingtoneManager(getActivity());
         mRingtoneManager.setType(RingtoneManager.TYPE_ALARM);
     }
@@ -82,6 +86,12 @@ public class RingtonePickerDialog extends BaseAlertDialogFragment {
     public void onDismiss(DialogInterface dialog) {
         super.onDismiss(dialog);
         destroyLocalPlayer();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelable(KEY_RINGTONE_URI, mRingtoneUri);
     }
 
     @Override
