@@ -13,7 +13,7 @@ import com.philliphsu.clock2.util.AlarmController;
 
 import static android.app.PendingIntent.FLAG_CANCEL_CURRENT;
 import static android.app.PendingIntent.FLAG_ONE_SHOT;
-import static com.philliphsu.clock2.util.DateFormatUtils.formatTime;
+import static com.philliphsu.clock2.util.TimeFormatUtils.formatTime;
 
 // TODO: Consider registering this locally instead of in the manifest.
 public class UpcomingAlarmReceiver extends BroadcastReceiver {

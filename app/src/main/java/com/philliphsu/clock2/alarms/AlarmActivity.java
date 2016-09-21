@@ -12,7 +12,7 @@ import com.philliphsu.clock2.R;
 import com.philliphsu.clock2.ringtone.RingtoneActivity;
 import com.philliphsu.clock2.ringtone.RingtoneService;
 import com.philliphsu.clock2.util.AlarmController;
-import com.philliphsu.clock2.util.DateFormatUtils;
+import com.philliphsu.clock2.util.TimeFormatUtils;
 
 public class AlarmActivity extends RingtoneActivity<Alarm> {
     private static final String TAG = "AlarmActivity";
@@ -117,7 +117,7 @@ public class AlarmActivity extends RingtoneActivity<Alarm> {
     }
 
     private void postMissedAlarmNote() {
-        String alarmTime = DateFormatUtils.formatTime(this,
+        String alarmTime = TimeFormatUtils.formatTime(this,
                 getRingingObject().hour(), getRingingObject().minutes());
         Notification note = new NotificationCompat.Builder(this)
                 .setContentTitle(getString(R.string.missed_alarm))

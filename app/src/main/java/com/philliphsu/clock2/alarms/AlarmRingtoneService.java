@@ -12,7 +12,7 @@ import com.philliphsu.clock2.ringtone.RingtoneService;
 import com.philliphsu.clock2.util.AlarmController;
 import com.philliphsu.clock2.util.AlarmUtils;
 
-import static com.philliphsu.clock2.util.DateFormatUtils.formatTime;
+import static com.philliphsu.clock2.util.TimeFormatUtils.formatTime;
 
 public class AlarmRingtoneService extends RingtoneService<Alarm> {
     private static final String TAG = "AlarmRingtoneService";

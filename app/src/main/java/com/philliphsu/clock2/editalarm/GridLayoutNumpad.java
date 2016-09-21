@@ -23,9 +23,6 @@ import butterknife.OnClick;
  * Created by Phillip Hsu on 7/12/2016.
  *
  * Successor to the Numpad class that was based on TableLayout.
- * Unlike Numpad, this class only manages the logic for number button clicks
- * and not the backspace button. However, we do provide an API for removing
- * digits from the input.
  *
  * TODO: Is NumpadTimePicker the only subclass? If so, why do we need this
  * superclass? If we move the contents of this class to NumpadTimePicker,

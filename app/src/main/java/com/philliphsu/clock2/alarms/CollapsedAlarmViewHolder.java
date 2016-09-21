@@ -23,11 +23,6 @@ public class CollapsedAlarmViewHolder extends BaseAlarmViewHolder {
     @Bind(R.id.countdown) AlarmCountdown mCountdown;
     @Bind(R.id.recurring_days) TextView mDays; // TODO: use `new DateFormatSymbols().getShortWeekdays()` to set texts
 
-    @Deprecated // TODO: Delete this, the only usage is from AlarmsAdapter (SortedList), which is not used anymore.
-    public CollapsedAlarmViewHolder(ViewGroup parent, OnListItemInteractionListener<Alarm> listener) {
-        super(parent, R.layout.item_collapsed_alarm, listener, null);
-    }
-
     public CollapsedAlarmViewHolder(ViewGroup parent, OnListItemInteractionListener<Alarm> listener,
                                     AlarmController alarmController) {
         super(parent, R.layout.item_collapsed_alarm, listener, alarmController);

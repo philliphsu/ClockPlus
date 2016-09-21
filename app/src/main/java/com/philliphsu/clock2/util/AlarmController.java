@@ -19,7 +19,7 @@ import com.philliphsu.clock2.model.AlarmsTableManager;
 import static android.app.PendingIntent.FLAG_CANCEL_CURRENT;
 import static android.app.PendingIntent.FLAG_NO_CREATE;
 import static android.app.PendingIntent.getActivity;
-import static com.philliphsu.clock2.util.DateFormatUtils.formatTime;
+import static com.philliphsu.clock2.util.TimeFormatUtils.formatTime;
 import static java.util.concurrent.TimeUnit.HOURS;
 
 /**
@@ -135,8 +135,8 @@ public final class AlarmController {
                 // passes before rescheduling the alarm.
                 alarm.ignoreUpcomingRingTime(true); // Useful only for VH binding
                 Intent intent = new Intent(mAppContext, PendingAlarmScheduler.class)
-                        .putExtra(PendingAlarmScheduler.EXTRA_ALARM_ID, alarm.id());
-                pi = PendingIntent.getBroadcast(mAppContext, alarm.intId(),
+                        .putExtra(PendingAlarmScheduler.EXTRA_ALARM_ID, alarm.getId());
+                pi = PendingIntent.getBroadcast(mAppContext, alarm.getIntId(),
                         intent, PendingIntent.FLAG_ONE_SHOT);
                 am.set(AlarmManager.RTC_WAKEUP, alarm.ringsAt(), pi);
             } else {
@@ -177,7 +177,7 @@ public final class AlarmController {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                mTableManager.updateItem(alarm.id(), alarm);
+                mTableManager.updateItem(alarm.getId(), alarm);
             }
         }).start();
     }
@@ -187,7 +187,7 @@ public final class AlarmController {
         Intent intent = new Intent(mAppContext, AlarmActivity.class)
                 .putExtra(AlarmActivity.EXTRA_RINGING_OBJECT, alarm);
         int flag = retrievePrevious ? FLAG_NO_CREATE : FLAG_CANCEL_CURRENT;
-        PendingIntent pi = getActivity(mAppContext, alarm.intId(), intent, flag);
+        PendingIntent pi = getActivity(mAppContext, alarm.getIntId(), intent, flag);
         // Even when we try to retrieve a previous instance that actually did exist,
         // null can be returned for some reason.
 /*
@@ -208,7 +208,7 @@ public final class AlarmController {
             intent.setAction(UpcomingAlarmReceiver.ACTION_SHOW_SNOOZING);
         }
         int flag = retrievePrevious ? FLAG_NO_CREATE : FLAG_CANCEL_CURRENT;
-        PendingIntent pi = PendingIntent.getBroadcast(mAppContext, alarm.intId(), intent, flag);
+        PendingIntent pi = PendingIntent.getBroadcast(mAppContext, alarm.getIntId(), intent, flag);
         // Even when we try to retrieve a previous instance that actually did exist,
         // null can be returned for some reason.
 /*

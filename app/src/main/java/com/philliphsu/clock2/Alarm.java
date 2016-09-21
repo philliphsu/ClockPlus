@@ -2,10 +2,8 @@ package com.philliphsu.clock2;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.support.annotation.NonNull;
 
 import com.google.auto.value.AutoValue;
-import com.philliphsu.clock2.model.JsonSerializable;
 import com.philliphsu.clock2.model.ObjectWithId;
 
 import org.json.JSONObject;
@@ -22,7 +20,7 @@ import static com.philliphsu.clock2.DaysOfWeek.SUNDAY;
  * Created by Phillip Hsu on 5/26/2016.
  */
 @AutoValue
-public abstract class Alarm extends ObjectWithId implements JsonSerializable, Parcelable {
+public abstract class Alarm extends ObjectWithId implements Parcelable {
     private static final int MAX_MINUTES_CAN_SNOOZE = 30;
 
     // =================== MUTABLE =======================
@@ -209,26 +207,6 @@ public abstract class Alarm extends ObjectWithId implements JsonSerializable, Pa
      */
     public boolean ringsWithinHours(int hours) {
         return !ignoreUpcomingRingTime && ringsIn() <= TimeUnit.HOURS.toMillis(hours);
-    }
-
-    // TODO: Rename to getIntId() so usages refer to ObjectWithId#getIntId(), then delete this method.
-    public int intId() {
-        return getIntId();
-    }
-
-    // TODO: Remove method signature from JsonSerializable interface.
-    // TODO: Remove final modifier.
-    // TODO: Rename to getId() so usages refer to ObjectWithId#getId(), then delete this method.
-    @Override
-    public final long id() {
-        return getId();
-    }
-
-    @Deprecated
-    @Override
-    @NonNull
-    public JSONObject toJsonObject() {
-        throw new UnsupportedOperationException();
     }
 
     // ============================ PARCELABLE ==============================

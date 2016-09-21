@@ -25,7 +25,7 @@ import com.philliphsu.clock2.R;
 import com.philliphsu.clock2.TimePickerDialogController;
 import com.philliphsu.clock2.aospdatetimepicker.Utils;
 import com.philliphsu.clock2.editalarm.BaseTimePickerDialog.OnTimeSetListener;
-import com.philliphsu.clock2.editalarm.TimeTextUtils;
+import com.philliphsu.clock2.util.TimeTextUtils;
 import com.philliphsu.clock2.util.AlarmController;
 import com.philliphsu.clock2.util.AlarmUtils;
 import com.philliphsu.clock2.util.FragmentTagUtils;
@@ -39,7 +39,7 @@ import butterknife.OnTouch;
 
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
-import static com.philliphsu.clock2.util.DateFormatUtils.formatTime;
+import static com.philliphsu.clock2.util.TimeFormatUtils.formatTime;
 
 /**
  * Created by Phillip Hsu on 7/31/2016.

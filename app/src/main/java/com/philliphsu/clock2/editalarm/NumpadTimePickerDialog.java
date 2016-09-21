@@ -9,6 +9,7 @@ import android.widget.TextView;
 
 import com.philliphsu.clock2.R;
 import com.philliphsu.clock2.aospdatetimepicker.Utils;
+import com.philliphsu.clock2.util.TimeTextUtils;
 
 import butterknife.Bind;
 import butterknife.OnClick;

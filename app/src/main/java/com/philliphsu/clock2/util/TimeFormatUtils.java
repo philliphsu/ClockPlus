@@ -10,9 +10,9 @@ import static android.text.format.DateFormat.getTimeFormat;
 /**
  * Created by Phillip Hsu on 6/3/2016.
  */
-public final class DateFormatUtils {
+public final class TimeFormatUtils {
 
-    private DateFormatUtils() {}
+    private TimeFormatUtils() {}
 
     public static String formatTime(Context context, long millis) {
         return getTimeFormat(context).format(new Date(millis));
