@@ -152,7 +152,7 @@
     </style>
     <style name="AppCompatAlertDialogStyle.Dark" parent="Theme.AppCompat.Dialog.Alert">
         <!-- Trying to use the colorAccent attribute (whether from ?android:attr or ?attr) WILL CRASH.-->
-        <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorAccent">@color/colorAccentInverse</item>
     </style>
 
     <style name="BottomSheetDialogTheme" parent="Theme.Design.Light.BottomSheetDialog">
