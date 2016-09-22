@@ -7,7 +7,7 @@ import android.os.SystemClock;
 import android.util.Log;
 
 import com.philliphsu.clock2.timers.Timer;
-import com.philliphsu.clock2.model.DatabaseTableManager;
+import com.philliphsu.clock2.data.DatabaseTableManager;
 
 /**
  * Created by Phillip Hsu on 7/30/2016.

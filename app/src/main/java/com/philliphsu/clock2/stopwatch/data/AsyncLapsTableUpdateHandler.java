@@ -3,7 +3,7 @@ package com.philliphsu.clock2.stopwatch.data;
 import android.content.Context;
 import android.content.Intent;
 
-import com.philliphsu.clock2.AsyncDatabaseTableUpdateHandler;
+import com.philliphsu.clock2.data.AsyncDatabaseTableUpdateHandler;
 import com.philliphsu.clock2.list.ScrollHandler;
 import com.philliphsu.clock2.stopwatch.Lap;
 import com.philliphsu.clock2.stopwatch.StopwatchNotificationService;

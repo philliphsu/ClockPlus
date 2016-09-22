@@ -3,7 +3,7 @@ package com.philliphsu.clock2.alarms.data;
 import android.content.Context;
 
 import com.philliphsu.clock2.alarms.Alarm;
-import com.philliphsu.clock2.model.SQLiteCursorLoader;
+import com.philliphsu.clock2.data.SQLiteCursorLoader;
 
 /**
  * Created by Phillip Hsu on 6/28/2016.

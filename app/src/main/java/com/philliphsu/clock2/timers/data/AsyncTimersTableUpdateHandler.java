@@ -6,7 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
-import com.philliphsu.clock2.AsyncDatabaseTableUpdateHandler;
+import com.philliphsu.clock2.data.AsyncDatabaseTableUpdateHandler;
 import com.philliphsu.clock2.timers.Timer;
 import com.philliphsu.clock2.list.ScrollHandler;
 import com.philliphsu.clock2.timers.TimerNotificationService;

@@ -20,7 +20,7 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.util.AttributeSet;
 
-import com.philliphsu.clock2.BaseChronometer;
+import com.philliphsu.clock2.chronometer.BaseChronometer;
 
 /**
  * Created by Phillip Hsu on 7/25/2016.

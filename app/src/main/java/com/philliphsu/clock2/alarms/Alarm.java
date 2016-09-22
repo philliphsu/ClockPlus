@@ -4,7 +4,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.google.auto.value.AutoValue;
-import com.philliphsu.clock2.model.ObjectWithId;
+import com.philliphsu.clock2.data.ObjectWithId;
 
 import org.json.JSONObject;
 

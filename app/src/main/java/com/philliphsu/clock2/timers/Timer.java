@@ -5,7 +5,7 @@ import android.os.Parcelable;
 import android.os.SystemClock;
 
 import com.google.auto.value.AutoValue;
-import com.philliphsu.clock2.model.ObjectWithId;
+import com.philliphsu.clock2.data.ObjectWithId;
 
 import java.util.concurrent.TimeUnit;
 

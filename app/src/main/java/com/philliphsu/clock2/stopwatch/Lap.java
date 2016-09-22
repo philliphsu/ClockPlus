@@ -2,7 +2,7 @@ package com.philliphsu.clock2.stopwatch;
 
 import android.os.SystemClock;
 
-import com.philliphsu.clock2.model.ObjectWithId;
+import com.philliphsu.clock2.data.ObjectWithId;
 
 /**
  * Created by Phillip Hsu on 8/8/2016.

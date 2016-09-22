@@ -1,4 +1,4 @@
-package com.philliphsu.clock2;
+package com.philliphsu.clock2.chronometer;
 
 import android.annotation.TargetApi;
 import android.content.Context;

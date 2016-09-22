@@ -2,7 +2,7 @@ package com.philliphsu.clock2.stopwatch.data;
 
 import android.database.Cursor;
 
-import com.philliphsu.clock2.model.BaseItemCursor;
+import com.philliphsu.clock2.data.BaseItemCursor;
 import com.philliphsu.clock2.stopwatch.Lap;
 
 /**

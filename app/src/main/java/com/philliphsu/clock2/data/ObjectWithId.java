@@ -1,4 +1,4 @@
-package com.philliphsu.clock2.model;
+package com.philliphsu.clock2.data;
 
 /**
  * Created by Phillip Hsu on 7/29/2016.

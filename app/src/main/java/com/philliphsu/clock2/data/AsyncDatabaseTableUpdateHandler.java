@@ -1,11 +1,9 @@
-package com.philliphsu.clock2;
+package com.philliphsu.clock2.data;
 
 import android.content.Context;
 import android.os.AsyncTask;
 
 import com.philliphsu.clock2.list.ScrollHandler;
-import com.philliphsu.clock2.model.DatabaseTableManager;
-import com.philliphsu.clock2.model.ObjectWithId;
 
 /**
  * Created by Phillip Hsu on 7/1/2016.

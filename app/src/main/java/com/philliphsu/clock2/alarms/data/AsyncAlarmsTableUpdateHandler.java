@@ -4,7 +4,7 @@ import android.content.Context;
 import android.support.design.widget.Snackbar;
 import android.view.View;
 
-import com.philliphsu.clock2.AsyncDatabaseTableUpdateHandler;
+import com.philliphsu.clock2.data.AsyncDatabaseTableUpdateHandler;
 import com.philliphsu.clock2.R;
 import com.philliphsu.clock2.alarms.Alarm;
 import com.philliphsu.clock2.list.ScrollHandler;

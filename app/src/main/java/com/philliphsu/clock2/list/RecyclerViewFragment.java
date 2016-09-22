@@ -17,8 +17,8 @@ import android.widget.TextView;
 import com.philliphsu.clock2.BaseFragment;
 import com.philliphsu.clock2.R;
 import com.philliphsu.clock2.timepickers.Utils;
-import com.philliphsu.clock2.model.BaseItemCursor;
-import com.philliphsu.clock2.model.ObjectWithId;
+import com.philliphsu.clock2.data.BaseItemCursor;
+import com.philliphsu.clock2.data.ObjectWithId;
 
 import butterknife.Bind;
 

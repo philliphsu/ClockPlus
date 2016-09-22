@@ -3,7 +3,7 @@ package com.philliphsu.clock2.timers.data;
 import android.content.Context;
 
 import com.philliphsu.clock2.timers.Timer;
-import com.philliphsu.clock2.model.SQLiteCursorLoader;
+import com.philliphsu.clock2.data.SQLiteCursorLoader;
 
 /**
  * Created by Phillip Hsu on 7/29/2016.

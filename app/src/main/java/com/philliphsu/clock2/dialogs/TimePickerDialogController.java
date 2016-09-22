@@ -1,4 +1,4 @@
-package com.philliphsu.clock2;
+package com.philliphsu.clock2.dialogs;
 
 import android.content.Context;
 import android.preference.PreferenceManager;
@@ -6,7 +6,7 @@ import android.support.v4.app.FragmentManager;
 import android.text.format.DateFormat;
 import android.util.Log;
 
-import com.philliphsu.clock2.dialogs.DialogFragmentController;
+import com.philliphsu.clock2.R;
 import com.philliphsu.clock2.timepickers.BaseTimePickerDialog;
 import com.philliphsu.clock2.timepickers.NumberGridTimePickerDialog;
 import com.philliphsu.clock2.timepickers.NumpadTimePickerDialog;

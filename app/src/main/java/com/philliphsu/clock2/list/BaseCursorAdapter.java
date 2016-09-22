@@ -4,8 +4,8 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.ViewGroup;
 
-import com.philliphsu.clock2.model.BaseItemCursor;
-import com.philliphsu.clock2.model.ObjectWithId;
+import com.philliphsu.clock2.data.BaseItemCursor;
+import com.philliphsu.clock2.data.ObjectWithId;
 
 /**
  * Created by Phillip Hsu on 7/29/2016.

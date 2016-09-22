@@ -1,4 +1,4 @@
-package com.philliphsu.clock2;
+package com.philliphsu.clock2.chronometer;
 
 import android.content.res.Resources;
 import android.os.SystemClock;
@@ -9,6 +9,8 @@ import android.text.TextUtils;
 import android.text.format.DateUtils;
 import android.text.style.RelativeSizeSpan;
 import android.util.Log;
+
+import com.philliphsu.clock2.R;
 
 import java.util.Formatter;
 import java.util.IllegalFormatException;

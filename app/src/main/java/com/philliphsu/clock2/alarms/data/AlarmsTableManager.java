@@ -5,7 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 
 import com.philliphsu.clock2.alarms.Alarm;
-import com.philliphsu.clock2.model.DatabaseTableManager;
+import com.philliphsu.clock2.data.DatabaseTableManager;
 
 import static com.philliphsu.clock2.alarms.misc.DaysOfWeek.FRIDAY;
 import static com.philliphsu.clock2.alarms.misc.DaysOfWeek.MONDAY;

@@ -9,7 +9,7 @@ import android.support.v4.util.SimpleArrayMap;
 import android.util.Log;
 
 import com.philliphsu.clock2.timers.data.AsyncTimersTableUpdateHandler;
-import com.philliphsu.clock2.ChronometerNotificationService;
+import com.philliphsu.clock2.chronometer.ChronometerNotificationService;
 import com.philliphsu.clock2.MainActivity;
 import com.philliphsu.clock2.R;
 import com.philliphsu.clock2.timers.data.TimerCursor;

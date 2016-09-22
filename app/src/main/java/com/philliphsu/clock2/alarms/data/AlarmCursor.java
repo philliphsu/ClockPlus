@@ -3,7 +3,7 @@ package com.philliphsu.clock2.alarms.data;
 import android.database.Cursor;
 
 import com.philliphsu.clock2.alarms.Alarm;
-import com.philliphsu.clock2.model.BaseItemCursor;
+import com.philliphsu.clock2.data.BaseItemCursor;
 
 import static com.philliphsu.clock2.alarms.misc.DaysOfWeek.FRIDAY;
 import static com.philliphsu.clock2.alarms.misc.DaysOfWeek.MONDAY;

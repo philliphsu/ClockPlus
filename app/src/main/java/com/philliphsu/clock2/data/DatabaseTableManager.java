@@ -1,4 +1,4 @@
-package com.philliphsu.clock2.model;
+package com.philliphsu.clock2.data;
 
 import android.content.ContentValues;
 import android.content.Context;

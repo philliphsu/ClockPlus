@@ -4,7 +4,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 
-import com.philliphsu.clock2.model.DatabaseTableManager;
+import com.philliphsu.clock2.data.DatabaseTableManager;
 import com.philliphsu.clock2.stopwatch.Lap;
 
 /**
