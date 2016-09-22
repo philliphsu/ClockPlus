@@ -1,4 +1,4 @@
-package com.philliphsu.clock2;
+package com.philliphsu.clock2.list;
 
 import android.content.Context;
 import android.support.annotation.CallSuper;

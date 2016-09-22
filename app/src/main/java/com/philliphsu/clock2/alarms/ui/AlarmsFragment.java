@@ -15,7 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.philliphsu.clock2.R;
-import com.philliphsu.clock2.RecyclerViewFragment;
+import com.philliphsu.clock2.list.RecyclerViewFragment;
 import com.philliphsu.clock2.TimePickerDialogController;
 import com.philliphsu.clock2.alarms.Alarm;
 import com.philliphsu.clock2.alarms.data.AlarmsListCursorLoader;

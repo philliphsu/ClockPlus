@@ -1,4 +1,4 @@
-package com.philliphsu.clock2;
+package com.philliphsu.clock2.list;
 
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -14,7 +14,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.philliphsu.clock2.alarms.ScrollHandler;
+import com.philliphsu.clock2.BaseFragment;
+import com.philliphsu.clock2.R;
 import com.philliphsu.clock2.aospdatetimepicker.Utils;
 import com.philliphsu.clock2.model.BaseItemCursor;
 import com.philliphsu.clock2.model.ObjectWithId;

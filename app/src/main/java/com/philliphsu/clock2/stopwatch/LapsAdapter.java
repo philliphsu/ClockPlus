@@ -2,8 +2,8 @@ package com.philliphsu.clock2.stopwatch;
 
 import android.view.ViewGroup;
 
-import com.philliphsu.clock2.BaseCursorAdapter;
-import com.philliphsu.clock2.OnListItemInteractionListener;
+import com.philliphsu.clock2.list.BaseCursorAdapter;
+import com.philliphsu.clock2.list.OnListItemInteractionListener;
 
 /**
  * Created by Phillip Hsu on 8/9/2016.

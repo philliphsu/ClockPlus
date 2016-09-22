@@ -4,7 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 
 import com.philliphsu.clock2.AsyncDatabaseTableUpdateHandler;
-import com.philliphsu.clock2.alarms.ScrollHandler;
+import com.philliphsu.clock2.list.ScrollHandler;
 
 /**
  * Created by Phillip Hsu on 8/9/2016.

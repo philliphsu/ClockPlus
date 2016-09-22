@@ -20,7 +20,7 @@ import android.view.ViewGroup;
 import android.widget.SeekBar;
 
 import com.philliphsu.clock2.R;
-import com.philliphsu.clock2.RecyclerViewFragment;
+import com.philliphsu.clock2.list.RecyclerViewFragment;
 import com.philliphsu.clock2.util.ProgressBarUtils;
 
 import java.lang.ref.WeakReference;

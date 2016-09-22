@@ -7,7 +7,7 @@ import android.view.View;
 import com.philliphsu.clock2.AsyncDatabaseTableUpdateHandler;
 import com.philliphsu.clock2.R;
 import com.philliphsu.clock2.alarms.Alarm;
-import com.philliphsu.clock2.alarms.ScrollHandler;
+import com.philliphsu.clock2.list.ScrollHandler;
 import com.philliphsu.clock2.alarms.misc.AlarmController;
 
 /**

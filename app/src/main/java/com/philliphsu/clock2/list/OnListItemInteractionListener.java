@@ -1,4 +1,4 @@
-package com.philliphsu.clock2;
+package com.philliphsu.clock2.list;
 
 /**
  * Created by Phillip Hsu on 5/31/2016.

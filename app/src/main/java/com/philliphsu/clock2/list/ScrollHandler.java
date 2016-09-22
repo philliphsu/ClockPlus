@@ -1,4 +1,4 @@
-package com.philliphsu.clock2.alarms;
+package com.philliphsu.clock2.list;
 
 /**
  * Created by Phillip Hsu on 7/6/2016.

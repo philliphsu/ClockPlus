@@ -3,7 +3,7 @@ package com.philliphsu.clock2.alarms.ui;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.philliphsu.clock2.OnListItemInteractionListener;
+import com.philliphsu.clock2.list.OnListItemInteractionListener;
 import com.philliphsu.clock2.R;
 import com.philliphsu.clock2.alarms.Alarm;
 import com.philliphsu.clock2.alarms.misc.AlarmController;

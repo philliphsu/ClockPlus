@@ -3,7 +3,7 @@ package com.philliphsu.clock2;
 import android.content.Context;
 import android.os.AsyncTask;
 
-import com.philliphsu.clock2.alarms.ScrollHandler;
+import com.philliphsu.clock2.list.ScrollHandler;
 import com.philliphsu.clock2.model.DatabaseTableManager;
 import com.philliphsu.clock2.model.ObjectWithId;
 

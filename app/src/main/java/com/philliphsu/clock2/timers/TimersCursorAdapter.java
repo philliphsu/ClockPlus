@@ -3,8 +3,8 @@ package com.philliphsu.clock2.timers;
 import android.view.ViewGroup;
 
 import com.philliphsu.clock2.AsyncTimersTableUpdateHandler;
-import com.philliphsu.clock2.BaseCursorAdapter;
-import com.philliphsu.clock2.OnListItemInteractionListener;
+import com.philliphsu.clock2.list.BaseCursorAdapter;
+import com.philliphsu.clock2.list.OnListItemInteractionListener;
 import com.philliphsu.clock2.Timer;
 import com.philliphsu.clock2.model.TimerCursor;
 

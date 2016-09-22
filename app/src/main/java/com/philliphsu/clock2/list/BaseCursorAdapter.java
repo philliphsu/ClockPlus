@@ -1,4 +1,4 @@
-package com.philliphsu.clock2;
+package com.philliphsu.clock2.list;
 
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;

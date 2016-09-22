@@ -6,7 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
-import com.philliphsu.clock2.alarms.ScrollHandler;
+import com.philliphsu.clock2.list.ScrollHandler;
 import com.philliphsu.clock2.model.TimersTableManager;
 import com.philliphsu.clock2.timers.TimerNotificationService;
 import com.philliphsu.clock2.timers.TimesUpActivity;
