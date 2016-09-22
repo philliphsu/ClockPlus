@@ -6,7 +6,7 @@ import android.database.Cursor;
 import android.os.SystemClock;
 import android.util.Log;
 
-import com.philliphsu.clock2.Timer;
+import com.philliphsu.clock2.timers.Timer;
 import com.philliphsu.clock2.model.DatabaseTableManager;
 
 /**

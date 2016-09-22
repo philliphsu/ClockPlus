@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.philliphsu.clock2.timers;
+package com.philliphsu.clock2.timers.ui;
 
 import android.annotation.TargetApi;
 import android.content.Context;

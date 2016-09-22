@@ -59,7 +59,7 @@
         </service>
 
         <activity
-            android:name=".edittimer.EditTimerActivity"
+            android:name=".timers.ui.EditTimerActivity"
             android:label="@string/title_activity_create_timer"
             android:parentActivityName=".MainActivity"
             android:windowSoftInputMode="adjustNothing">

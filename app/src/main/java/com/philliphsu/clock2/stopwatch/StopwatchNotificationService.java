@@ -12,7 +12,7 @@ import android.util.Log;
 import com.philliphsu.clock2.ChronometerNotificationService;
 import com.philliphsu.clock2.MainActivity;
 import com.philliphsu.clock2.R;
-import com.philliphsu.clock2.timers.ChronometerDelegate;
+import com.philliphsu.clock2.ChronometerDelegate;
 
 public class StopwatchNotificationService extends ChronometerNotificationService {
     private static final String TAG = "StopwatchNotifService";

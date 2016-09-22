@@ -1,4 +1,4 @@
-package com.philliphsu.clock2.edittimer;
+package com.philliphsu.clock2.timers.ui;
 
 import android.content.Intent;
 import android.os.Bundle;

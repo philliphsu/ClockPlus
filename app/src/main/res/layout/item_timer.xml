@@ -15,7 +15,7 @@
             android:id="@+id/label"
             style="@style/TimerLabel"/>
 
-        <com.philliphsu.clock2.timers.CountdownChronometer
+        <com.philliphsu.clock2.timers.ui.CountdownChronometer
             android:id="@+id/duration"
             android:layout_below="@id/label"
             style="@style/TimerText.Countdown"/>

@@ -8,7 +8,7 @@ import android.provider.Settings;
 import android.support.v4.app.NotificationCompat;
 
 import com.philliphsu.clock2.R;
-import com.philliphsu.clock2.Timer;
+import com.philliphsu.clock2.timers.Timer;
 import com.philliphsu.clock2.timers.TimerController;
 import com.philliphsu.clock2.timers.TimerNotificationService;
 import com.philliphsu.clock2.timers.data.AsyncTimersTableUpdateHandler;

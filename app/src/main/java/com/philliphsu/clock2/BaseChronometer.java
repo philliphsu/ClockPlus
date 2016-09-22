@@ -8,8 +8,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
-import com.philliphsu.clock2.timers.ChronometerDelegate;
-
 /**
  * Created by Phillip Hsu on 9/9/2016.
  *

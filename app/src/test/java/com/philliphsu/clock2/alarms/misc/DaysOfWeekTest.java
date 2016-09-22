@@ -1,10 +1,14 @@
-package com.philliphsu.clock2;
-
-import com.philliphsu.clock2.alarms.misc.DaysOfWeek;
+package com.philliphsu.clock2.alarms.misc;
 
 import org.junit.Test;
 
-import static com.philliphsu.clock2.alarms.misc.DaysOfWeek.*;
+import static com.philliphsu.clock2.alarms.misc.DaysOfWeek.FRIDAY;
+import static com.philliphsu.clock2.alarms.misc.DaysOfWeek.MONDAY;
+import static com.philliphsu.clock2.alarms.misc.DaysOfWeek.SATURDAY;
+import static com.philliphsu.clock2.alarms.misc.DaysOfWeek.SUNDAY;
+import static com.philliphsu.clock2.alarms.misc.DaysOfWeek.THURSDAY;
+import static com.philliphsu.clock2.alarms.misc.DaysOfWeek.TUESDAY;
+import static com.philliphsu.clock2.alarms.misc.DaysOfWeek.WEDNESDAY;
 import static org.junit.Assert.assertEquals;
 
 /**
