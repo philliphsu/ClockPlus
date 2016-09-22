@@ -23,7 +23,7 @@ import com.philliphsu.clock2.alarms.ui.AlarmsFragment;
 import com.philliphsu.clock2.list.RecyclerViewFragment;
 import com.philliphsu.clock2.settings.SettingsActivity;
 import com.philliphsu.clock2.stopwatch.StopwatchFragment;
-import com.philliphsu.clock2.timers.TimersFragment;
+import com.philliphsu.clock2.timers.ui.TimersFragment;
 
 import butterknife.Bind;
 

@@ -1,4 +1,4 @@
-package com.philliphsu.clock2.timers;
+package com.philliphsu.clock2.timers.ui;
 
 
 import android.app.Activity;

@@ -1,4 +1,4 @@
-package com.philliphsu.clock2.timers;
+package com.philliphsu.clock2.ringtone;
 
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -8,11 +8,12 @@ import android.os.SystemClock;
 import android.support.v4.app.NotificationCompat;
 import android.view.ViewGroup;
 
+import com.philliphsu.clock2.timers.CountdownChronometer;
+import com.philliphsu.clock2.timers.TimerController;
+import com.philliphsu.clock2.timers.TimerNotificationService;
 import com.philliphsu.clock2.timers.data.AsyncTimersTableUpdateHandler;
 import com.philliphsu.clock2.R;
 import com.philliphsu.clock2.Timer;
-import com.philliphsu.clock2.ringtone.RingtoneActivity;
-import com.philliphsu.clock2.ringtone.RingtoneService;
 
 public class TimesUpActivity extends RingtoneActivity<Timer> {
     private static final String TAG = "TimesUpActivity";

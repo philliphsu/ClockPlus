@@ -1,4 +1,4 @@
-package com.philliphsu.clock2.timers;
+package com.philliphsu.clock2.ringtone;
 
 import android.app.Notification;
 import android.content.Intent;
@@ -7,10 +7,11 @@ import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.support.v4.app.NotificationCompat;
 
-import com.philliphsu.clock2.timers.data.AsyncTimersTableUpdateHandler;
 import com.philliphsu.clock2.R;
 import com.philliphsu.clock2.Timer;
-import com.philliphsu.clock2.ringtone.RingtoneService;
+import com.philliphsu.clock2.timers.TimerController;
+import com.philliphsu.clock2.timers.TimerNotificationService;
+import com.philliphsu.clock2.timers.data.AsyncTimersTableUpdateHandler;
 
 public class TimerRingtoneService extends RingtoneService<Timer> {
     private static final String TAG = "TimerRingtoneService";

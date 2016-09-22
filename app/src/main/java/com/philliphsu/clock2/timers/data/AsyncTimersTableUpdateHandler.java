@@ -10,7 +10,7 @@ import com.philliphsu.clock2.AsyncDatabaseTableUpdateHandler;
 import com.philliphsu.clock2.Timer;
 import com.philliphsu.clock2.list.ScrollHandler;
 import com.philliphsu.clock2.timers.TimerNotificationService;
-import com.philliphsu.clock2.timers.TimesUpActivity;
+import com.philliphsu.clock2.ringtone.TimesUpActivity;
 
 /**
  * Created by Phillip Hsu on 8/2/2016.

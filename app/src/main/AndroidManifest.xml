@@ -74,7 +74,7 @@
         </service>
 
         <activity
-            android:name=".timers.TimesUpActivity"
+            android:name=".ringtone.TimesUpActivity"
             android:excludeFromRecents="true"
             android:label="@string/title_activity_ringtone"
             android:launchMode="singleTask"
@@ -94,7 +94,7 @@
             android:exported="false">
         </service>
         <service
-            android:name=".timers.TimerRingtoneService"
+            android:name=".ringtone.TimerRingtoneService"
             android:enabled="true"
             android:exported="false">
         </service>
