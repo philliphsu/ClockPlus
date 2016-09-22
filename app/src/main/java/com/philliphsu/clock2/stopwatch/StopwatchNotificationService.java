@@ -154,8 +154,21 @@ public class StopwatchNotificationService extends ChronometerNotificationService
         // says and tell StopwatchFragment to stop itself. The latter would also stop the
         // chronometer view if the fragment is still in view (i.e. app is still open).
         mCurrentLap = null;
-        mUpdateHandler.asyncClear();
-        stopSelf();
+        // If this service instance is running in a process different from the one it
+        // was originally started in, then this AsyncTask will not finish executing
+        // before stopSelf() is called; as such, the laps table will NOT be cleared.
+        // This problem does not occur when the service is running in its
+        // original process.
+//        mUpdateHandler.asyncClear();
+//        stopSelf();
+        // A workaround is to place both calls in the SAME thread.
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                mUpdateHandler.getTableManager().clear();
+                stopSelf();
+            }
+        }).start();
     }
 
     @Override
