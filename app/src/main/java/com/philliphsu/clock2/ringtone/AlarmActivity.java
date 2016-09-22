@@ -10,6 +10,8 @@ import android.view.ViewGroup;
 import com.philliphsu.clock2.R;
 import com.philliphsu.clock2.alarms.Alarm;
 import com.philliphsu.clock2.alarms.misc.AlarmController;
+import com.philliphsu.clock2.ringtone.playback.AlarmRingtoneService;
+import com.philliphsu.clock2.ringtone.playback.RingtoneService;
 import com.philliphsu.clock2.util.TimeFormatUtils;
 
 public class AlarmActivity extends RingtoneActivity<Alarm> {

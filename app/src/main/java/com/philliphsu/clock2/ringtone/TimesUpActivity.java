@@ -8,6 +8,8 @@ import android.os.SystemClock;
 import android.support.v4.app.NotificationCompat;
 import android.view.ViewGroup;
 
+import com.philliphsu.clock2.ringtone.playback.RingtoneService;
+import com.philliphsu.clock2.ringtone.playback.TimerRingtoneService;
 import com.philliphsu.clock2.timers.ui.CountdownChronometer;
 import com.philliphsu.clock2.timers.TimerController;
 import com.philliphsu.clock2.timers.TimerNotificationService;

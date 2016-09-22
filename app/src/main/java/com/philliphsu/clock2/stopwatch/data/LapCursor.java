@@ -1,8 +1,9 @@
-package com.philliphsu.clock2.stopwatch;
+package com.philliphsu.clock2.stopwatch.data;
 
 import android.database.Cursor;
 
 import com.philliphsu.clock2.model.BaseItemCursor;
+import com.philliphsu.clock2.stopwatch.Lap;
 
 /**
  * Created by Phillip Hsu on 8/8/2016.

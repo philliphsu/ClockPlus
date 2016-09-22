@@ -1,4 +1,4 @@
-package com.philliphsu.clock2.stopwatch;
+package com.philliphsu.clock2.stopwatch.data;
 
 import android.database.sqlite.SQLiteDatabase;
 

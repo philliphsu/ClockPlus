@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.philliphsu.clock2.stopwatch;
+package com.philliphsu.clock2.stopwatch.ui;
 
 import android.annotation.TargetApi;
 import android.content.Context;

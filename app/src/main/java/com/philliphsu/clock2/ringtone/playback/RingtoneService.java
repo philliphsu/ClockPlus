@@ -1,4 +1,4 @@
-package com.philliphsu.clock2.ringtone;
+package com.philliphsu.clock2.ringtone.playback;
 
 import android.app.Notification;
 import android.app.PendingIntent;
@@ -16,6 +16,7 @@ import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.philliphsu.clock2.R;
+import com.philliphsu.clock2.ringtone.RingtoneActivity;
 import com.philliphsu.clock2.util.LocalBroadcastHelper;
 
 import java.util.concurrent.TimeUnit;

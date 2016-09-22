@@ -11,7 +11,7 @@ import android.view.View;
 import com.philliphsu.clock2.R;
 import com.philliphsu.clock2.alarms.Alarm;
 import com.philliphsu.clock2.ringtone.AlarmActivity;
-import com.philliphsu.clock2.ringtone.AlarmRingtoneService;
+import com.philliphsu.clock2.ringtone.playback.AlarmRingtoneService;
 import com.philliphsu.clock2.alarms.background.PendingAlarmScheduler;
 import com.philliphsu.clock2.alarms.background.UpcomingAlarmReceiver;
 import com.philliphsu.clock2.alarms.data.AlarmsTableManager;

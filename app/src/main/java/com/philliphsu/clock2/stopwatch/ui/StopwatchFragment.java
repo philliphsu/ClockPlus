@@ -1,4 +1,4 @@
-package com.philliphsu.clock2.stopwatch;
+package com.philliphsu.clock2.stopwatch.ui;
 
 import android.animation.Animator;
 import android.animation.ObjectAnimator;
@@ -21,6 +21,10 @@ import android.widget.SeekBar;
 
 import com.philliphsu.clock2.R;
 import com.philliphsu.clock2.list.RecyclerViewFragment;
+import com.philliphsu.clock2.stopwatch.Lap;
+import com.philliphsu.clock2.stopwatch.StopwatchNotificationService;
+import com.philliphsu.clock2.stopwatch.data.LapCursor;
+import com.philliphsu.clock2.stopwatch.data.LapsCursorLoader;
 import com.philliphsu.clock2.util.ProgressBarUtils;
 
 import java.lang.ref.WeakReference;
@@ -39,9 +43,9 @@ public class StopwatchFragment extends RecyclerViewFragment<
     private static final String TAG = "StopwatchFragment";
 
     // Exposed for StopwatchNotificationService
-    static final String KEY_START_TIME = "start_time";
-    static final String KEY_PAUSE_TIME = "pause_time";
-    static final String KEY_CHRONOMETER_RUNNING = "chronometer_running";
+    public static final String KEY_START_TIME = "start_time";
+    public static final String KEY_PAUSE_TIME = "pause_time";
+    public static final String KEY_CHRONOMETER_RUNNING = "chronometer_running";
 
     private ObjectAnimator mProgressAnimator;
     private SharedPreferences mPrefs;

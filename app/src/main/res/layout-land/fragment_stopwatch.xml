@@ -15,7 +15,7 @@
             android:orientation="horizontal"
             android:layout_above="@+id/mini_fab_layout">
 
-            <com.philliphsu.clock2.stopwatch.ChronometerWithMillis
+            <com.philliphsu.clock2.stopwatch.ui.ChronometerWithMillis
                 android:id="@+id/chronometer"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"

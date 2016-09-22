@@ -1,9 +1,11 @@
-package com.philliphsu.clock2.stopwatch;
+package com.philliphsu.clock2.stopwatch.ui;
 
 import android.view.ViewGroup;
 
 import com.philliphsu.clock2.list.BaseCursorAdapter;
 import com.philliphsu.clock2.list.OnListItemInteractionListener;
+import com.philliphsu.clock2.stopwatch.Lap;
+import com.philliphsu.clock2.stopwatch.data.LapCursor;
 
 /**
  * Created by Phillip Hsu on 8/9/2016.

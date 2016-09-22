@@ -1,10 +1,11 @@
-package com.philliphsu.clock2.stopwatch;
+package com.philliphsu.clock2.stopwatch.data;
 
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 
 import com.philliphsu.clock2.model.DatabaseTableManager;
+import com.philliphsu.clock2.stopwatch.Lap;
 
 /**
  * Created by Phillip Hsu on 8/8/2016.

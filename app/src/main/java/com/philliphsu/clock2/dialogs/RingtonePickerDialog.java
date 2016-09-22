@@ -9,7 +9,7 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 
 import com.philliphsu.clock2.R;
-import com.philliphsu.clock2.ringtone.RingtoneLoop;
+import com.philliphsu.clock2.ringtone.playback.RingtoneLoop;
 
 /**
  * Created by Phillip Hsu on 9/3/2016.

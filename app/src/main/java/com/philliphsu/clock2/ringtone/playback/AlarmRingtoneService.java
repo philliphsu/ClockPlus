@@ -1,4 +1,4 @@
-package com.philliphsu.clock2.ringtone;
+package com.philliphsu.clock2.ringtone.playback;
 
 import android.app.Notification;
 import android.content.Intent;

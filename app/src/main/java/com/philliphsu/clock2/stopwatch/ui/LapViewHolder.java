@@ -1,4 +1,4 @@
-package com.philliphsu.clock2.stopwatch;
+package com.philliphsu.clock2.stopwatch.ui;
 
 import android.view.View;
 import android.view.ViewGroup;
@@ -6,6 +6,7 @@ import android.widget.TextView;
 
 import com.philliphsu.clock2.list.BaseViewHolder;
 import com.philliphsu.clock2.R;
+import com.philliphsu.clock2.stopwatch.Lap;
 
 import butterknife.Bind;
 

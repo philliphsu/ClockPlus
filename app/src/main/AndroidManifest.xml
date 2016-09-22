@@ -89,12 +89,12 @@
         </activity>
 
         <service
-            android:name=".ringtone.AlarmRingtoneService"
+            android:name=".ringtone.playback.AlarmRingtoneService"
             android:enabled="true"
             android:exported="false">
         </service>
         <service
-            android:name=".ringtone.TimerRingtoneService"
+            android:name=".ringtone.playback.TimerRingtoneService"
             android:enabled="true"
             android:exported="false">
         </service>

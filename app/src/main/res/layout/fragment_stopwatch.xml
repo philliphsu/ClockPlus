@@ -10,7 +10,7 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <com.philliphsu.clock2.stopwatch.ChronometerWithMillis
+        <com.philliphsu.clock2.stopwatch.ui.ChronometerWithMillis
             android:id="@+id/chronometer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

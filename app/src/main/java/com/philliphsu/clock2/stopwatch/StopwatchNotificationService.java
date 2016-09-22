@@ -13,6 +13,8 @@ import com.philliphsu.clock2.ChronometerNotificationService;
 import com.philliphsu.clock2.MainActivity;
 import com.philliphsu.clock2.R;
 import com.philliphsu.clock2.ChronometerDelegate;
+import com.philliphsu.clock2.stopwatch.data.AsyncLapsTableUpdateHandler;
+import com.philliphsu.clock2.stopwatch.ui.StopwatchFragment;
 
 public class StopwatchNotificationService extends ChronometerNotificationService {
     private static final String TAG = "StopwatchNotifService";

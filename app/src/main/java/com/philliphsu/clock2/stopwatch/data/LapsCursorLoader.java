@@ -1,8 +1,11 @@
-package com.philliphsu.clock2.stopwatch;
+package com.philliphsu.clock2.stopwatch.data;
 
 import android.content.Context;
 
 import com.philliphsu.clock2.model.SQLiteCursorLoader;
+import com.philliphsu.clock2.stopwatch.Lap;
+import com.philliphsu.clock2.stopwatch.data.LapCursor;
+import com.philliphsu.clock2.stopwatch.data.LapsTableManager;
 
 /**
  * Created by Phillip Hsu on 8/9/2016.
