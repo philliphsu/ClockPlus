@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.philliphsu.clock2.aospdatetimepicker;
+package com.philliphsu.clock2.timepickers;
 
 import android.content.Context;
 import android.util.AttributeSet;

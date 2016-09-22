@@ -25,7 +25,7 @@ import com.philliphsu.clock2.list.BaseViewHolder;
 import com.philliphsu.clock2.list.OnListItemInteractionListener;
 import com.philliphsu.clock2.R;
 import com.philliphsu.clock2.TimePickerDialogController;
-import com.philliphsu.clock2.aospdatetimepicker.Utils;
+import com.philliphsu.clock2.timepickers.Utils;
 import com.philliphsu.clock2.timepickers.BaseTimePickerDialog.OnTimeSetListener;
 import com.philliphsu.clock2.util.TimeTextUtils;
 import com.philliphsu.clock2.util.FragmentTagUtils;

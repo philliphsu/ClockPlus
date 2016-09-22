@@ -9,7 +9,6 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.philliphsu.clock2.R;
-import com.philliphsu.clock2.aospdatetimepicker.Utils;
 
 /**
  * Created by Phillip Hsu on 8/17/2016.

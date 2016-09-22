@@ -36,7 +36,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.philliphsu.clock2.R;
-import com.philliphsu.clock2.aospdatetimepicker.Utils;
 import com.philliphsu.clock2.timepickers.GridSelectorLayout.OnValueSelectedListener;
 
 import java.text.DateFormatSymbols;
