@@ -1,19 +1,19 @@
-package com.philliphsu.clock2.alarms;
+package com.philliphsu.clock2.alarms.ui;
 
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.philliphsu.clock2.Alarm;
-import com.philliphsu.clock2.DaysOfWeek;
 import com.philliphsu.clock2.OnListItemInteractionListener;
 import com.philliphsu.clock2.R;
-import com.philliphsu.clock2.util.AlarmController;
+import com.philliphsu.clock2.alarms.Alarm;
+import com.philliphsu.clock2.alarms.misc.AlarmController;
+import com.philliphsu.clock2.alarms.misc.DaysOfWeek;
 
 import butterknife.Bind;
 
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
-import static com.philliphsu.clock2.DaysOfWeek.NUM_DAYS;
+import static com.philliphsu.clock2.alarms.misc.DaysOfWeek.NUM_DAYS;
 
 /**
  * Created by Phillip Hsu on 5/31/2016.

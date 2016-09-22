@@ -1,12 +1,13 @@
-package com.philliphsu.clock2;
+package com.philliphsu.clock2.alarms.background;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
-import com.philliphsu.clock2.model.AlarmCursor;
-import com.philliphsu.clock2.model.AlarmsTableManager;
-import com.philliphsu.clock2.util.AlarmController;
+import com.philliphsu.clock2.alarms.Alarm;
+import com.philliphsu.clock2.alarms.data.AlarmCursor;
+import com.philliphsu.clock2.alarms.data.AlarmsTableManager;
+import com.philliphsu.clock2.alarms.misc.AlarmController;
 
 import static com.philliphsu.clock2.util.Preconditions.checkNotNull;
 
@@ -20,7 +21,7 @@ import static com.philliphsu.clock2.util.Preconditions.checkNotNull;
 public class PendingAlarmScheduler extends BroadcastReceiver {
     // We include the class name in the string to distinguish this constant from the one defined
     // in UpcomingAlarmReceiver.
-    public static final String EXTRA_ALARM_ID = "com.philliphsu.clock2.PendingAlarmScheduler.extra.ALARM_ID";
+    public static final String EXTRA_ALARM_ID = "com.philliphsu.clock2.alarms.background.PendingAlarmScheduler.extra.ALARM_ID";
 
     @Override
     public void onReceive(final Context context, Intent intent) {

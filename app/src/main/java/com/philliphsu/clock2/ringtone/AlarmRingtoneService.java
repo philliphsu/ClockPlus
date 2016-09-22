@@ -1,4 +1,4 @@
-package com.philliphsu.clock2.alarms;
+package com.philliphsu.clock2.ringtone;
 
 import android.app.Notification;
 import android.content.Intent;
@@ -6,11 +6,10 @@ import android.net.Uri;
 import android.provider.Settings;
 import android.support.v4.app.NotificationCompat;
 
-import com.philliphsu.clock2.Alarm;
 import com.philliphsu.clock2.R;
-import com.philliphsu.clock2.ringtone.RingtoneService;
-import com.philliphsu.clock2.util.AlarmController;
-import com.philliphsu.clock2.util.AlarmUtils;
+import com.philliphsu.clock2.alarms.Alarm;
+import com.philliphsu.clock2.alarms.misc.AlarmController;
+import com.philliphsu.clock2.alarms.misc.AlarmPreferences;
 
 import static com.philliphsu.clock2.util.TimeFormatUtils.formatTime;
 
@@ -89,6 +88,6 @@ public class AlarmRingtoneService extends RingtoneService<Alarm> {
 
     @Override
     protected int minutesToAutoSilence() {
-        return AlarmUtils.minutesToSilenceAfter(this);
+        return AlarmPreferences.minutesToSilenceAfter(this);
     }
 }

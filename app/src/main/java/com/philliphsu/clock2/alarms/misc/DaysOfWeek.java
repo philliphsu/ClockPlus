@@ -1,10 +1,8 @@
-package com.philliphsu.clock2;
+package com.philliphsu.clock2.alarms.misc;
 
 import android.content.Context;
 import android.support.annotation.VisibleForTesting;
 import android.util.Log;
-
-import com.philliphsu.clock2.util.AlarmUtils;
 
 import java.text.DateFormatSymbols;
 import java.util.Arrays;
@@ -31,7 +29,7 @@ public final class DaysOfWeek {
     private static int sLastPreferredFirstDay;
 
     public static DaysOfWeek getInstance(Context context) {
-        int preferredFirstDay = AlarmUtils.firstDayOfWeek(context);
+        int preferredFirstDay = AlarmPreferences.firstDayOfWeek(context);
         if (sInstance == null || preferredFirstDay != sLastPreferredFirstDay) {
             sLastPreferredFirstDay = preferredFirstDay;
             sInstance = new DaysOfWeek(preferredFirstDay);

@@ -1,4 +1,4 @@
-package com.philliphsu.clock2.alarms;
+package com.philliphsu.clock2.alarms.ui;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -14,15 +14,15 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.philliphsu.clock2.Alarm;
-import com.philliphsu.clock2.AsyncAlarmsTableUpdateHandler;
 import com.philliphsu.clock2.R;
 import com.philliphsu.clock2.RecyclerViewFragment;
 import com.philliphsu.clock2.TimePickerDialogController;
+import com.philliphsu.clock2.alarms.Alarm;
+import com.philliphsu.clock2.alarms.data.AlarmsListCursorLoader;
+import com.philliphsu.clock2.alarms.data.AsyncAlarmsTableUpdateHandler;
+import com.philliphsu.clock2.alarms.misc.AlarmController;
 import com.philliphsu.clock2.timepickers.BaseTimePickerDialog;
-import com.philliphsu.clock2.model.AlarmCursor;
-import com.philliphsu.clock2.model.AlarmsListCursorLoader;
-import com.philliphsu.clock2.util.AlarmController;
+import com.philliphsu.clock2.alarms.data.AlarmCursor;
 import com.philliphsu.clock2.util.DelayedSnackbarHandler;
 
 import static com.philliphsu.clock2.util.FragmentTagUtils.makeTag;

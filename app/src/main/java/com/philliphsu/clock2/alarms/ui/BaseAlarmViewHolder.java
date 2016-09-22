@@ -1,4 +1,4 @@
-package com.philliphsu.clock2.alarms;
+package com.philliphsu.clock2.alarms.ui;
 
 import android.content.res.ColorStateList;
 import android.graphics.drawable.Drawable;
@@ -16,9 +16,11 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.philliphsu.clock2.alarms.Alarm;
+import com.philliphsu.clock2.alarms.misc.AlarmController;
+import com.philliphsu.clock2.alarms.misc.AlarmPreferences;
 import com.philliphsu.clock2.dialogs.AddLabelDialog;
 import com.philliphsu.clock2.dialogs.AddLabelDialogController;
-import com.philliphsu.clock2.Alarm;
 import com.philliphsu.clock2.BaseViewHolder;
 import com.philliphsu.clock2.OnListItemInteractionListener;
 import com.philliphsu.clock2.R;
@@ -26,8 +28,6 @@ import com.philliphsu.clock2.TimePickerDialogController;
 import com.philliphsu.clock2.aospdatetimepicker.Utils;
 import com.philliphsu.clock2.timepickers.BaseTimePickerDialog.OnTimeSetListener;
 import com.philliphsu.clock2.util.TimeTextUtils;
-import com.philliphsu.clock2.util.AlarmController;
-import com.philliphsu.clock2.util.AlarmUtils;
 import com.philliphsu.clock2.util.FragmentTagUtils;
 
 import java.util.Date;
@@ -275,7 +275,7 @@ public abstract class BaseAlarmViewHolder extends BaseViewHolder<Alarm> {
     }
 
     private void bindDismissButton(Alarm alarm) {
-        int hoursBeforeUpcoming = AlarmUtils.hoursBeforeUpcoming(getContext());
+        int hoursBeforeUpcoming = AlarmPreferences.hoursBeforeUpcoming(getContext());
         boolean upcoming = alarm.ringsWithinHours(hoursBeforeUpcoming);
         boolean snoozed = alarm.isSnoozed();
         boolean visible = alarm.isEnabled() && (upcoming || snoozed);

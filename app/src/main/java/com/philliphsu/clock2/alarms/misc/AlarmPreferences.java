@@ -1,4 +1,4 @@
-package com.philliphsu.clock2.util;
+package com.philliphsu.clock2.alarms.misc;
 
 import android.content.Context;
 import android.preference.PreferenceManager;
@@ -11,10 +11,10 @@ import com.philliphsu.clock2.R;
  *
  * Utilities for reading alarm preferences.
  */
-public final class AlarmUtils {
-    private static final String TAG = "AlarmUtils";
+public final class AlarmPreferences {
+    private static final String TAG = "AlarmPreferences";
 
-    private AlarmUtils() {}
+    private AlarmPreferences() {}
 
     public static int snoozeDuration(Context c) {
         return readPreference(c, R.string.key_snooze_duration, 10);

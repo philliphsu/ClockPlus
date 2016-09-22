@@ -1,13 +1,9 @@
-package com.philliphsu.clock2;
+package com.philliphsu.clock2.alarms.background;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
-/**
- * If the device is turned off, all alarms scheduled will be cancelled, and they will not be automatically
- * rescheduled when it is turned on again.
- */
 public class OnBootUpReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {

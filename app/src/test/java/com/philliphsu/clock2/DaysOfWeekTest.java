@@ -1,8 +1,10 @@
 package com.philliphsu.clock2;
 
+import com.philliphsu.clock2.alarms.misc.DaysOfWeek;
+
 import org.junit.Test;
 
-import static com.philliphsu.clock2.DaysOfWeek.*;
+import static com.philliphsu.clock2.alarms.misc.DaysOfWeek.*;
 import static org.junit.Assert.assertEquals;
 
 /**

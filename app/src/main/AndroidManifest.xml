@@ -24,7 +24,7 @@
         </activity>
 
         <receiver
-            android:name=".UpcomingAlarmReceiver"
+            android:name=".alarms.background.UpcomingAlarmReceiver"
             android:enabled="true"
             android:exported="false">
         </receiver>
@@ -39,12 +39,12 @@
         </activity>
 
         <receiver
-            android:name=".PendingAlarmScheduler"
+            android:name=".alarms.background.PendingAlarmScheduler"
             android:enabled="true"
             android:exported="false">
         </receiver>
         <receiver
-            android:name=".OnBootUpReceiver"
+            android:name=".alarms.background.OnBootUpReceiver"
             android:enabled="true"
             android:exported="true">
             <intent-filter>
@@ -53,7 +53,7 @@
         </receiver>
 
         <service
-            android:name=".OnBootUpAlarmScheduler"
+            android:name=".alarms.background.OnBootUpAlarmScheduler"
             android:enabled="true"
             android:exported="false">
         </service>
@@ -81,7 +81,7 @@
             android:taskAffinity="com.philliphsu.clock2.RingtoneActivity">
         </activity>
         <activity
-            android:name=".alarms.AlarmActivity"
+            android:name=".ringtone.AlarmActivity"
             android:excludeFromRecents="true"
             android:label="@string/title_activity_ringtone"
             android:launchMode="singleTask"
@@ -89,7 +89,7 @@
         </activity>
 
         <service
-            android:name=".alarms.AlarmRingtoneService"
+            android:name=".ringtone.AlarmRingtoneService"
             android:enabled="true"
             android:exported="false">
         </service>

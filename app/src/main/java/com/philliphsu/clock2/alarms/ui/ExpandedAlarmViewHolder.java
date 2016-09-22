@@ -1,4 +1,4 @@
-package com.philliphsu.clock2.alarms;
+package com.philliphsu.clock2.alarms.ui;
 
 import android.content.res.ColorStateList;
 import android.graphics.drawable.Drawable;
@@ -13,14 +13,14 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ToggleButton;
 
-import com.philliphsu.clock2.Alarm;
-import com.philliphsu.clock2.DaysOfWeek;
 import com.philliphsu.clock2.OnListItemInteractionListener;
 import com.philliphsu.clock2.R;
+import com.philliphsu.clock2.alarms.Alarm;
+import com.philliphsu.clock2.alarms.misc.AlarmController;
+import com.philliphsu.clock2.alarms.misc.DaysOfWeek;
 import com.philliphsu.clock2.dialogs.RingtonePickerDialog;
 import com.philliphsu.clock2.aospdatetimepicker.Utils;
 import com.philliphsu.clock2.dialogs.RingtonePickerDialogController;
-import com.philliphsu.clock2.util.AlarmController;
 import com.philliphsu.clock2.util.FragmentTagUtils;
 
 import butterknife.Bind;

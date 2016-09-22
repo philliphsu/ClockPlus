@@ -1,4 +1,4 @@
-package com.philliphsu.clock2.util;
+package com.philliphsu.clock2.alarms.misc;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -8,13 +8,15 @@ import android.support.design.widget.Snackbar;
 import android.util.Log;
 import android.view.View;
 
-import com.philliphsu.clock2.Alarm;
-import com.philliphsu.clock2.PendingAlarmScheduler;
 import com.philliphsu.clock2.R;
-import com.philliphsu.clock2.UpcomingAlarmReceiver;
-import com.philliphsu.clock2.alarms.AlarmActivity;
-import com.philliphsu.clock2.alarms.AlarmRingtoneService;
-import com.philliphsu.clock2.model.AlarmsTableManager;
+import com.philliphsu.clock2.alarms.Alarm;
+import com.philliphsu.clock2.ringtone.AlarmActivity;
+import com.philliphsu.clock2.ringtone.AlarmRingtoneService;
+import com.philliphsu.clock2.alarms.background.PendingAlarmScheduler;
+import com.philliphsu.clock2.alarms.background.UpcomingAlarmReceiver;
+import com.philliphsu.clock2.alarms.data.AlarmsTableManager;
+import com.philliphsu.clock2.util.DelayedSnackbarHandler;
+import com.philliphsu.clock2.util.DurationUtils;
 
 import static android.app.PendingIntent.FLAG_CANCEL_CURRENT;
 import static android.app.PendingIntent.FLAG_NO_CREATE;
@@ -26,7 +28,6 @@ import static java.util.concurrent.TimeUnit.HOURS;
  * Created by Phillip Hsu on 7/10/2016.
  *
  * API to control alarm states and update the UI.
- * TODO: Move this out of the .utils package when done.
  * TODO: Rename to AlarmStateHandler? AlarmStateController?
  */
 public final class AlarmController {
@@ -73,7 +74,7 @@ public final class AlarmController {
         // We use a WAKEUP alarm to send the upcoming alarm notification so it goes off even if the
         // device is asleep. Otherwise, it will not go off until the device is turned back on.
         long ringAt = alarm.isSnoozed() ? alarm.snoozingUntil() : alarm.ringsAt();
-        int hoursToNotifyInAdvance = AlarmUtils.hoursBeforeUpcoming(mAppContext);
+        int hoursToNotifyInAdvance = AlarmPreferences.hoursBeforeUpcoming(mAppContext);
         long upcomingAt = ringAt - HOURS.toMillis(hoursToNotifyInAdvance);
         // If snoozed, upcoming note posted immediately.
         am.set(AlarmManager.RTC_WAKEUP, upcomingAt, notifyUpcomingAlarmIntent(alarm, false));
@@ -111,7 +112,7 @@ public final class AlarmController {
         // Does nothing if it's not posted.
         removeUpcomingAlarmNotification(alarm);
 
-        int hoursToNotifyInAdvance = AlarmUtils.hoursBeforeUpcoming(mAppContext);
+        int hoursToNotifyInAdvance = AlarmPreferences.hoursBeforeUpcoming(mAppContext);
         // TOneverDO: Place block after making value changes to the alarm.
         if (showSnackbar
                 // TODO: Consider showing the snackbar for non-upcoming alarms too;
@@ -151,7 +152,7 @@ public final class AlarmController {
     }
 
     public void snoozeAlarm(Alarm alarm) {
-        int minutesToSnooze = AlarmUtils.snoozeDuration(mAppContext);
+        int minutesToSnooze = AlarmPreferences.snoozeDuration(mAppContext);
         alarm.snooze(minutesToSnooze);
         scheduleAlarm(alarm, false);
         String message = mAppContext.getString(R.string.title_snoozing_until,

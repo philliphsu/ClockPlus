@@ -1,4 +1,4 @@
-package com.philliphsu.clock2.alarms;
+package com.philliphsu.clock2.ringtone;
 
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -7,11 +7,9 @@ import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.view.ViewGroup;
 
-import com.philliphsu.clock2.Alarm;
 import com.philliphsu.clock2.R;
-import com.philliphsu.clock2.ringtone.RingtoneActivity;
-import com.philliphsu.clock2.ringtone.RingtoneService;
-import com.philliphsu.clock2.util.AlarmController;
+import com.philliphsu.clock2.alarms.Alarm;
+import com.philliphsu.clock2.alarms.misc.AlarmController;
 import com.philliphsu.clock2.util.TimeFormatUtils;
 
 public class AlarmActivity extends RingtoneActivity<Alarm> {

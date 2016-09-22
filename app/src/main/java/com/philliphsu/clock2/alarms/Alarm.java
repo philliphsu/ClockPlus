@@ -1,4 +1,4 @@
-package com.philliphsu.clock2;
+package com.philliphsu.clock2.alarms;
 
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -12,9 +12,9 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.concurrent.TimeUnit;
 
-import static com.philliphsu.clock2.DaysOfWeek.NUM_DAYS;
-import static com.philliphsu.clock2.DaysOfWeek.SATURDAY;
-import static com.philliphsu.clock2.DaysOfWeek.SUNDAY;
+import static com.philliphsu.clock2.alarms.misc.DaysOfWeek.NUM_DAYS;
+import static com.philliphsu.clock2.alarms.misc.DaysOfWeek.SATURDAY;
+import static com.philliphsu.clock2.alarms.misc.DaysOfWeek.SUNDAY;
 
 /**
  * Created by Phillip Hsu on 5/26/2016.

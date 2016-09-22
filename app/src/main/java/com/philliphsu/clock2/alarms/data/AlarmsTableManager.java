@@ -1,18 +1,19 @@
-package com.philliphsu.clock2.model;
+package com.philliphsu.clock2.alarms.data;
 
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 
-import com.philliphsu.clock2.Alarm;
+import com.philliphsu.clock2.alarms.Alarm;
+import com.philliphsu.clock2.model.DatabaseTableManager;
 
-import static com.philliphsu.clock2.DaysOfWeek.FRIDAY;
-import static com.philliphsu.clock2.DaysOfWeek.MONDAY;
-import static com.philliphsu.clock2.DaysOfWeek.SATURDAY;
-import static com.philliphsu.clock2.DaysOfWeek.SUNDAY;
-import static com.philliphsu.clock2.DaysOfWeek.THURSDAY;
-import static com.philliphsu.clock2.DaysOfWeek.TUESDAY;
-import static com.philliphsu.clock2.DaysOfWeek.WEDNESDAY;
+import static com.philliphsu.clock2.alarms.misc.DaysOfWeek.FRIDAY;
+import static com.philliphsu.clock2.alarms.misc.DaysOfWeek.MONDAY;
+import static com.philliphsu.clock2.alarms.misc.DaysOfWeek.SATURDAY;
+import static com.philliphsu.clock2.alarms.misc.DaysOfWeek.SUNDAY;
+import static com.philliphsu.clock2.alarms.misc.DaysOfWeek.THURSDAY;
+import static com.philliphsu.clock2.alarms.misc.DaysOfWeek.TUESDAY;
+import static com.philliphsu.clock2.alarms.misc.DaysOfWeek.WEDNESDAY;
 
 /**
  * Created by Phillip Hsu on 7/30/2016.

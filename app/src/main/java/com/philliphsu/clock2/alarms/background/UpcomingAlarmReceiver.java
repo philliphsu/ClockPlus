@@ -1,4 +1,4 @@
-package com.philliphsu.clock2;
+package com.philliphsu.clock2.alarms.background;
 
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -8,8 +8,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.v4.app.NotificationCompat;
 
-import com.philliphsu.clock2.alarms.AlarmsFragment;
-import com.philliphsu.clock2.util.AlarmController;
+import com.philliphsu.clock2.MainActivity;
+import com.philliphsu.clock2.R;
+import com.philliphsu.clock2.alarms.Alarm;
+import com.philliphsu.clock2.alarms.misc.AlarmController;
+import com.philliphsu.clock2.alarms.ui.AlarmsFragment;
 
 import static android.app.PendingIntent.FLAG_CANCEL_CURRENT;
 import static android.app.PendingIntent.FLAG_ONE_SHOT;

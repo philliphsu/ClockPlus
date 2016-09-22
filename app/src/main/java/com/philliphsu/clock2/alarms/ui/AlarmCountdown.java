@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.philliphsu.clock2.alarms;
+package com.philliphsu.clock2.alarms.ui;
 
 import android.annotation.TargetApi;
 import android.content.Context;

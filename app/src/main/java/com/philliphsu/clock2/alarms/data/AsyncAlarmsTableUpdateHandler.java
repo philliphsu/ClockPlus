@@ -1,12 +1,14 @@
-package com.philliphsu.clock2;
+package com.philliphsu.clock2.alarms.data;
 
 import android.content.Context;
 import android.support.design.widget.Snackbar;
 import android.view.View;
 
+import com.philliphsu.clock2.AsyncDatabaseTableUpdateHandler;
+import com.philliphsu.clock2.R;
+import com.philliphsu.clock2.alarms.Alarm;
 import com.philliphsu.clock2.alarms.ScrollHandler;
-import com.philliphsu.clock2.model.AlarmsTableManager;
-import com.philliphsu.clock2.util.AlarmController;
+import com.philliphsu.clock2.alarms.misc.AlarmController;
 
 /**
  * Created by Phillip Hsu on 7/1/2016.

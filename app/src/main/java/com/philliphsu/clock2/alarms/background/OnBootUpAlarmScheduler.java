@@ -1,12 +1,13 @@
-package com.philliphsu.clock2;
+package com.philliphsu.clock2.alarms.background;
 
 import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
 
-import com.philliphsu.clock2.model.AlarmCursor;
-import com.philliphsu.clock2.model.AlarmsTableManager;
-import com.philliphsu.clock2.util.AlarmController;
+import com.philliphsu.clock2.alarms.Alarm;
+import com.philliphsu.clock2.alarms.data.AlarmCursor;
+import com.philliphsu.clock2.alarms.data.AlarmsTableManager;
+import com.philliphsu.clock2.alarms.misc.AlarmController;
 
 /**
  * An {@link IntentService} subclass for handling asynchronous task requests in
