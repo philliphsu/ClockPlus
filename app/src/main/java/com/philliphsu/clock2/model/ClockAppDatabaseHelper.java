@@ -6,6 +6,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 import com.philliphsu.clock2.alarms.data.AlarmsTable;
 import com.philliphsu.clock2.stopwatch.LapsTable;
+import com.philliphsu.clock2.timers.data.TimersTable;
 
 /**
  * Created by Phillip Hsu on 7/30/2016.

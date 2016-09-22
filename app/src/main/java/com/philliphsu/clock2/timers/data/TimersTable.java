@@ -1,4 +1,4 @@
-package com.philliphsu.clock2.model;
+package com.philliphsu.clock2.timers.data;
 
 import android.database.sqlite.SQLiteDatabase;
 

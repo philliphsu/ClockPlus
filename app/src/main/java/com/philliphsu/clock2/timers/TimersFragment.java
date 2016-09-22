@@ -14,13 +14,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.philliphsu.clock2.AsyncTimersTableUpdateHandler;
+import com.philliphsu.clock2.timers.data.AsyncTimersTableUpdateHandler;
 import com.philliphsu.clock2.R;
 import com.philliphsu.clock2.list.RecyclerViewFragment;
 import com.philliphsu.clock2.Timer;
 import com.philliphsu.clock2.edittimer.EditTimerActivity;
-import com.philliphsu.clock2.model.TimerCursor;
-import com.philliphsu.clock2.model.TimersListCursorLoader;
+import com.philliphsu.clock2.timers.data.TimerCursor;
+import com.philliphsu.clock2.timers.data.TimersListCursorLoader;
 
 import static butterknife.ButterKnife.findById;
 import static com.philliphsu.clock2.util.ConfigurationUtils.getOrientation;

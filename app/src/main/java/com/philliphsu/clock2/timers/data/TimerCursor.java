@@ -1,8 +1,9 @@
-package com.philliphsu.clock2.model;
+package com.philliphsu.clock2.timers.data;
 
 import android.database.Cursor;
 
 import com.philliphsu.clock2.Timer;
+import com.philliphsu.clock2.model.BaseItemCursor;
 
 /**
  * Created by Phillip Hsu on 7/30/2016.

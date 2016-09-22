@@ -17,7 +17,7 @@ import android.widget.TextView;
 
 import com.philliphsu.clock2.dialogs.AddLabelDialog;
 import com.philliphsu.clock2.dialogs.AddLabelDialogController;
-import com.philliphsu.clock2.AsyncTimersTableUpdateHandler;
+import com.philliphsu.clock2.timers.data.AsyncTimersTableUpdateHandler;
 import com.philliphsu.clock2.list.BaseViewHolder;
 import com.philliphsu.clock2.list.OnListItemInteractionListener;
 import com.philliphsu.clock2.R;

@@ -8,12 +8,12 @@ import android.support.annotation.Nullable;
 import android.support.v4.util.SimpleArrayMap;
 import android.util.Log;
 
-import com.philliphsu.clock2.AsyncTimersTableUpdateHandler;
+import com.philliphsu.clock2.timers.data.AsyncTimersTableUpdateHandler;
 import com.philliphsu.clock2.ChronometerNotificationService;
 import com.philliphsu.clock2.MainActivity;
 import com.philliphsu.clock2.R;
 import com.philliphsu.clock2.Timer;
-import com.philliphsu.clock2.model.TimerCursor;
+import com.philliphsu.clock2.timers.data.TimerCursor;
 
 /**
  * Handles the notification for an active Timer.
