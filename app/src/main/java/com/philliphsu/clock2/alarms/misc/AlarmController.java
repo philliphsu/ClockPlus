@@ -60,7 +60,12 @@ public final class AlarmController {
             return;
         }
 
-        // TODO: Consider doing this in a new thread.
+        // Does nothing if it's not posted. This is primarily here for when alarms
+        // are updated, instead of newly created, so that we don't leave behind
+        // stray upcoming alarm notifications. This occurs e.g. when a single-use
+        // alarm is updated to recur on a weekday later than the current day.
+        removeUpcomingAlarmNotification(alarm);
+
         Log.d(TAG, "Scheduling alarm " + alarm);
         AlarmManager am = (AlarmManager) mAppContext.getSystemService(Context.ALARM_SERVICE);
         // If there is already an alarm for this Intent scheduled (with the equality of two
