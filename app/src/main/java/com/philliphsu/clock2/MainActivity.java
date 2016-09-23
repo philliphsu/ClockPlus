@@ -13,11 +13,9 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.util.SparseArray;
-import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import com.philliphsu.clock2.alarms.ui.AlarmsFragment;
 import com.philliphsu.clock2.list.RecyclerViewFragment;
@@ -222,14 +220,6 @@ public class MainActivity extends BaseActivity {
         mFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                Intent intent = new Intent(MainActivity.this, EditAlarmActivity.class);
-//                // Call Fragment#startActivityForResult() instead of Activity#startActivityForResult()
-//                // because we want the result to be handled in the Fragment, not in this Activity.
-//                // FragmentActivity does NOT deliver the result to the Fragment, i.e. your
-//                // Fragment's onActivityResult() will NOT be called.
-//                mSectionsPagerAdapter.getFragment()
-//                        .startActivityForResult(intent, AlarmsFragment.REQUEST_CREATE_ALARM);
-
                 Fragment f = mSectionsPagerAdapter.getFragment(mViewPager.getCurrentItem());
                 if (f instanceof RecyclerViewFragment) {
                     ((RecyclerViewFragment) f).onFabClick();
@@ -291,18 +281,6 @@ public class MainActivity extends BaseActivity {
         // http://stackoverflow.com/q/6147884/5055032
         // http://stackoverflow.com/a/24303360/5055032
         super.onActivityResult(requestCode, resultCode, data);
-        // This is a hacky workaround when you absolutely must have a Fragment
-        // handle the result, even when it was not the one to start the requested
-        // Activity. For example, the ExpandedAlarmViewHolder can start the ringtone
-        // picker dialog (which is an Activity) for a result; ExpandedAlarmViewHolder
-        // has no reference to the AlarmsFragment, but it does have a reference to a
-        // Context (which we can cast to Activity). Thus, ExpandedAlarmViewHolder
-        // uses Activity#startActivityForResult().
-
-        // THIS WAS ACTUALLY A BAD IDEA, ESPECIALLY FOR TIMERSFRAGMENT. THIS ENDS UP ADDING
-        // DUPLICATE TIMERS.
-//        mSectionsPagerAdapter.getFragment(mViewPager.getCurrentItem())
-//                .onActivityResult(requestCode, resultCode, data);
 
         switch (requestCode) {
             case REQUEST_THEME_CHANGE:
@@ -367,41 +345,6 @@ public class MainActivity extends BaseActivity {
     }
 
     /**
-     * A placeholder fragment containing a simple view.
-     */
-    public static class PlaceholderFragment extends Fragment {
-        /**
-         * The fragment argument representing the section number for this
-         * fragment.
-         */
-        private static final String ARG_SECTION_NUMBER = "section_number";
-
-        public PlaceholderFragment() {
-        }
-
-        /**
-         * Returns a new instance of this fragment for the given section
-         * number.
-         */
-        public static PlaceholderFragment newInstance(int sectionNumber) {
-            PlaceholderFragment fragment = new PlaceholderFragment();
-            Bundle args = new Bundle();
-            args.putInt(ARG_SECTION_NUMBER, sectionNumber);
-            fragment.setArguments(args);
-            return fragment;
-        }
-
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                                 Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_main, container, false);
-            TextView textView = (TextView) rootView.findViewById(R.id.section_label);
-            textView.setText(getString(R.string.section_format, getArguments().getInt(ARG_SECTION_NUMBER)));
-            return rootView;
-        }
-    }
-
-    /**
      * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
      * one of the sections/tabs/pages.
      */
@@ -426,7 +369,7 @@ public class MainActivity extends BaseActivity {
                 case PAGE_STOPWATCH:
                     return new StopwatchFragment();
                 default:
-                    return PlaceholderFragment.newInstance(position + 1);
+                    throw new IllegalStateException("No fragment can be instantiated for position " + position);
             }
         }
 
