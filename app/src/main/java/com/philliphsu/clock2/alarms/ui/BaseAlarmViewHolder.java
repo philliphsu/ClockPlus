@@ -157,7 +157,7 @@ public abstract class BaseAlarmViewHolder extends BaseViewHolder<Alarm> {
         } else {
             // Dismisses the current upcoming alarm and handles scheduling the next alarm for us.
             // Since changes are saved to the database, this prompts a UI refresh.
-            mAlarmController.cancelAlarm(alarm, true);
+            mAlarmController.cancelAlarm(alarm, true, true);
         }
         // TOneverDO: AlarmUtils.cancelAlarm() otherwise it will be called twice
         /*
@@ -209,7 +209,7 @@ public abstract class BaseAlarmViewHolder extends BaseViewHolder<Alarm> {
                 // TODO: On 21+, upcoming notification doesn't post immediately
                 persistUpdatedAlarm(alarm, true);
             } else {
-                mAlarmController.cancelAlarm(alarm, true);
+                mAlarmController.cancelAlarm(alarm, true, false);
                 // cancelAlarm() already calls save() for you.
             }
             mSwitch.setPressed(false); // clear the pressed focus, esp. if setPressed(true) was called manually

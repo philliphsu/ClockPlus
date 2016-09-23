@@ -39,7 +39,7 @@ public final class AsyncAlarmsTableUpdateHandler extends AsyncDatabaseTableUpdat
 
     @Override
     protected void onPostAsyncDelete(Integer result, final Alarm alarm) {
-        mAlarmController.cancelAlarm(alarm, false);
+        mAlarmController.cancelAlarm(alarm, false, false);
         if (mSnackbarAnchor != null) {
             // TODO: Consider adding delay to allow the alarm item animation
             // to finish first before we show the snackbar. Inbox app does this.

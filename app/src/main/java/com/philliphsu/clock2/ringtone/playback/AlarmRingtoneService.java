@@ -29,7 +29,7 @@ public class AlarmRingtoneService extends RingtoneService<Alarm> {
             if (ACTION_SNOOZE.equals(intent.getAction())) {
                 mAlarmController.snoozeAlarm(getRingingObject());
             } else if (ACTION_DISMISS.equals(intent.getAction())) {
-                mAlarmController.cancelAlarm(getRingingObject(), false); // TODO do we really need to cancel the intent and alarm?
+                mAlarmController.cancelAlarm(getRingingObject(), false, true); // TODO do we really need to cancel the intent and alarm?
             } else {
                 throw new UnsupportedOperationException();
             }
@@ -49,7 +49,7 @@ public class AlarmRingtoneService extends RingtoneService<Alarm> {
     @Override
     protected void onAutoSilenced() {
         // TODO do we really need to cancel the alarm and intent?
-        mAlarmController.cancelAlarm(getRingingObject(), false);
+        mAlarmController.cancelAlarm(getRingingObject(), false, true);
     }
 
     @Override

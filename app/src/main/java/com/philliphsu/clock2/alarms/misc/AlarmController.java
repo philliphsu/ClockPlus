@@ -91,8 +91,11 @@ public final class AlarmController {
 
     /**
      * Cancel the alarm. This does NOT check if you previously scheduled the alarm.
+     * @param rescheduleIfRecurring True if the alarm should be rescheduled after cancelling.
+     *                              This param will only be considered if the alarm has recurrence
+     *                              and is enabled.
      */
-    public void cancelAlarm(Alarm alarm, boolean showSnackbar) {
+    public void cancelAlarm(Alarm alarm, boolean showSnackbar, boolean rescheduleIfRecurring) {
         // TODO: Consider doing this in a new thread.
         Log.d(TAG, "Cancelling alarm " + alarm);
         AlarmManager am = (AlarmManager) mAppContext.getSystemService(Context.ALARM_SERVICE);
@@ -130,7 +133,7 @@ public final class AlarmController {
 
         if (!alarm.hasRecurrence()) {
             alarm.setEnabled(false);
-        } else if (alarm.isEnabled()) {
+        } else if (alarm.isEnabled() && rescheduleIfRecurring) {
             if (alarm.ringsWithinHours(hoursToNotifyInAdvance)) {
                 // Still upcoming today, so wait until the normal ring time
                 // passes before rescheduling the alarm.

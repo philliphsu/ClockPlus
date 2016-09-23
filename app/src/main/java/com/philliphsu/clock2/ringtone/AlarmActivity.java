@@ -104,7 +104,7 @@ public class AlarmActivity extends RingtoneActivity<Alarm> {
     @Override
     protected void onRightButtonClick() {
         // TODO do we really need to cancel the intent and alarm?
-        mAlarmController.cancelAlarm(getRingingObject(), false);
+        mAlarmController.cancelAlarm(getRingingObject(), false, true);
         stopAndFinish();
     }
 

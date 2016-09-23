@@ -43,7 +43,7 @@ public class UpcomingAlarmReceiver extends BroadcastReceiver {
             nm.cancel(TAG, (int) id);
         } else {
             if (ACTION_DISMISS_NOW.equals(intent.getAction())) {
-                new AlarmController(context, null).cancelAlarm(alarm, false);
+                new AlarmController(context, null).cancelAlarm(alarm, false, true);
             } else {
                 // Prepare notification
                 // http://stackoverflow.com/a/15803726/5055032
