@@ -1,7 +1,30 @@
 apply plugin: 'com.android.application'
 apply plugin: 'com.neenbedankt.android-apt'
 
+// =============================================================================
+// https://developer.android.com/studio/publish/app-signing.html#secure-shared-keystore
+
+// Create a variable called keystorePropertiesFile, and initialize it to your
+// keystore.properties file, in the rootProject folder.
+def keystorePropertiesFile = rootProject.file("keystore.properties")
+
+// Initialize a new Properties() object called keystoreProperties.
+def keystoreProperties = new Properties()
+
+// Load your keystore.properties file into the keystoreProperties object.
+keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+
+// =============================================================================
+
 android {
+    signingConfigs {
+        config {
+            keyAlias keystoreProperties['keyAlias']
+            keyPassword keystoreProperties['keyPassword']
+            storeFile file(keystoreProperties['storeFile'])
+            storePassword keystoreProperties['storePassword']
+        }
+    }
     compileSdkVersion 23
     buildToolsVersion "23.0.3"
     defaultConfig {
@@ -16,8 +39,17 @@ android {
     }
     buildTypes {
         release {
+            // https://developer.android.com/studio/build/shrink-code.html#shrink-code
+            //
+            // Proguard is disabled, because it seems like it is removing
+            // ButterKnife generated code and I don't know how to fix it...
             minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            // "'proguard-android-optimize.txt' includes the same ProGuard rules
+            // [as 'proguard-android.txt'], but with other optimizations that
+            // perform analysis at the bytecode level—inside and across methods—
+            // to reduce your APK size further and help it run faster."
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.config
         }
     }
     productFlavors {
@@ -28,7 +60,8 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-core:1.10.19'
-    testCompile 'org.robolectric:robolectric:3.0' // TODO: delete, not in use
+    // TODO: delete, not in use
+    testCompile 'org.robolectric:robolectric:3.0'
     provided 'com.google.auto.value:auto-value:1.2'
     apt 'com.google.auto.value:auto-value:1.2'
     compile 'com.android.support:appcompat-v7:23.4.0'
