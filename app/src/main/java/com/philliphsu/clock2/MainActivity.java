@@ -231,6 +231,8 @@ public class MainActivity extends BaseActivity {
 
         final int initialPage = getIntent().getIntExtra(EXTRA_SHOW_PAGE, -1);
         if (initialPage >= 0 && initialPage <= mSectionsPagerAdapter.getCount() - 1) {
+            // This is so we don't keep it around when the configuration changes.
+            getIntent().removeExtra(EXTRA_SHOW_PAGE);
             // Run this only after the ViewPager is finished drawing
             mViewPager.post(new Runnable() {
                 @Override
