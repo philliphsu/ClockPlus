@@ -1,9 +1,12 @@
 package com.philliphsu.clock2;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.PersistableBundle;
+import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -28,12 +31,14 @@ import butterknife.Bind;
 public class MainActivity extends BaseActivity {
     private static final String TAG = "MainActivity";
 
-    public static final int PAGE_ALARMS = 0;
-    public static final int PAGE_TIMERS = 1;
-    public static final int PAGE_STOPWATCH = 2;
+    public static final int    PAGE_ALARMS     = 0;
+    public static final int    PAGE_TIMERS     = 1;
+    public static final int    PAGE_STOPWATCH  = 2;
     public static final String EXTRA_SHOW_PAGE = "com.philliphsu.clock2.extra.SHOW_PAGE";
 
-    public static final int REQUEST_THEME_CHANGE = 5;
+    public static final  int    REQUEST_THEME_CHANGE = 5;
+    private static final String LAST_TAB             = "last_tab";
+    private static final int    DEFAULT_TAB          = 0;
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -44,7 +49,7 @@ public class MainActivity extends BaseActivity {
      * {@link android.support.v4.app.FragmentStatePagerAdapter}.
      */
     private SectionsPagerAdapter mSectionsPagerAdapter;
-    private Drawable mAddItemDrawable;
+    private Drawable             mAddItemDrawable;
 
 //    // For delaying fab.show() on SCROLL_STATE_SETTLING
 //    private final Handler mHandler = new Handler();
@@ -244,6 +249,15 @@ public class MainActivity extends BaseActivity {
                 }
             });
         }
+        final String key = getString(R.string.key_last_tab);
+        final int fromPrefsLastTab = PreferenceManager.getDefaultSharedPreferences(this).getInt(key, DEFAULT_TAB);
+        restoreTab(savedInstanceState, fromPrefsLastTab);
+    }
+
+    private void restoreTab(final Bundle savedInstanceState, int def) {
+        final int tabToSwitchTo = savedInstanceState == null ?
+                def : savedInstanceState.getInt(LAST_TAB, def);
+        mViewPager.setCurrentItem(tabToSwitchTo);
     }
 
     @Override
@@ -285,12 +299,36 @@ public class MainActivity extends BaseActivity {
         super.onActivityResult(requestCode, resultCode, data);
 
         switch (requestCode) {
-            case REQUEST_THEME_CHANGE:
-                if (data != null && data.getBooleanExtra(SettingsActivity.EXTRA_THEME_CHANGED, false)) {
-                    recreate();
-                }
-                break;
+        case REQUEST_THEME_CHANGE:
+            if (data != null && data.getBooleanExtra(SettingsActivity.EXTRA_THEME_CHANGED, false)) {
+                recreate();
+            }
+            break;
         }
+    }
+
+    @Override
+    public void onSaveInstanceState(final Bundle outState, final PersistableBundle outPersistentState) {
+        super.onSaveInstanceState(outState, outPersistentState);
+        outState.putInt(LAST_TAB, mViewPager.getCurrentItem());
+    }
+
+    @Override
+    protected void onRestoreInstanceState(final Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        restoreTab(savedInstanceState, DEFAULT_TAB);
+    }
+
+    @SuppressLint("CommitPrefEdits")
+    @Override
+    protected void onDestroy() {
+        final int currentTab = mViewPager.getCurrentItem();
+        PreferenceManager.getDefaultSharedPreferences(this)
+                .edit()
+                .putInt(getString(R.string.key_last_tab), currentTab)
+                .commit();
+
+        super.onDestroy();
     }
 
     @Override
@@ -364,14 +402,14 @@ public class MainActivity extends BaseActivity {
         public Fragment getItem(int position) {
             // getItem is called to instantiate the fragment for the given page.
             switch (position) {
-                case PAGE_ALARMS:
-                    return AlarmsFragment.newInstance(1);
-                case PAGE_TIMERS:
-                    return new TimersFragment();
-                case PAGE_STOPWATCH:
-                    return new StopwatchFragment();
-                default:
-                    throw new IllegalStateException("No fragment can be instantiated for position " + position);
+            case PAGE_ALARMS:
+                return AlarmsFragment.newInstance(1);
+            case PAGE_TIMERS:
+                return new TimersFragment();
+            case PAGE_STOPWATCH:
+                return new StopwatchFragment();
+            default:
+                throw new IllegalStateException("No fragment can be instantiated for position " + position);
             }
         }
 
