@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.design.widget.CoordinatorLayout
-    android:id="@+id/main_content"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context="com.philliphsu.clock2.MainActivity">
+    tools:context="com.philliphsu.clock2.MainActivity"
+    android:id="@+id/main_content">
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
@@ -19,16 +19,15 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/colorPrimary"
+            app:popupTheme="?themedPopupOverlay"
             app:contentInsetStart="0dp"
-            app:layout_scrollFlags=""
-            app:popupTheme="?themedPopupOverlay"> <!-- None intentionally -->
+            app:layout_scrollFlags=""> <!-- None intentionally -->
 
             <android.support.design.widget.TabLayout
                 android:id="@+id/tabs"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                app:tabGravity="center"
-                app:tabMode="scrollable"/>
+                app:tabGravity="fill"/>
 
         </android.support.v7.widget.Toolbar>
 
@@ -45,8 +44,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
+        app:srcCompat="@drawable/ic_add_24dp"
         android:layout_margin="@dimen/fab_margin"
-        android:tint="@android:color/white"
-        app:srcCompat="@drawable/ic_add_24dp"/>
+        android:tint="@android:color/white"/>
 
 </android.support.design.widget.CoordinatorLayout>
