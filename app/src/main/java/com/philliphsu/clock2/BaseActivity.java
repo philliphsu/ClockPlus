@@ -59,7 +59,6 @@ public abstract class BaseActivity extends AppCompatActivity {
             if (ab != null) {
                 ab.setDisplayHomeAsUpEnabled(isDisplayHomeUpEnabled());
                 ab.setDisplayShowTitleEnabled(isDisplayShowTitleEnabled());
-                ab.setElevation(getResources().getDimension(R.dimen.appbar_elevation));
             }
         }
     }

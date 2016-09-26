@@ -86,4 +86,9 @@
     <dimen name="text_size_subtitle_toolbar">16dp</dimen>
     <dimen name="text_size_title">20sp</dimen>
     <dimen name="text_size_title_toolbar">20dp</dimen>
+
+    <!--Main activity-->
+    <!--Twice the toolbar default height, 56dp-->
+    <dimen name="main_toolbar_height">112dp</dimen>
+    <dimen name="main_toolbar_tabs_height">56dp</dimen>
 </resources>
