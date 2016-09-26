@@ -12,4 +12,6 @@
         <item>@string/theme_light</item>
         <item>@string/theme_dark</item>
     </string-array>
+
+    <string name="key_last_tab">last_tab</string>
 </resources>
