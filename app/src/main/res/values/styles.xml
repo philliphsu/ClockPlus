@@ -176,11 +176,4 @@
         <item name="android:maxLines">1</item>
         <item name="android:textSize">@dimen/text_size_subhead</item>
     </style>
-
-    <style name="AlertDialogStyle" parent="@android:style/Theme.Holo.Dialog">
-        <item name="android:windowBackground">@color/alert_dialog_background_color</item>
-    </style>
-    <style name="AlertDialogStyle.Dark">
-        <item name="android:windowBackground">@color/alert_dialog_background_color_inverse</item>
-    </style>
 </resources>
