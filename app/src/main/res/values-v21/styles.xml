@@ -18,6 +18,10 @@
         <item name="android:navigationBarColor">?android:colorPrimary</item>
         <item name="android:alertDialogTheme">@style/AlertDialogStyle.Dark</item>
     </style>
+    <style name="AppTheme.Black" parent="BaseAppTheme.Black">
+        <item name="android:navigationBarColor">?android:colorPrimary</item>
+        <item name="android:alertDialogTheme">@style/AlertDialogStyle.Black</item>
+    </style>
 
     <style name="AlertDialogStyle" parent="android:Theme.Material.Dialog.Alert">
         <item name="android:colorAccent">@color/colorAccent</item>
