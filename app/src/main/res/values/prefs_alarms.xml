@@ -50,6 +50,7 @@
     <string name="key_notify_me_of_upcoming_alarms">key_notify_me_of_upcoming_alarms</string>
     <string name="title_notify_me_of_upcoming_alarms">Notify me of upcoming alarms</string>
     <string-array name="entries_notify_me_of_upcoming_alarms">
+        <item>Never</item>
         <item>1 hour before</item>
         <item>2 hours before</item>
         <item>3 hours before</item>
@@ -60,6 +61,7 @@
         <item>8 hours before</item>
     </string-array>
     <string-array name="values_notify_me_of_upcoming_alarms">
+        <item>0</item>
         <item>1</item>
         <item>2</item>
         <item>3</item>

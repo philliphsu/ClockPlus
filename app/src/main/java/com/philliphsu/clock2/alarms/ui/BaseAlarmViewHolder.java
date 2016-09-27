@@ -275,8 +275,8 @@ public abstract class BaseAlarmViewHolder extends BaseViewHolder<Alarm> {
     }
 
     private void bindDismissButton(Alarm alarm) {
-        int hoursBeforeUpcoming = AlarmPreferences.hoursBeforeUpcoming(getContext());
-        boolean upcoming = alarm.ringsWithinHours(hoursBeforeUpcoming);
+        final int hoursBeforeUpcoming = AlarmPreferences.hoursBeforeUpcoming(getContext());
+        boolean upcoming = hoursBeforeUpcoming > 0 && alarm.ringsWithinHours(hoursBeforeUpcoming);
         boolean snoozed = alarm.isSnoozed();
         boolean visible = alarm.isEnabled() && (upcoming || snoozed);
         String buttonText = snoozed

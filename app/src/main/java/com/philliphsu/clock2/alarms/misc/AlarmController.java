@@ -78,12 +78,15 @@ public final class AlarmController {
         // to handle that yourself by using a wakelock, etc..
         // We use a WAKEUP alarm to send the upcoming alarm notification so it goes off even if the
         // device is asleep. Otherwise, it will not go off until the device is turned back on.
-        long ringAt = alarm.isSnoozed() ? alarm.snoozingUntil() : alarm.ringsAt();
-        int hoursToNotifyInAdvance = AlarmPreferences.hoursBeforeUpcoming(mAppContext);
-        long upcomingAt = ringAt - HOURS.toMillis(hoursToNotifyInAdvance);
-        // If snoozed, upcoming note posted immediately.
-        am.set(AlarmManager.RTC_WAKEUP, upcomingAt, notifyUpcomingAlarmIntent(alarm, false));
+        final long ringAt = alarm.isSnoozed() ? alarm.snoozingUntil() : alarm.ringsAt();
         am.setExact(AlarmManager.RTC_WAKEUP, ringAt, alarmIntent(alarm, false));
+
+        final int hoursToNotifyInAdvance = AlarmPreferences.hoursBeforeUpcoming(mAppContext);
+        if (hoursToNotifyInAdvance > 0 || alarm.isSnoozed()) {
+            // If snoozed, upcoming note posted immediately.
+            long upcomingAt = ringAt - HOURS.toMillis(hoursToNotifyInAdvance);
+            am.set(AlarmManager.RTC_WAKEUP, upcomingAt, notifyUpcomingAlarmIntent(alarm, false));
+        }
 
         if (showSnackbar) {
             String message = mAppContext.getString(R.string.alarm_set_for,
@@ -120,12 +123,12 @@ public final class AlarmController {
         // Does nothing if it's not posted.
         removeUpcomingAlarmNotification(alarm);
 
-        int hoursToNotifyInAdvance = AlarmPreferences.hoursBeforeUpcoming(mAppContext);
+        final int hoursToNotifyInAdvance = AlarmPreferences.hoursBeforeUpcoming(mAppContext);
         // TOneverDO: Place block after making value changes to the alarm.
-        if (showSnackbar
+        if ((hoursToNotifyInAdvance > 0 && showSnackbar
                 // TODO: Consider showing the snackbar for non-upcoming alarms too;
                 // then, we can remove these checks.
-                && alarm.ringsWithinHours(hoursToNotifyInAdvance) || alarm.isSnoozed()) {
+                && alarm.ringsWithinHours(hoursToNotifyInAdvance)) || alarm.isSnoozed()) {
             long time = alarm.isSnoozed() ? alarm.snoozingUntil() : alarm.ringsAt();
             String msg = mAppContext.getString(R.string.upcoming_alarm_dismissed,
                     formatTime(mAppContext, time));
