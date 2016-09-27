@@ -63,6 +63,7 @@
     <!--ExpandedAlarmViewHolder-->
     <dimen name="expanded_alarm_elevation">2dp</dimen> <!--TODO: Increase for v21-->
     <dimen name="label_height">48dp</dimen>
+    <dimen name="vibrate_toggle_size">48dp</dimen>
 
     <!--EditTimerActivity-->
     <dimen name="field_end_margin">8dp</dimen>

@@ -1,10 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="AlarmDayToggle">
+    <style name="BaseAlarmToggleButton">
+        <item name="android:background">?selectableItemBackground</item>
+    </style>
+    <style name="AlarmDayToggle" parent="BaseAlarmToggleButton">
         <item name="android:layout_width">0dp</item>
         <item name="android:layout_height">match_parent</item>
         <item name="android:layout_weight">1</item>
         <item name="android:textAllCaps">true</item>
-        <item name="android:background">?selectableItemBackground</item>
+    </style>
+    <style name="AlarmVibrateToggle" parent="BaseAlarmToggleButton">
+        <item name="android:layout_width">@dimen/vibrate_toggle_size</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="srcCompat">@drawable/ic_vibrate_24dp</item>
     </style>
 </resources>

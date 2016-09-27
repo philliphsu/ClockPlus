@@ -1,26 +1,28 @@
 package com.philliphsu.clock2.alarms.ui;
 
+import android.content.Context;
 import android.content.res.ColorStateList;
 import android.graphics.drawable.Drawable;
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.os.Vibrator;
 import android.support.annotation.IdRes;
+import android.support.design.widget.CheckableImageButton;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.ToggleButton;
 
-import com.philliphsu.clock2.list.OnListItemInteractionListener;
 import com.philliphsu.clock2.R;
 import com.philliphsu.clock2.alarms.Alarm;
 import com.philliphsu.clock2.alarms.misc.AlarmController;
 import com.philliphsu.clock2.alarms.misc.DaysOfWeek;
 import com.philliphsu.clock2.dialogs.RingtonePickerDialog;
-import com.philliphsu.clock2.timepickers.Utils;
 import com.philliphsu.clock2.dialogs.RingtonePickerDialogController;
+import com.philliphsu.clock2.list.OnListItemInteractionListener;
+import com.philliphsu.clock2.timepickers.Utils;
 import com.philliphsu.clock2.util.FragmentTagUtils;
 
 import butterknife.Bind;
@@ -35,11 +37,12 @@ public class ExpandedAlarmViewHolder extends BaseAlarmViewHolder {
     @Bind(R.id.ok) Button mOk;
     @Bind(R.id.delete) Button mDelete;
     @Bind(R.id.ringtone) Button mRingtone;
-    @Bind(R.id.vibrate) CheckBox mVibrate;
+    @Bind(R.id.vibrate) CheckableImageButton mVibrate;
     @Bind({R.id.day0, R.id.day1, R.id.day2, R.id.day3, R.id.day4, R.id.day5, R.id.day6})
     ToggleButton[] mDays;
 
     private final ColorStateList mDayToggleColors;
+    private final ColorStateList mVibrateColors;
     private final RingtonePickerDialogController mRingtonePickerController;
 
     public ExpandedAlarmViewHolder(ViewGroup parent, final OnListItemInteractionListener<Alarm> listener,
@@ -83,11 +86,16 @@ public class ExpandedAlarmViewHolder extends BaseAlarmViewHolder {
         };
         // TODO: Phase out Utils.getColorFromThemeAttr because it doesn't work for text colors.
         // WHereas getTextColorFromThemeAttr works for both regular colors and text colors.
-        int[] colors = {
+        int[] dayToggleColors = {
                 /*item 1*/Utils.getTextColorFromThemeAttr(getContext(), R.attr.colorAccent),
                 /*item 2*/Utils.getTextColorFromThemeAttr(getContext(), android.R.attr.textColorHint)
         };
-        mDayToggleColors = new ColorStateList(states, colors);
+        int[] vibrateColors = {
+                /*item 1*/Utils.getTextColorFromThemeAttr(getContext(), R.attr.colorAccent),
+                /*item 2*/Utils.getTextColorFromThemeAttr(getContext(), R.attr.themedIconTint)
+        };
+        mDayToggleColors = new ColorStateList(states, dayToggleColors);
+        mVibrateColors = new ColorStateList(states, vibrateColors);
 
         mRingtonePickerController = new RingtonePickerDialogController(mFragmentManager,
                 new RingtonePickerDialog.OnRingtoneSelectedListener() {
@@ -149,9 +157,14 @@ public class ExpandedAlarmViewHolder extends BaseAlarmViewHolder {
 
     @OnClick(R.id.vibrate)
     void onVibrateToggled() {
+        final boolean checked = mVibrate.isChecked();
+        if (checked) {
+            Vibrator vibrator = (Vibrator) getContext().getSystemService(Context.VIBRATOR_SERVICE);
+            vibrator.vibrate(300);
+        }
         final Alarm oldAlarm = getAlarm();
         Alarm newAlarm = oldAlarm.toBuilder()
-                .vibrates(mVibrate.isChecked())
+                .vibrates(checked)
                 .build();
         oldAlarm.copyMutableFieldsTo(newAlarm);
         persistUpdatedAlarm(newAlarm, false);
@@ -198,6 +211,7 @@ public class ExpandedAlarmViewHolder extends BaseAlarmViewHolder {
     }
 
     private void bindVibrate(boolean vibrates) {
+        Utils.setTintList(mVibrate, mVibrate.getDrawable(), mVibrateColors);
         mVibrate.setChecked(vibrates);
     }
 

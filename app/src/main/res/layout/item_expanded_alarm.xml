@@ -103,12 +103,9 @@
                     android:drawableStart="@drawable/ic_ringtone_24dp"
                     android:drawablePadding="@dimen/text_compound_drawable_padding"/>
 
-                <!--TODO: See CheckableImageButton-->
-                <CheckBox
+                <com.philliphsu.clock2.alarms.ui.TempCheckableImageButton
                     android:id="@+id/vibrate"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:text="Vibrate"/>
+                    style="@style/AlarmVibrateToggle"/>
 
             </LinearLayout>
 
