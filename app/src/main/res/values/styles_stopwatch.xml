@@ -3,7 +3,6 @@
     <style name="Stopwatch" parent="TextAppearance.AppCompat">
         <item name="android:gravity">center</item>
         <item name="android:fontFamily">sans-serif-light</item>
-        <item name="android:theme">@style/AppTheme.TextOverlay</item>
         <item name="android:textSize">@dimen/text_size_display_3</item>
     </style>
 </resources>

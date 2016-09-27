@@ -11,8 +11,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/activity_vertical_margin"
         android:orientation="vertical"
-        android:gravity="center_horizontal"
-        android:theme="@style/AppTheme.TextOverlay">
+        android:gravity="center_horizontal">
 
         <TextView
             android:id="@+id/title"
@@ -37,7 +36,6 @@
             android:layout_height="wrap_content"
             android:drawablePadding="8dp"
             style="@style/TextAppearance.AppCompat.Large"
-            android:theme="@style/AppTheme.TextOverlay"
             android:layout_marginBottom="16dp"/>
 
         <Button
@@ -54,8 +52,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="bottom"
-        android:orientation="horizontal"
-        android:theme="@style/AppTheme.TextOverlay">
+        android:orientation="horizontal">
 
         <FrameLayout
             android:id="@+id/btn_left"
