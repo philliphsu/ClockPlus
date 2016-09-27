@@ -21,6 +21,7 @@
 
     <style name="BaseTheme" parent="Theme.AppCompat.NoActionBar">
         <item name="android:alertDialogTheme">@style/AlertDialogStyle</item>
+        <item name="android:navigationBarColor">?android:colorPrimary</item>
     </style>
 
     <style name="AlertDialogStyle" parent="android:Theme.Material.Dialog.Alert">

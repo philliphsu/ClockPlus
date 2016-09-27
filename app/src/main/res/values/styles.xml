@@ -2,6 +2,7 @@
     <!--TODO: DayNight parent-->
     <style name="BaseTheme" parent="Theme.AppCompat.NoActionBar">
         <item name="alertDialogTheme">@style/AppCompatAlertDialogStyle</item>
+        <item name="android:windowTranslucentNavigation">true</item>
     </style>
 
     <style name="BaseAppTheme" parent="BaseTheme">
