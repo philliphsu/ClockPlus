@@ -4,9 +4,10 @@
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF5252</color>
 
-    <!--TODO: Use color int instead? This resource is defined in aosp_datetimepicker_colors file. -->
-    <color name="colorPrimaryInverse">@color/dark_gray</color>
+    <color name="colorPrimaryInverse">#212121</color>
     <color name="colorPrimaryDarkInverse">@android:color/black</color>
     <!-- Same as colorAccent, can't find a lighter accent color that looks red enough.. -->
     <color name="colorAccentInverse">#FF5252</color>
+
+    <color name="card_background_color">#1fffffff</color> <!--12% white, not from MD spec-->
 </resources>

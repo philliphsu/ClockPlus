@@ -1,49 +1,40 @@
 <resources>
+    <!--TODO: DayNight parent-->
+    <style name="BaseTheme" parent="Theme.AppCompat.NoActionBar">
+        <item name="alertDialogTheme">@style/AppCompatAlertDialogStyle</item>
+    </style>
+
+    <style name="BaseAppTheme" parent="BaseTheme">
+        <item name="bottomSheetDialogTheme">@style/BottomSheetDialogTheme</item>
+        <!--Don't need to use `@color/icon_color` ColorStateList resource because icons tinted by this
+          - attribute will only ever be in the active state.
+          - Secondly, using a ColorStateList resource via XML for the tint attribute of an ImageView
+          - is not supported below 21.
+        -->
+        <!--TODO: Remove all light variants of colors.-->
+        <item name="themedIconTint">@color/icon_color_active_dark</item>
+        <!--TODO: Copy this resource over, because it will be going to BottomSheetTimePickers.-->
+        <item name="android:textColorHint">@color/text_color_disabled_dark</item>
+        <item name="themedPopupOverlay">@style/ThemeOverlay.AppCompat.Dark</item>
+        <!--BottomSheetTimePickers-->
+        <item name="themeDark">true</item>
+
+        <item name="cardBackgroundColor">@color/card_background_color</item>
+    </style>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+    <style name="AppTheme" parent="BaseAppTheme">
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
-        <!-- TODO: This doesn't work for BottomSheetDialogs. Verify this works for other types of dialogs. -->
-        <!--<item name="dialogTheme">@style/AppCompatDialogTheme</item>-->
-        <!-- This theme is applied to appcompat AlertDialogs. -->
-        <item name="alertDialogTheme">@style/AppCompatAlertDialogStyle</item>
-        <!-- This theme is applied to standard `android.app.AlertDialog`s. -->
-        <item name="android:alertDialogTheme">@style/AppCompatAlertDialogStyle</item>
-        <item name="bottomSheetDialogTheme">@style/BottomSheetDialogTheme</item>
-        <!--The icons that need to be tinted with this attribute will only ever be in
-         the active state, so we don't need to use @color/icon_color ColorStateList resource.
-         Secondly, using a ColorStateList resource via XML for the tint attribute of an ImageView
-         is not supported below 21. -->
-        <item name="themedIconTint">@color/icon_color_active_light</item>
-        <item name="android:textColorHint">@color/text_color_disabled_light</item>
-        <item name="themedPopupOverlay">@style/ThemeOverlay.AppCompat.Light</item>
-        <!-- For BottomSheetTimePickers -->
-        <item name="themeDark">false</item>
+
+        <item name="android:windowBackground">@color/colorPrimary</item>
     </style>
 
-    <style name="AppTheme.Dark" parent="Theme.AppCompat.NoActionBar">
+    <style name="AppTheme.Dark" parent="BaseAppTheme">
         <item name="colorPrimary">@color/colorPrimaryInverse</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDarkInverse</item>
         <item name="colorAccent">@color/colorAccentInverse</item>
-        <!-- TODO: This doesn't work for BottomSheetDialogs. Verify this works for other types of dialogs. -->
-        <!--<item name="dialogTheme">@style/AppCompatDialogTheme.Dark</item>-->
-        <!-- This theme is applied to appcompat AlertDialogs. -->
-        <item name="alertDialogTheme">@style/AppCompatAlertDialogStyle.Dark</item>
-        <!-- This theme is applied to standard `android.app.AlertDialog`s. -->
-        <item name="android:alertDialogTheme">@style/AppCompatAlertDialogStyle.Dark</item>
-        <!--TODO: Dark theme-->
-        <item name="bottomSheetDialogTheme">@style/BottomSheetDialogTheme</item>
-        <!--The icons that need to be tinted with this attribute will only ever be in
-         the active state, so we don't need to use @color/icon_color_dark ColorStateList resource
-         Secondly, using a ColorStateList resource via XML for the tint attribute of an ImageView
-         is not supported below 21.-->
-        <item name="themedIconTint">@color/icon_color_active_dark</item>
-        <item name="android:textColorHint">@color/text_color_disabled_dark</item>
-        <item name="themedPopupOverlay">@style/ThemeOverlay.AppCompat.Dark</item>
-        <!-- For BottomSheetTimePickers -->
-        <item name="themeDark">true</item>
     </style>
 
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar"/>
@@ -146,21 +137,8 @@
         <item name="android:focusable">true</item>
         <item name="android:focusableInTouchMode">true</item>
     </style>
-
-    <!-- Style for AppCompatDialog from the v7 support library -->
-    <style name="AppCompatDialogTheme" parent="Theme.AppCompat.Light.Dialog">
-        <item name="colorAccent">@color/colorAccent</item>
-    </style>
-
-    <style name="AppCompatDialogTheme.Dark" parent="Theme.AppCompat.Dialog">
-        <item name="colorAccent">@color/colorAccent</item>
-    </style>
-
-    <style name="AppCompatAlertDialogStyle" parent="Theme.AppCompat.Light.Dialog.Alert">
-        <!-- Trying to use the colorAccent attribute (whether from ?android:attr or ?attr) WILL CRASH.-->
-        <item name="colorAccent">@color/colorAccent</item>
-    </style>
-    <style name="AppCompatAlertDialogStyle.Dark" parent="Theme.AppCompat.Dialog.Alert">
+    
+    <style name="AppCompatAlertDialogStyle" parent="Theme.AppCompat.Dialog.Alert">
         <!-- Trying to use the colorAccent attribute (whether from ?android:attr or ?attr) WILL CRASH.-->
         <item name="colorAccent">@color/colorAccentInverse</item>
     </style>

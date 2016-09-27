@@ -7,7 +7,6 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Vibrator;
 import android.support.annotation.IdRes;
-import android.support.design.widget.CheckableImageButton;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.util.Log;
 import android.view.View;
@@ -37,7 +36,7 @@ public class ExpandedAlarmViewHolder extends BaseAlarmViewHolder {
     @Bind(R.id.ok) Button mOk;
     @Bind(R.id.delete) Button mDelete;
     @Bind(R.id.ringtone) Button mRingtone;
-    @Bind(R.id.vibrate) CheckableImageButton mVibrate;
+    @Bind(R.id.vibrate) TempCheckableImageButton mVibrate;
     @Bind({R.id.day0, R.id.day1, R.id.day2, R.id.day3, R.id.day4, R.id.day5, R.id.day6})
     ToggleButton[] mDays;
 

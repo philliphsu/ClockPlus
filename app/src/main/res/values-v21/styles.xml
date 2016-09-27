@@ -1,5 +1,6 @@
 <resources>
 
+    <!--TODO: Why is this here?-->
     <style name="AppTheme.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
@@ -16,5 +17,13 @@
         <item name="android:layout_height">@dimen/numeric_keypad_cell_height</item>
         <item name="android:background">?android:attr/selectableItemBackgroundBorderless</item>
         <item name="android:gravity">center</item>
+    </style>
+
+    <style name="BaseTheme" parent="Theme.AppCompat.NoActionBar">
+        <item name="android:alertDialogTheme">@style/AlertDialogStyle</item>
+    </style>
+
+    <style name="AlertDialogStyle" parent="android:Theme.Material.Dialog.Alert">
+        <item name="android:colorAccent">@color/colorAccentInverse</item>
     </style>
 </resources>
