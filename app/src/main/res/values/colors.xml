@@ -3,12 +3,17 @@
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF5252</color>
+    <color name="colorPrimaryFallback">#5C6BC0</color>
 
     <color name="colorPrimaryInverse">#212121</color>
     <color name="colorPrimaryDarkInverse">@android:color/black</color>
     <!-- Same as colorAccent, can't find a lighter accent color that looks red enough.. -->
     <color name="colorAccentInverse">#FF5252</color>
+    <color name="colorPrimaryFallbackInverse">#303030</color>
 
     <color name="card_background_color">#1fffffff</color> <!--12% white, not from MD spec-->
     <color name="card_background_color_inverse">#0fffffff</color> <!--6% white, not from MD spec-->
+
+    <color name="alert_dialog_background_color">@color/colorPrimaryFallback</color>
+    <color name="alert_dialog_background_color_inverse">@color/colorPrimaryFallbackInverse</color>
 </resources>

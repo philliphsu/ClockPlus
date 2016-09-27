@@ -1,7 +1,6 @@
 <resources>
     <!--TODO: DayNight parent-->
     <style name="BaseTheme" parent="Theme.AppCompat.NoActionBar">
-        <item name="alertDialogTheme">@style/AppCompatAlertDialogStyle</item>
         <item name="android:windowTranslucentNavigation">true</item>
     </style>
 
@@ -26,6 +25,7 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="alertDialogTheme">@style/AppCompatAlertDialogStyle</item>
         <item name="android:windowBackground">@color/colorPrimary</item>
         <item name="cardBackgroundColor">@color/card_background_color</item>
     </style>
@@ -33,6 +33,7 @@
     <style name="AppTheme.Dark" parent="BaseAppTheme">
         <item name="colorPrimary">@color/colorPrimaryInverse</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDarkInverse</item>
+        <item name="alertDialogTheme">@style/AppCompatAlertDialogStyle.Dark</item>
         <item name="colorAccent">@color/colorAccentInverse</item>
         <item name="android:windowBackground">@color/colorPrimaryInverse</item>
         <item name="cardBackgroundColor">@color/card_background_color_inverse</item>
@@ -138,10 +139,18 @@
         <item name="android:focusable">true</item>
         <item name="android:focusableInTouchMode">true</item>
     </style>
-    
-    <style name="AppCompatAlertDialogStyle" parent="Theme.AppCompat.Dialog.Alert">
+
+    <style name="BaseAppCompatAlertDialogStyle" parent="Theme.AppCompat.Dialog.Alert">
         <!-- Trying to use the colorAccent attribute (whether from ?android:attr or ?attr) WILL CRASH.-->
         <item name="colorAccent">@color/colorAccentInverse</item>
+    </style>
+
+    <style name="AppCompatAlertDialogStyle" parent="BaseAppCompatAlertDialogStyle">
+        <item name="android:background">@color/alert_dialog_background_color</item>
+    </style>
+
+    <style name="AppCompatAlertDialogStyle.Dark" parent="BaseAppCompatAlertDialogStyle">
+        <item name="android:background">@color/alert_dialog_background_color_inverse</item>
     </style>
 
     <style name="BottomSheetDialogTheme" parent="Theme.Design.Light.BottomSheetDialog">
