@@ -19,9 +19,13 @@
         <item name="android:gravity">center</item>
     </style>
 
-    <style name="BaseTheme" parent="Theme.AppCompat.NoActionBar">
-        <item name="android:alertDialogTheme">@style/AlertDialogStyle</item>
+    <style name="AppTheme" parent="BaseAppTheme.Light">
         <item name="android:navigationBarColor">?android:colorPrimary</item>
+        <item name="android:alertDialogTheme">@style/AlertDialogStyle</item>
+    </style>
+    <style name="AppTheme.Dark" parent="BaseAppTheme.Dark">
+        <item name="android:navigationBarColor">?android:colorPrimary</item>
+        <item name="android:alertDialogTheme">@style/AlertDialogStyle.Dark</item>
     </style>
 
     <style name="AlertDialogStyle" parent="android:Theme.Material.Dialog.Alert">
@@ -32,4 +36,5 @@
         <item name="android:colorAccent">@color/colorAccentInverse</item>
         <item name="android:background">@color/alert_dialog_background_color_inverse</item>
     </style>
+
 </resources>

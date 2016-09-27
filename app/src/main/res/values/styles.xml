@@ -1,10 +1,6 @@
 <resources>
     <!--TODO: DayNight parent-->
-    <style name="BaseTheme" parent="Theme.AppCompat.NoActionBar">
-        <item name="android:windowTranslucentNavigation">true</item>
-    </style>
-
-    <style name="BaseAppTheme" parent="BaseTheme">
+    <style name="BaseAppTheme" parent="Theme.AppCompat.NoActionBar">
         <item name="bottomSheetDialogTheme">@style/BottomSheetDialogTheme</item>
         <!--Don't need to use `@color/icon_color` ColorStateList resource because icons tinted by this
           - attribute will only ever be in the active state.
@@ -20,25 +16,28 @@
         <item name="themeDark">true</item>
     </style>
 
-    <!-- Base application theme. -->
-    <style name="AppTheme" parent="BaseAppTheme">
+    <style name="BaseAppTheme.Light">
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
-        <item name="alertDialogTheme">@style/AppCompatAlertDialogStyle</item>
-        <item name="android:alertDialogTheme">@style/AlertDialogStyle</item>
-        <item name="android:windowBackground">@color/colorPrimary</item>
         <item name="cardBackgroundColor">@color/card_background_color</item>
+        <item name="alertDialogTheme">@style/AppCompatAlertDialogStyle</item>
+        <item name="android:windowBackground">@color/colorPrimary</item>
     </style>
 
-    <style name="AppTheme.Dark" parent="BaseAppTheme">
+    <style name="BaseAppTheme.Dark">
         <item name="colorPrimary">@color/colorPrimaryInverse</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDarkInverse</item>
-        <item name="alertDialogTheme">@style/AppCompatAlertDialogStyle.Dark</item>
-        <item name="android:alertDialogTheme">@style/AlertDialogStyle.Dark</item>
         <item name="colorAccent">@color/colorAccentInverse</item>
-        <item name="android:windowBackground">@color/colorPrimaryInverse</item>
         <item name="cardBackgroundColor">@color/card_background_color_inverse</item>
+        <item name="alertDialogTheme">@style/AppCompatAlertDialogStyle.Dark</item>
+        <item name="android:windowBackground">@color/colorPrimaryInverse</item>
+    </style>
+
+    <style name="AppTheme" parent="BaseAppTheme.Light">
+    </style>
+
+    <style name="AppTheme.Dark" parent="BaseAppTheme.Dark">
     </style>
 
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar"/>
@@ -46,6 +45,7 @@
     <!--DEPRECATED. ONLY USAGES ARE FROM LAYOUTS OF EDIT ALARM ACTIVITY.-->
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light"/>
 
+    <!--TODO: We can delete this.-->
     <style name="AppTheme.TextOverlay" parent="ThemeOverlay.AppCompat.Dark"/>
 
     <style name="NumberButton">
@@ -151,7 +151,7 @@
         <item name="android:background">@color/alert_dialog_background_color</item>
     </style>
 
-    <style name="AppCompatAlertDialogStyle.Dark" parent="BaseAppCompatAlertDialogStyle">
+    <style name="AppCompatAlertDialogStyle.Dark">
         <item name="android:background">@color/alert_dialog_background_color_inverse</item>
     </style>
 
@@ -185,6 +185,10 @@
         <item name="android:textSize">@dimen/text_size_subhead</item>
     </style>
 
-    <style name="AlertDialogStyle"/>
-    <style name="AlertDialogStyle.Dark"/>
+    <style name="AlertDialogStyle" parent="@android:style/Theme.Holo.Dialog">
+        <item name="android:windowBackground">@color/alert_dialog_background_color</item>
+    </style>
+    <style name="AlertDialogStyle.Dark">
+        <item name="android:windowBackground">@color/alert_dialog_background_color_inverse</item>
+    </style>
 </resources>
