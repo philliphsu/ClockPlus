@@ -36,4 +36,8 @@
         <item name="android:background">@color/alert_dialog_background_color_black</item>
     </style>
 
+    <style name="SelectableButton">
+        <item name="android:background">?selectableItemBackgroundBorderless</item>
+    </style>
+
 </resources>

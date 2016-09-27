@@ -188,4 +188,8 @@
         <item name="android:maxLines">1</item>
         <item name="android:textSize">@dimen/text_size_subhead</item>
     </style>
+
+    <style name="SelectableButton">
+        <item name="android:background">?selectableItemBackground</item>
+    </style>
 </resources>

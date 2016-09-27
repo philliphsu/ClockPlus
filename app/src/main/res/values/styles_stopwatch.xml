@@ -5,4 +5,17 @@
         <item name="android:fontFamily">sans-serif-light</item>
         <item name="android:textSize">@dimen/text_size_display_3</item>
     </style>
+    <style name="SideButton" parent="SelectableButton">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:visibility">invisible</item>
+        <item name="layout_columnWeight">1</item>
+        <item name="layout_gravity">center</item>
+    </style>
+    <style name="AddLapButton" parent="SideButton">
+        <item name="android:src">@drawable/ic_add_lap_40dp</item>
+    </style>
+    <style name="StopButton" parent="SideButton">
+        <item name="android:src">@drawable/ic_stop_40dp</item>
+    </style>
 </resources>

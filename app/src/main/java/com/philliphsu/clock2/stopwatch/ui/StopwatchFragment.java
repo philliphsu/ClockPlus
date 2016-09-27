@@ -17,6 +17,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.SeekBar;
 
 import com.philliphsu.clock2.R;
@@ -43,20 +44,20 @@ public class StopwatchFragment extends RecyclerViewFragment<
     private static final String TAG = "StopwatchFragment";
 
     // Exposed for StopwatchNotificationService
-    public static final String KEY_START_TIME = "start_time";
-    public static final String KEY_PAUSE_TIME = "pause_time";
+    public static final String KEY_START_TIME          = "start_time";
+    public static final String KEY_PAUSE_TIME          = "pause_time";
     public static final String KEY_CHRONOMETER_RUNNING = "chronometer_running";
 
-    private ObjectAnimator mProgressAnimator;
-    private SharedPreferences mPrefs;
+    private ObjectAnimator                      mProgressAnimator;
+    private SharedPreferences                   mPrefs;
     private WeakReference<FloatingActionButton> mActivityFab;
-    private Drawable mStartDrawable;
-    private Drawable mPauseDrawable;
+    private Drawable                            mStartDrawable;
+    private Drawable                            mPauseDrawable;
 
     @Bind(R.id.chronometer) ChronometerWithMillis mChronometer;
-    @Bind(R.id.new_lap) FloatingActionButton mNewLapButton;
-    @Bind(R.id.stop) FloatingActionButton mStopButton;
-    @Bind(R.id.seek_bar) SeekBar mSeekBar;
+    @Bind(R.id.new_lap)     ImageButton           mNewLapButton;
+    @Bind(R.id.stop)        ImageButton           mStopButton;
+    @Bind(R.id.seek_bar)    SeekBar               mSeekBar;
 
     /**
      * This is called only when a new instance of this Fragment is being created,
@@ -142,7 +143,7 @@ public class StopwatchFragment extends RecyclerViewFragment<
      * this Fragment gets to. Here, the view hierarchy returned from onCreateView()
      * is destroyed--the Fragment itself is NOT destroyed. If the user navigates back
      * to this tab, this Fragment goes through its lifecycle beginning from onCreateView().
-     *
+     * <p/>
      * TODO: Verify that members are not reset.
      */
     @Override

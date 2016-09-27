@@ -36,8 +36,6 @@
 
         </LinearLayout>
 
-        <!--TODO: If we are changing the style of the mini FABS often,
-        then create a style resource for them. -->
         <android.support.v7.widget.GridLayout
             android:id="@id/mini_fab_layout"
             android:layout_width="match_parent"
@@ -45,29 +43,13 @@
             android:layout_alignParentBottom="true"
             app:columnCount="2">
 
-            <android.support.design.widget.FloatingActionButton
+            <ImageButton
                 android:id="@+id/new_lap"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/ic_add_lap_24dp"
-                android:tint="@android:color/white"
-                android:visibility="invisible"
-                app:layout_columnWeight="1"
-                app:layout_gravity="center"
-                app:fabSize="mini"
-                app:backgroundTint="?attr/colorPrimary"/>
+                style="@style/AddLapButton"/>
 
-            <android.support.design.widget.FloatingActionButton
+            <ImageButton
                 android:id="@+id/stop"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/ic_stop_24dp"
-                android:tint="@android:color/white"
-                android:visibility="invisible"
-                app:layout_columnWeight="1"
-                app:layout_gravity="center"
-                app:fabSize="mini"
-                app:backgroundTint="?attr/colorPrimary"/>
+                style="@style/StopButton"/>
 
         </android.support.v7.widget.GridLayout>
 
