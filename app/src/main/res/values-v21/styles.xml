@@ -25,6 +25,10 @@
     </style>
 
     <style name="AlertDialogStyle" parent="android:Theme.Material.Dialog.Alert">
+        <item name="android:colorAccent">@color/colorAccent</item>
+        <item name="android:background">@color/alert_dialog_background_color</item>
+    </style>
+    <style name="AlertDialogStyle.Dark" parent="android:Theme.Material.Dialog.Alert">
         <item name="android:colorAccent">@color/colorAccentInverse</item>
         <item name="android:background">@color/alert_dialog_background_color_inverse</item>
     </style>

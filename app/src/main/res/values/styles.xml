@@ -26,6 +26,7 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
         <item name="alertDialogTheme">@style/AppCompatAlertDialogStyle</item>
+        <item name="android:alertDialogTheme">@style/AlertDialogStyle</item>
         <item name="android:windowBackground">@color/colorPrimary</item>
         <item name="cardBackgroundColor">@color/card_background_color</item>
     </style>
@@ -34,6 +35,7 @@
         <item name="colorPrimary">@color/colorPrimaryInverse</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDarkInverse</item>
         <item name="alertDialogTheme">@style/AppCompatAlertDialogStyle.Dark</item>
+        <item name="android:alertDialogTheme">@style/AlertDialogStyle.Dark</item>
         <item name="colorAccent">@color/colorAccentInverse</item>
         <item name="android:windowBackground">@color/colorPrimaryInverse</item>
         <item name="cardBackgroundColor">@color/card_background_color_inverse</item>
@@ -182,4 +184,7 @@
         <item name="android:maxLines">1</item>
         <item name="android:textSize">@dimen/text_size_subhead</item>
     </style>
+
+    <style name="AlertDialogStyle"/>
+    <style name="AlertDialogStyle.Dark"/>
 </resources>
