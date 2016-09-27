@@ -134,16 +134,13 @@
         <item name="android:focusableInTouchMode">true</item>
     </style>
 
-    <style name="BaseAppCompatAlertDialogStyle" parent="Theme.AppCompat.Dialog.Alert">
-        <!-- Trying to use the colorAccent attribute (whether from ?android:attr or ?attr) WILL CRASH.-->
-        <item name="colorAccent">@color/colorAccentInverse</item>
-    </style>
-
-    <style name="AppCompatAlertDialogStyle" parent="BaseAppCompatAlertDialogStyle">
+    <style name="AppCompatAlertDialogStyle" parent="Theme.AppCompat.Dialog.Alert">
+        <item name="colorAccent">@color/colorAccent</item>
         <item name="android:background">@color/alert_dialog_background_color</item>
     </style>
 
     <style name="AppCompatAlertDialogStyle.Dark">
+        <item name="colorAccent">@color/colorAccentInverse</item>
         <item name="android:background">@color/alert_dialog_background_color_inverse</item>
     </style>
 
