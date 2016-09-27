@@ -71,8 +71,6 @@ public class StopwatchFragment extends RecyclerViewFragment<
         // onCreateView() or any other callback that is guaranteed to be called.
         mStartDrawable = ContextCompat.getDrawable(getActivity(), R.drawable.ic_start_24dp);
         mPauseDrawable = ContextCompat.getDrawable(getActivity(), R.drawable.ic_pause_24dp);
-
-        // TODO: Load the current lap here
     }
 
     @Nullable

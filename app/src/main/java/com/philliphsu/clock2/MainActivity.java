@@ -1,8 +1,6 @@
 package com.philliphsu.clock2;
 
-import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.PersistableBundle;
@@ -48,7 +46,6 @@ public class MainActivity extends BaseActivity {
      * {@link android.support.v4.app.FragmentStatePagerAdapter}.
      */
     private SectionsPagerAdapter mSectionsPagerAdapter;
-    private Drawable             mAddItemDrawable;
 
     @Bind(R.id.container)
     ViewPager            mViewPager;
@@ -194,15 +191,8 @@ public class MainActivity extends BaseActivity {
         mViewPager.removeOnPageChangeListener(mModifyFabPositionListener);
     }
 
-    @SuppressLint("CommitPrefEdits")
     @Override
     protected void onDestroy() {
-        final int currentTab = mViewPager.getCurrentItem();
-        PreferenceManager.getDefaultSharedPreferences(this)
-                .edit()
-                .putInt(getString(R.string.key_last_tab), currentTab)
-                .commit();
-
         super.onDestroy();
         this.mModifyFabPositionListener = null;
     }
@@ -382,6 +372,12 @@ public class MainActivity extends BaseActivity {
             if (f != null) {
                 f.onPageSelected();
             }
+
+            final int currentTab = mViewPager.getCurrentItem();
+            PreferenceManager.getDefaultSharedPreferences(mViewPager.getContext())
+                    .edit()
+                    .putInt(LAST_TAB, currentTab)
+                    .commit();
         }
     }
 }
