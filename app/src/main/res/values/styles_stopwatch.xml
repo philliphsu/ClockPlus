@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <style name="Stopwatch" parent="TextAppearance.AppCompat">
-        <item name="android:background">?attr/colorPrimary</item>
         <item name="android:gravity">center</item>
         <item name="android:fontFamily">sans-serif-light</item>
         <item name="android:theme">@style/AppTheme.TextOverlay</item>
