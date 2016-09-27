@@ -41,12 +41,14 @@ public abstract class BaseActivity extends AppCompatActivity {
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
         // ========================================================================================
         // TOneverDO: Set theme after setContentView()
-        // Since the default theme is light, we only need to check against the dark theme.
-        String themeDark = getString(R.string.theme_dark);
+        final String themeDark = getString(R.string.theme_dark);
+        final String themeBlack = getString(R.string.theme_black);
         String theme = PreferenceManager.getDefaultSharedPreferences(this).getString(
                 getString(R.string.key_theme), null);
         if (themeDark.equals(theme)) {
             setTheme(R.style.AppTheme_Dark);
+        } else if (themeBlack.equals(theme)) {
+            setTheme(R.style.AppTheme_Black);
         }
         // ========================================================================================
         setContentView(layoutResId());

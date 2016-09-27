@@ -27,5 +27,9 @@
         <item name="android:colorAccent">@color/colorAccentInverse</item>
         <item name="android:background">@color/alert_dialog_background_color_inverse</item>
     </style>
+    <style name="AlertDialogStyle.Black">
+        <item name="android:colorAccent">@color/colorAccentBlack</item>
+        <item name="android:background">@color/alert_dialog_background_color_black</item>
+    </style>
 
 </resources>

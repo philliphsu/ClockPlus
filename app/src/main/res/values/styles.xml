@@ -34,10 +34,22 @@
         <item name="android:windowBackground">@color/colorPrimaryInverse</item>
     </style>
 
+    <style name="BaseAppTheme.Black">
+        <item name="colorPrimary">@android:color/black</item>
+        <item name="colorPrimaryDark">@android:color/black</item>
+        <item name="colorAccent">@color/colorAccentBlack</item>
+        <item name="cardBackgroundColor">@color/card_background_color_inverse</item>
+        <item name="alertDialogTheme">@style/AppCompatAlertDialogStyle.Black</item>
+        <item name="android:windowBackground">@android:color/black</item>
+    </style>
+
     <style name="AppTheme" parent="BaseAppTheme.Light">
     </style>
 
     <style name="AppTheme.Dark" parent="BaseAppTheme.Dark">
+    </style>
+
+    <style name="AppTheme.Black" parent="BaseAppTheme.Black">
     </style>
 
     <style name="NumberButton">
@@ -138,10 +150,13 @@
         <item name="colorAccent">@color/colorAccent</item>
         <item name="android:background">@color/alert_dialog_background_color</item>
     </style>
-
     <style name="AppCompatAlertDialogStyle.Dark">
         <item name="colorAccent">@color/colorAccentInverse</item>
         <item name="android:background">@color/alert_dialog_background_color_inverse</item>
+    </style>
+    <style name="AppCompatAlertDialogStyle.Black">
+        <item name="colorAccent">@color/colorAccentBlack</item>
+        <item name="android:background">@color/alert_dialog_background_color_black</item>
     </style>
 
     <style name="BottomSheetDialogTheme" parent="Theme.Design.Light.BottomSheetDialog">

@@ -8,9 +8,11 @@
 
     <string name="theme_light">Light</string>
     <string name="theme_dark">Dark</string>
+    <string name="theme_black">Black</string>
     <string-array name="array_theme">
         <item>@string/theme_light</item>
         <item>@string/theme_dark</item>
+        <item>@string/theme_black</item>
     </string-array>
 
     <string name="key_last_tab">last_tab</string>

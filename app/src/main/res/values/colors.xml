@@ -11,9 +11,12 @@
     <color name="colorAccentInverse">#FF5252</color>
     <color name="colorPrimaryFallbackInverse">#303030</color>
 
+    <color name="colorAccentBlack">#FF5252</color>
+
     <color name="card_background_color">#1fffffff</color> <!--12% white, not from MD spec-->
     <color name="card_background_color_inverse">#0fffffff</color> <!--6% white, not from MD spec-->
 
     <color name="alert_dialog_background_color">@color/colorPrimaryFallback</color>
     <color name="alert_dialog_background_color_inverse">@color/colorPrimaryFallbackInverse</color>
+    <color name="alert_dialog_background_color_black">#111111</color>
 </resources>
