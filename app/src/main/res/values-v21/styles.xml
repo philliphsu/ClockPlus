@@ -1,13 +1,4 @@
 <resources>
-
-    <!--TODO: Why is this here?-->
-    <style name="AppTheme.NoActionBar">
-        <item name="windowActionBar">false</item>
-        <item name="windowNoTitle">true</item>
-        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
-        <item name="android:statusBarColor">@android:color/transparent</item>
-    </style>
-
     <style name="GridLayoutNumpadElement">
         <!-- http://stackoverflow.com/a/6868308/5055032
          Leave off the namespace to reference a custom attribute.
