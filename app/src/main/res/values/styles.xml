@@ -40,8 +40,6 @@
     <style name="AppTheme.Dark" parent="BaseAppTheme.Dark">
     </style>
 
-    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar"/>
-
     <style name="NumberButton">
         <item name="android:layout_width">0dp</item>
         <item name="android:layout_height">match_parent</item>
