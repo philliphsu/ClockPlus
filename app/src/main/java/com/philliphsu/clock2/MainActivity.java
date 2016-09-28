@@ -1,9 +1,11 @@
 package com.philliphsu.clock2;
 
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
@@ -12,6 +14,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.Loader;
+import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.util.SparseArray;
@@ -24,6 +27,7 @@ import com.philliphsu.clock2.data.BaseItemCursor;
 import com.philliphsu.clock2.list.RecyclerViewFragment;
 import com.philliphsu.clock2.settings.SettingsActivity;
 import com.philliphsu.clock2.stopwatch.ui.StopwatchFragment;
+import com.philliphsu.clock2.timepickers.Utils;
 import com.philliphsu.clock2.timers.ui.TimersFragment;
 
 import butterknife.Bind;
@@ -48,6 +52,9 @@ public class MainActivity extends BaseActivity {
 
     @Bind(R.id.fab)
     FloatingActionButton mFab;
+
+    @Bind(R.id.tabs)
+    TabLayout mTabLayout;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -133,9 +140,11 @@ public class MainActivity extends BaseActivity {
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
-        tabLayout.getTabAt(0).setIcon(R.drawable.ic_alarm_24dp);
-        tabLayout.getTabAt(1).setIcon(R.drawable.ic_timer_24dp);
-        tabLayout.getTabAt(2).setIcon(R.drawable.ic_stopwatch_24dp);
+
+        ColorStateList tabIconColor = ContextCompat.getColorStateList(this, R.color.tab_icon_color);
+        setTabIcon(PAGE_ALARMS, R.drawable.ic_alarm_24dp, tabIconColor);
+        setTabIcon(PAGE_TIMERS, R.drawable.ic_timer_24dp, tabIconColor);
+        setTabIcon(PAGE_STOPWATCH, R.drawable.ic_stopwatch_24dp, tabIconColor);
 
         // TODO: @OnCLick instead.
         mFab.setOnClickListener(new View.OnClickListener() {
@@ -150,6 +159,13 @@ public class MainActivity extends BaseActivity {
 
         mAddItemDrawable = ContextCompat.getDrawable(this, R.drawable.ic_add_24dp);
         handleActionScrollToStableId(getIntent(), false);
+    }
+
+    private void setTabIcon(int index, @DrawableRes int iconRes, @NonNull final ColorStateList color) {
+        TabLayout.Tab tab = mTabLayout.getTabAt(index);
+        Drawable icon = Utils.getTintedDrawable(this, iconRes, color);
+        DrawableCompat.setTintList(icon, color);
+        tab.setIcon(icon);
     }
 
     @Override
