@@ -4,12 +4,15 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.support.design.widget.Snackbar;
 import android.util.Log;
 import android.view.View;
 
+import com.philliphsu.clock2.MainActivity;
 import com.philliphsu.clock2.R;
 import com.philliphsu.clock2.alarms.Alarm;
+import com.philliphsu.clock2.alarms.ui.AlarmsFragment;
 import com.philliphsu.clock2.ringtone.AlarmActivity;
 import com.philliphsu.clock2.ringtone.playback.AlarmRingtoneService;
 import com.philliphsu.clock2.alarms.background.PendingAlarmScheduler;
@@ -53,46 +56,56 @@ public final class AlarmController {
      * Schedules the alarm with the {@link AlarmManager}.
      * If {@code alarm.}{@link Alarm#isEnabled() isEnabled()}
      * returns false, this does nothing and returns immediately.
+     * 
+     * If there is already an alarm for this Intent scheduled (with the equality of two
+     * intents being defined by filterEquals(Intent)), then it will be removed and replaced
+     * by this one. For most of our uses, the relevant criteria for equality will be the
+     * action, the data, and the class (component). Although not documented, the request code
+     * of a PendingIntent is also considered to determine equality of two intents.
      */
     public void scheduleAlarm(Alarm alarm, boolean showSnackbar) {
         if (!alarm.isEnabled()) {
-            Log.i(TAG, "Skipped scheduling an alarm because it was not enabled");
             return;
         }
-
         // Does nothing if it's not posted. This is primarily here for when alarms
         // are updated, instead of newly created, so that we don't leave behind
         // stray upcoming alarm notifications. This occurs e.g. when a single-use
         // alarm is updated to recur on a weekday later than the current day.
         removeUpcomingAlarmNotification(alarm);
 
-        Log.d(TAG, "Scheduling alarm " + alarm);
         AlarmManager am = (AlarmManager) mAppContext.getSystemService(Context.ALARM_SERVICE);
-        // If there is already an alarm for this Intent scheduled (with the equality of two
-        // intents being defined by filterEquals(Intent)), then it will be removed and replaced
-        // by this one. For most of our uses, the relevant criteria for equality will be the
-        // action, the data, and the class (component). Although not documented, the request code
-        // of a PendingIntent is also considered to determine equality of two intents.
 
-        // WAKEUP alarm types wake the CPU up, but NOT the screen. If that is what you want, you need
-        // to handle that yourself by using a wakelock, etc..
-        // We use a WAKEUP alarm to send the upcoming alarm notification so it goes off even if the
-        // device is asleep. Otherwise, it will not go off until the device is turned back on.
         final long ringAt = alarm.isSnoozed() ? alarm.snoozingUntil() : alarm.ringsAt();
-        am.setExact(AlarmManager.RTC_WAKEUP, ringAt, alarmIntent(alarm, false));
+        final PendingIntent alarmIntent = alarmIntent(alarm, false);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            Intent viewAlarm = new Intent(mAppContext, MainActivity.class);
+            viewAlarm.putExtra(AlarmsFragment.EXTRA_SCROLL_TO_ALARM_ID, alarm.getId());
+            PendingIntent showIntent = PendingIntent.getActivity(mAppContext,
+                    alarm.getIntId(), viewAlarm, FLAG_CANCEL_CURRENT);
+            AlarmManager.AlarmClockInfo info = new AlarmManager.AlarmClockInfo(ringAt, showIntent);
+            am.setAlarmClock(info, alarmIntent);
+        } else {
+            // WAKEUP alarm types wake the CPU up, but NOT the screen;
+            // you would handle that yourself by using a wakelock, etc..
+            am.setExact(AlarmManager.RTC_WAKEUP, ringAt, alarmIntent);
+            // Show alarm in the status bar
+            Intent alarmChanged = new Intent("android.intent.action.ALARM_CHANGED");
+            alarmChanged.putExtra("alarmSet", true/*enabled*/);
+            mAppContext.sendBroadcast(alarmChanged);
+        }
 
         final int hoursToNotifyInAdvance = AlarmPreferences.hoursBeforeUpcoming(mAppContext);
         if (hoursToNotifyInAdvance > 0 || alarm.isSnoozed()) {
             // If snoozed, upcoming note posted immediately.
             long upcomingAt = ringAt - HOURS.toMillis(hoursToNotifyInAdvance);
+            // We use a WAKEUP alarm to send the upcoming alarm notification so it goes off even if the
+            // device is asleep. Otherwise, it will not go off until the device is turned back on.
             am.set(AlarmManager.RTC_WAKEUP, upcomingAt, notifyUpcomingAlarmIntent(alarm, false));
         }
 
         if (showSnackbar) {
             String message = mAppContext.getString(R.string.alarm_set_for,
-                    DurationUtils.toString(mAppContext, alarm.ringsIn(), false /*abbreviate?*/));
-            // TODO: Consider adding delay to allow the alarm item animation
-            // to finish first before we show the snackbar. Inbox app does this.
+                    DurationUtils.toString(mAppContext, alarm.ringsIn(), false/*abbreviate*/));
             showSnackbar(message);
         }
     }
@@ -104,7 +117,6 @@ public final class AlarmController {
      *                              and is enabled.
      */
     public void cancelAlarm(Alarm alarm, boolean showSnackbar, boolean rescheduleIfRecurring) {
-        // TODO: Consider doing this in a new thread.
         Log.d(TAG, "Cancelling alarm " + alarm);
         AlarmManager am = (AlarmManager) mAppContext.getSystemService(Context.ALARM_SERVICE);
 
@@ -112,6 +124,12 @@ public final class AlarmController {
         if (pi != null) {
             am.cancel(pi);
             pi.cancel();
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+                // Remove alarm in the status bar
+                Intent alarmChanged = new Intent("android.intent.action.ALARM_CHANGED");
+                alarmChanged.putExtra("alarmSet", false/*enabled*/);
+                mAppContext.sendBroadcast(alarmChanged);
+            }
         }
 
         pi = notifyUpcomingAlarmIntent(alarm, true);
@@ -124,6 +142,7 @@ public final class AlarmController {
         removeUpcomingAlarmNotification(alarm);
 
         final int hoursToNotifyInAdvance = AlarmPreferences.hoursBeforeUpcoming(mAppContext);
+        // ------------------------------------------------------------------------------------
         // TOneverDO: Place block after making value changes to the alarm.
         if ((hoursToNotifyInAdvance > 0 && showSnackbar
                 // TODO: Consider showing the snackbar for non-upcoming alarms too;
@@ -134,6 +153,7 @@ public final class AlarmController {
                     formatTime(mAppContext, time));
             showSnackbar(msg);
         }
+        // ------------------------------------------------------------------------------------
 
         if (alarm.isSnoozed()) {
             alarm.stopSnoozing();
@@ -195,40 +215,24 @@ public final class AlarmController {
     }
 
     private PendingIntent alarmIntent(Alarm alarm, boolean retrievePrevious) {
-        // TODO: Use appropriate subclass instead
         Intent intent = new Intent(mAppContext, AlarmActivity.class)
                 .putExtra(AlarmActivity.EXTRA_RINGING_OBJECT, alarm);
         int flag = retrievePrevious ? FLAG_NO_CREATE : FLAG_CANCEL_CURRENT;
-        PendingIntent pi = getActivity(mAppContext, alarm.getIntId(), intent, flag);
         // Even when we try to retrieve a previous instance that actually did exist,
-        // null can be returned for some reason.
-/*
-        if (retrievePrevious) {
-            checkNotNull(pi);
-        }
-*/
-        return pi;
+        // null can be returned for some reason. Thus, we don't checkNotNull().
+        return getActivity(mAppContext, alarm.getIntId(), intent, flag);
     }
 
     private PendingIntent notifyUpcomingAlarmIntent(Alarm alarm, boolean retrievePrevious) {
         Intent intent = new Intent(mAppContext, UpcomingAlarmReceiver.class)
                 .putExtra(UpcomingAlarmReceiver.EXTRA_ALARM, alarm);
         if (alarm.isSnoozed()) {
-            // TODO: Will this affect retrieving a previous instance? Say if the previous instance
-            // didn't have this action set initially, but at a later time we made a new instance
-            // with it set.
             intent.setAction(UpcomingAlarmReceiver.ACTION_SHOW_SNOOZING);
         }
         int flag = retrievePrevious ? FLAG_NO_CREATE : FLAG_CANCEL_CURRENT;
-        PendingIntent pi = PendingIntent.getBroadcast(mAppContext, alarm.getIntId(), intent, flag);
         // Even when we try to retrieve a previous instance that actually did exist,
-        // null can be returned for some reason.
-/*
-        if (retrievePrevious) {
-            checkNotNull(pi);
-        }
-*/
-        return pi;
+        // null can be returned for some reason. Thus, we don't checkNotNull().
+        return PendingIntent.getBroadcast(mAppContext, alarm.getIntId(), intent, flag);
     }
 
     private void showSnackbar(final String message) {

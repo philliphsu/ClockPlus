@@ -267,7 +267,7 @@ public class MainActivity extends BaseActivity {
         public Fragment getItem(int position) {
             switch (position) {
                 case PAGE_ALARMS:
-                    return AlarmsFragment.newInstance(1);
+                    return new AlarmsFragment();
                 case PAGE_TIMERS:
                     return new TimersFragment();
                 case PAGE_STOPWATCH:

@@ -140,7 +140,8 @@ public abstract class RecyclerViewFragment<
         }
         // This may have been a requery due to content change. If the change
         // was an insertion, scroll to the last modified alarm.
-        performScrollToStableId();
+        performScrollToStableId(mScrollToStableId);
+        mScrollToStableId = RecyclerView.NO_ID;
     }
 
     @Override
@@ -167,21 +168,19 @@ public abstract class RecyclerViewFragment<
         mList.smoothScrollToPosition(position);
     }
 
-    private void performScrollToStableId() {
-        if (mScrollToStableId != RecyclerView.NO_ID) {
+    protected final void performScrollToStableId(long stableId) {
+        if (stableId != RecyclerView.NO_ID) {
             int position = -1;
             for (int i = 0; i < mAdapter.getItemCount(); i++) {
-                if (mAdapter.getItemId(i) == mScrollToStableId) {
+                if (mAdapter.getItemId(i) == stableId) {
                     position = i;
                     break;
                 }
             }
             if (position >= 0) {
                 scrollToPosition(position);
-                onScrolledToStableId(mScrollToStableId, position);
+                onScrolledToStableId(stableId, position);
             }
         }
-        // Reset
-        mScrollToStableId = RecyclerView.NO_ID;
     }
 }

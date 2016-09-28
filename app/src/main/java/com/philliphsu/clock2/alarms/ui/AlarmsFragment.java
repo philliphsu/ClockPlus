@@ -1,28 +1,22 @@
 package com.philliphsu.clock2.alarms.ui;
 
-import android.app.Activity;
-import android.content.Intent;
-import android.media.RingtoneManager;
-import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.content.Loader;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.philliphsu.clock2.R;
-import com.philliphsu.clock2.list.RecyclerViewFragment;
-import com.philliphsu.clock2.dialogs.TimePickerDialogController;
 import com.philliphsu.clock2.alarms.Alarm;
+import com.philliphsu.clock2.alarms.data.AlarmCursor;
 import com.philliphsu.clock2.alarms.data.AlarmsListCursorLoader;
 import com.philliphsu.clock2.alarms.data.AsyncAlarmsTableUpdateHandler;
 import com.philliphsu.clock2.alarms.misc.AlarmController;
+import com.philliphsu.clock2.dialogs.TimePickerDialogController;
+import com.philliphsu.clock2.list.RecyclerViewFragment;
 import com.philliphsu.clock2.timepickers.BaseTimePickerDialog;
-import com.philliphsu.clock2.alarms.data.AlarmCursor;
 import com.philliphsu.clock2.util.DelayedSnackbarHandler;
 
 import static com.philliphsu.clock2.util.FragmentTagUtils.makeTag;
@@ -30,54 +24,19 @@ import static com.philliphsu.clock2.util.FragmentTagUtils.makeTag;
 public class AlarmsFragment extends RecyclerViewFragment<Alarm, BaseAlarmViewHolder, AlarmCursor,
         AlarmsCursorAdapter> implements BaseTimePickerDialog.OnTimeSetListener {
     private static final String TAG = "AlarmsFragment";
-
     private static final String KEY_EXPANDED_POSITION = "expanded_position";
-
-    // TODO: Delete these constants. We no longer use EditAlarmActivity.
-//    @Deprecated
-//    private static final int REQUEST_EDIT_ALARM = 0;
-//    // Public because MainActivity needs to use it.
-//    // TODO: private because we handle fab clicks in the fragment now
-//    @Deprecated
-//    public static final int REQUEST_CREATE_ALARM = 1;
-
-    // TODO: Delete this. We no longer use the system's ringtone picker.
-    public static final int REQUEST_PICK_RINGTONE = 1;
     public static final String EXTRA_SCROLL_TO_ALARM_ID = "com.philliphsu.clock2.alarms.extra.SCROLL_TO_ALARM_ID";
 
     private AsyncAlarmsTableUpdateHandler mAsyncUpdateHandler;
     private AlarmController mAlarmController;
-    // TODO: Delete this. If I recall correctly, this was just used for delaying item animations.
-    private Handler mHandler = new Handler();
     private View mSnackbarAnchor;
     private TimePickerDialogController mTimePickerDialogController;
 
     private int mExpandedPosition = RecyclerView.NO_POSITION;
 
-    /**
-     * Mandatory empty constructor for the fragment manager to instantiate the
-     * fragment (e.g. upon screen orientation changes).
-     */
-    public AlarmsFragment() {}
-
-    // TODO: Customize parameter initialization
-    @SuppressWarnings("unused")
-    public static AlarmsFragment newInstance(int columnCount) {
-        AlarmsFragment fragment = new AlarmsFragment();
-        Bundle args = new Bundle();
-        // TODO Put any arguments in bundle
-        fragment.setArguments(args);
-        return fragment;
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        if (getArguments() != null) {
-            // TODO Read arguments
-        }
-
         if (savedInstanceState != null) {
             // Restore the value of the last expanded position here.
             // We cannot tell the adapter to expand this item until onLoadFinished()
@@ -144,61 +103,8 @@ public class AlarmsFragment extends RecyclerViewFragment<Alarm, BaseAlarmViewHol
         return R.string.empty_alarms_container;
     }
 
-    // TODO: We're not using EditAlarmActivity anymore, so move this logic somewhere else.
-    // We also don't need to delay the change to get animations working.
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        Log.d(TAG, "onActivityResult()");
-        if (resultCode != Activity.RESULT_OK || data == null)
-            return;
-        if (requestCode == REQUEST_PICK_RINGTONE) {
-            Uri uri = data.getParcelableExtra(RingtoneManager.EXTRA_RINGTONE_PICKED_URI);
-            Log.d(TAG, "Retrieved ringtone URI: " + uri);
-            // TODO: We'll have to create a new Alarm instance with this ringtone value
-            // because we don't have a setter method. Alternatively, write an independent
-            // SQL update statement updating COLUMN_RINGTONE.
-        }
-
-//        final Alarm alarm = data.getParcelableExtra(EditAlarmActivity.EXTRA_MODIFIED_ALARM);
-//        if (alarm == null)
-//            return;
-//
-//        // http://stackoverflow.com/a/27055512/5055032
-//        // "RecyclerView does not run animations in the first layout
-//        // pass after being attached." A workaround is to postpone
-//        // the CRUD operation to the next frame. A delay of 300ms is
-//        // short enough to not be noticeable, and long enough to
-//        // give us the animation *most of the time*.
-//        switch (requestCode) {
-//            case REQUEST_CREATE_ALARM:
-//                mHandler.postDelayed(
-//                        new AsyncAddItemRunnable(mAsyncUpdateHandler, alarm),
-//                        300);
-//                break;
-//            case REQUEST_EDIT_ALARM:
-//                if (data.getBooleanExtra(EditAlarmActivity.EXTRA_IS_DELETING, false)) {
-//                    // TODO: Should we delay this too? It seems animations run
-//                    // some of the time.
-//                    mAsyncUpdateHandler.asyncDelete(alarm);
-//                } else {
-//                    // TODO: Increase the delay, because update animation is
-//                    // more elusive than insert.
-//                    mHandler.postDelayed(
-//                            new AsyncUpdateItemRunnable(mAsyncUpdateHandler, alarm),
-//                            300);
-//                }
-//                break;
-//            default:
-//                Log.i(TAG, "Could not handle request code " + requestCode);
-//                break;
-//        }
-    }
-
     @Override
     public void onListItemClick(Alarm item, int position) {
-//        Intent intent = new Intent(getActivity(), EditAlarmActivity.class);
-//        intent.putExtra(EditAlarmActivity.EXTRA_ALARM_ID, item.id());
-//        startActivityForResult(intent, REQUEST_EDIT_ALARM);
         boolean expanded = getAdapter().expand(position);
         if (!expanded) {
             getAdapter().collapse(position);
@@ -210,7 +116,6 @@ public class AlarmsFragment extends RecyclerViewFragment<Alarm, BaseAlarmViewHol
     // to the AlarmsCursorAdapter and call these on the save and delete button click bindings.
 
     @Override
-    // TODO: Rename to onListItem***Delete*** because the item hasn't been deleted from our db yet
     public void onListItemDeleted(final Alarm item) {
         // The corresponding VH will be automatically removed from view following
         // the requery, so we don't have to do anything to it.
@@ -223,9 +128,6 @@ public class AlarmsFragment extends RecyclerViewFragment<Alarm, BaseAlarmViewHol
         // be in view. While the requery will probably update the values displayed
         // by the VH, the VH remains in its expanded state from before we were
         // called. Tell the adapter reset its expanded position.
-        // TODO: Implement editing in the expanded VH. Then verify that changes
-        // while in that VH are saved and updated after the requery.
-//        getAdapter().collapse(position);
         mAsyncUpdateHandler.asyncUpdate(item.getId(), item);
     }
 
@@ -233,8 +135,6 @@ public class AlarmsFragment extends RecyclerViewFragment<Alarm, BaseAlarmViewHol
 
     @Override
     protected void onScrolledToStableId(long id, int position) {
-        // We were called because of a requery. If it was due to an insertion,
-        // expand the newly added alarm.
         boolean expanded = getAdapter().expand(position);
         if (!expanded) {
             // Otherwise, it was due to an item update. The VH is expanded
@@ -299,66 +199,5 @@ public class AlarmsFragment extends RecyclerViewFragment<Alarm, BaseAlarmViewHol
 
     private static String makeTimePickerDialogTag() {
         return makeTag(AlarmsFragment.class, R.id.fab);
-    }
-
-    /////////////////////////////////////////////////////////////////////////////////////
-    // TODO: We won't need these anymore, since we won't handle the db
-    // update in onActivityResult() anymore.
-
-    @Deprecated
-    private static abstract class BaseAsyncItemChangeRunnable {
-        // TODO: Will holding onto this cause a memory leak?
-        private final AsyncAlarmsTableUpdateHandler mAsyncAlarmsTableUpdateHandler;
-        private final Alarm mAlarm;
-
-        BaseAsyncItemChangeRunnable(AsyncAlarmsTableUpdateHandler asyncAlarmsTableUpdateHandler, Alarm alarm) {
-            mAsyncAlarmsTableUpdateHandler = asyncAlarmsTableUpdateHandler;
-            mAlarm = alarm;
-        }
-
-        void asyncAddAlarm() {
-            mAsyncAlarmsTableUpdateHandler.asyncInsert(mAlarm);
-        }
-
-        void asyncUpdateAlarm() {
-            mAsyncAlarmsTableUpdateHandler.asyncUpdate(mAlarm.getId(), mAlarm);
-        }
-
-        void asyncRemoveAlarm() {
-            mAsyncAlarmsTableUpdateHandler.asyncDelete(mAlarm);
-        }
-    }
-
-    private static class AsyncAddItemRunnable extends BaseAsyncItemChangeRunnable implements Runnable {
-        AsyncAddItemRunnable(AsyncAlarmsTableUpdateHandler asyncAlarmsTableUpdateHandler, Alarm alarm) {
-            super(asyncAlarmsTableUpdateHandler, alarm);
-        }
-
-        @Override
-        public void run() {
-            asyncAddAlarm();
-        }
-    }
-
-    private static class AsyncUpdateItemRunnable extends BaseAsyncItemChangeRunnable implements Runnable {
-        AsyncUpdateItemRunnable(AsyncAlarmsTableUpdateHandler asyncAlarmsTableUpdateHandler, Alarm alarm) {
-            super(asyncAlarmsTableUpdateHandler, alarm);
-        }
-
-        @Override
-        public void run() {
-            asyncUpdateAlarm();
-        }
-    }
-
-    private static class AsyncRemoveItemRunnable extends BaseAsyncItemChangeRunnable implements Runnable {
-        AsyncRemoveItemRunnable(AsyncAlarmsTableUpdateHandler asyncAlarmsTableUpdateHandler, Alarm alarm) {
-            super(asyncAlarmsTableUpdateHandler, alarm);
-        }
-
-        @Override
-        public void run() {
-            asyncRemoveAlarm();
-        }
     }
 }
