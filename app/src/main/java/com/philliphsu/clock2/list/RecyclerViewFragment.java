@@ -1,6 +1,5 @@
 package com.philliphsu.clock2.list;
 
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.Nullable;
@@ -16,7 +15,6 @@ import android.widget.TextView;
 
 import com.philliphsu.clock2.BaseFragment;
 import com.philliphsu.clock2.R;
-import com.philliphsu.clock2.timepickers.Utils;
 import com.philliphsu.clock2.data.BaseItemCursor;
 import com.philliphsu.clock2.data.ObjectWithId;
 
@@ -79,10 +77,10 @@ public abstract class RecyclerViewFragment<
      * @return a resource to a Drawable that will be displayed when the list is empty
      */
     @DrawableRes
-    protected int emptyMessageIcon() {
-        // TODO: If this is the same for all RecyclerViewFragments, then why not just specify
-        // the compound drawable in XML?
-        return R.drawable.ic_empty_list_96dp;
+    protected int emptyIcon() {
+        // The reason this isn't abstract is so we don't require subclasses that
+        // don't have an empty view to implement this.
+        return 0;
     }
 
     /**
@@ -117,9 +115,7 @@ public abstract class RecyclerViewFragment<
         if (hasEmptyView() && mEmptyView != null) {
             // Configure the empty view, even if there currently are items.
             mEmptyView.setText(emptyMessage());
-            int iconColor = Utils.getTextColorFromThemeAttr(getActivity(), R.attr.themedIconTint);
-            Drawable emptyMessageIcon = Utils.getTintedDrawable(getActivity(), emptyMessageIcon(), iconColor);
-            mEmptyView.setCompoundDrawablesRelativeWithIntrinsicBounds(null, emptyMessageIcon, null, null);
+            mEmptyView.setCompoundDrawablesRelativeWithIntrinsicBounds(0, emptyIcon(), 0, 0);
         }
         return view;
     }

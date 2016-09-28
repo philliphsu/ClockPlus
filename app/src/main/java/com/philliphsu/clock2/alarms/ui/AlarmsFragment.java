@@ -125,6 +125,11 @@ public class AlarmsFragment extends RecyclerViewFragment<Alarm, BaseAlarmViewHol
     }
 
     @Override
+    protected int emptyIcon() {
+        return R.drawable.ic_alarm_96dp;
+    }
+
+    @Override
     public void onListItemClick(Alarm item, int position) {
         boolean expanded = getAdapter().expand(position);
         if (!expanded) {

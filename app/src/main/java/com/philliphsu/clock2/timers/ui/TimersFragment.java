@@ -110,6 +110,11 @@ public class TimersFragment extends RecyclerViewFragment<Timer, TimerViewHolder,
     }
 
     @Override
+    protected int emptyIcon() {
+        return R.drawable.ic_timer_96dp;
+    }
+
+    @Override
     public Loader<TimerCursor> onCreateLoader(int id, Bundle args) {
         return new TimersListCursorLoader(getActivity());
     }
