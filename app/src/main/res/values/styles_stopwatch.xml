@@ -6,8 +6,8 @@
         <item name="android:textSize">@dimen/text_size_display_3</item>
     </style>
     <style name="SideButton" parent="SelectableButton">
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_width">@dimen/side_button_size</item>
+        <item name="android:layout_height">@dimen/side_button_size</item>
         <item name="android:visibility">invisible</item>
         <item name="layout_columnWeight">1</item>
         <item name="layout_gravity">center</item>

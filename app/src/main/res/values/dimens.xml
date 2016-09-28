@@ -56,6 +56,7 @@
     <!-- StopwatchFragment -->
     <dimen name="laps_container_margin_top">8dp</dimen>
     <dimen name="chronometer_padding">16dp</dimen>
+    <dimen name="side_button_size">48dp</dimen>
 
     <!-- TimerViewHolder -->
     <dimen name="add_one_minute_text_size">18dp</dimen>
