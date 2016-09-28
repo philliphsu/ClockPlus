@@ -4,12 +4,14 @@ import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.Loader;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.util.SparseArray;
@@ -18,12 +20,16 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.philliphsu.clock2.alarms.ui.AlarmsFragment;
+import com.philliphsu.clock2.data.BaseItemCursor;
 import com.philliphsu.clock2.list.RecyclerViewFragment;
 import com.philliphsu.clock2.settings.SettingsActivity;
 import com.philliphsu.clock2.stopwatch.ui.StopwatchFragment;
 import com.philliphsu.clock2.timers.ui.TimersFragment;
 
 import butterknife.Bind;
+
+import static com.philliphsu.clock2.list.RecyclerViewFragment.ACTION_SCROLL_TO_STABLE_ID;
+import static com.philliphsu.clock2.list.RecyclerViewFragment.EXTRA_SCROLL_TO_STABLE_ID;
 
 public class MainActivity extends BaseActivity {
     private static final String TAG = "MainActivity";
@@ -143,45 +149,58 @@ public class MainActivity extends BaseActivity {
         });
 
         mAddItemDrawable = ContextCompat.getDrawable(this, R.drawable.ic_add_24dp);
-
-        final int initialPage = getIntent().getIntExtra(EXTRA_SHOW_PAGE, -1);
-        if (initialPage >= 0 && initialPage <= mSectionsPagerAdapter.getCount() - 1) {
-            // This is so we don't keep it around when the configuration changes.
-            getIntent().removeExtra(EXTRA_SHOW_PAGE);
-            // Run this only after the ViewPager is finished drawing
-            mViewPager.post(new Runnable() {
-                @Override
-                public void run() {
-                    // TOneverDO: smoothScroll == false, or else the onPageScrolled callback won't
-                    // be called for the intermediate pages that are responsible for translating
-                    // the FAB
-                    mViewPager.setCurrentItem(initialPage, true/*smoothScroll*/);
-                }
-            });
-        }
+        handleActionScrollToStableId(getIntent(), false);
     }
 
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
-        Log.d(TAG, "Got new intent " + intent);
-        // TODO: Make actual action const
-//        if ("RecyclerViewFragment.ACTION_SCROLL_TO_STABLE_ID".equals(intent.getAction())) {
-            // TODO: Get int extra for the page of the exact RVFrag this scrolling should be applied to.
-            // Requires making RVFrag.EXTRA_SCROLL_TARGET_PAGE.
-            final int targetPage = PAGE_ALARMS;
+        handleActionScrollToStableId(intent, true);
+    }
+
+    /**
+     * Handles a PendingIntent, fired from e.g. clicking a notification, that tells us to
+     * set the ViewPager's current item and scroll to a specific RecyclerView item
+     * given by its stable ID.
+     *
+     * @param performScroll Whether to actually scroll to the stable id, if there is one.
+     *                      Pass true if you know {@link
+     *                      RecyclerViewFragment#onLoadFinished(Loader, BaseItemCursor) onLoadFinished()}
+     *                      had previously been called. Otherwise, pass false so that we can
+     *                      {@link RecyclerViewFragment#setScrollToStableId(long) setScrollToStableId(long)}
+     *                      and let {@link
+     *                      RecyclerViewFragment#onLoadFinished(Loader, BaseItemCursor) onLoadFinished()}
+     *                      perform the scroll for us.
+     */
+    private void handleActionScrollToStableId(@NonNull final Intent intent,
+                                              final boolean performScroll) {
+        if (ACTION_SCROLL_TO_STABLE_ID.equals(intent.getAction())) {
+            final int targetPage = intent.getIntExtra(EXTRA_SHOW_PAGE, -1);
             if (targetPage >= 0 && targetPage <= mSectionsPagerAdapter.getCount() - 1) {
-                mViewPager.setCurrentItem(targetPage, true/*smoothScroll*/);
-                // TODO: Make generic extra RVFrag.EXTRA_SCROLL_TO_STABLE_ID
-                final long scrollToStableId = intent.getLongExtra(AlarmsFragment.EXTRA_SCROLL_TO_ALARM_ID, -1);
-                if (scrollToStableId != -1) {
-                    RecyclerViewFragment rvFrag = (RecyclerViewFragment)
-                            mSectionsPagerAdapter.getFragment(targetPage);
-                    Log.d(TAG, "Scrolling to stable id");
-                    rvFrag.performScrollToStableId(scrollToStableId);
-                }
+                // #post() works for any state the app is in, especially robust against
+                // cases when the app was not previously in memory--i.e. this got called
+                // in onCreate().
+                mViewPager.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        mViewPager.setCurrentItem(targetPage, true/*smoothScroll*/);
+                        final long stableId = intent.getLongExtra(EXTRA_SCROLL_TO_STABLE_ID, -1);
+                        if (stableId != -1) {
+                            RecyclerViewFragment rvFrag = (RecyclerViewFragment)
+                                    mSectionsPagerAdapter.getFragment(targetPage);
+                            if (performScroll) {
+                                rvFrag.performScrollToStableId(stableId);
+                            } else {
+                                rvFrag.setScrollToStableId(stableId);
+                            }
+                        }
+                        intent.setAction(null);
+                        intent.removeExtra(EXTRA_SHOW_PAGE);
+                        intent.removeExtra(EXTRA_SCROLL_TO_STABLE_ID);
+                    }
+                });
             }
-//        }
+        }
     }
 
     @Override
