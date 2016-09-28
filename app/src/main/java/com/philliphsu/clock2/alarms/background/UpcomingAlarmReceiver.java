@@ -86,7 +86,6 @@ public class UpcomingAlarmReceiver extends BroadcastReceiver {
                         .setContentTitle(title)
                         .setContentText(text)
                         .setContentIntent(piContent)
-                        .setOngoing(true)
                         .addAction(R.drawable.ic_dismiss_alarm_24dp, context.getString(R.string.dismiss_now), piDismiss)
                         .build();
                 nm.notify(TAG, (int) id, note);
