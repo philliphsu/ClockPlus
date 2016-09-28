@@ -19,4 +19,6 @@
     <color name="alert_dialog_background_color">@color/colorPrimaryFallback</color>
     <color name="alert_dialog_background_color_inverse">@color/colorPrimaryFallbackInverse</color>
     <color name="alert_dialog_background_color_black">#111111</color>
+
+    <color name="empty_recyclerview_text_color">#4dffffff</color> <!--30% white-->
 </resources>

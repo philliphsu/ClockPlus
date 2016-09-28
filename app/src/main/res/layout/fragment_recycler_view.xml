@@ -30,6 +30,7 @@
         android:layout_gravity="center"
         android:gravity="center"
         android:textSize="@dimen/text_size_headline"
+        android:textColor="@color/empty_recyclerview_text_color"
         android:drawablePadding="@dimen/text_compound_drawable_padding"
         android:visibility="gone"/>
 
