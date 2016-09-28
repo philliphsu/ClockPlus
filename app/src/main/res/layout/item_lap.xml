@@ -2,7 +2,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:orientation="horizontal"
               android:layout_width="match_parent"
-              android:layout_height="wrap_content">
+              android:layout_height="wrap_content"
+              android:paddingTop="@dimen/item_margin_between_elements">
 
     <TextView
         android:id="@+id/lap_number"
@@ -10,14 +11,15 @@
         android:layout_height="match_parent"
         android:layout_weight="1"
         android:gravity="center"
-        style="@style/TextAppearance.AppCompat"/>
+        style="@style/TextAppearance.AppCompat.Subhead"/>
 
     <com.philliphsu.clock2.stopwatch.ui.ChronometerWithMillis
         android:id="@+id/elapsed_time"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="1"
-        android:gravity="center"/>
+        android:gravity="center"
+        style="@style/TextAppearance.AppCompat.Subhead"/>
 
     <TextView
         android:id="@+id/total_time"
@@ -25,6 +27,6 @@
         android:layout_height="match_parent"
         android:layout_weight="1"
         android:gravity="center"
-        style="@style/TextAppearance.AppCompat"/>
+        style="@style/TextAppearance.AppCompat.Subhead"/>
 
 </LinearLayout>
