@@ -1,10 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--TODO: Make your own color resources, because these belong to BottomSheetTimePickers.-->
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <!--We can get away with this for all themes because they have the same accent color.-->
-    <!--If they are not the same, then we would have to resort to programmatically creating
-    a ColorStateList to get the themed ?colorAccent attribute. -->
     <item android:state_selected="true"
-          android:color="@color/colorAccent"/>
-    <!--TODO: Make your own resource, because this belongs to BottomSheetTimePickers.-->
+          android:color="@color/icon_color_active_dark"/>
     <item android:color="@color/icon_color_inactive_dark"/>
 </selector>
