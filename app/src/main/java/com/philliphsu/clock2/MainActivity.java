@@ -28,14 +28,14 @@ import butterknife.Bind;
 public class MainActivity extends BaseActivity {
     private static final String TAG = "MainActivity";
 
-    public static final int PAGE_ALARMS = 0;
-    public static final int PAGE_TIMERS = 1;
-    public static final int PAGE_STOPWATCH = 2;
-    public static final int REQUEST_THEME_CHANGE = 5;
-    public static final String EXTRA_SHOW_PAGE = "com.philliphsu.clock2.extra.SHOW_PAGE";
+    public static final int    PAGE_ALARMS          = 0;
+    public static final int    PAGE_TIMERS          = 1;
+    public static final int    PAGE_STOPWATCH       = 2;
+    public static final int    REQUEST_THEME_CHANGE = 5;
+    public static final String EXTRA_SHOW_PAGE      = "com.philliphsu.clock2.extra.SHOW_PAGE";
 
     private SectionsPagerAdapter mSectionsPagerAdapter;
-    private Drawable mAddItemDrawable;
+    private Drawable             mAddItemDrawable;
 
     @Bind(R.id.container)
     ViewPager mViewPager;
@@ -127,7 +127,6 @@ public class MainActivity extends BaseActivity {
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
-        // Using the resources is fine since tab icons will never change once they are set.
         tabLayout.getTabAt(0).setIcon(R.drawable.ic_alarm_24dp);
         tabLayout.getTabAt(1).setIcon(R.drawable.ic_timer_24dp);
         tabLayout.getTabAt(2).setIcon(R.drawable.ic_stopwatch_24dp);
@@ -226,12 +225,8 @@ public class MainActivity extends BaseActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             startActivityForResult(new Intent(this, SettingsActivity.class), REQUEST_THEME_CHANGE);
             return true;
@@ -256,16 +251,12 @@ public class MainActivity extends BaseActivity {
             // hardcoding some small margin value.
             margin = 0;
         }
-        // X-translation is done relative to a view's left position; by adding
-        // an offset of half the FAB's width, we effectively rebase the translation
+        // By adding on half the FAB's width, we effectively rebase the translation
         // relative to the view's center position.
         return mFab.getWidth() / 2f + margin;
     }
 
     private static class SectionsPagerAdapter extends FragmentPagerAdapter {
-        // We can't use an ArrayList because the structure reorganizes as elements are removed,
-        // so page indices won't stay in sync with list indices. SparseArray allows you to have
-        // gaps in your range of indices.
         private final SparseArray<Fragment> mFragments = new SparseArray<>(getCount());
 
         public SectionsPagerAdapter(FragmentManager fm) {
@@ -274,7 +265,6 @@ public class MainActivity extends BaseActivity {
 
         @Override
         public Fragment getItem(int position) {
-            // getItem is called to instantiate the fragment for the given page.
             switch (position) {
                 case PAGE_ALARMS:
                     return AlarmsFragment.newInstance(1);
@@ -302,7 +292,6 @@ public class MainActivity extends BaseActivity {
 
         @Override
         public int getCount() {
-            // Show 3 total pages.
             return 3;
         }
 
