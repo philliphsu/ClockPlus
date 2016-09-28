@@ -79,6 +79,9 @@ public final class AlarmController {
         final PendingIntent alarmIntent = alarmIntent(alarm, false);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             Intent viewAlarm = new Intent(mAppContext, MainActivity.class);
+            // TODO: Use RVFrag.ACTION_......
+            viewAlarm.setAction("viewAlarm");
+            // TODO: Pass int extra for the alarms page to RVFrag.EXTRA_SCROLL_TARGET_PAGE.
             viewAlarm.putExtra(AlarmsFragment.EXTRA_SCROLL_TO_ALARM_ID, alarm.getId());
             PendingIntent showIntent = PendingIntent.getActivity(mAppContext,
                     alarm.getIntId(), viewAlarm, FLAG_CANCEL_CURRENT);

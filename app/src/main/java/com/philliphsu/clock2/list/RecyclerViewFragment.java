@@ -168,7 +168,7 @@ public abstract class RecyclerViewFragment<
         mList.smoothScrollToPosition(position);
     }
 
-    protected final void performScrollToStableId(long stableId) {
+    public final void performScrollToStableId(long stableId) {
         if (stableId != RecyclerView.NO_ID) {
             int position = -1;
             for (int i = 0; i < mAdapter.getItemCount(); i++) {

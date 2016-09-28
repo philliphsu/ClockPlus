@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.content.Loader;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -47,10 +48,10 @@ public class AlarmsFragment extends RecyclerViewFragment<Alarm, BaseAlarmViewHol
                 getFragmentManager(), getActivity(), this);
         mTimePickerDialogController.tryRestoreCallback(makeTimePickerDialogTag());
 
-        long scrollToStableId = getActivity().getIntent().getLongExtra(EXTRA_SCROLL_TO_ALARM_ID, -1);
-        if (scrollToStableId != -1) {
-            setScrollToStableId(scrollToStableId);
-        }
+//        long scrollToStableId = getActivity().getIntent().getLongExtra(EXTRA_SCROLL_TO_ALARM_ID, -1);
+//        if (scrollToStableId != -1) {
+//            setScrollToStableId(scrollToStableId);
+//        }
     }
 
     @Nullable
@@ -64,8 +65,27 @@ public class AlarmsFragment extends RecyclerViewFragment<Alarm, BaseAlarmViewHol
     }
 
     @Override
+    public void onPause() {
+        super.onPause();
+        Log.d(TAG, "onPause()");
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        Log.d(TAG, "onStop()");
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        Log.d(TAG, "onStart()");
+    }
+
+    @Override
     public void onResume() {
         super.onResume();
+        Log.d(TAG, "onResume()");
         // Show the pending Snackbar, if any, that was prepared for us
         // by another app component.
         DelayedSnackbarHandler.makeAndShow(mSnackbarAnchor);
@@ -79,6 +99,7 @@ public class AlarmsFragment extends RecyclerViewFragment<Alarm, BaseAlarmViewHol
     @Override
     public void onLoadFinished(Loader<AlarmCursor> loader, AlarmCursor data) {
         super.onLoadFinished(loader, data);
+        Log.d(TAG, "onLoadFinished()");
         // TODO: If this was a content change due to an update, verify that
         // we scroll to the updated alarm if its sort order changes.
 

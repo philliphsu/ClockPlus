@@ -162,6 +162,29 @@ public class MainActivity extends BaseActivity {
     }
 
     @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        Log.d(TAG, "Got new intent " + intent);
+        // TODO: Make actual action const
+//        if ("RecyclerViewFragment.ACTION_SCROLL_TO_STABLE_ID".equals(intent.getAction())) {
+            // TODO: Get int extra for the page of the exact RVFrag this scrolling should be applied to.
+            // Requires making RVFrag.EXTRA_SCROLL_TARGET_PAGE.
+            final int targetPage = PAGE_ALARMS;
+            if (targetPage >= 0 && targetPage <= mSectionsPagerAdapter.getCount() - 1) {
+                mViewPager.setCurrentItem(targetPage, true/*smoothScroll*/);
+                // TODO: Make generic extra RVFrag.EXTRA_SCROLL_TO_STABLE_ID
+                final long scrollToStableId = intent.getLongExtra(AlarmsFragment.EXTRA_SCROLL_TO_ALARM_ID, -1);
+                if (scrollToStableId != -1) {
+                    RecyclerViewFragment rvFrag = (RecyclerViewFragment)
+                            mSectionsPagerAdapter.getFragment(targetPage);
+                    Log.d(TAG, "Scrolling to stable id");
+                    rvFrag.performScrollToStableId(scrollToStableId);
+                }
+            }
+//        }
+    }
+
+    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode != RESULT_OK)
             return;
