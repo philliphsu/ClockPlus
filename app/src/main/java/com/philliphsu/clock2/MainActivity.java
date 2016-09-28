@@ -31,39 +31,17 @@ public class MainActivity extends BaseActivity {
     public static final int PAGE_ALARMS = 0;
     public static final int PAGE_TIMERS = 1;
     public static final int PAGE_STOPWATCH = 2;
+    public static final int REQUEST_THEME_CHANGE = 5;
     public static final String EXTRA_SHOW_PAGE = "com.philliphsu.clock2.extra.SHOW_PAGE";
 
-    public static final int REQUEST_THEME_CHANGE = 5;
-
-    /**
-     * The {@link android.support.v4.view.PagerAdapter} that will provide
-     * fragments for each of the sections. We use a
-     * {@link FragmentPagerAdapter} derivative, which will keep every
-     * loaded fragment in memory. If this becomes too memory intensive, it
-     * may be best to switch to a
-     * {@link android.support.v4.app.FragmentStatePagerAdapter}.
-     */
     private SectionsPagerAdapter mSectionsPagerAdapter;
     private Drawable mAddItemDrawable;
-
-//    // For delaying fab.show() on SCROLL_STATE_SETTLING
-//    private final Handler mHandler = new Handler();
-//
-//    private boolean mScrollStateDragging;
-//    private int mPageDragging = -1; // TOneverDO: initial value >= 0
-//    private boolean mDraggingPastEndBoundaries;
 
     @Bind(R.id.container)
     ViewPager mViewPager;
 
     @Bind(R.id.fab)
     FloatingActionButton mFab;
-
-//    // https://medium.com/@chrisbanes/appcompat-v23-2-age-of-the-vectors-91cbafa87c88#.141274xy8
-//    // This is needed to load vector drawables from 23.4.0
-//    static {
-//        AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
-//    }
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -86,8 +64,6 @@ public class MainActivity extends BaseActivity {
             }
         });
 
-        // Create the adapter that will return a fragment for each of the three
-        // primary sections of the activity.
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
         mViewPager.setAdapter(mSectionsPagerAdapter);
         mViewPager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
@@ -147,67 +123,7 @@ public class MainActivity extends BaseActivity {
                     ((BaseFragment) f).onPageSelected();
                 }
             }
-//            @Override
-//            public void onPageScrollStateChanged(int state) {
-//                // TODO: This was not sufficient to prevent the user from quickly
-//                // hitting the fab for the previous page.
-//                switch (state) {
-//                    case ViewPager.SCROLL_STATE_DRAGGING:
-//                        if (mDraggingPastEndBoundaries) {
-//                            return;
-//                        }
-//                        mScrollStateDragging = true;
-//                        mPageDragging = mViewPager.getCurrentItem();
-//                        mFab.hide();
-//                        break;
-//                    case ViewPager.SCROLL_STATE_SETTLING:
-//                        if (!mScrollStateDragging) {
-//                            mFab.hide();
-//                        }
-//                        mScrollStateDragging = false;
-//                        // getCurrentItem() has changed to the target page we're settling on.
-//                        // 200ms is the same as show/hide animation duration
-//                        int targetPage = mViewPager.getCurrentItem();
-//                        if (targetPage != 2) { // TODO: Use page constant
-//                            int delay = mPageDragging == targetPage ? 0 : 200;
-//                            mHandler.postDelayed(new Runnable() {
-//                                @Override
-//                                public void run() {
-//                                    mFab.show();
-//                                }
-//                            }, delay);
-//                        }
-//                        mPageDragging = -1;
-//                        break;
-//                    case ViewPager.SCROLL_STATE_IDLE:
-//                        // Nothing
-//                        break;
-//                }
-//            }
         });
-//        mViewPager.setPageTransformer(false, new ViewPager.PageTransformer() {
-//            @Override
-//            public void transformPage(View page, float position) {
-//                Log.d(TAG, "position: " + position);
-//                // position represents a page's offset from the front-and-center position of 0 (the page
-//                // that is in full view). Consider pages A, B, C, D.
-//                // If we are now on page A (position 0), then pages B, C, and D are respectively
-//                // in positions 1, 2, 3.
-//                // If we move to the right to page B (now in position 0), then pages A, C, D are
-//                // respectively in positions -1, 1, 2.
-//                int currentPage = mViewPager.getCurrentItem();
-//                // TODO: Use page constants
-//                // Page 0 can't move one full page position to the right (i.e. there is no page to
-//                // the left of page 0 that can adopt the front-and-center position of 0 while page 0
-//                // moves to adopt position 1)
-//                mDraggingPastEndBoundaries = currentPage == 0 && position >= 0f
-//                        // The last page can't move one full page position to the left (i.e. there
-//                        // is no page to the right of the last page that can adopt the front-and-center
-//                        // position of 0 while the last page moves to adopt position -1)
-//                        || currentPage == mSectionsPagerAdapter.getCount() - 1 && position <= 0f;
-//                Log.d(TAG, "Draggin past end bounds: " + mDraggingPastEndBoundaries);
-//            }
-//        });
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
@@ -346,10 +262,6 @@ public class MainActivity extends BaseActivity {
         return mFab.getWidth() / 2f + margin;
     }
 
-    /**
-     * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
-     * one of the sections/tabs/pages.
-     */
     private static class SectionsPagerAdapter extends FragmentPagerAdapter {
         // We can't use an ArrayList because the structure reorganizes as elements are removed,
         // so page indices won't stay in sync with list indices. SparseArray allows you to have
@@ -393,20 +305,6 @@ public class MainActivity extends BaseActivity {
             // Show 3 total pages.
             return 3;
         }
-
-        // TODO: If you wish to have text labels for your tabs, then implement this method.
-//        @Override
-//        public CharSequence getPageTitle(int position) {
-//            switch (position) {
-//                case 0:
-//                    return "SECTION 1";
-//                case 1:
-//                    return "SECTION 2";
-//                case 2:
-//                    return "SECTION 3";
-//            }
-//            return null;
-//        }
 
         public Fragment getFragment(int position) {
             return mFragments.get(position);
