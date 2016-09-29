@@ -8,12 +8,12 @@ import android.support.annotation.Nullable;
 import android.support.v4.util.SimpleArrayMap;
 import android.util.Log;
 
-import com.philliphsu.clock2.timers.data.AsyncTimersTableUpdateHandler;
-import com.philliphsu.clock2.chronometer.ChronometerNotificationService;
 import com.philliphsu.clock2.MainActivity;
 import com.philliphsu.clock2.R;
+import com.philliphsu.clock2.chronometer.ChronometerNotificationService;
+import com.philliphsu.clock2.timers.data.AsyncTimersTableUpdateHandler;
 import com.philliphsu.clock2.timers.data.TimerCursor;
-import com.philliphsu.clock2.timers.ui.TimersFragment;
+import com.philliphsu.clock2.util.ContentIntentUtils;
 
 /**
  * Handles the notification for an active Timer.
@@ -73,19 +73,8 @@ public class TimerNotificationService extends ChronometerNotificationService {
         // The base class won't call this for us because this is not a foreground service,
         // as we require multiple notifications created as needed. Instead, this is called after
         // we call registerNewNoteBuilder() in handleDefaultAction().
-        Intent intent = new Intent(this, MainActivity.class);
-        // http://stackoverflow.com/a/3128418/5055032
-        // "For some unspecified reason, extras will be delivered only if you've set some action"
-        // This ONLY applies to PendingIntents...
-        // And for another unspecified reason, this dummy action must NOT be the same value
-        // as another PendingIntent's dummy action. For example, StopwatchNotificationService
-        // uses the dummy action "foo"; we previously used "foo" here as well, and firing this
-        // intent scrolled us to MainActivity.PAGE_STOPWATCH...
-        intent.setAction("bar");
-        intent.putExtra(MainActivity.EXTRA_SHOW_PAGE, MainActivity.PAGE_TIMERS);
         // Before we called registerNewNoteBuilder(), we saved a reference to the most recent timer id.
-        intent.putExtra(TimersFragment.EXTRA_SCROLL_TO_TIMER_ID, mMostRecentTimerId);
-        return PendingIntent.getActivity(this, (int) mMostRecentTimerId, intent, 0);
+        return ContentIntentUtils.create(this, MainActivity.PAGE_TIMERS, mMostRecentTimerId);
     }
 
     @Override
