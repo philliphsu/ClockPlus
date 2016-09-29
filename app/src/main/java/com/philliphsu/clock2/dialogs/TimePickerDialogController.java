@@ -1,10 +1,12 @@
 package com.philliphsu.clock2.dialogs;
 
+import android.app.TimePickerDialog;
 import android.content.Context;
 import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentManager;
 import android.text.format.DateFormat;
 import android.util.Log;
+import android.widget.TimePicker;
 
 import com.philliphsu.clock2.R;
 import com.philliphsu.clock2.timepickers.BaseTimePickerDialog;
@@ -19,6 +21,7 @@ public final class TimePickerDialogController extends DialogFragmentController<B
 
     private final BaseTimePickerDialog.OnTimeSetListener mListener;
     private final Context mContext;
+    private final FragmentManager mFragmentManager;
 
     /**
      * @param context Used to read the user's preference for the style of the time picker dialog to show.
@@ -26,19 +29,17 @@ public final class TimePickerDialogController extends DialogFragmentController<B
     public TimePickerDialogController(FragmentManager fragmentManager, Context context,
                                       BaseTimePickerDialog.OnTimeSetListener listener) {
         super(fragmentManager);
+        mFragmentManager = fragmentManager;
         mContext = context;
         mListener = listener;
     }
 
     public void show(int initialHourOfDay, int initialMinute, String tag) {
         BaseTimePickerDialog dialog = null;
-        String numpadStyle = mContext.getString(R.string.number_pad);
-        String gridStyle = mContext.getString(R.string.grid_selector);
-        String prefTimePickerStyle = PreferenceManager.getDefaultSharedPreferences(mContext).getString(
-                // key for the preference value to retrieve
-                mContext.getString(R.string.key_time_picker_style),
-                // default value
-                numpadStyle);
+        final String numpadStyle = mContext.getString(R.string.number_pad);
+        final String gridStyle = mContext.getString(R.string.grid_selector);
+        String prefTimePickerStyle = PreferenceManager.getDefaultSharedPreferences(mContext)
+                .getString(mContext.getString(R.string.key_time_picker_style), numpadStyle);
         if (prefTimePickerStyle.equals(numpadStyle)) {
             dialog = NumpadTimePickerDialog.newInstance(mListener);
         } else if (prefTimePickerStyle.equals(gridStyle)) {
@@ -47,10 +48,16 @@ public final class TimePickerDialogController extends DialogFragmentController<B
                     initialHourOfDay,
                     initialMinute,
                     DateFormat.is24HourFormat(mContext));
+        } else {
+            // Use system default
+//            TimePickerDialog sysDefDialog = new TimePickerDialog(
+//                    mContext, new ForwardingOnTimeSetListener(mListener),
+//                    initialHourOfDay, initialMinute, DateFormat.is24HourFormat(mContext));
+//            sysDefDialog.show();
+            SystemTimePickerDialog timepicker = new SystemTimePickerDialog();
+            timepicker.show(mFragmentManager, "dfsd");
+            return;
         }
-        // We don't have a default case, because we don't need one; prefTimePickerStyle
-        // will ALWAYS match one of numpadStyle or gridStyle. As such, the dialog
-        // will NEVER be null.
         show(dialog, tag);
     }
 
@@ -60,6 +67,25 @@ public final class TimePickerDialogController extends DialogFragmentController<B
         if (picker != null) {
             Log.i(TAG, "Restoring time picker callback: " + mListener);
             picker.setOnTimeSetListener(mListener);
+        }
+    }
+
+    /**
+     * The listener to set on system's default time picker.
+     */
+    private static final class ForwardingOnTimeSetListener implements TimePickerDialog.OnTimeSetListener {
+        private final BaseTimePickerDialog.OnTimeSetListener mListener;
+
+        private ForwardingOnTimeSetListener(BaseTimePickerDialog.OnTimeSetListener listener) {
+            mListener = listener;
+        }
+
+        @Override
+        public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+            Log.d(TAG, "Calling onTimeSet");
+            if (mListener != null) {
+                mListener.onTimeSet(view, hourOfDay, minute);
+            }
         }
     }
 }

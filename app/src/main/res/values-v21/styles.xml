@@ -13,14 +13,17 @@
     <style name="AppTheme" parent="BaseAppTheme.Light">
         <item name="android:navigationBarColor">?android:colorPrimary</item>
         <item name="android:alertDialogTheme">@style/AlertDialogStyle</item>
+        <item name="android:timePickerDialogTheme">@style/TimePickerDialogTheme</item>
     </style>
     <style name="AppTheme.Dark" parent="BaseAppTheme.Dark">
         <item name="android:navigationBarColor">?android:colorPrimary</item>
         <item name="android:alertDialogTheme">@style/AlertDialogStyle.Dark</item>
+        <item name="android:timePickerDialogTheme">@style/TimePickerDialogTheme.Dark</item>
     </style>
     <style name="AppTheme.Black" parent="BaseAppTheme.Black">
         <item name="android:navigationBarColor">?android:colorPrimary</item>
         <item name="android:alertDialogTheme">@style/AlertDialogStyle.Black</item>
+        <item name="android:timePickerDialogTheme">@style/TimePickerDialogTheme.Black</item>
     </style>
 
     <style name="AlertDialogStyle" parent="android:Theme.Material.Dialog.Alert">
@@ -34,6 +37,49 @@
     <style name="AlertDialogStyle.Black">
         <item name="android:colorAccent">@color/colorAccentBlack</item>
         <item name="android:background">@color/alert_dialog_background_color_black</item>
+    </style>
+
+    <style name="TimePickerDialogTheme" parent="android:Theme.Material.Light.Dialog.Alert">
+        <!--
+          ~ Why didn't we just extend from AlertDialogStyle to get these properties?
+          ~ (1) We require a different variant of the .Dialog.Alert theme as a parent.
+          ~     The Light variant gives us white text in the header.
+          ~ (2) We could extend from AlertDialogStyle and then attempt to style the header's
+          ~     time text appearance, but that won't work; as of 9/28/2016,
+          ~     the attribute headerSelectedTextColor cannot be referenced at all.
+          ~     The rest of the header's text style seem to be changeable, using the
+          ~     headerTimeTextAppearance and headerAmPmTextAppearance attributes,
+          ~     but that's a lot of needless work.
+        -->
+        <item name="android:colorAccent">@color/colorAccent</item>
+        <item name="android:background">@color/alert_dialog_background_color</item>
+        <item name="android:timePickerStyle">@style/TimePickerDialogStyle</item>
+    </style>
+    <style name="TimePickerDialogTheme.Dark">
+        <item name="android:colorAccent">@color/colorAccentInverse</item>
+        <item name="android:background">@color/alert_dialog_background_color_inverse</item>
+        <item name="android:timePickerStyle">@style/TimePickerDialogStyle.Dark</item>
+    </style>
+    <style name="TimePickerDialogTheme.Black">
+        <item name="android:colorAccent">@color/colorAccentBlack</item>
+        <item name="android:background">@color/alert_dialog_background_color_black</item>
+        <item name="android:timePickerStyle">@style/TimePickerDialogStyle.Black</item>
+    </style>
+    <style name="TimePickerDialogStyle" parent="@android:style/Widget.Material.TimePicker">
+        <!--https://android.googlesource.com/platform/frameworks/base/+/lollipop-release/core/res/res/values/styles_material.xml-->
+        <item name="android:headerBackground">@color/alert_dialog_background_color</item>
+        <item name="android:numbersBackgroundColor">@color/alert_dialog_background_color</item>
+        <item name="android:numbersTextColor">@color/text_color_primary_dark</item>
+    </style>
+    <style name="TimePickerDialogStyle.Dark">
+        <item name="android:headerBackground">@color/alert_dialog_background_color_inverse</item>
+        <item name="android:numbersBackgroundColor">@color/alert_dialog_background_color_inverse</item>
+        <item name="android:numbersTextColor">@color/text_color_primary_dark</item>
+    </style>
+    <style name="TimePickerDialogStyle.Black">
+        <item name="android:headerBackground">@color/alert_dialog_background_color_black</item>
+        <item name="android:numbersBackgroundColor">@color/alert_dialog_background_color_black</item>
+        <item name="android:numbersTextColor">@color/text_color_primary_dark</item>
     </style>
 
     <style name="SelectableButton">
