@@ -34,11 +34,14 @@
         android:layout_width="match_parent"
         android:layout_height="@dimen/fab_total_height"
         android:layout_gravity="bottom"
-        app:columnCount="2">
+        app:columnCount="3">
 
         <ImageButton
             android:id="@+id/new_lap"
             style="@style/AddLapButton"/>
+
+        <Space app:layout_columnWeight="1"
+            app:layout_gravity="center"/> <!--Necessary to get correct spacing-->
 
         <ImageButton
             android:id="@+id/stop"
