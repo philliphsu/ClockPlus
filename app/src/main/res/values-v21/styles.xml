@@ -39,11 +39,10 @@
         <item name="android:background">@color/alert_dialog_background_color_black</item>
     </style>
 
-    <style name="TimePickerDialogTheme" parent="android:Theme.Material.Light.Dialog.Alert">
+    <style name="TimePickerDialogTheme" parent="android:Theme.Material.Light.Dialog">
         <!--
           ~ Why didn't we just extend from AlertDialogStyle to get these properties?
-          ~ (1) We require a different variant of the .Dialog.Alert theme as a parent.
-          ~     The Light variant gives us white text in the header.
+          ~ (1) We require a different parent theme.
           ~ (2) We could extend from AlertDialogStyle and then attempt to style the header's
           ~     time text appearance, but that won't work; as of 9/28/2016,
           ~     the attribute headerSelectedTextColor cannot be referenced at all.
