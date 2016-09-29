@@ -15,6 +15,7 @@ import com.philliphsu.clock2.R;
 import com.philliphsu.clock2.chronometer.ChronometerDelegate;
 import com.philliphsu.clock2.stopwatch.data.AsyncLapsTableUpdateHandler;
 import com.philliphsu.clock2.stopwatch.ui.StopwatchFragment;
+import com.philliphsu.clock2.util.ContentIntentUtils;
 
 public class StopwatchNotificationService extends ChronometerNotificationService {
     private static final String TAG = "StopwatchNotifService";
@@ -82,13 +83,7 @@ public class StopwatchNotificationService extends ChronometerNotificationService
     @Nullable
     @Override
     protected PendingIntent getContentIntent() {
-        Intent intent = new Intent(this, MainActivity.class);
-        // http://stackoverflow.com/a/3128418/5055032
-        // "For some unspecified reason, extras will be delivered only if you've set some action"
-        // This ONLY applies to PendingIntents...
-        intent.setAction("foo"/*dummy action*/);
-        intent.putExtra(MainActivity.EXTRA_SHOW_PAGE, MainActivity.PAGE_STOPWATCH);
-        return PendingIntent.getActivity(this, 0, intent, 0);
+        return ContentIntentUtils.create(this, MainActivity.PAGE_STOPWATCH, -1);
     }
 
     @Override
