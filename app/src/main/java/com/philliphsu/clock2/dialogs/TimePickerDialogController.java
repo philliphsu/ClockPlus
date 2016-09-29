@@ -1,12 +1,10 @@
 package com.philliphsu.clock2.dialogs;
 
-import android.app.TimePickerDialog;
 import android.content.Context;
 import android.preference.PreferenceManager;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
 import android.text.format.DateFormat;
-import android.util.Log;
-import android.widget.TimePicker;
 
 import com.philliphsu.clock2.R;
 import com.philliphsu.clock2.timepickers.BaseTimePickerDialog;
@@ -49,13 +47,9 @@ public final class TimePickerDialogController extends DialogFragmentController<B
                     initialMinute,
                     DateFormat.is24HourFormat(mContext));
         } else {
-            // Use system default
-//            TimePickerDialog sysDefDialog = new TimePickerDialog(
-//                    mContext, new ForwardingOnTimeSetListener(mListener),
-//                    initialHourOfDay, initialMinute, DateFormat.is24HourFormat(mContext));
-//            sysDefDialog.show();
-            SystemTimePickerDialog timepicker = new SystemTimePickerDialog();
-            timepicker.show(mFragmentManager, "dfsd");
+            SystemTimePickerDialog timepicker = SystemTimePickerDialog.newInstance(
+                    mListener, initialHourOfDay, initialMinute, DateFormat.is24HourFormat(mContext));
+            timepicker.show(mFragmentManager, tag);
             return;
         }
         show(dialog, tag);
@@ -63,29 +57,12 @@ public final class TimePickerDialogController extends DialogFragmentController<B
 
     @Override
     public void tryRestoreCallback(String tag) {
-        BaseTimePickerDialog picker = findDialog(tag);
-        if (picker != null) {
-            Log.i(TAG, "Restoring time picker callback: " + mListener);
-            picker.setOnTimeSetListener(mListener);
-        }
-    }
-
-    /**
-     * The listener to set on system's default time picker.
-     */
-    private static final class ForwardingOnTimeSetListener implements TimePickerDialog.OnTimeSetListener {
-        private final BaseTimePickerDialog.OnTimeSetListener mListener;
-
-        private ForwardingOnTimeSetListener(BaseTimePickerDialog.OnTimeSetListener listener) {
-            mListener = listener;
-        }
-
-        @Override
-        public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-            Log.d(TAG, "Calling onTimeSet");
-            if (mListener != null) {
-                mListener.onTimeSet(view, hourOfDay, minute);
-            }
+        // Can't use #findDialog()!
+        DialogFragment picker = (DialogFragment) mFragmentManager.findFragmentByTag(tag);
+        if (picker instanceof BaseTimePickerDialog) {
+            ((BaseTimePickerDialog) picker).setOnTimeSetListener(mListener);
+        } else if (picker instanceof SystemTimePickerDialog) {
+            ((SystemTimePickerDialog) picker).setOnTimeSetListener(mListener);
         }
     }
 }
