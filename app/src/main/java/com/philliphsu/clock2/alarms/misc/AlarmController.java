@@ -12,12 +12,12 @@ import android.view.View;
 import com.philliphsu.clock2.MainActivity;
 import com.philliphsu.clock2.R;
 import com.philliphsu.clock2.alarms.Alarm;
-import com.philliphsu.clock2.alarms.ui.AlarmsFragment;
-import com.philliphsu.clock2.ringtone.AlarmActivity;
-import com.philliphsu.clock2.ringtone.playback.AlarmRingtoneService;
 import com.philliphsu.clock2.alarms.background.PendingAlarmScheduler;
 import com.philliphsu.clock2.alarms.background.UpcomingAlarmReceiver;
 import com.philliphsu.clock2.alarms.data.AlarmsTableManager;
+import com.philliphsu.clock2.ringtone.AlarmActivity;
+import com.philliphsu.clock2.ringtone.playback.AlarmRingtoneService;
+import com.philliphsu.clock2.util.ContentIntentUtils;
 import com.philliphsu.clock2.util.DelayedSnackbarHandler;
 import com.philliphsu.clock2.util.DurationUtils;
 
@@ -78,12 +78,7 @@ public final class AlarmController {
         final long ringAt = alarm.isSnoozed() ? alarm.snoozingUntil() : alarm.ringsAt();
         final PendingIntent alarmIntent = alarmIntent(alarm, false);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            Intent viewAlarm = new Intent(mAppContext, MainActivity.class)
-                    .setAction(AlarmsFragment.ACTION_SCROLL_TO_STABLE_ID)
-                    .putExtra(MainActivity.EXTRA_SHOW_PAGE, MainActivity.PAGE_ALARMS)
-                    .putExtra(AlarmsFragment.EXTRA_SCROLL_TO_STABLE_ID, alarm.getId());
-            PendingIntent showIntent = PendingIntent.getActivity(mAppContext,
-                    alarm.getIntId(), viewAlarm, FLAG_CANCEL_CURRENT);
+            PendingIntent showIntent = ContentIntentUtils.create(mAppContext, MainActivity.PAGE_ALARMS, alarm.getId());
             AlarmManager.AlarmClockInfo info = new AlarmManager.AlarmClockInfo(ringAt, showIntent);
             am.setAlarmClock(info, alarmIntent);
         } else {
