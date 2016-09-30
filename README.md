@@ -3,9 +3,9 @@ Clock+ is an alternative to the Google Clock app for Android, featuring UI/UX en
 
 <a href='https://play.google.com/store/apps/details?id=com.philliphsu.clock2&utm_source=global_co&utm_medium=prtnr&utm_content=Mar2515&utm_campaign=PartBadge&pcampaignid=MKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1'><img alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png'/></a>
 
-![screenshot_2016-09-29-18-21-00](https://cloud.githubusercontent.com/assets/19766085/19008497/830d2844-8720-11e6-8b8e-ff01ebcc26fe.png)
-![screenshot_2016-09-29-18-03-32](https://cloud.githubusercontent.com/assets/19766085/19008498/8312eeaa-8720-11e6-9dc8-2079eb9c50f7.png)
-![screenshot_2016-09-30-15-01-45](https://cloud.githubusercontent.com/assets/19766085/19008382/cc800614-871f-11e6-8fab-d1be69807e91.png)
+<img src="https://cloud.githubusercontent.com/assets/19766085/19008497/830d2844-8720-11e6-8b8e-ff01ebcc26fe.png" width="180" height="320" />
+<img src="https://cloud.githubusercontent.com/assets/19766085/19008498/8312eeaa-8720-11e6-9dc8-2079eb9c50f7.png" width="180" height="320" />
+<img src="https://cloud.githubusercontent.com/assets/19766085/19008382/cc800614-871f-11e6-8fab-d1be69807e91.png" height="320" />
 
 # License
 Copyright (C) 2016 Phillip Hsu
