@@ -1,3 +1,6 @@
+# Clock+
+Clock+ is an alternative to the Google Clock app for Android, featuring UI/UX enhancements and new time pickers.
+
 # License
 Copyright (C) 2016 Phillip Hsu
 
