@@ -17,7 +17,6 @@
 <resources>
     <!--TODO: DayNight parent-->
     <style name="BaseAppTheme" parent="Theme.AppCompat.NoActionBar">
-        <item name="bottomSheetDialogTheme">@style/BottomSheetDialogTheme</item>
         <!--Don't need to use `@color/icon_color` ColorStateList resource because icons tinted by this
           - attribute will only ever be in the active state.
           - Secondly, using a ColorStateList resource via XML for the tint attribute of an ImageView
@@ -173,18 +172,6 @@
     <style name="AppCompatAlertDialogStyle.Black">
         <item name="colorAccent">@color/colorAccentBlack</item>
         <item name="android:background">@color/alert_dialog_background_color_black</item>
-    </style>
-
-    <style name="BottomSheetDialogTheme" parent="Theme.Design.Light.BottomSheetDialog">
-        <item name="bottomSheetStyle">@style/ModalStyle</item>
-        <!--TODO: See if defining a colorAccent item works.-->
-    </style>
-
-    <style name="ModalStyle" parent="Widget.Design.BottomSheet.Modal">
-        <!-- TODO: See if this can be set programmatically, or else we'd have to force users
-           ~ to declare a bottomSheetDialogTheme in their theme.
-         -->
-        <item name="behavior_peekHeight">@dimen/peek_height_upper_limit</item>
     </style>
 
     <!--Style for SeekBar that spans full width-->
