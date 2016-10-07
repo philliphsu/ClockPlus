@@ -54,7 +54,7 @@
         <item name="colorPrimary">@android:color/black</item>
         <item name="colorPrimaryDark">@android:color/black</item>
         <item name="colorAccent">@color/colorAccentBlack</item>
-        <item name="cardBackgroundColor">@color/card_background_color_inverse</item>
+        <item name="cardBackgroundColor">@color/card_background_color_black</item>
         <item name="alertDialogTheme">@style/AppCompatAlertDialogStyle.Black</item>
         <item name="android:windowBackground">@android:color/black</item>
     </style>

@@ -35,6 +35,7 @@
     android:layout_height="wrap_content"
     app:cardElevation="@dimen/expanded_alarm_elevation"
     app:cardCornerRadius="0dp"
+    app:cardBackgroundColor="?cardBackgroundColor"
     android:foreground="?selectableItemBackground"
     android:clickable="true"
     android:layout_marginTop="@dimen/cardview_margin"

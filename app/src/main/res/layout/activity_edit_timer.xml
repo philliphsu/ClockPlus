@@ -55,54 +55,45 @@
 
         </android.support.v7.widget.Toolbar>
 
-        <EditText
-            android:id="@+id/hour"
-            android:layout_below="@id/toolbar"
-            style="@style/TimerText.EditField"
-            android:layout_marginStart="72dp"/>
-        
-        <TextView
-            android:id="@+id/hour_label"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="h"
-            android:layout_below="@id/toolbar"
-            android:layout_toEndOf="@id/hour"
-            android:layout_alignBaseline="@id/hour"
-            style="@style/TimerText.FieldLabel"/>
+            android:orientation="horizontal"
+            android:layout_centerHorizontal="true"
+            android:layout_below="@id/toolbar">
 
-        <EditText
-            android:id="@+id/minute"
-            android:layout_below="@id/toolbar"
-            android:layout_toEndOf="@id/hour_label"
-            style="@style/TimerText.EditField"/>
+            <EditText
+                android:id="@+id/hour"
+                style="@style/TimerText.EditField"/>
 
-        <TextView
-            android:id="@+id/minute_label"
-            android:text="m"
-            android:layout_below="@id/toolbar"
-            android:layout_toEndOf="@id/minute"
-            android:layout_alignBaseline="@id/minute"
-            style="@style/TimerText.FieldLabel"/>
+            <TextView
+                android:id="@+id/hour_label"
+                android:text="h"
+                style="@style/TimerText.FieldLabel"/>
 
-        <EditText
-            android:id="@+id/second"
-            android:layout_below="@id/toolbar"
-            android:layout_toEndOf="@id/minute_label"
-            style="@style/TimerText.EditField"/>
+            <EditText
+                android:id="@+id/minute"
+                style="@style/TimerText.EditField"/>
 
-        <TextView
-            android:id="@+id/second_label"
-            android:text="s"
-            android:layout_below="@id/toolbar"
-            android:layout_toEndOf="@id/second"
-            android:layout_alignBaseline="@id/minute"
-            style="@style/TimerText.FieldLabel"/>
+            <TextView
+                android:id="@+id/minute_label"
+                android:text="m"
+                style="@style/TimerText.FieldLabel"/>
 
-        <View
-            android:id="@+id/focus_grabber"
-            style="@style/FocusGrabber"
-            android:layout_toEndOf="@id/second_label"/> <!-- Required for right focus search -->
+            <EditText
+                android:id="@+id/second"
+                style="@style/TimerText.EditField"/>
+
+            <TextView
+                android:id="@+id/second_label"
+                android:text="s"
+                style="@style/TimerText.FieldLabel"/>
+
+            <View
+                android:id="@+id/focus_grabber"
+                style="@style/FocusGrabber"/>
+
+        </LinearLayout>
         
     </RelativeLayout>
 
