@@ -25,6 +25,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.philliphsu.bottomsheetpickers.time.BottomSheetTimePickerDialog;
 import com.philliphsu.clock2.R;
 import com.philliphsu.clock2.alarms.Alarm;
 import com.philliphsu.clock2.alarms.data.AlarmCursor;
@@ -33,13 +34,12 @@ import com.philliphsu.clock2.alarms.data.AsyncAlarmsTableUpdateHandler;
 import com.philliphsu.clock2.alarms.misc.AlarmController;
 import com.philliphsu.clock2.dialogs.TimePickerDialogController;
 import com.philliphsu.clock2.list.RecyclerViewFragment;
-import com.philliphsu.clock2.timepickers.BaseTimePickerDialog;
 import com.philliphsu.clock2.util.DelayedSnackbarHandler;
 
 import static com.philliphsu.clock2.util.FragmentTagUtils.makeTag;
 
 public class AlarmsFragment extends RecyclerViewFragment<Alarm, BaseAlarmViewHolder, AlarmCursor,
-        AlarmsCursorAdapter> implements BaseTimePickerDialog.OnTimeSetListener {
+        AlarmsCursorAdapter> implements BottomSheetTimePickerDialog.OnTimeSetListener {
     private static final String TAG = "AlarmsFragment";
     private static final String KEY_EXPANDED_POSITION = "expanded_position";
     public static final String EXTRA_SCROLL_TO_ALARM_ID = "com.philliphsu.clock2.alarms.extra.SCROLL_TO_ALARM_ID";

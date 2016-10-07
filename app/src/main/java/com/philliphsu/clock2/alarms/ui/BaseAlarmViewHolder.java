@@ -32,19 +32,19 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.philliphsu.clock2.R;
 import com.philliphsu.clock2.alarms.Alarm;
 import com.philliphsu.clock2.alarms.misc.AlarmController;
 import com.philliphsu.clock2.alarms.misc.AlarmPreferences;
 import com.philliphsu.clock2.dialogs.AddLabelDialog;
 import com.philliphsu.clock2.dialogs.AddLabelDialogController;
+import com.philliphsu.clock2.dialogs.TimePickerDialogController;
 import com.philliphsu.clock2.list.BaseViewHolder;
 import com.philliphsu.clock2.list.OnListItemInteractionListener;
-import com.philliphsu.clock2.R;
-import com.philliphsu.clock2.dialogs.TimePickerDialogController;
+import com.philliphsu.bottomsheetpickers.time.BottomSheetTimePickerDialog.OnTimeSetListener;
 import com.philliphsu.clock2.timepickers.Utils;
-import com.philliphsu.clock2.timepickers.BaseTimePickerDialog.OnTimeSetListener;
-import com.philliphsu.clock2.util.TimeTextUtils;
 import com.philliphsu.clock2.util.FragmentTagUtils;
+import com.philliphsu.clock2.util.TimeTextUtils;
 
 import java.util.Date;
 
