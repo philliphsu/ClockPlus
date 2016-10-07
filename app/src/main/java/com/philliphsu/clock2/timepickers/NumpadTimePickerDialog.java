@@ -33,6 +33,8 @@ import butterknife.OnClick;
  * Created by Phillip Hsu on 7/12/2016.
  *
  */
+// TODO: Use library's NumberPadTimePickerDialog instead.
+@Deprecated
 public class NumpadTimePickerDialog extends BaseTimePickerDialog
         implements NumpadTimePicker.OnInputChangeListener {
     private static final String TAG = "NumpadTimePickerDialog";
@@ -147,7 +149,7 @@ public class NumpadTimePickerDialog extends BaseTimePickerDialog
 
     @Override
     protected int contentLayout() {
-        return R.layout.dialog_time_picker_numpad;
+        return 0;
     }
 
     @Override
