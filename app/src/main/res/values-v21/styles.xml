@@ -80,21 +80,24 @@
         <item name="android:background">@color/alert_dialog_background_color_black</item>
         <item name="android:timePickerStyle">@style/TimePickerDialogStyle.Black</item>
     </style>
-    <style name="TimePickerDialogStyle" parent="@android:style/Widget.Material.TimePicker">
+    <style name="TimePickerDialogStyle" parent="@android:style/Widget.Material.Light.TimePicker">
         <!--https://android.googlesource.com/platform/frameworks/base/+/lollipop-release/core/res/res/values/styles_material.xml-->
         <item name="android:headerBackground">@color/alert_dialog_background_color</item>
         <item name="android:numbersBackgroundColor">@color/alert_dialog_background_color</item>
         <item name="android:numbersTextColor">@color/text_color_primary_dark</item>
+        <item name="android:numbersInnerTextColor">@color/text_color_primary_dark</item>
     </style>
     <style name="TimePickerDialogStyle.Dark">
         <item name="android:headerBackground">@color/alert_dialog_background_color_inverse</item>
         <item name="android:numbersBackgroundColor">@color/alert_dialog_background_color_inverse</item>
         <item name="android:numbersTextColor">@color/text_color_primary_dark</item>
+        <item name="android:numbersInnerTextColor">@color/text_color_primary_dark</item>
     </style>
     <style name="TimePickerDialogStyle.Black">
         <item name="android:headerBackground">@color/alert_dialog_background_color_black</item>
         <item name="android:numbersBackgroundColor">@color/alert_dialog_background_color_black</item>
         <item name="android:numbersTextColor">@color/text_color_primary_dark</item>
+        <item name="android:numbersInnerTextColor">@color/text_color_primary_dark</item>
     </style>
 
     <style name="SelectableButton">
