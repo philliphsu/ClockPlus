@@ -90,5 +90,5 @@ dependencies {
     compile 'com.android.support:gridlayout-v7:24.2.0'
     compile 'com.android.support:cardview-v7:24.2.0'
     compile 'com.jakewharton:butterknife:7.0.1'
-    compile project(":bottomsheetpickers-release")
+    compile 'com.philliphsu:bottomsheetpickers:2.3.0'
 }
