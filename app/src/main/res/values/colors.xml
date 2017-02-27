@@ -19,7 +19,7 @@
     <color name="colorPrimary">#1C46A0</color>
     <color name="colorPrimaryDark">#143782</color>
     <color name="colorAccent">#FF5252</color>
-    <color name="colorPrimaryFallback">#5C6BC0</color>
+    <color name="colorPrimaryFallback">#235AC8</color>
 
     <color name="colorPrimaryInverse">#212121</color>
     <color name="colorPrimaryDarkInverse">@android:color/black</color>
