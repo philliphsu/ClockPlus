@@ -80,6 +80,7 @@ public final class TimePickerDialogController extends DialogFragmentController<B
                 dialog = new NumberPadTimePickerDialog.Builder(mListener)
                         .setHeaderColor(dialogColor)
                         .setBackgroundColor(dialogColor)
+                        .setThemeDark(true)
                         .build();
             } else {
                 dialog = new GridTimePickerDialog.Builder(
@@ -89,6 +90,7 @@ public final class TimePickerDialogController extends DialogFragmentController<B
                         DateFormat.is24HourFormat(mContext))
                         .setHeaderColor(dialogColor)
                         .setBackgroundColor(dialogColor)
+                        .setThemeDark(true)
                         .build();
             }
         } else {
