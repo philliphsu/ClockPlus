@@ -17,9 +17,12 @@
 package com.philliphsu.clock2.dialogs;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import android.support.annotation.ColorInt;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.content.ContextCompat;
 import android.text.format.DateFormat;
 
 import com.philliphsu.bottomsheetpickers.time.BottomSheetTimePickerDialog;
@@ -52,16 +55,42 @@ public final class TimePickerDialogController extends DialogFragmentController<B
         BottomSheetTimePickerDialog dialog = null;
         final String numpadStyle = mContext.getString(R.string.number_pad);
         final String gridStyle = mContext.getString(R.string.grid_selector);
-        String prefTimePickerStyle = PreferenceManager.getDefaultSharedPreferences(mContext)
-                .getString(mContext.getString(R.string.key_time_picker_style), numpadStyle);
-        if (prefTimePickerStyle.equals(numpadStyle)) {
-            dialog = NumberPadTimePickerDialog.newInstance(mListener);
-        } else if (prefTimePickerStyle.equals(gridStyle)) {
-            dialog = GridTimePickerDialog.newInstance(
-                    mListener,
-                    initialHourOfDay,
-                    initialMinute,
-                    DateFormat.is24HourFormat(mContext));
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(mContext);
+        String prefTimePickerStyle = prefs.getString(mContext.getString(R.string.key_time_picker_style), numpadStyle);
+        boolean isNumpadStyle = prefTimePickerStyle.equals(numpadStyle);
+        boolean isGridStyle = prefTimePickerStyle.equals(gridStyle);
+        if (isNumpadStyle || isGridStyle) {
+            final String themeLight = mContext.getString(R.string.theme_light);
+            final String themeDark = mContext.getString(R.string.theme_dark);
+            final String themeBlack = mContext.getString(R.string.theme_black);
+            String prefTheme = prefs.getString(mContext.getString(R.string.key_theme), themeLight);
+            
+            final int dialogColorRes;
+            if (prefTheme.equals(themeLight)) {
+                dialogColorRes = R.color.alert_dialog_background_color;
+            } else if (prefTheme.equals(themeDark)) {
+                dialogColorRes = R.color.alert_dialog_background_color_inverse;
+            } else if (prefTheme.equals(themeBlack)) {
+                dialogColorRes = R.color.alert_dialog_background_color_black;
+            } else {
+                dialogColorRes = 0;
+            }
+            final @ColorInt int dialogColor = ContextCompat.getColor(mContext, dialogColorRes);
+            if (isNumpadStyle) {
+                dialog = new NumberPadTimePickerDialog.Builder(mListener)
+                        .setHeaderColor(dialogColor)
+                        .setBackgroundColor(dialogColor)
+                        .build();
+            } else {
+                dialog = new GridTimePickerDialog.Builder(
+                        mListener,
+                        initialHourOfDay,
+                        initialMinute,
+                        DateFormat.is24HourFormat(mContext))
+                        .setHeaderColor(dialogColor)
+                        .setBackgroundColor(dialogColor)
+                        .build();
+            }
         } else {
             SystemTimePickerDialog timepicker = SystemTimePickerDialog.newInstance(
                     mListener, initialHourOfDay, initialMinute, DateFormat.is24HourFormat(mContext));
