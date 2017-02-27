@@ -83,6 +83,8 @@ public final class TimePickerDialogController extends DialogFragmentController<B
                         .setThemeDark(true)
                         .build();
             } else {
+                final int selectedColor = ContextCompat.getColor(mContext, R.color.colorAccent);
+                final int unselectedColor = ContextCompat.getColor(mContext, android.R.color.white);
                 dialog = new GridTimePickerDialog.Builder(
                         mListener,
                         initialHourOfDay,
@@ -90,6 +92,11 @@ public final class TimePickerDialogController extends DialogFragmentController<B
                         DateFormat.is24HourFormat(mContext))
                         .setHeaderColor(dialogColor)
                         .setBackgroundColor(dialogColor)
+                        .setHeaderTextColorSelected(selectedColor)
+                        .setHeaderTextColorUnselected(unselectedColor)
+                        .setTimeSeparatorColor(unselectedColor)
+                        .setHalfDayButtonColorSelected(selectedColor)
+                        .setHalfDayButtonColorUnselected(unselectedColor)
                         .setThemeDark(true)
                         .build();
             }
