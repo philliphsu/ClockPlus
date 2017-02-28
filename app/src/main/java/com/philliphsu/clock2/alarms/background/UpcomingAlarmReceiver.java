@@ -29,6 +29,7 @@ import com.philliphsu.clock2.R;
 import com.philliphsu.clock2.alarms.Alarm;
 import com.philliphsu.clock2.alarms.misc.AlarmController;
 import com.philliphsu.clock2.util.ContentIntentUtils;
+import com.philliphsu.clock2.util.ParcelableUtil;
 
 import static android.app.PendingIntent.FLAG_ONE_SHOT;
 import static com.philliphsu.clock2.util.TimeFormatUtils.formatTime;
@@ -45,7 +46,9 @@ public class UpcomingAlarmReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(final Context context, final Intent intent) {
-        final Alarm alarm = intent.getParcelableExtra(EXTRA_ALARM);
+        final byte[] alarmBytes = intent.getByteArrayExtra(EXTRA_ALARM);
+        // Unmarshall the bytes into a parcel and create our Alarm with it.
+        final Alarm alarm = ParcelableUtil.unmarshall(alarmBytes, Alarm.CREATOR);
         if (alarm == null) {
             throw new IllegalStateException("No alarm received");
         }
@@ -84,7 +87,7 @@ public class UpcomingAlarmReceiver extends BroadcastReceiver {
 
                 Intent dismissIntent = new Intent(context, UpcomingAlarmReceiver.class)
                         .setAction(ACTION_DISMISS_NOW)
-                        .putExtra(EXTRA_ALARM, alarm);
+                        .putExtra(EXTRA_ALARM, ParcelableUtil.marshall(alarm));
                 PendingIntent piDismiss = PendingIntent.getBroadcast(context, (int) id, dismissIntent, FLAG_ONE_SHOT);
                 Notification note = new NotificationCompat.Builder(context)
                         .setSmallIcon(R.drawable.ic_alarm_24dp)

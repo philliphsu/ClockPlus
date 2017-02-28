@@ -36,6 +36,7 @@ import com.philliphsu.clock2.ringtone.playback.AlarmRingtoneService;
 import com.philliphsu.clock2.util.ContentIntentUtils;
 import com.philliphsu.clock2.util.DelayedSnackbarHandler;
 import com.philliphsu.clock2.util.DurationUtils;
+import com.philliphsu.clock2.util.ParcelableUtil;
 
 import static android.app.PendingIntent.FLAG_CANCEL_CURRENT;
 import static android.app.PendingIntent.FLAG_NO_CREATE;
@@ -213,7 +214,7 @@ public final class AlarmController {
     public void removeUpcomingAlarmNotification(Alarm a) {
         Intent intent = new Intent(mAppContext, UpcomingAlarmReceiver.class)
                 .setAction(UpcomingAlarmReceiver.ACTION_CANCEL_NOTIFICATION)
-                .putExtra(UpcomingAlarmReceiver.EXTRA_ALARM, a);
+                .putExtra(UpcomingAlarmReceiver.EXTRA_ALARM, ParcelableUtil.marshall(a));
         mAppContext.sendBroadcast(intent);
     }
 
@@ -238,7 +239,7 @@ public final class AlarmController {
 
     private PendingIntent notifyUpcomingAlarmIntent(Alarm alarm, boolean retrievePrevious) {
         Intent intent = new Intent(mAppContext, UpcomingAlarmReceiver.class)
-                .putExtra(UpcomingAlarmReceiver.EXTRA_ALARM, alarm);
+                .putExtra(UpcomingAlarmReceiver.EXTRA_ALARM, ParcelableUtil.marshall(alarm));
         if (alarm.isSnoozed()) {
             intent.setAction(UpcomingAlarmReceiver.ACTION_SHOW_SNOOZING);
         }
