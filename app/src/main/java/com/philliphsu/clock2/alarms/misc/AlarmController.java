@@ -183,7 +183,7 @@ public final class AlarmController {
                 Intent intent = new Intent(mAppContext, PendingAlarmScheduler.class)
                         .putExtra(PendingAlarmScheduler.EXTRA_ALARM_ID, alarm.getId());
                 pi = PendingIntent.getBroadcast(mAppContext, alarm.getIntId(),
-                        intent, PendingIntent.FLAG_ONE_SHOT);
+                        intent, FLAG_CANCEL_CURRENT);
                 am.set(AlarmManager.RTC_WAKEUP, alarm.ringsAt(), pi);
             } else {
                 scheduleAlarm(alarm, false);
