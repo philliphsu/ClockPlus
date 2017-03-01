@@ -230,7 +230,7 @@ public final class AlarmController {
 
     private PendingIntent alarmIntent(Alarm alarm, boolean retrievePrevious) {
         Intent intent = new Intent(mAppContext, AlarmActivity.class)
-                .putExtra(AlarmActivity.EXTRA_RINGING_OBJECT, alarm);
+                .putExtra(AlarmActivity.EXTRA_RINGING_OBJECT, ParcelableUtil.marshall(alarm));
         int flag = retrievePrevious ? FLAG_NO_CREATE : FLAG_CANCEL_CURRENT;
         // Even when we try to retrieve a previous instance that actually did exist,
         // null can be returned for some reason. Thus, we don't checkNotNull().

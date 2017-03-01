@@ -34,6 +34,7 @@ import com.philliphsu.clock2.BaseActivity;
 import com.philliphsu.clock2.R;
 import com.philliphsu.clock2.ringtone.playback.RingtoneService;
 import com.philliphsu.clock2.util.LocalBroadcastHelper;
+import com.philliphsu.clock2.util.ParcelableUtil;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -98,13 +99,25 @@ public abstract class RingtoneActivity<T extends Parcelable> extends BaseActivit
     @OnClick(R.id.btn_right)
     protected abstract void onRightButtonClick();
 
+    /**
+     * @return An implementation of {@link android.os.Parcelable.Creator} that can create
+     *         an instance of the {@link #mRingingObject ringing object}.
+     */
+    // TODO: Make abstract when we override this in all RingtoneActivities.
+    protected Parcelable.Creator<T> getParcelableCreator() {
+        return null;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ButterKnife.bind(this);
 
-        if ((mRingingObject = getIntent().getParcelableExtra(EXTRA_RINGING_OBJECT)) == null)
+        final byte[] bytes = getIntent().getByteArrayExtra(EXTRA_RINGING_OBJECT);
+        if (bytes == null) {
             throw new IllegalStateException("Cannot start RingtoneActivity without a ringing object");
+        }
+        mRingingObject = ParcelableUtil.unmarshall(bytes, getParcelableCreator());
         sIsAlive = true;
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
@@ -122,7 +135,7 @@ public abstract class RingtoneActivity<T extends Parcelable> extends BaseActivit
         mRightButton.setCompoundDrawablesWithIntrinsicBounds(0, getRightButtonDrawable(), 0, 0);
 
         Intent intent = new Intent(this, getRingtoneServiceClass())
-                .putExtra(EXTRA_RINGING_OBJECT, mRingingObject);
+                .putExtra(EXTRA_RINGING_OBJECT, ParcelableUtil.marshall(mRingingObject));
         startService(intent);
     }
 

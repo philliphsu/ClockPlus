@@ -34,6 +34,7 @@ import android.util.Log;
 import com.philliphsu.clock2.R;
 import com.philliphsu.clock2.ringtone.RingtoneActivity;
 import com.philliphsu.clock2.util.LocalBroadcastHelper;
+import com.philliphsu.clock2.util.ParcelableUtil;
 
 import java.util.concurrent.TimeUnit;
 
@@ -104,12 +105,23 @@ public abstract class RingtoneService<T extends Parcelable> extends Service {
      */
     protected abstract int minutesToAutoSilence();
 
+    /**
+     * @return An implementation of {@link android.os.Parcelable.Creator} that can create
+     *         an instance of the {@link #mRingingObject ringing object}.
+     */
+    // TODO: Make abstract when we override this in all RingtoneServices.
+    protected Parcelable.Creator<T> getParcelableCreator() {
+        return null;
+    }
+
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (mRingingObject == null) {
-            if ((mRingingObject = intent.getParcelableExtra(EXTRA_RINGING_OBJECT)) == null) {
+            final byte[] bytes = intent.getByteArrayExtra(EXTRA_RINGING_OBJECT);
+            if (bytes == null) {
                 throw new IllegalStateException("Cannot start RingtoneService without a ringing object");
             }
+            mRingingObject = ParcelableUtil.unmarshall(bytes, getParcelableCreator());
         }
         // Play ringtone, if not already playing
         if (mAudioManager == null && mRingtone == null) {
