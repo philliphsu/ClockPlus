@@ -30,6 +30,7 @@ import com.philliphsu.clock2.chronometer.ChronometerNotificationService;
 import com.philliphsu.clock2.timers.data.AsyncTimersTableUpdateHandler;
 import com.philliphsu.clock2.timers.data.TimerCursor;
 import com.philliphsu.clock2.util.ContentIntentUtils;
+import com.philliphsu.clock2.util.ParcelableUtil;
 
 /**
  * Handles the notification for an active Timer.
@@ -59,7 +60,7 @@ public class TimerNotificationService extends ChronometerNotificationService {
      */
     public static void showNotification(Context context, Timer timer) {
         Intent intent = new Intent(context, TimerNotificationService.class);
-        intent.putExtra(EXTRA_TIMER, timer);
+        intent.putExtra(EXTRA_TIMER, ParcelableUtil.marshall(timer));
         context.startService(intent);
     }
 
@@ -156,7 +157,8 @@ public class TimerNotificationService extends ChronometerNotificationService {
                         Intent intent = new Intent(
                                 /*TimerNotificationService.this,
                                 TimerNotificationService.class*/);
-                        intent.putExtra(EXTRA_TIMER, cursor.getItem());
+                        final Timer timer = cursor.getItem();
+                        intent.putExtra(EXTRA_TIMER, ParcelableUtil.marshall(timer));
                         // TODO: Should we startService() instead?
                         handleDefaultAction(intent, 0, 0);
                     }
@@ -168,10 +170,11 @@ public class TimerNotificationService extends ChronometerNotificationService {
 
     @Override
     protected void handleDefaultAction(Intent intent, int flags, int startId) {
-        final Timer timer = intent.getParcelableExtra(EXTRA_TIMER);
-        if (timer == null) {
+        final byte[] bytes = intent.getByteArrayExtra(EXTRA_TIMER);
+        if (bytes == null) {
             throw new IllegalStateException("Cannot start TimerNotificationService without a Timer");
         }
+        final Timer timer = ParcelableUtil.unmarshall(bytes, Timer.CREATOR);
         final long id = timer.getId();
         boolean updateChronometer = false;
         Timer oldTimer = mTimers.put(id, timer);
