@@ -31,7 +31,6 @@ import com.philliphsu.clock2.alarms.misc.AlarmController;
 import com.philliphsu.clock2.util.ContentIntentUtils;
 import com.philliphsu.clock2.util.ParcelableUtil;
 
-import static android.app.PendingIntent.FLAG_ONE_SHOT;
 import static com.philliphsu.clock2.util.TimeFormatUtils.formatTime;
 
 // TODO: Consider registering this locally instead of in the manifest.
@@ -85,13 +84,16 @@ public class UpcomingAlarmReceiver extends BroadcastReceiver {
             Intent dismissIntent = new Intent(context, UpcomingAlarmReceiver.class)
                     .setAction(ACTION_DISMISS_NOW)
                     .putExtra(EXTRA_ALARM, ParcelableUtil.marshall(alarm));
-            PendingIntent piDismiss = PendingIntent.getBroadcast(context, (int) id, dismissIntent, FLAG_ONE_SHOT);
+            PendingIntent piDismiss = PendingIntent.getBroadcast(context, (int) id,
+                    dismissIntent, PendingIntent.FLAG_CANCEL_CURRENT);
             Notification note = new NotificationCompat.Builder(context)
                     .setSmallIcon(R.drawable.ic_alarm_24dp)
                     .setContentTitle(title)
                     .setContentText(text)
-                    .setContentIntent(ContentIntentUtils.create(context, MainActivity.PAGE_ALARMS, id))
-                    .addAction(R.drawable.ic_dismiss_alarm_24dp, context.getString(R.string.dismiss_now), piDismiss)
+                    .setContentIntent(ContentIntentUtils.create(context,
+                            MainActivity.PAGE_ALARMS, id))
+                    .addAction(R.drawable.ic_dismiss_alarm_24dp,
+                            context.getString(R.string.dismiss_now), piDismiss)
                     .build();
             nm.notify(TAG, (int) id, note);
         } else if (ACTION_CANCEL_NOTIFICATION.equals(intent.getAction())) {
