@@ -19,6 +19,7 @@ package com.philliphsu.clock2.ringtone.playback;
 import android.app.Notification;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Parcelable;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.support.v4.app.NotificationCompat;
@@ -120,5 +121,10 @@ public class TimerRingtoneService extends RingtoneService<Timer> {
         String value = PreferenceManager.getDefaultSharedPreferences(this).getString(
                 getString(R.string.key_timer_silence_after), "15");
         return Integer.parseInt(value);
+    }
+
+    @Override
+    protected Parcelable.Creator<Timer> getParcelableCreator() {
+        return Timer.CREATOR;
     }
 }

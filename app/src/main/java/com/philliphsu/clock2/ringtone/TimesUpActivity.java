@@ -20,6 +20,7 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.os.SystemClock;
 import android.support.v4.app.NotificationCompat;
 import android.view.ViewGroup;
@@ -127,6 +128,11 @@ public class TimesUpActivity extends RingtoneActivity<Timer> {
     protected void showAutoSilenced() {
         super.showAutoSilenced();
         postExpiredTimerNote();
+    }
+
+    @Override
+    protected Parcelable.Creator<Timer> getParcelableCreator() {
+        return Timer.CREATOR;
     }
 
     private void postExpiredTimerNote() {

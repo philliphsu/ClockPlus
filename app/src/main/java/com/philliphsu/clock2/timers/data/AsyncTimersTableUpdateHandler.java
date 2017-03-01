@@ -27,6 +27,7 @@ import com.philliphsu.clock2.timers.Timer;
 import com.philliphsu.clock2.list.ScrollHandler;
 import com.philliphsu.clock2.timers.TimerNotificationService;
 import com.philliphsu.clock2.ringtone.TimesUpActivity;
+import com.philliphsu.clock2.util.ParcelableUtil;
 
 /**
  * Created by Phillip Hsu on 8/2/2016.
@@ -75,8 +76,7 @@ public final class AsyncTimersTableUpdateHandler extends AsyncDatabaseTableUpdat
     // TODO: Consider changing to just a long id param
     private PendingIntent createTimesUpIntent(Timer timer) {
         Intent intent = new Intent(getContext(), TimesUpActivity.class);
-//        intent.putExtra(TimesUpActivity.EXTRA_ITEM_ID, timer.getId());
-        intent.putExtra(TimesUpActivity.EXTRA_RINGING_OBJECT, timer);
+        intent.putExtra(TimesUpActivity.EXTRA_RINGING_OBJECT, ParcelableUtil.marshall(timer));
         // There's no point to determining whether to retrieve a previous instance, because
         // we chose to ignore it since we had issues with NPEs. TODO: Perhaps these issues
         // were caused by you using the same reference variable for every Intent/PI that
