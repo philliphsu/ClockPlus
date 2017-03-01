@@ -94,14 +94,16 @@
             android:excludeFromRecents="true"
             android:label="@string/title_activity_ringtone"
             android:launchMode="singleTask"
-            android:taskAffinity="com.philliphsu.clock2.RingtoneActivity">
+            android:taskAffinity="com.philliphsu.clock2.RingtoneActivity"
+            android:screenOrientation="nosensor">
         </activity>
         <activity
             android:name=".ringtone.AlarmActivity"
             android:excludeFromRecents="true"
             android:label="@string/title_activity_ringtone"
             android:launchMode="singleTask"
-            android:taskAffinity="com.philliphsu.clock2.RingtoneActivity">
+            android:taskAffinity="com.philliphsu.clock2.RingtoneActivity"
+            android:screenOrientation="nosensor">
         </activity>
 
         <service
