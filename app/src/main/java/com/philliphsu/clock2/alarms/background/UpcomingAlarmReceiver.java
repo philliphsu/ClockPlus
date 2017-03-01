@@ -57,11 +57,8 @@ public class UpcomingAlarmReceiver extends BroadcastReceiver {
         final NotificationManager nm = (NotificationManager)
                 context.getSystemService(Context.NOTIFICATION_SERVICE);
 
-        if (ACTION_CANCEL_NOTIFICATION.equals(intent.getAction())) {
-            nm.cancel(TAG, (int) id);
-        } else if (ACTION_DISMISS_NOW.equals(intent.getAction())) {
-            new AlarmController(context, null).cancelAlarm(alarm, false, true);
-        } else {
+        final boolean actionShowSnoozing = ACTION_SHOW_SNOOZING.equals(intent.getAction());
+        if (intent.getAction() == null || actionShowSnoozing) {
             // Prepare notification
             // http://stackoverflow.com/a/15803726/5055032
             // Notifications aren't updated on the UI thread, so we could have
@@ -69,9 +66,10 @@ public class UpcomingAlarmReceiver extends BroadcastReceiver {
             // done here, so doing so is a premature optimization.
             String title;
             String text;
-            if (ACTION_SHOW_SNOOZING.equals(intent.getAction())) {
-                if (!alarm.isSnoozed())
+            if (actionShowSnoozing) {
+                if (!alarm.isSnoozed()) {
                     throw new IllegalStateException("Can't show snoozing notif. if alarm not snoozed!");
+                }
                 title = alarm.label().isEmpty() ? context.getString(R.string.alarm) : alarm.label();
                 text = context.getString(R.string.title_snoozing_until,
                         formatTime(context, alarm.snoozingUntil()));
@@ -96,6 +94,10 @@ public class UpcomingAlarmReceiver extends BroadcastReceiver {
                     .addAction(R.drawable.ic_dismiss_alarm_24dp, context.getString(R.string.dismiss_now), piDismiss)
                     .build();
             nm.notify(TAG, (int) id, note);
+        } else if (ACTION_CANCEL_NOTIFICATION.equals(intent.getAction())) {
+            nm.cancel(TAG, (int) id);
+        } else if (ACTION_DISMISS_NOW.equals(intent.getAction())) {
+            new AlarmController(context, null).cancelAlarm(alarm, false, true);
         }
     }
 }
