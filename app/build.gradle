@@ -44,7 +44,7 @@ android {
             storePassword keystoreProperties['storePassword']
         }
     }
-    implementationSdkVersion 27
+    compileSdkVersion 27
     buildToolsVersion "27.0.3"
     defaultConfig {
         applicationId 'com.philliphsu.clock2'
@@ -90,7 +90,7 @@ dependencies {
     implementation 'com.android.support:gridlayout-v7:27.1.1'
     implementation 'com.android.support:cardview-v7:27.1.1'
     implementation 'com.jakewharton:butterknife:8.8.1'
-    annotationProcessor 'com.jakewharton:butterknife-implementationr:8.8.1'
+    annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
     implementation('com.philliphsu:bottomsheetpickers:2.4.1') {
         exclude group: 'com.android.support', module: 'appcompat-v7'
         exclude group: 'com.android.support', module: 'design'
