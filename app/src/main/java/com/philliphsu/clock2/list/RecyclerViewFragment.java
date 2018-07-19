@@ -37,7 +37,8 @@ import com.philliphsu.clock2.R;
 import com.philliphsu.clock2.data.BaseItemCursor;
 import com.philliphsu.clock2.data.ObjectWithId;
 
-import butterknife.Bind;
+
+import butterknife.BindView;
 
 /**
  * Created by Phillip Hsu on 7/26/2016.
@@ -60,11 +61,11 @@ public abstract class RecyclerViewFragment<
 
     // TODO: Rename id to recyclerView?
     // TODO: Rename variable to mRecyclerView?
-    @Bind(R.id.list)
+    @BindView(R.id.list)
     RecyclerView mList;
 
     @Nullable // Subclasses are not required to use the default content layout, so this may not be present.
-    @Bind(R.id.empty_view)
+    @BindView(R.id.empty_view)
     TextView mEmptyView;
 
     public abstract void onFabClick();

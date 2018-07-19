@@ -51,7 +51,8 @@ import com.philliphsu.clock2.util.TimeTextUtils;
 
 import java.util.Date;
 
-import butterknife.Bind;
+
+import butterknife.BindView;
 import butterknife.OnCheckedChanged;
 import butterknife.OnClick;
 import butterknife.OnTouch;
@@ -76,10 +77,10 @@ public abstract class BaseAlarmViewHolder extends BaseViewHolder<Alarm> {
 
     final FragmentManager mFragmentManager;
 
-    @Bind(R.id.time) TextView mTime;
-    @Bind(R.id.on_off_switch) SwitchCompat mSwitch;
-    @Bind(R.id.label) TextView mLabel;
-    @Bind(R.id.dismiss) Button mDismissButton;
+    @BindView(R.id.time) TextView mTime;
+    @BindView(R.id.on_off_switch) SwitchCompat mSwitch;
+    @BindView(R.id.label) TextView mLabel;
+    @BindView(R.id.dismiss) Button mDismissButton;
 
     public BaseAlarmViewHolder(ViewGroup parent, @LayoutRes int layoutRes,
                                OnListItemInteractionListener<Alarm> listener,

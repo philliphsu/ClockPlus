@@ -43,7 +43,9 @@ import com.philliphsu.clock2.list.OnListItemInteractionListener;
 import com.philliphsu.clock2.timepickers.Utils;
 import com.philliphsu.clock2.util.FragmentTagUtils;
 
-import butterknife.Bind;
+
+import butterknife.BindView;
+import butterknife.BindViews;
 import butterknife.OnClick;
 
 /**
@@ -52,11 +54,11 @@ import butterknife.OnClick;
 public class ExpandedAlarmViewHolder extends BaseAlarmViewHolder {
     private static final String TAG = "ExpandedAlarmViewHolder";
 
-    @Bind(R.id.ok) Button mOk;
-    @Bind(R.id.delete) Button mDelete;
-    @Bind(R.id.ringtone) Button mRingtone;
-    @Bind(R.id.vibrate) TempCheckableImageButton mVibrate;
-    @Bind({R.id.day0, R.id.day1, R.id.day2, R.id.day3, R.id.day4, R.id.day5, R.id.day6})
+    @BindView(R.id.ok) Button mOk;
+    @BindView(R.id.delete) Button mDelete;
+    @BindView(R.id.ringtone) Button mRingtone;
+    @BindView(R.id.vibrate) TempCheckableImageButton mVibrate;
+    @BindViews({R.id.day0, R.id.day1, R.id.day2, R.id.day3, R.id.day4, R.id.day5, R.id.day6})
     ToggleButton[] mDays;
 
     private final ColorStateList mDayToggleColors;
