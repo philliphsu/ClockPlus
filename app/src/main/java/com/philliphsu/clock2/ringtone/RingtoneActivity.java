@@ -39,7 +39,7 @@ import com.philliphsu.clock2.ringtone.playback.RingtoneService;
 import com.philliphsu.clock2.util.LocalBroadcastHelper;
 import com.philliphsu.clock2.util.ParcelableUtil;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
@@ -58,13 +58,13 @@ public abstract class RingtoneActivity<T extends Parcelable> extends BaseActivit
     private static boolean sIsAlive = false;
     private T mRingingObject;
 
-    @Bind(R.id.title) TextView mHeaderTitle;
-    @Bind(R.id.auto_silenced_container) LinearLayout mAutoSilencedContainer;
-    @Bind(R.id.auto_silenced_text) TextView mAutoSilencedText;
-    @Bind(R.id.ok) Button mOkButton;
-    @Bind(R.id.buttons_container) LinearLayout mButtonsContainer;
-    @Bind(R.id.btn_text_left) TextView mLeftButton;
-    @Bind(R.id.btn_text_right) TextView mRightButton;
+    @BindView(R.id.title) TextView mHeaderTitle;
+    @BindView(R.id.auto_silenced_container) LinearLayout mAutoSilencedContainer;
+    @BindView(R.id.auto_silenced_text) TextView mAutoSilencedText;
+    @BindView(R.id.ok) Button mOkButton;
+    @BindView(R.id.buttons_container) LinearLayout mButtonsContainer;
+    @BindView(R.id.btn_text_left) TextView mLeftButton;
+    @BindView(R.id.btn_text_right) TextView mRightButton;
 
     protected abstract Class<? extends RingtoneService> getRingtoneServiceClass();
 

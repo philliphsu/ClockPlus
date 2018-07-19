@@ -27,16 +27,17 @@ import com.philliphsu.clock2.list.BaseViewHolder;
 import com.philliphsu.clock2.R;
 import com.philliphsu.clock2.stopwatch.Lap;
 
-import butterknife.Bind;
+import butterknife.BindView;
+
 
 /**
  * Created by Phillip Hsu on 8/8/2016.
  */
 public class LapViewHolder extends BaseViewHolder<Lap> {
 
-    @Bind(R.id.lap_number) TextView mLapNumber;
-    @Bind(R.id.elapsed_time) ChronometerWithMillis mElapsedTime;
-    @Bind(R.id.total_time) TextView mTotalTime;
+    @BindView(R.id.lap_number) TextView mLapNumber;
+    @BindView(R.id.elapsed_time) ChronometerWithMillis mElapsedTime;
+    @BindView(R.id.total_time) TextView mTotalTime;
 
     public LapViewHolder(ViewGroup parent) {
         super(parent, R.layout.item_lap, null);

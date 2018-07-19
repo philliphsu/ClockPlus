@@ -49,7 +49,8 @@ import com.philliphsu.clock2.util.ProgressBarUtils;
 
 import java.lang.ref.WeakReference;
 
-import butterknife.Bind;
+
+import butterknife.BindView;
 import butterknife.OnClick;
 
 /**
@@ -73,10 +74,10 @@ public class StopwatchFragment extends RecyclerViewFragment<
     private Drawable                            mStartDrawable;
     private Drawable                            mPauseDrawable;
 
-    @Bind(R.id.chronometer) ChronometerWithMillis mChronometer;
-    @Bind(R.id.new_lap)     ImageButton           mNewLapButton;
-    @Bind(R.id.stop)        ImageButton           mStopButton;
-    @Bind(R.id.seek_bar)    SeekBar               mSeekBar;
+    @BindView(R.id.chronometer) ChronometerWithMillis mChronometer;
+    @BindView(R.id.new_lap)     ImageButton           mNewLapButton;
+    @BindView(R.id.stop)        ImageButton           mStopButton;
+    @BindView(R.id.seek_bar)    SeekBar               mSeekBar;
 
     /**
      * This is called only when a new instance of this Fragment is being created,
