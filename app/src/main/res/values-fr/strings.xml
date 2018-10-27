@@ -1,0 +1,66 @@
+<!--
+  ~ Copyright 2017 Phillip Hsu
+  ~
+  ~ This file is part of ClockPlus.
+  ~
+  ~ ClockPlus is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ ClockPlus is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with ClockPlus.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <string name="app_name">Clock+</string>
+
+    <string name="title_activity_ringtone">Clock+</string>
+
+    <!-- ================================= EDIT ALARM ACTIVITY ==================================-->
+    <string name="delete">Supprimer</string>
+    <!-- ======================================================================================= -->
+
+    <!-- ==================================== TOASTS ==================================== -->
+    <string name="day_and_hour">1 jour et 1 heure</string>
+    <string name="hour_and_minute">1 heure et 1 minute</string>
+    <string name="day">1 jour</string>
+    <string name="hour">1 heure</string>
+
+
+    <!-- ======================================================================================= -->
+
+    <!-- ==================================== NOTIFICATIONS ==================================== -->
+    <string name="alarm">Alarme</string>
+    <!-- ======================================================================================= -->
+
+    <!-- ==================================== MAIN ACTIVITY ==================================== -->
+    <!-- ======================================================================================= -->
+
+    <string name="title_activity_settings">Paramètres</string>
+
+    <string name="every_day">Tous les jours</string>
+
+    <string name="zero">0</string>
+    <string name="two">2</string>
+    <string name="four">4</string>
+    <string name="five">5</string>
+
+
+    <!-- TODO: Remove or change this placeholder text -->
+
+
+
+
+
+
+    <!-- The notification title to use when there are laps in a stopwatch timing. An example is "Stopwatch - Lap 2". -->
+
+    <!-- https://android.googlesource.com/platform/frameworks/base/+/master/core/res/res/values/strings.xml -->
+    <!-- The representation of a time duration when negative. An example is -1:14. This can be used with a countdown timer for example.-->
+</resources>

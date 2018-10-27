@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright 2017 Phillip Hsu
+  ~
+  ~ This file is part of ClockPlus.
+  ~
+  ~ ClockPlus is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ ClockPlus is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with ClockPlus.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<resources>
+    <string name="title_category_alarms">Alarmes</string>
+
+    <!-- Time picker style -->
+    <!-- Internally, we refer to this picker as a numpad because it's concise.
+    However, "numeric keypad" is more descriptive when describing the style to users. -->
+
+    <!-- Silence after -->
+    <string name="title_silence_after">Silence après</string>
+    <!-- Snooze duration -->
+    <!-- Durations for silence after & snooze duration -->
+
+    <!-- Alarm volume -->
+    <string name="title_alarm_volume">Volume de l\'alarme</string>
+
+    <!-- Upcoming alarm threshold -->
+    <string name="title_notify_me_of_upcoming_alarms">Me notifier les alarmes imminentes</string>
+
+    <!-- First day of week -->
+    <string name="title_first_day_of_week">Premier jour de la semaine</string>
+    <string name="value_saturday">6</string>
+    <string name="value_sunday">0</string>
+    <string name="value_monday">1</string>
+</resources>
